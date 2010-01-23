@@ -14,7 +14,7 @@ public enum Duration implements DurationSpecification {
             SECONDS)), TWO_SECONDS(new DurationSpecificationImpl(2, SECONDS)), FIVE_SECONDS(new DurationSpecificationImpl(5, SECONDS)), TEN_SECONDS(
             new DurationSpecificationImpl(10, SECONDS)), ONE_MINUTE(new DurationSpecificationImpl(1, MINUTES)), TWO_MINUTES(
             new DurationSpecificationImpl(2, MINUTES)), FIVE_MINUTES(new DurationSpecificationImpl(5, MINUTES)), TEN_MINUTES(
-            new DurationSpecificationImpl(110, MINUTES));
+            new DurationSpecificationImpl(10, MINUTES));
 
     private final DurationSpecification duration;
 
