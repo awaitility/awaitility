@@ -15,16 +15,16 @@
  */
 package com.jayway.concurrenttest.classes;
 
-import com.jayway.concurrenttest.synchronizer.Condition;
+import com.jayway.concurrenttest.synchronizer.Supplier;
 
-public class FakeRepositoryValue implements Condition<Integer> {
+public class FakeRepositoryValue implements Supplier<Integer> {
 	private final FakeRepository repository;
 
 	public FakeRepositoryValue(FakeRepository repository) {
 		this.repository = repository;
 	}
 
-	public Integer condition() {
+	public Integer get() {
 		return repository.getValue();
 	}
 }

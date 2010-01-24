@@ -51,9 +51,9 @@ public class SynchronizerOperationOptions {
         return Duration.FOREVER;
     }
 
-    public static <T> ConditionSpecification until(final Condition<T> condition, final Matcher<T> matcher) {
-		if (condition == null) {
-			throw new IllegalArgumentException("You must specify a condition (was null).");
+    public static <T> ConditionSpecification until(final Supplier<T> supplier, final Matcher<T> matcher) {
+		if (supplier == null) {
+			throw new IllegalArgumentException("You must specify a supplier (was null).");
 		}
 		if (matcher == null) {
 			throw new IllegalArgumentException("You must specify a matcher (was null).");
@@ -61,7 +61,7 @@ public class SynchronizerOperationOptions {
         return new ConditionSpecification() {
 			@Override
 			public boolean isConditionSatisified() throws Exception {
-				return matcher.matches(condition.condition());
+				return matcher.matches(supplier.get());
 			}
         };
     }
