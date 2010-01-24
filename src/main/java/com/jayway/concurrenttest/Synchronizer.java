@@ -17,19 +17,21 @@ package com.jayway.concurrenttest;
 
 import java.util.concurrent.TimeUnit;
 
-
-import com.jayway.concurrenttest.internal.AwaitOperationImpl;
-import com.jayway.concurrenttest.internal.PollSpecificationImpl;
+import com.jayway.concurrenttest.synchronizer.AwaitOperationImpl;
 import com.jayway.concurrenttest.synchronizer.ConditionSpecification;
-import com.jayway.concurrenttest.synchronizer.DurationSpecification;
-import com.jayway.concurrenttest.synchronizer.PollSpecification;
+import com.jayway.concurrenttest.synchronizer.Duration;
 import com.jayway.concurrenttest.synchronizer.SynchronizerOperation;
 import com.jayway.concurrenttest.synchronizer.SynchronizerOperationOptions;
 
 public class Synchronizer extends SynchronizerOperationOptions {
-    private static volatile PollSpecification defaultPollSpecfication = null;
+    private static volatile Duration defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
 
-    private static volatile DurationSpecification defaultTimeout = null;
+    private static volatile Duration defaultTimeout = null;
+    
+    public static void reset() {
+    	defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
+    	defaultTimeout = null;
+    }
 
     public static void block(ConditionSpecification conditionSpecification) throws Exception {
         block(defaultTimeout == null ? forever() : defaultTimeout, conditionSpecification);
@@ -39,22 +41,22 @@ public class Synchronizer extends SynchronizerOperationOptions {
         block(duration(timeout, unit), conditionSpecification);
     }
 
-    public static void block(DurationSpecification duration, ConditionSpecification conditionSpecification) throws Exception {
+    public static void block(Duration duration, ConditionSpecification conditionSpecification) throws Exception {
         block(duration, conditionSpecification, null);
     }
 
-    public static void block(ConditionSpecification conditionSpecification, PollSpecification pollSpecification) throws Exception {
-        block(forever(), conditionSpecification, pollSpecification);
+    public static void block(ConditionSpecification conditionSpecification, Duration pollInterval) throws Exception {
+        block(forever(), conditionSpecification, pollInterval);
     }
 
-    public static void block(long timeout, TimeUnit unit, ConditionSpecification conditionSpecification, PollSpecification pollSpecification)
+    public static void block(long timeout, TimeUnit unit, ConditionSpecification conditionSpecification, Duration pollInterval)
             throws Exception {
-        block(duration(timeout, unit), conditionSpecification, pollSpecification);
+        block(duration(timeout, unit), conditionSpecification, pollInterval);
     }
 
-    public static void block(DurationSpecification duration, ConditionSpecification conditionSpecification, PollSpecification pollSpecification)
+    public static void block(Duration duration, ConditionSpecification conditionSpecification, Duration pollInterval)
             throws Exception {
-        await(duration, conditionSpecification, pollSpecification).join();
+        await(duration, conditionSpecification, pollInterval).join();
     }
 
     public static SynchronizerOperation await(long timeout, TimeUnit unit, ConditionSpecification conditionSpecification) {
@@ -65,43 +67,46 @@ public class Synchronizer extends SynchronizerOperationOptions {
         return await(defaultTimeout == null ? forever() : defaultTimeout, conditionSpecification);
     }
 
-    public static SynchronizerOperation await(DurationSpecification duration, ConditionSpecification conditionSpecification) {
+    public static SynchronizerOperation await(Duration duration, ConditionSpecification conditionSpecification) {
         return await(duration, conditionSpecification, null);
     }
 
     public static SynchronizerOperation await(long timeout, TimeUnit unit, ConditionSpecification conditionSpecification,
-            PollSpecification pollSpecification) {
-        return await(duration(timeout, unit), conditionSpecification, pollSpecification);
+            Duration pollInterval) {
+        return await(duration(timeout, unit), conditionSpecification, pollInterval);
     }
 
-    public static SynchronizerOperation await(ConditionSpecification conditionSpecification, PollSpecification pollSpecification) {
-        return await(forever(), conditionSpecification, pollSpecification);
+    public static SynchronizerOperation await(ConditionSpecification conditionSpecification, Duration pollInterval) {
+        return await(forever(), conditionSpecification, pollInterval);
     }
 
-    public static SynchronizerOperation await(DurationSpecification duration, ConditionSpecification conditionSpecification,
-            PollSpecification pollSpecification) {
-        if (pollSpecification == null && defaultPollSpecfication != null) {
-            pollSpecification = defaultPollSpecfication;
+    public static SynchronizerOperation await(Duration duration, ConditionSpecification conditionSpecification,
+            Duration pollInterval) {
+        if (pollInterval == null) {
+        	pollInterval = defaultPollInterval;
         }
-        if (duration == null && defaultTimeout != null) {
+        if (duration == null) {
             duration = defaultTimeout;
         }
-        return new AwaitOperationImpl(duration, conditionSpecification, pollSpecification);
+        return new AwaitOperationImpl(duration, conditionSpecification, pollInterval);
     }
 
     public static void setDefaultPollInterval(long pollInterval, TimeUnit unit) {
-        defaultPollSpecfication = new PollSpecificationImpl(pollInterval, unit);
+        defaultPollInterval = new Duration(pollInterval, unit);
     }
 
     public static void setDefaultTimeout(long timeout, TimeUnit unit) {
         defaultTimeout = duration(timeout, unit);
     }
 
-    public static void setDefaultPollInterval(PollSpecification pollSpecification) {
-        defaultPollSpecfication = pollSpecification;
+    public static void setDefaultPollInterval(Duration pollInterval) {
+    	if (pollInterval == null) {
+    		throw new IllegalArgumentException("You must specify a poll interval (was null).");
+    	}
+        defaultPollInterval = pollInterval;
     }
 
-    public static void setDefaultTimeout(DurationSpecification defaultTimeout) {
+    public static void setDefaultTimeout(Duration defaultTimeout) {
         Synchronizer.defaultTimeout = defaultTimeout;
     }
 }

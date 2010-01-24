@@ -19,45 +19,51 @@ import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Matcher;
 
-import com.jayway.concurrenttest.internal.ConditionSpecificationImpl;
-import com.jayway.concurrenttest.internal.DurationSpecificationImpl;
-import com.jayway.concurrenttest.internal.ForeverImpl;
-import com.jayway.concurrenttest.internal.PollSpecificationImpl;
-
 public class SynchronizerOperationOptions {
 
-    public static PollSpecification withPollInterval(long time, TimeUnit unit) {
-        return new PollSpecificationImpl(time, unit);
+    public static Duration withPollInterval(long time, TimeUnit unit) {
+        return new Duration(time, unit);
     }
 
-    public static PollSpecification withPollInterval(PollSpecification pollInterval) {
+    public static Duration withPollInterval(Duration pollInterval) {
         if (pollInterval == null) {
             throw new IllegalArgumentException("pollInterval cannot be null");
         }
         return pollInterval;
     }
 
-    public static DurationSpecification duration(long time, TimeUnit unit) {
-        return new DurationSpecificationImpl(time, unit);
+    public static Duration duration(long time, TimeUnit unit) {
+        return new Duration(time, unit);
     }
 
-    public static DurationSpecification atMost(DurationSpecification duration) {
+    public static Duration atMost(Duration duration) {
         if (duration == null) {
             throw new IllegalArgumentException("duration cannot be null");
         }
         return duration;
     }
 
-    public static DurationSpecification atMost(long time, TimeUnit unit) {
-        return new DurationSpecificationImpl(time, unit);
+    public static Duration atMost(long time, TimeUnit unit) {
+        return new Duration(time, unit);
     }
 
-    public static DurationSpecification forever() {
-        return new ForeverImpl();
+    public static Duration forever() {
+        return Duration.FOREVER;
     }
 
-    public static <T> ConditionSpecification until(Condition<T> condition, Matcher<T> matcher) {
-        return new ConditionSpecificationImpl<T>(condition, matcher);
+    public static <T> ConditionSpecification until(final Condition<T> condition, final Matcher<T> matcher) {
+		if (condition == null) {
+			throw new IllegalArgumentException("You must specify a condition (was null).");
+		}
+		if (matcher == null) {
+			throw new IllegalArgumentException("You must specify a matcher (was null).");
+		}
+        return new ConditionSpecification() {
+			@Override
+			public boolean isConditionSatisified() throws Exception {
+				return matcher.matches(condition.condition());
+			}
+        };
     }
 
     public static ConditionSpecification until(ConditionSpecification conditionSpecification) {

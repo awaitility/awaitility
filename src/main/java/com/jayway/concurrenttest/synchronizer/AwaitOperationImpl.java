@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.concurrenttest.internal;
+package com.jayway.concurrenttest.synchronizer;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.CountDownLatch;
@@ -22,27 +22,24 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.jayway.concurrenttest.synchronizer.ConditionSpecification;
-import com.jayway.concurrenttest.synchronizer.DurationSpecification;
-import com.jayway.concurrenttest.synchronizer.PollSpecification;
-import com.jayway.concurrenttest.synchronizer.SynchronizerOperation;
-
 public class AwaitOperationImpl implements SynchronizerOperation, UncaughtExceptionHandler {
-	private final DurationSpecification maxWaitTime;
+	private final Duration maxWaitTime;
 	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 	private final CountDownLatch latch;
 	private Exception exception = null;
 
-	public AwaitOperationImpl(final DurationSpecification maxWaitTime, final ConditionSpecification specification, final PollSpecification pollSpecification) {
+	public AwaitOperationImpl(final Duration maxWaitTime, final ConditionSpecification specification, Duration pollInterval) {
 		if (maxWaitTime == null) {
 			throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
 		}
 		if (specification == null) {
 			throw new IllegalArgumentException("You must specify a condition that to match (was null).");
 		}
+		if (pollInterval == null) {
+			throw new IllegalArgumentException("You must specify a poll interval (was null).");
+		}
 		latch = new CountDownLatch(1);
 		this.maxWaitTime = maxWaitTime;
-		final DurationSpecification pollInterval = pollSpecification == null ? new DurationSpecificationImpl(500, TimeUnit.MILLISECONDS) : pollSpecification.getPollInterval();
 		executor.scheduleAtFixedRate(new Runnable() {
 			public void run() {
 				try {
@@ -62,7 +59,7 @@ public class AwaitOperationImpl implements SynchronizerOperation, UncaughtExcept
 		try {
 			final long timeout = maxWaitTime.getValue();
 			final boolean finishedBeforeTimeout;
-			if (timeout == ForeverImpl.DURATION_FOREVER) {
+			if (maxWaitTime == Duration.FOREVER) {
 				latch.await();
 				finishedBeforeTimeout = true;
 			} else {
