@@ -28,9 +28,17 @@ public class Synchronizer extends SynchronizerOperationOptions {
 
     private static volatile Duration defaultTimeout = Duration.FOREVER;
     
+    private static volatile boolean defaultCatchUncaughtExceptions = false;
+    
+    public static void catchUncaughtExceptions() {
+    	defaultCatchUncaughtExceptions = true;
+    }
+    
     public static void reset() {
     	defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
     	defaultTimeout = Duration.FOREVER;
+    	defaultCatchUncaughtExceptions = false;
+		Thread.setDefaultUncaughtExceptionHandler(null);
     }
 
     public static void block(Condition condition) throws Exception {
@@ -56,7 +64,11 @@ public class Synchronizer extends SynchronizerOperationOptions {
 
     public static void block(Duration duration, Condition condition, Duration pollInterval)
             throws Exception {
-        await(duration, condition, pollInterval).join();
+        SynchronizerOperation operation = await(duration, condition, pollInterval);
+        if (defaultCatchUncaughtExceptions) {
+        	operation.andCatchAllUncaughtExceptions();
+        }
+        operation.join();
     }
 
     public static SynchronizerOperation await(long timeout, TimeUnit unit, Condition condition) {

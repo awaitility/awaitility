@@ -186,6 +186,19 @@ public class SynchronizerTest {
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)
+    public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockAlsoForBlockWhenSetToCatchAllUncaughtExceptions() throws Exception {
+    	Synchronizer.catchUncaughtExceptions();
+        new ExceptionThrowingAsynch().perform();
+        block(until(value(), equalTo(1)));
+    }
+
+    @Test(timeout = 2000, expected = TimeoutException.class)
+    public void catchUncaughtExceptionsIsReset() throws Exception {
+        new ExceptionThrowingAsynch().perform();
+        block(Duration.ONE_SECOND, until(value(), equalTo(1)));
+    }
+
+    @Test(timeout = 2000, expected = IllegalStateException.class)
     public void exceptionsInConditionsArePropagatedToAwaitingThreadAndBreaksForeverBlock() throws Exception {
         final ExceptionThrowingFakeRepository repository = new ExceptionThrowingFakeRepository();
         new Asynch(repository).perform();
