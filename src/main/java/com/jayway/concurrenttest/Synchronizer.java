@@ -18,7 +18,7 @@ package com.jayway.concurrenttest;
 import java.util.concurrent.TimeUnit;
 
 import com.jayway.concurrenttest.synchronizer.AwaitOperationImpl;
-import com.jayway.concurrenttest.synchronizer.ConditionSpecification;
+import com.jayway.concurrenttest.synchronizer.Condition;
 import com.jayway.concurrenttest.synchronizer.Duration;
 import com.jayway.concurrenttest.synchronizer.SynchronizerOperation;
 import com.jayway.concurrenttest.synchronizer.SynchronizerOperationOptions;
@@ -33,54 +33,54 @@ public class Synchronizer extends SynchronizerOperationOptions {
     	defaultTimeout = Duration.FOREVER;
     }
 
-    public static void block(ConditionSpecification conditionSpecification) throws Exception {
-        block(defaultTimeout, conditionSpecification);
+    public static void block(Condition condition) throws Exception {
+        block(defaultTimeout, condition);
     }
 
-    public static void block(long timeout, TimeUnit unit, ConditionSpecification conditionSpecification) throws Exception {
-        block(duration(timeout, unit), conditionSpecification);
+    public static void block(long timeout, TimeUnit unit, Condition condition) throws Exception {
+        block(duration(timeout, unit), condition);
     }
 
-    public static void block(Duration duration, ConditionSpecification conditionSpecification) throws Exception {
-        block(duration, conditionSpecification, null);
+    public static void block(Duration duration, Condition condition) throws Exception {
+        block(duration, condition, null);
     }
 
-    public static void block(ConditionSpecification conditionSpecification, Duration pollInterval) throws Exception {
-        block(defaultTimeout, conditionSpecification, pollInterval);
+    public static void block(Condition condition, Duration pollInterval) throws Exception {
+        block(defaultTimeout, condition, pollInterval);
     }
 
-    public static void block(long timeout, TimeUnit unit, ConditionSpecification conditionSpecification, Duration pollInterval)
+    public static void block(long timeout, TimeUnit unit, Condition condition, Duration pollInterval)
             throws Exception {
-        block(duration(timeout, unit), conditionSpecification, pollInterval);
+        block(duration(timeout, unit), condition, pollInterval);
     }
 
-    public static void block(Duration duration, ConditionSpecification conditionSpecification, Duration pollInterval)
+    public static void block(Duration duration, Condition condition, Duration pollInterval)
             throws Exception {
-        await(duration, conditionSpecification, pollInterval).join();
+        await(duration, condition, pollInterval).join();
     }
 
-    public static SynchronizerOperation await(long timeout, TimeUnit unit, ConditionSpecification conditionSpecification) {
-        return await(duration(timeout, unit), conditionSpecification);
+    public static SynchronizerOperation await(long timeout, TimeUnit unit, Condition condition) {
+        return await(duration(timeout, unit), condition);
     }
 
-    public static SynchronizerOperation await(ConditionSpecification conditionSpecification) {
-        return await(defaultTimeout, conditionSpecification);
+    public static SynchronizerOperation await(Condition condition) {
+        return await(defaultTimeout, condition);
     }
 
-    public static SynchronizerOperation await(Duration duration, ConditionSpecification conditionSpecification) {
-        return await(duration, conditionSpecification, null);
+    public static SynchronizerOperation await(Duration duration, Condition condition) {
+        return await(duration, condition, null);
     }
 
-    public static SynchronizerOperation await(long timeout, TimeUnit unit, ConditionSpecification conditionSpecification,
+    public static SynchronizerOperation await(long timeout, TimeUnit unit, Condition condition,
             Duration pollInterval) {
-        return await(duration(timeout, unit), conditionSpecification, pollInterval);
+        return await(duration(timeout, unit), condition, pollInterval);
     }
 
-    public static SynchronizerOperation await(ConditionSpecification conditionSpecification, Duration pollInterval) {
-        return await(defaultTimeout, conditionSpecification, pollInterval);
+    public static SynchronizerOperation await(Condition condition, Duration pollInterval) {
+        return await(defaultTimeout, condition, pollInterval);
     }
 
-    public static SynchronizerOperation await(Duration duration, ConditionSpecification conditionSpecification,
+    public static SynchronizerOperation await(Duration duration, Condition condition,
             Duration pollInterval) {
         if (pollInterval == null) {
         	pollInterval = defaultPollInterval;
@@ -88,7 +88,7 @@ public class Synchronizer extends SynchronizerOperationOptions {
         if (duration == null) {
             duration = defaultTimeout;
         }
-        return new AwaitOperationImpl(duration, conditionSpecification, pollInterval);
+        return new AwaitOperationImpl(duration, condition, pollInterval);
     }
 
     public static void setDefaultPollInterval(long pollInterval, TimeUnit unit) {

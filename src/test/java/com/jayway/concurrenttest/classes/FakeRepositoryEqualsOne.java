@@ -15,9 +15,9 @@
  */
 package com.jayway.concurrenttest.classes;
 
-import com.jayway.concurrenttest.synchronizer.ConditionSpecification;
+import com.jayway.concurrenttest.synchronizer.Condition;
 
-public class FakeRepositoryEqualsOne implements ConditionSpecification {
+public class FakeRepositoryEqualsOne implements Condition {
 
 	private final FakeRepository repository;
 
@@ -26,7 +26,7 @@ public class FakeRepositoryEqualsOne implements ConditionSpecification {
 		this.repository = repository;
 	}
 
-	public boolean isConditionSatisified() {
+	public boolean evaluate() {
 		return repository.getValue() == 1;
 	}
 }

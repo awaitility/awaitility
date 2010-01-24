@@ -51,22 +51,22 @@ public class SynchronizerOperationOptions {
         return Duration.FOREVER;
     }
 
-    public static <T> ConditionSpecification until(final Supplier<T> supplier, final Matcher<T> matcher) {
+    public static <T> Condition until(final Supplier<T> supplier, final Matcher<T> matcher) {
 		if (supplier == null) {
 			throw new IllegalArgumentException("You must specify a supplier (was null).");
 		}
 		if (matcher == null) {
 			throw new IllegalArgumentException("You must specify a matcher (was null).");
 		}
-        return new ConditionSpecification() {
+        return new Condition() {
 			@Override
-			public boolean isConditionSatisified() throws Exception {
+			public boolean evaluate() throws Exception {
 				return matcher.matches(supplier.get());
 			}
         };
     }
 
-    public static ConditionSpecification until(ConditionSpecification conditionSpecification) {
-        return conditionSpecification;
+    public static Condition until(Condition condition) {
+        return condition;
     }
 }

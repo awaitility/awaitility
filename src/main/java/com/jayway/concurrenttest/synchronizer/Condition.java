@@ -15,6 +15,6 @@
  */
 package com.jayway.concurrenttest.synchronizer;
 
-public interface ConditionSpecification {
-	boolean isConditionSatisified() throws Exception;
+public interface Condition {
+	boolean evaluate() throws Exception;
 }

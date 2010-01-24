@@ -28,7 +28,7 @@ public class AwaitOperationImpl implements SynchronizerOperation, UncaughtExcept
 	private final CountDownLatch latch;
 	private Exception exception = null;
 
-	public AwaitOperationImpl(final Duration maxWaitTime, final ConditionSpecification specification, Duration pollInterval) {
+	public AwaitOperationImpl(final Duration maxWaitTime, final Condition specification, Duration pollInterval) {
 		if (maxWaitTime == null) {
 			throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
 		}
@@ -43,7 +43,7 @@ public class AwaitOperationImpl implements SynchronizerOperation, UncaughtExcept
 		executor.scheduleAtFixedRate(new Runnable() {
 			public void run() {
 				try {
-					if (specification.isConditionSatisified()) {
+					if (specification.evaluate()) {
 						latch.countDown();
 					}
 				} catch (Exception e) {

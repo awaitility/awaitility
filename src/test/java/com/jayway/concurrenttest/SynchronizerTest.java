@@ -40,7 +40,7 @@ import com.jayway.concurrenttest.classes.FakeRepositoryImpl;
 import com.jayway.concurrenttest.classes.FakeRepositoryValue;
 import com.jayway.concurrenttest.synchronizer.BlockingSupportedOperation;
 import com.jayway.concurrenttest.synchronizer.Supplier;
-import com.jayway.concurrenttest.synchronizer.ConditionSpecification;
+import com.jayway.concurrenttest.synchronizer.Condition;
 import com.jayway.concurrenttest.synchronizer.Duration;
 
 public class SynchronizerTest {
@@ -192,7 +192,7 @@ public class SynchronizerTest {
         await(until(new FakeRepositoryValue(repository), equalTo(1))).join();
     }
 
-    private ConditionSpecification fakeRepositoryValueEqualsOne() {
+    private Condition fakeRepositoryValueEqualsOne() {
         return new FakeRepositoryEqualsOne(fakeRepository);
     }
 
