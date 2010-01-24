@@ -131,23 +131,15 @@ public class SynchronizerTest {
     @Test(expected = TimeoutException.class)
     public void awaitOperationSupportsDefaultTimeout() throws Exception {
         Synchronizer.setDefaultTimeout(duration(20, TimeUnit.MILLISECONDS));
-        try {
-            await(until(valueCondition(), greaterThan(0))).join();
-            assertEquals(1, fakeRepository.getValue());
-        } finally {
-            Synchronizer.setDefaultTimeout(null);
-        }
+        await(until(valueCondition(), greaterThan(0))).join();
+        assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(expected = TimeoutException.class)
     public void blockOperationSupportsDefaultTimeout() throws Exception {
         Synchronizer.setDefaultTimeout(duration(20, TimeUnit.MILLISECONDS));
-        try {
-            block(until(valueCondition(), greaterThan(0)));
-            assertEquals(1, fakeRepository.getValue());
-        } finally {
-            Synchronizer.setDefaultTimeout(null);
-        }
+        block(until(valueCondition(), greaterThan(0)));
+        assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)

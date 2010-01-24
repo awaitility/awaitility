@@ -26,15 +26,15 @@ import com.jayway.concurrenttest.synchronizer.SynchronizerOperationOptions;
 public class Synchronizer extends SynchronizerOperationOptions {
     private static volatile Duration defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
 
-    private static volatile Duration defaultTimeout = null;
+    private static volatile Duration defaultTimeout = Duration.FOREVER;
     
     public static void reset() {
     	defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
-    	defaultTimeout = null;
+    	defaultTimeout = Duration.FOREVER;
     }
 
     public static void block(ConditionSpecification conditionSpecification) throws Exception {
-        block(defaultTimeout == null ? forever() : defaultTimeout, conditionSpecification);
+        block(defaultTimeout, conditionSpecification);
     }
 
     public static void block(long timeout, TimeUnit unit, ConditionSpecification conditionSpecification) throws Exception {
@@ -46,7 +46,7 @@ public class Synchronizer extends SynchronizerOperationOptions {
     }
 
     public static void block(ConditionSpecification conditionSpecification, Duration pollInterval) throws Exception {
-        block(forever(), conditionSpecification, pollInterval);
+        block(defaultTimeout, conditionSpecification, pollInterval);
     }
 
     public static void block(long timeout, TimeUnit unit, ConditionSpecification conditionSpecification, Duration pollInterval)
@@ -64,7 +64,7 @@ public class Synchronizer extends SynchronizerOperationOptions {
     }
 
     public static SynchronizerOperation await(ConditionSpecification conditionSpecification) {
-        return await(defaultTimeout == null ? forever() : defaultTimeout, conditionSpecification);
+        return await(defaultTimeout, conditionSpecification);
     }
 
     public static SynchronizerOperation await(Duration duration, ConditionSpecification conditionSpecification) {
@@ -77,7 +77,7 @@ public class Synchronizer extends SynchronizerOperationOptions {
     }
 
     public static SynchronizerOperation await(ConditionSpecification conditionSpecification, Duration pollInterval) {
-        return await(forever(), conditionSpecification, pollInterval);
+        return await(defaultTimeout, conditionSpecification, pollInterval);
     }
 
     public static SynchronizerOperation await(Duration duration, ConditionSpecification conditionSpecification,
@@ -107,6 +107,9 @@ public class Synchronizer extends SynchronizerOperationOptions {
     }
 
     public static void setDefaultTimeout(Duration defaultTimeout) {
+		if (defaultTimeout == null) {
+			throw new IllegalArgumentException("You must specify a default timeout (was null).");
+		}
         Synchronizer.defaultTimeout = defaultTimeout;
     }
 }
