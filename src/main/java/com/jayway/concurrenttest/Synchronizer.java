@@ -41,58 +41,58 @@ public class Synchronizer extends SynchronizerOperationOptions {
 		Thread.setDefaultUncaughtExceptionHandler(null);
     }
 
-    public static void block(Condition condition) throws Exception {
-        block(defaultTimeout, condition);
+    public static void await(Condition condition) throws Exception {
+        await(defaultTimeout, condition);
     }
 
-    public static void block(long timeout, TimeUnit unit, Condition condition) throws Exception {
-        block(duration(timeout, unit), condition);
+    public static void await(long timeout, TimeUnit unit, Condition condition) throws Exception {
+        await(duration(timeout, unit), condition);
     }
 
-    public static void block(Duration duration, Condition condition) throws Exception {
-        block(duration, condition, null);
+    public static void await(Duration duration, Condition condition) throws Exception {
+        await(duration, condition, null);
     }
 
-    public static void block(Condition condition, Duration pollInterval) throws Exception {
-        block(defaultTimeout, condition, pollInterval);
+    public static void await(Condition condition, Duration pollInterval) throws Exception {
+        await(defaultTimeout, condition, pollInterval);
     }
 
-    public static void block(long timeout, TimeUnit unit, Condition condition, Duration pollInterval)
+    public static void await(long timeout, TimeUnit unit, Condition condition, Duration pollInterval)
             throws Exception {
-        block(duration(timeout, unit), condition, pollInterval);
+        await(duration(timeout, unit), condition, pollInterval);
     }
 
-    public static void block(Duration duration, Condition condition, Duration pollInterval)
+    public static void await(Duration duration, Condition condition, Duration pollInterval)
             throws Exception {
-        SynchronizerOperation operation = await(duration, condition, pollInterval);
+        SynchronizerOperation operation = defineCondition(duration, condition, pollInterval);
         if (defaultCatchUncaughtExceptions) {
         	operation.andCatchAllUncaughtExceptions();
         }
         operation.join();
     }
 
-    public static SynchronizerOperation await(long timeout, TimeUnit unit, Condition condition) {
-        return await(duration(timeout, unit), condition);
+    public static SynchronizerOperation defineCondition(long timeout, TimeUnit unit, Condition condition) {
+        return defineCondition(duration(timeout, unit), condition);
     }
 
-    public static SynchronizerOperation await(Condition condition) {
-        return await(defaultTimeout, condition);
+    public static SynchronizerOperation defineCondition(Condition condition) {
+        return defineCondition(defaultTimeout, condition);
     }
 
-    public static SynchronizerOperation await(Duration duration, Condition condition) {
-        return await(duration, condition, null);
+    public static SynchronizerOperation defineCondition(Duration duration, Condition condition) {
+        return defineCondition(duration, condition, null);
     }
 
-    public static SynchronizerOperation await(long timeout, TimeUnit unit, Condition condition,
+    public static SynchronizerOperation defineCondition(long timeout, TimeUnit unit, Condition condition,
             Duration pollInterval) {
-        return await(duration(timeout, unit), condition, pollInterval);
+        return defineCondition(duration(timeout, unit), condition, pollInterval);
     }
 
-    public static SynchronizerOperation await(Condition condition, Duration pollInterval) {
-        return await(defaultTimeout, condition, pollInterval);
+    public static SynchronizerOperation defineCondition(Condition condition, Duration pollInterval) {
+        return defineCondition(defaultTimeout, condition, pollInterval);
     }
 
-    public static SynchronizerOperation await(Duration duration, Condition condition,
+    public static SynchronizerOperation defineCondition(Duration duration, Condition condition,
             Duration pollInterval) {
         if (pollInterval == null) {
         	pollInterval = defaultPollInterval;

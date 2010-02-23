@@ -52,17 +52,17 @@ public class SynchronizerOperationOptions {
     }
 
     public static <T> Condition until(final Supplier<T> supplier, final Matcher<T> matcher) {
-		if (supplier == null) {
-			throw new IllegalArgumentException("You must specify a supplier (was null).");
-		}
-		if (matcher == null) {
-			throw new IllegalArgumentException("You must specify a matcher (was null).");
-		}
+        if (supplier == null) {
+            throw new IllegalArgumentException("You must specify a supplier (was null).");
+        }
+        if (matcher == null) {
+            throw new IllegalArgumentException("You must specify a matcher (was null).");
+        }
         return new Condition() {
-			@Override
-			public boolean evaluate() throws Exception {
-				return matcher.matches(supplier.get());
-			}
+            @Override
+            public boolean evaluate() throws Exception {
+                return matcher.matches(supplier.get());
+            }
         };
     }
 

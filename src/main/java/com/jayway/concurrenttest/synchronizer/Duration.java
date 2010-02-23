@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Duration {
 	public static final Duration FOREVER = new Duration();
-
 	public static final Duration ONE_HUNDRED_MILLISECONDS = new Duration(100, MILLISECONDS);
 	public static final Duration TWO_HUNDRED_MILLISECONDS = new Duration(200, MILLISECONDS);
 	public static final Duration FIVE_HUNDRED_MILLISECONDS = new Duration(500, MILLISECONDS);

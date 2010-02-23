@@ -15,8 +15,8 @@
  */
 package com.jayway.concurrenttest;
 
+import static com.jayway.concurrenttest.Synchronizer.defineCondition;
 import static com.jayway.concurrenttest.Synchronizer.await;
-import static com.jayway.concurrenttest.Synchronizer.block;
 import static com.jayway.concurrenttest.synchronizer.SynchronizerOperationOptions.atMost;
 import static com.jayway.concurrenttest.synchronizer.SynchronizerOperationOptions.duration;
 import static com.jayway.concurrenttest.synchronizer.SynchronizerOperationOptions.until;
@@ -56,103 +56,103 @@ public class SynchronizerTest {
     @Test(timeout = 2000)
     public void foreverConditionSpecificationWithDirectBlock() throws Exception {
         new Asynch(fakeRepository).perform();
-        await(fakeRepositoryValueEqualsOne()).join();
+        defineCondition(fakeRepositoryValueEqualsOne()).join();
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
     public void blockOperationBlocksAutomatically() throws Exception {
         new Asynch(fakeRepository).perform();
-        block(until(fakeRepositoryValueEqualsOne()));
+        await(until(fakeRepositoryValueEqualsOne()));
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
     public void blockOperationSupportsSpecifyingPollSpecification() throws Exception {
         new Asynch(fakeRepository).perform();
-        block(until(fakeRepositoryValueEqualsOne()), withPollInterval(20, TimeUnit.MILLISECONDS));
+        await(until(fakeRepositoryValueEqualsOne()), withPollInterval(20, TimeUnit.MILLISECONDS));
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
     public void blockOperationSupportsSpecifyingPollIntervalDirectly() throws Exception {
         new Asynch(fakeRepository).perform();
-        block(until(fakeRepositoryValueEqualsOne()), Duration.TWO_HUNDRED_MILLISECONDS);
+        await(until(fakeRepositoryValueEqualsOne()), Duration.TWO_HUNDRED_MILLISECONDS);
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
     public void awaitOperationSupportsSpecifyingPollIntervalDirectly() throws Exception {
         new Asynch(fakeRepository).perform();
-        await(until(fakeRepositoryValueEqualsOne()), Duration.TWO_HUNDRED_MILLISECONDS).join();
+        defineCondition(until(fakeRepositoryValueEqualsOne()), Duration.TWO_HUNDRED_MILLISECONDS).join();
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
     public void awaitOperationSupportsSpecifyingPollIntervalAndDurationDirectly() throws Exception {
         new Asynch(fakeRepository).perform();
-        await(Duration.ONE_SECOND, until(fakeRepositoryValueEqualsOne()), Duration.TWO_HUNDRED_MILLISECONDS).join();
-        assertEquals(1, fakeRepository.getValue());
-    }
-
-    @Test(expected = TimeoutException.class)
-    public void blockOperationSupportsSpecifyingDurationDirectly() throws Exception {
-        block(Duration.ONE_HUNDRED_MILLISECONDS, until(fakeRepositoryValueEqualsOne()));
+        defineCondition(Duration.ONE_SECOND, until(fakeRepositoryValueEqualsOne()), Duration.TWO_HUNDRED_MILLISECONDS).join();
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(expected = TimeoutException.class)
     public void awaitOperationSupportsSpecifyingDurationDirectly() throws Exception {
-        await(Duration.ONE_HUNDRED_MILLISECONDS, until(fakeRepositoryValueEqualsOne()), Duration.ONE_HUNDRED_MILLISECONDS).join();
+        await(Duration.ONE_HUNDRED_MILLISECONDS, until(fakeRepositoryValueEqualsOne()));
         assertEquals(1, fakeRepository.getValue());
     }
 
-    @Test(timeout = 2000)
-    public void blockOperationSupportsSpecifyingPollInterval() throws Exception {
-        new Asynch(fakeRepository).perform();
-        block(until(fakeRepositoryValueEqualsOne()), withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS));
-        assertEquals(1, fakeRepository.getValue());
-    }
-
-    @Test(timeout = 2000)
-    public void awaitOperationSupportsSpecifyingPollSpecification() throws Exception {
-        new Asynch(fakeRepository).perform();
-        await(until(value(), greaterThan(0)), withPollInterval(20, TimeUnit.MILLISECONDS)).join();
+    @Test(expected = TimeoutException.class)
+    public void defineConditionSupportsSpecifyingDurationDirectly() throws Exception {
+        defineCondition(Duration.ONE_HUNDRED_MILLISECONDS, until(fakeRepositoryValueEqualsOne()), Duration.ONE_HUNDRED_MILLISECONDS).join();
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
     public void awaitOperationSupportsSpecifyingPollInterval() throws Exception {
         new Asynch(fakeRepository).perform();
-        await(until(value(), greaterThan(0)), withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS)).join();
+        await(until(fakeRepositoryValueEqualsOne()), withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS));
+        assertEquals(1, fakeRepository.getValue());
+    }
+
+    @Test(timeout = 2000)
+    public void defineConditionSupportsSpecifyingPollSpecification() throws Exception {
+        new Asynch(fakeRepository).perform();
+        defineCondition(until(value(), greaterThan(0)), withPollInterval(20, TimeUnit.MILLISECONDS)).join();
+        assertEquals(1, fakeRepository.getValue());
+    }
+
+    @Test(timeout = 2000)
+    public void defineConditionSupportsSpecifyingPollInterval() throws Exception {
+        new Asynch(fakeRepository).perform();
+        defineCondition(until(value(), greaterThan(0)), withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS)).join();
+        assertEquals(1, fakeRepository.getValue());
+    }
+
+    @Test(expected = TimeoutException.class)
+    public void defineConditionSupportsDefaultTimeout() throws Exception {
+        Synchronizer.setDefaultTimeout(duration(20, TimeUnit.MILLISECONDS));
+        defineCondition(until(value(), greaterThan(0))).join();
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(expected = TimeoutException.class)
     public void awaitOperationSupportsDefaultTimeout() throws Exception {
         Synchronizer.setDefaultTimeout(duration(20, TimeUnit.MILLISECONDS));
-        await(until(value(), greaterThan(0))).join();
-        assertEquals(1, fakeRepository.getValue());
-    }
-
-    @Test(expected = TimeoutException.class)
-    public void blockOperationSupportsDefaultTimeout() throws Exception {
-        Synchronizer.setDefaultTimeout(duration(20, TimeUnit.MILLISECONDS));
-        block(until(value(), greaterThan(0)));
+        await(until(value(), greaterThan(0)));
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
     public void foreverConditionSpecificationUsingUntilWithDirectBlock() throws Exception {
         new Asynch(fakeRepository).perform();
-        await(until(fakeRepositoryValueEqualsOne())).join();
+        defineCondition(until(fakeRepositoryValueEqualsOne())).join();
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
     public void foreverConditionWithHamcrestMatchersWithDirectBlock() throws Exception {
         new Asynch(fakeRepository).perform();
-        await(until(value(), equalTo(1))).join();
+        defineCondition(until(value(), equalTo(1))).join();
         assertEquals(1, fakeRepository.getValue());
     }
 
@@ -160,27 +160,27 @@ public class SynchronizerTest {
     public void specifyingDefaultPollIntervalImpactsAllSubsequentUndefinedPollIntervalStatements() throws Exception {
         Synchronizer.setDefaultPollInterval(20, TimeUnit.MILLISECONDS);
         new Asynch(fakeRepository).perform();
-        await(until(value(), equalTo(1))).join();
+        defineCondition(until(value(), equalTo(1))).join();
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000, expected = TimeoutException.class)
     public void conditionBreaksAfterDurationTimeout() throws Exception {
         new Asynch(fakeRepository).perform();
-        await(200, TimeUnit.MILLISECONDS, until(value(), equalTo(1))).join();
+        defineCondition(200, TimeUnit.MILLISECONDS, until(value(), equalTo(1))).join();
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000, expected = TimeoutException.class)
     public void conditionBreaksAfterDurationTimeoutWhenUsingAtMost() throws Exception {
         new Asynch(fakeRepository).perform();
-        await(atMost(200, TimeUnit.MILLISECONDS), until(value(), equalTo(1))).join();
+        defineCondition(atMost(200, TimeUnit.MILLISECONDS), until(value(), equalTo(1))).join();
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)
     public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockWhenSetToCatchAllUncaughtExceptions() throws Exception {
-        BlockingSupportedOperation operation = await(until(value(), equalTo(1))).andCatchAllUncaughtExceptions();
+        BlockingSupportedOperation operation = defineCondition(until(value(), equalTo(1))).andCatchAllUncaughtExceptions();
         new ExceptionThrowingAsynch().perform();
         operation.join();
     }
@@ -189,20 +189,20 @@ public class SynchronizerTest {
     public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockAlsoForBlockWhenSetToCatchAllUncaughtExceptions() throws Exception {
     	Synchronizer.catchUncaughtExceptions();
         new ExceptionThrowingAsynch().perform();
-        block(until(value(), equalTo(1)));
+        await(until(value(), equalTo(1)));
     }
 
     @Test(timeout = 2000, expected = TimeoutException.class)
     public void catchUncaughtExceptionsIsReset() throws Exception {
         new ExceptionThrowingAsynch().perform();
-        block(Duration.ONE_SECOND, until(value(), equalTo(1)));
+        await(Duration.ONE_SECOND, until(value(), equalTo(1)));
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)
     public void exceptionsInConditionsArePropagatedToAwaitingThreadAndBreaksForeverBlock() throws Exception {
         final ExceptionThrowingFakeRepository repository = new ExceptionThrowingFakeRepository();
         new Asynch(repository).perform();
-        await(until(new FakeRepositoryValue(repository), equalTo(1))).join();
+        defineCondition(until(new FakeRepositoryValue(repository), equalTo(1))).join();
     }
 
     private Condition fakeRepositoryValueEqualsOne() {
