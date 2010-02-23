@@ -15,6 +15,6 @@
  */
 package com.jayway.concurrenttest.synchronizer;
 
-public interface SynchronizerOperation extends BlockingSupportedOperation, ExceptionCatcher {
-
+public interface AwaitSupportedCondition {
+	void await() throws Exception;
 }

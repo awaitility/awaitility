@@ -17,90 +17,95 @@ package com.jayway.concurrenttest;
 
 import java.util.concurrent.TimeUnit;
 
-import com.jayway.concurrenttest.synchronizer.AwaitOperationImpl;
+import com.jayway.concurrenttest.synchronizer.AwaitConditionImpl;
 import com.jayway.concurrenttest.synchronizer.Condition;
+import com.jayway.concurrenttest.synchronizer.ConditionEvaluator;
 import com.jayway.concurrenttest.synchronizer.Duration;
-import com.jayway.concurrenttest.synchronizer.SynchronizerOperation;
-import com.jayway.concurrenttest.synchronizer.SynchronizerOperationOptions;
+import com.jayway.concurrenttest.synchronizer.ConditionOptions;
 
-public class Synchronizer extends SynchronizerOperationOptions {
+public class Synchronizer extends ConditionOptions {
     private static volatile Duration defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
 
     private static volatile Duration defaultTimeout = Duration.FOREVER;
-    
+
     private static volatile boolean defaultCatchUncaughtExceptions = false;
-    
+
     public static void catchUncaughtExceptions() {
-    	defaultCatchUncaughtExceptions = true;
-    }
-    
-    public static void reset() {
-    	defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
-    	defaultTimeout = Duration.FOREVER;
-    	defaultCatchUncaughtExceptions = false;
-		Thread.setDefaultUncaughtExceptionHandler(null);
+        defaultCatchUncaughtExceptions = true;
     }
 
-    public static void await(Condition condition) throws Exception {
+    public static void reset() {
+        defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
+        defaultTimeout = Duration.FOREVER;
+        defaultCatchUncaughtExceptions = false;
+        Thread.setDefaultUncaughtExceptionHandler(null);
+    }
+
+    public static void await(ConditionEvaluator condition) throws Exception {
         await(defaultTimeout, condition);
     }
 
-    public static void await(long timeout, TimeUnit unit, Condition condition) throws Exception {
+    public static void await(long timeout, TimeUnit unit, ConditionEvaluator condition) throws Exception {
         await(duration(timeout, unit), condition);
     }
 
-    public static void await(Duration duration, Condition condition) throws Exception {
+    public static void await(Duration duration, ConditionEvaluator condition) throws Exception {
         await(duration, condition, null);
     }
 
-    public static void await(Condition condition, Duration pollInterval) throws Exception {
+    public static void await(ConditionEvaluator condition, Duration pollInterval) throws Exception {
         await(defaultTimeout, condition, pollInterval);
     }
 
-    public static void await(long timeout, TimeUnit unit, Condition condition, Duration pollInterval)
+    public static void await(long timeout, TimeUnit unit, ConditionEvaluator conditionEvaluator, Duration pollInterval)
             throws Exception {
-        await(duration(timeout, unit), condition, pollInterval);
+        await(duration(timeout, unit), conditionEvaluator, pollInterval);
     }
 
-    public static void await(Duration duration, Condition condition, Duration pollInterval)
+    public static void await(Duration duration, ConditionEvaluator conditionEvaluator, Duration pollInterval)
             throws Exception {
-        SynchronizerOperation operation = defineCondition(duration, condition, pollInterval);
-        if (defaultCatchUncaughtExceptions) {
-        	operation.andCatchAllUncaughtExceptions();
+        await(condition(duration, conditionEvaluator, pollInterval));
+    }
+
+    public static void await(Condition condition) throws Exception {
+        if (condition == null) {
+            throw new IllegalArgumentException("Condition cannot be null");
         }
-        operation.join();
+        if (defaultCatchUncaughtExceptions) {
+            condition.andCatchAllUncaughtExceptions();
+        }
+        condition.await();
     }
 
-    public static SynchronizerOperation defineCondition(long timeout, TimeUnit unit, Condition condition) {
-        return defineCondition(duration(timeout, unit), condition);
+    public static Condition condition(long timeout, TimeUnit unit, ConditionEvaluator condition) {
+        return condition(duration(timeout, unit), condition);
     }
 
-    public static SynchronizerOperation defineCondition(Condition condition) {
-        return defineCondition(defaultTimeout, condition);
+    public static Condition condition(ConditionEvaluator condition) {
+        return condition(defaultTimeout, condition);
     }
 
-    public static SynchronizerOperation defineCondition(Duration duration, Condition condition) {
-        return defineCondition(duration, condition, null);
+    public static Condition condition(Duration duration, ConditionEvaluator conditionEvaluator) {
+        return condition(duration, conditionEvaluator, null);
     }
 
-    public static SynchronizerOperation defineCondition(long timeout, TimeUnit unit, Condition condition,
+    public static Condition condition(long timeout, TimeUnit unit, ConditionEvaluator conditionEvaluator,
             Duration pollInterval) {
-        return defineCondition(duration(timeout, unit), condition, pollInterval);
+        return condition(duration(timeout, unit), conditionEvaluator, pollInterval);
     }
 
-    public static SynchronizerOperation defineCondition(Condition condition, Duration pollInterval) {
-        return defineCondition(defaultTimeout, condition, pollInterval);
+    public static Condition condition(ConditionEvaluator conditionEvaluator, Duration pollInterval) {
+        return condition(defaultTimeout, conditionEvaluator, pollInterval);
     }
 
-    public static SynchronizerOperation defineCondition(Duration duration, Condition condition,
-            Duration pollInterval) {
+    public static Condition condition(Duration duration, ConditionEvaluator conditionEvaluator, Duration pollInterval) {
         if (pollInterval == null) {
-        	pollInterval = defaultPollInterval;
+            pollInterval = defaultPollInterval;
         }
         if (duration == null) {
             duration = defaultTimeout;
         }
-        return new AwaitOperationImpl(duration, condition, pollInterval);
+        return new AwaitConditionImpl(duration, conditionEvaluator, pollInterval);
     }
 
     public static void setDefaultPollInterval(long pollInterval, TimeUnit unit) {
@@ -112,16 +117,16 @@ public class Synchronizer extends SynchronizerOperationOptions {
     }
 
     public static void setDefaultPollInterval(Duration pollInterval) {
-    	if (pollInterval == null) {
-    		throw new IllegalArgumentException("You must specify a poll interval (was null).");
-    	}
+        if (pollInterval == null) {
+            throw new IllegalArgumentException("You must specify a poll interval (was null).");
+        }
         defaultPollInterval = pollInterval;
     }
 
     public static void setDefaultTimeout(Duration defaultTimeout) {
-		if (defaultTimeout == null) {
-			throw new IllegalArgumentException("You must specify a default timeout (was null).");
-		}
+        if (defaultTimeout == null) {
+            throw new IllegalArgumentException("You must specify a default timeout (was null).");
+        }
         Synchronizer.defaultTimeout = defaultTimeout;
     }
 }

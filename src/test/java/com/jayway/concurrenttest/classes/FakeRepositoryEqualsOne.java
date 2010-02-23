@@ -15,9 +15,9 @@
  */
 package com.jayway.concurrenttest.classes;
 
-import com.jayway.concurrenttest.synchronizer.Condition;
+import com.jayway.concurrenttest.synchronizer.ConditionEvaluator;
 
-public class FakeRepositoryEqualsOne implements Condition {
+public class FakeRepositoryEqualsOne implements ConditionEvaluator {
 
 	private final FakeRepository repository;
 

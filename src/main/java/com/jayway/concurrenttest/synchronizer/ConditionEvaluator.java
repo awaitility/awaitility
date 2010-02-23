@@ -15,6 +15,6 @@
  */
 package com.jayway.concurrenttest.synchronizer;
 
-public interface BlockingSupportedOperation {
-	void join() throws Exception;
+public interface ConditionEvaluator {
+	boolean evaluate() throws Exception;
 }

@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Matcher;
 
-public class SynchronizerOperationOptions {
+public class ConditionOptions {
 
     public static Duration withPollInterval(long time, TimeUnit unit) {
         return new Duration(time, unit);
@@ -51,14 +51,14 @@ public class SynchronizerOperationOptions {
         return Duration.FOREVER;
     }
 
-    public static <T> Condition until(final Supplier<T> supplier, final Matcher<T> matcher) {
+    public static <T> ConditionEvaluator until(final Supplier<T> supplier, final Matcher<T> matcher) {
         if (supplier == null) {
             throw new IllegalArgumentException("You must specify a supplier (was null).");
         }
         if (matcher == null) {
             throw new IllegalArgumentException("You must specify a matcher (was null).");
         }
-        return new Condition() {
+        return new ConditionEvaluator() {
             @Override
             public boolean evaluate() throws Exception {
                 return matcher.matches(supplier.get());
@@ -66,7 +66,7 @@ public class SynchronizerOperationOptions {
         };
     }
 
-    public static Condition until(Condition condition) {
+    public static ConditionEvaluator until(ConditionEvaluator condition) {
         return condition;
     }
 }
