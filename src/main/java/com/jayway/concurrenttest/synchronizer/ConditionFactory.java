@@ -2,6 +2,10 @@ package com.jayway.concurrenttest.synchronizer;
 
 import java.util.concurrent.Callable;
 
+import org.hamcrest.Matcher;
+
+import com.jayway.concurrenttest.synchronizer.ConditionOptions.MethodCaller;
+
 public class ConditionFactory {
     private final Duration timeout;
     private final Duration pollInterval;
@@ -23,6 +27,10 @@ public class ConditionFactory {
         return new ConditionFactory(timeout, pollInterval, catchUncaughtExceptions);
     }
 
+    public ConditionFactory waitAtMost(Duration timeout) {
+        return new ConditionFactory(timeout, pollInterval, catchUncaughtExceptions);
+    }
+
     public ConditionFactory andPollInterval(Duration pollInterval) {
         return new ConditionFactory(timeout, pollInterval, catchUncaughtExceptions);
     }
@@ -37,5 +45,14 @@ public class ConditionFactory {
             condition.andCatchAllUncaughtExceptions();
         }
         condition.await();
+    }
+    
+    
+    public <T> void until(T ignore, final Matcher<T> matcher) throws Exception {
+        await(ConditionOptions.until(ignore, matcher));
+    }
+
+    public <T> void until(final Callable<T> supplier, final Matcher<T> matcher) throws Exception {
+        await(ConditionOptions.until(supplier, matcher));
     }
 }

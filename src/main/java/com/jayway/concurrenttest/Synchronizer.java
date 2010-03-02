@@ -66,6 +66,10 @@ public class Synchronizer extends ConditionOptions {
         new ConditionFactory(duration, pollInterval, defaultCatchUncaughtExceptions).await(conditionEvaluator);
     }
 
+    public static ConditionFactory block() {
+        return new ConditionFactory(defaultTimeout, defaultTimeout, defaultCatchUncaughtExceptions);
+    }
+
     public static ConditionFactory catchingUncaughExceptions() {
         return new ConditionFactory(defaultTimeout, defaultPollInterval, true);
     }
@@ -79,6 +83,10 @@ public class Synchronizer extends ConditionOptions {
     }
 
     public static ConditionFactory withTimeout(Duration timeout) {
+        return new ConditionFactory(timeout, defaultPollInterval, defaultCatchUncaughtExceptions);
+    }
+
+    public static ConditionFactory waitAtMost(Duration timeout) {
         return new ConditionFactory(timeout, defaultPollInterval, defaultCatchUncaughtExceptions);
     }
 

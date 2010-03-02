@@ -15,7 +15,7 @@
  */
 package com.jayway.concurrenttest;
 
-import static com.jayway.concurrenttest.Synchronizer.await;
+import static com.jayway.concurrenttest.Synchronizer.*;
 import static com.jayway.concurrenttest.Synchronizer.catchUncaughtExceptions;
 import static com.jayway.concurrenttest.Synchronizer.catchingUncaughExceptions;
 import static com.jayway.concurrenttest.Synchronizer.withPollInterval;
@@ -60,7 +60,6 @@ public class SynchronizerTest {
         await(until(callTo(fakeRepository).getValue(), greaterThan(0)));
         assertEquals(1, fakeRepository.getValue());
     }
-
 
     @Test(timeout = 2000)
     public void foreverConditionSpecificationWithDirectBlock() throws Exception {
@@ -180,6 +179,13 @@ public class SynchronizerTest {
     public void catchUncaughtExceptionsIsReset() throws Exception {
         new ExceptionThrowingAsynch().perform();
         await(Duration.ONE_SECOND, until(value(), equalTo(1)));
+    }
+
+    @Test(timeout = 2000, expected = TimeoutException.class)
+    public void waitAtMostWorks() throws Exception {
+        new ExceptionThrowingAsynch().perform();
+        withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS).waitAtMost(Duration.ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
+        waitAtMost(Duration.ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)
