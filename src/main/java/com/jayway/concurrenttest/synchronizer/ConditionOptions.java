@@ -25,17 +25,6 @@ import org.hamcrest.Matcher;
 
 public class ConditionOptions {
 
-    public static Duration withPollInterval(long time, TimeUnit unit) {
-        return new Duration(time, unit);
-    }
-
-    public static Duration withPollInterval(Duration pollInterval) {
-        if (pollInterval == null) {
-            throw new IllegalArgumentException("pollInterval cannot be null");
-        }
-        return pollInterval;
-    }
-
     public static Duration duration(long time, TimeUnit unit) {
         return new Duration(time, unit);
     }
@@ -102,13 +91,13 @@ public class ConditionOptions {
         }
         return new ConditionEvaluator() {
             @Override
-            public boolean evaluate() throws Exception {
+            public Boolean call() throws Exception {
                 return matcher.matches(supplier.call());
             }
         };
     }
 
-    public static ConditionEvaluator until(ConditionEvaluator condition) {
+    public static Callable<Boolean> until(Callable<Boolean> condition) {
         return condition;
     }
 }

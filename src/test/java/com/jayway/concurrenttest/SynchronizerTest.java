@@ -17,11 +17,12 @@ package com.jayway.concurrenttest;
 
 import static com.jayway.concurrenttest.Synchronizer.await;
 import static com.jayway.concurrenttest.Synchronizer.catchUncaughtExceptions;
+import static com.jayway.concurrenttest.Synchronizer.catchingUncaughExceptions;
+import static com.jayway.concurrenttest.Synchronizer.withPollInterval;
 import static com.jayway.concurrenttest.synchronizer.ConditionOptions.atMost;
 import static com.jayway.concurrenttest.synchronizer.ConditionOptions.callTo;
 import static com.jayway.concurrenttest.synchronizer.ConditionOptions.duration;
 import static com.jayway.concurrenttest.synchronizer.ConditionOptions.until;
-import static com.jayway.concurrenttest.synchronizer.ConditionOptions.withPollInterval;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
@@ -53,6 +54,14 @@ public class SynchronizerTest {
         Synchronizer.reset();
     }
 
+    @Test(timeout=2000)
+    public void awaitUsingCallTo() throws Exception {
+        new Asynch(fakeRepository).perform();
+        await(until(callTo(fakeRepository).getValue(), greaterThan(0)));
+        assertEquals(1, fakeRepository.getValue());
+    }
+
+
     @Test(timeout = 2000)
     public void foreverConditionSpecificationWithDirectBlock() throws Exception {
         new Asynch(fakeRepository).perform();
@@ -70,7 +79,8 @@ public class SynchronizerTest {
     @Test(timeout = 2000)
     public void awaitOperationSupportsSpecifyingPollSpecification() throws Exception {
         new Asynch(fakeRepository).perform();
-        await(until(fakeRepositoryValueEqualsOne()), withPollInterval(20, TimeUnit.MILLISECONDS));
+        withPollInterval(20, TimeUnit.MILLISECONDS).await(until(fakeRepositoryValueEqualsOne()));
+        withPollInterval(20, TimeUnit.MILLISECONDS).await(until(fakeRepositoryValueEqualsOne()));
         assertEquals(1, fakeRepository.getValue());
     }
 
@@ -104,7 +114,7 @@ public class SynchronizerTest {
     @Test(timeout = 2000)
     public void awaitOperationSupportsSpecifyingPollInterval() throws Exception {
         new Asynch(fakeRepository).perform();
-        await(until(fakeRepositoryValueEqualsOne()), withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS));
+        withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS).await(until(fakeRepositoryValueEqualsOne()));
         assertEquals(1, fakeRepository.getValue());
     }
 
@@ -112,13 +122,6 @@ public class SynchronizerTest {
     public void awaitOperationSupportsDefaultTimeout() throws Exception {
         Synchronizer.setDefaultTimeout(duration(20, TimeUnit.MILLISECONDS));
         await(until(value(), greaterThan(0)));
-        assertEquals(1, fakeRepository.getValue());
-    }
-
-    @Test(timeout=2000)
-    public void awaitUsingProxy() throws Exception {
-        new Asynch(fakeRepository).perform();
-        await(until(callTo(fakeRepository).getValue(), greaterThan(0)));
         assertEquals(1, fakeRepository.getValue());
     }
 
@@ -167,11 +170,10 @@ public class SynchronizerTest {
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)
-    public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockAlsoForBlockWhenSetToCatchAllUncaughtExceptions()
+    public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockWhenCatchingAllUncaughtExceptions()
             throws Exception {
-        Synchronizer.catchUncaughtExceptions();
         new ExceptionThrowingAsynch().perform();
-        await(until(value(), equalTo(1)));
+        catchingUncaughExceptions().await(until(value(), equalTo(1)));
     }
 
     @Test(timeout = 2000, expected = TimeoutException.class)

@@ -26,7 +26,7 @@ public class FakeRepositoryEqualsOne implements ConditionEvaluator {
 		this.repository = repository;
 	}
 
-	public boolean evaluate() {
+	public Boolean call() {
 		return repository.getValue() == 1;
 	}
 }

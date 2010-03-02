@@ -15,6 +15,7 @@
  */
 package com.jayway.concurrenttest.synchronizer;
 
-public interface ConditionEvaluator {
-	boolean evaluate() throws Exception;
+import java.util.concurrent.Callable;
+
+public interface ConditionEvaluator extends Callable<Boolean> {
 }

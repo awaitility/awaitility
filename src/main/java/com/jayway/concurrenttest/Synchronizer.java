@@ -15,11 +15,10 @@
  */
 package com.jayway.concurrenttest;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import com.jayway.concurrenttest.synchronizer.AwaitConditionImpl;
-import com.jayway.concurrenttest.synchronizer.Condition;
-import com.jayway.concurrenttest.synchronizer.ConditionEvaluator;
+import com.jayway.concurrenttest.synchronizer.ConditionFactory;
 import com.jayway.concurrenttest.synchronizer.ConditionOptions;
 import com.jayway.concurrenttest.synchronizer.Duration;
 
@@ -41,44 +40,46 @@ public class Synchronizer extends ConditionOptions {
         Thread.setDefaultUncaughtExceptionHandler(null);
     }
 
-    public static void await(ConditionEvaluator condition) throws Exception {
+    public static void await(Callable<Boolean> condition) throws Exception {
         await(defaultTimeout, condition);
     }
 
-    public static void await(long timeout, TimeUnit unit, ConditionEvaluator condition) throws Exception {
+    public static void await(long timeout, TimeUnit unit, Callable<Boolean> condition) throws Exception {
         await(duration(timeout, unit), condition);
     }
 
-    public static void await(Duration duration, ConditionEvaluator condition) throws Exception {
-        await(duration, condition, null);
+    public static void await(Duration duration, Callable<Boolean> condition) throws Exception {
+        await(duration, condition, defaultPollInterval);
     }
 
-    public static void await(ConditionEvaluator condition, Duration pollInterval) throws Exception {
+    public static void await(Callable<Boolean> condition, Duration pollInterval) throws Exception {
         await(defaultTimeout, condition, pollInterval);
     }
 
-    public static void await(long timeout, TimeUnit unit, ConditionEvaluator conditionEvaluator, Duration pollInterval)
+    public static void await(long timeout, TimeUnit unit, Callable<Boolean> conditionEvaluator, Duration pollInterval)
             throws Exception {
         await(duration(timeout, unit), conditionEvaluator, pollInterval);
     }
 
-    public static void await(Duration duration, ConditionEvaluator conditionEvaluator, Duration pollInterval)
+    public static void await(Duration duration, Callable<Boolean> conditionEvaluator, Duration pollInterval)
             throws Exception {
-        Condition condition = condition(duration, conditionEvaluator, pollInterval);
-        if (defaultCatchUncaughtExceptions) {
-            condition.andCatchAllUncaughtExceptions();
-        }
-        condition.await();
+        new ConditionFactory(duration, pollInterval, defaultCatchUncaughtExceptions).await(conditionEvaluator);
     }
 
-    private static Condition condition(Duration duration, ConditionEvaluator conditionEvaluator, Duration pollInterval) {
-        if (pollInterval == null) {
-            pollInterval = defaultPollInterval;
-        }
-        if (duration == null) {
-            duration = defaultTimeout;
-        }
-        return new AwaitConditionImpl(duration, conditionEvaluator, pollInterval);
+    public static ConditionFactory catchingUncaughExceptions() {
+        return new ConditionFactory(defaultTimeout, defaultPollInterval, true);
+    }
+
+    public static ConditionFactory withPollInterval(long time, TimeUnit unit) {
+        return new ConditionFactory(defaultTimeout, new Duration(time, unit), defaultCatchUncaughtExceptions);
+    }
+
+    public static ConditionFactory withPollInterval(Duration pollInterval) {
+        return new ConditionFactory(defaultTimeout, pollInterval, defaultCatchUncaughtExceptions);
+    }
+
+    public static ConditionFactory withTimeout(Duration timeout) {
+        return new ConditionFactory(timeout, defaultPollInterval, defaultCatchUncaughtExceptions);
     }
 
     public static void setDefaultPollInterval(long pollInterval, TimeUnit unit) {

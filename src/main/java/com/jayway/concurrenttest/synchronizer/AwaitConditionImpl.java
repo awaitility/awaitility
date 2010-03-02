@@ -16,6 +16,7 @@
 package com.jayway.concurrenttest.synchronizer;
 
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -28,7 +29,7 @@ public class AwaitConditionImpl implements Condition, UncaughtExceptionHandler {
     private final CountDownLatch latch;
     private Exception exception = null;
 
-    public AwaitConditionImpl(final Duration maxWaitTime, final ConditionEvaluator condition, Duration pollInterval) {
+    public AwaitConditionImpl(final Duration maxWaitTime, final Callable<Boolean> condition, Duration pollInterval) {
         if (maxWaitTime == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
@@ -43,7 +44,7 @@ public class AwaitConditionImpl implements Condition, UncaughtExceptionHandler {
         executor.scheduleAtFixedRate(new Runnable() {
             public void run() {
                 try {
-                    if (condition.evaluate()) {
+                    if (condition.call()) {
                         latch.countDown();
                     }
                 } catch (Exception e) {
