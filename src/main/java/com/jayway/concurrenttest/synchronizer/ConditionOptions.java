@@ -15,6 +15,9 @@
  */
 package com.jayway.concurrenttest.synchronizer;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Matcher;
@@ -49,6 +52,49 @@ public class ConditionOptions {
 
     public static Duration forever() {
         return Duration.FOREVER;
+    }
+
+    static class MethodCaller<T> implements Supplier<T> {
+        private final Object target;
+        private final Method method;
+        private final Object[] args;
+
+        public MethodCaller(Object target, Method method, Object[] args) {
+            this.target = target;
+            this.method = method;
+            this.args = args;
+        }
+
+        @Override
+        public T get() throws Exception {
+            return (T) method.invoke(target, args);
+        }
+    }
+
+    private static Object lastTarget;
+    private static Method lastMethod;
+    private static Object[] lastArgs;
+   
+    public static <S> S callTo(S service) {
+        Object proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), service.getClass().getInterfaces(), new InvocationHandler() {
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                lastMethod = method;
+                lastArgs = args;
+                return makeReturnValueFor(method.getReturnType());
+            }
+
+        });
+        lastTarget = service;
+        return (S) proxy;
+    }
+
+    // TODO: implement for all types
+    private static Object makeReturnValueFor(Class<?> returnType) {
+        return 0;
+    }
+
+    public static <T> ConditionEvaluator until(T ignore, final Matcher<T> matcher) {
+        return until(new MethodCaller<T>(lastTarget, lastMethod, lastArgs), matcher);
     }
 
     public static <T> ConditionEvaluator until(final Supplier<T> supplier, final Matcher<T> matcher) {

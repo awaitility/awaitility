@@ -15,13 +15,17 @@
  */
 package com.jayway.concurrenttest;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.concurrent.TimeUnit;
 
 import com.jayway.concurrenttest.synchronizer.AwaitConditionImpl;
 import com.jayway.concurrenttest.synchronizer.Condition;
 import com.jayway.concurrenttest.synchronizer.ConditionEvaluator;
-import com.jayway.concurrenttest.synchronizer.Duration;
 import com.jayway.concurrenttest.synchronizer.ConditionOptions;
+import com.jayway.concurrenttest.synchronizer.Duration;
+import com.jayway.concurrenttest.synchronizer.Supplier;
 
 public class Synchronizer extends ConditionOptions {
     private static volatile Duration defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;

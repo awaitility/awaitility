@@ -18,6 +18,7 @@ package com.jayway.concurrenttest;
 import static com.jayway.concurrenttest.Synchronizer.await;
 import static com.jayway.concurrenttest.Synchronizer.condition;
 import static com.jayway.concurrenttest.synchronizer.ConditionOptions.atMost;
+import static com.jayway.concurrenttest.synchronizer.ConditionOptions.callTo;
 import static com.jayway.concurrenttest.synchronizer.ConditionOptions.duration;
 import static com.jayway.concurrenttest.synchronizer.ConditionOptions.until;
 import static com.jayway.concurrenttest.synchronizer.ConditionOptions.withPollInterval;
@@ -141,6 +142,13 @@ public class SynchronizerTest {
     public void awaitOperationSupportsDefaultTimeout() throws Exception {
         Synchronizer.setDefaultTimeout(duration(20, TimeUnit.MILLISECONDS));
         await(until(value(), greaterThan(0)));
+        assertEquals(1, fakeRepository.getValue());
+    }
+
+    @Test(timeout=2000)
+    public void awaitUsingProxy() throws Exception {
+        new Asynch(fakeRepository).perform();
+        await(until(callTo(fakeRepository).getValue(), greaterThan(0)));
         assertEquals(1, fakeRepository.getValue());
     }
 
