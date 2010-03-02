@@ -15,9 +15,6 @@
  */
 package com.jayway.concurrenttest;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.concurrent.TimeUnit;
 
 import com.jayway.concurrenttest.synchronizer.AwaitConditionImpl;
@@ -25,7 +22,6 @@ import com.jayway.concurrenttest.synchronizer.Condition;
 import com.jayway.concurrenttest.synchronizer.ConditionEvaluator;
 import com.jayway.concurrenttest.synchronizer.ConditionOptions;
 import com.jayway.concurrenttest.synchronizer.Duration;
-import com.jayway.concurrenttest.synchronizer.Supplier;
 
 public class Synchronizer extends ConditionOptions {
     private static volatile Duration defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
@@ -81,28 +77,7 @@ public class Synchronizer extends ConditionOptions {
         condition.await();
     }
 
-    public static Condition condition(long timeout, TimeUnit unit, ConditionEvaluator condition) {
-        return condition(duration(timeout, unit), condition);
-    }
-
-    public static Condition condition(ConditionEvaluator condition) {
-        return condition(defaultTimeout, condition);
-    }
-
-    public static Condition condition(Duration duration, ConditionEvaluator conditionEvaluator) {
-        return condition(duration, conditionEvaluator, null);
-    }
-
-    public static Condition condition(long timeout, TimeUnit unit, ConditionEvaluator conditionEvaluator,
-            Duration pollInterval) {
-        return condition(duration(timeout, unit), conditionEvaluator, pollInterval);
-    }
-
-    public static Condition condition(ConditionEvaluator conditionEvaluator, Duration pollInterval) {
-        return condition(defaultTimeout, conditionEvaluator, pollInterval);
-    }
-
-    public static Condition condition(Duration duration, ConditionEvaluator conditionEvaluator, Duration pollInterval) {
+    private static Condition condition(Duration duration, ConditionEvaluator conditionEvaluator, Duration pollInterval) {
         if (pollInterval == null) {
             pollInterval = defaultPollInterval;
         }

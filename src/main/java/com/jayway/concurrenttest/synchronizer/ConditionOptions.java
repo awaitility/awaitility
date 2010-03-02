@@ -80,17 +80,12 @@ public class ConditionOptions {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 lastMethod = method;
                 lastArgs = args;
-                return makeReturnValueFor(method.getReturnType());
+                return TypeUtils.getDefaultValue(method.getReturnType());
             }
 
         });
         lastTarget = service;
         return (S) proxy;
-    }
-
-    // TODO: implement for all types
-    private static Object makeReturnValueFor(Class<?> returnType) {
-        return 0;
     }
 
     public static <T> ConditionEvaluator until(T ignore, final Matcher<T> matcher) {
