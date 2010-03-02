@@ -66,7 +66,7 @@ public class Synchronizer extends ConditionOptions {
         new ConditionFactory(duration, pollInterval, defaultCatchUncaughtExceptions).await(conditionEvaluator);
     }
 
-    public static ConditionFactory block() {
+    public static ConditionFactory await() {
         return new ConditionFactory(defaultTimeout, defaultTimeout, defaultCatchUncaughtExceptions);
     }
 
