@@ -25,79 +25,82 @@ import org.hamcrest.Matcher;
 
 public class ConditionOptions {
 
-    public static Duration duration(long time, TimeUnit unit) {
-        return new Duration(time, unit);
-    }
+	public static Duration duration(long time, TimeUnit unit) {
+		return new Duration(time, unit);
+	}
 
-    public static Duration atMost(Duration duration) {
-        if (duration == null) {
-            throw new IllegalArgumentException("duration cannot be null");
-        }
-        return duration;
-    }
+	public static Duration atMost(Duration duration) {
+		if (duration == null) {
+			throw new IllegalArgumentException("duration cannot be null");
+		}
+		return duration;
+	}
 
-    public static Duration atMost(long time, TimeUnit unit) {
-        return new Duration(time, unit);
-    }
+	public static Duration atMost(long time, TimeUnit unit) {
+		return new Duration(time, unit);
+	}
 
-    public static Duration forever() {
-        return Duration.FOREVER;
-    }
+	public static Duration forever() {
+		return Duration.FOREVER;
+	}
 
-    static class MethodCaller<T> implements Callable<T> {
-        private final Object target;
-        private final Method method;
-        private final Object[] args;
+	static class MethodCaller<T> implements Callable<T> {
+		private final Object target;
+		private final Method method;
+		private final Object[] args;
 
-        public MethodCaller(Object target, Method method, Object[] args) {
-            this.target = target;
-            this.method = method;
-            this.args = args;
-        }
+		public MethodCaller(Object target, Method method, Object[] args) {
+			this.target = target;
+			this.method = method;
+			this.args = args;
+		}
 
-        @Override
-        public T call() throws Exception {
-            return (T) method.invoke(target, args);
-        }
-    }
+		@SuppressWarnings("unchecked")
+		@Override
+		public T call() throws Exception {
+			return (T) method.invoke(target, args);
+		}
+	}
 
-    private static Object lastTarget;
-    private static Method lastMethod;
-    private static Object[] lastArgs;
-   
-    public static <S> S callTo(S service) {
-        Object proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), service.getClass().getInterfaces(), new InvocationHandler() {
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                lastMethod = method;
-                lastArgs = args;
-                return TypeUtils.getDefaultValue(method.getReturnType());
-            }
+	private static Object lastTarget;
+	private static Method lastMethod;
+	private static Object[] lastArgs;
 
-        });
-        lastTarget = service;
-        return (S) proxy;
-    }
+	@SuppressWarnings("unchecked")
+	public static <S> S callTo(S service) {
+		Object proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), service.getClass()
+				.getInterfaces(), new InvocationHandler() {
+			public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+				lastMethod = method;
+				lastArgs = args;
+				return TypeUtils.getDefaultValue(method.getReturnType());
+			}
 
-    public static <T> ConditionEvaluator until(T ignore, final Matcher<T> matcher) {
-        return until(new MethodCaller<T>(lastTarget, lastMethod, lastArgs), matcher);
-    }
+		});
+		lastTarget = service;
+		return (S) proxy;
+	}
 
-    public static <T> ConditionEvaluator until(final Callable<T> supplier, final Matcher<T> matcher) {
-        if (supplier == null) {
-            throw new IllegalArgumentException("You must specify a supplier (was null).");
-        }
-        if (matcher == null) {
-            throw new IllegalArgumentException("You must specify a matcher (was null).");
-        }
-        return new ConditionEvaluator() {
-            @Override
-            public Boolean call() throws Exception {
-                return matcher.matches(supplier.call());
-            }
-        };
-    }
+	public static <T> ConditionEvaluator until(T ignore, final Matcher<T> matcher) {
+		return until(new MethodCaller<T>(lastTarget, lastMethod, lastArgs), matcher);
+	}
 
-    public static Callable<Boolean> until(Callable<Boolean> condition) {
-        return condition;
-    }
+	public static <T> ConditionEvaluator until(final Callable<T> supplier, final Matcher<T> matcher) {
+		if (supplier == null) {
+			throw new IllegalArgumentException("You must specify a supplier (was null).");
+		}
+		if (matcher == null) {
+			throw new IllegalArgumentException("You must specify a matcher (was null).");
+		}
+		return new ConditionEvaluator() {
+			@Override
+			public Boolean call() throws Exception {
+				return matcher.matches(supplier.call());
+			}
+		};
+	}
+
+	public static Callable<Boolean> until(Callable<Boolean> condition) {
+		return condition;
+	}
 }

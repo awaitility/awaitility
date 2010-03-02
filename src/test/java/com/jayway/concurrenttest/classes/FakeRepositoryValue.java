@@ -24,8 +24,8 @@ public class FakeRepositoryValue implements Callable<Integer> {
 		this.repository = repository;
 	}
 
-    @Override
-    public Integer call() throws Exception {
+	@Override
+	public Integer call() throws Exception {
 		return repository.getValue();
 	}
 }

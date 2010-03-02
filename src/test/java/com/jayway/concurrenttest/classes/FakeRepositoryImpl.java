@@ -18,15 +18,19 @@ package com.jayway.concurrenttest.classes;
 public class FakeRepositoryImpl implements FakeRepository {
 
 	private volatile int value = 0;
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.powermock.utils.classes.FakeRepository#getValue()
 	 */
 	public int getValue() {
 		return value;
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.powermock.utils.classes.FakeRepository#setValue(int)
 	 */
 	public void setValue(int value) {
