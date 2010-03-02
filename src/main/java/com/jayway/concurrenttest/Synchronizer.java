@@ -64,13 +64,7 @@ public class Synchronizer extends ConditionOptions {
 
     public static void await(Duration duration, ConditionEvaluator conditionEvaluator, Duration pollInterval)
             throws Exception {
-        await(condition(duration, conditionEvaluator, pollInterval));
-    }
-
-    public static void await(Condition condition) throws Exception {
-        if (condition == null) {
-            throw new IllegalArgumentException("Condition cannot be null");
-        }
+        Condition condition = condition(duration, conditionEvaluator, pollInterval);
         if (defaultCatchUncaughtExceptions) {
             condition.andCatchAllUncaughtExceptions();
         }

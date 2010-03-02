@@ -26,6 +26,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -41,7 +42,6 @@ import com.jayway.concurrenttest.classes.FakeRepositoryImpl;
 import com.jayway.concurrenttest.classes.FakeRepositoryValue;
 import com.jayway.concurrenttest.synchronizer.ConditionEvaluator;
 import com.jayway.concurrenttest.synchronizer.Duration;
-import com.jayway.concurrenttest.synchronizer.Supplier;
 
 public class SynchronizerTest {
 
@@ -191,7 +191,7 @@ public class SynchronizerTest {
         return new FakeRepositoryEqualsOne(fakeRepository);
     }
 
-    private Supplier<Integer> value() {
+    private Callable<Integer> value() {
         return new FakeRepositoryValue(fakeRepository);
     }
 }

@@ -18,6 +18,7 @@ package com.jayway.concurrenttest.synchronizer;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Matcher;
@@ -54,7 +55,7 @@ public class ConditionOptions {
         return Duration.FOREVER;
     }
 
-    static class MethodCaller<T> implements Supplier<T> {
+    static class MethodCaller<T> implements Callable<T> {
         private final Object target;
         private final Method method;
         private final Object[] args;
@@ -66,7 +67,7 @@ public class ConditionOptions {
         }
 
         @Override
-        public T get() throws Exception {
+        public T call() throws Exception {
             return (T) method.invoke(target, args);
         }
     }
@@ -92,7 +93,7 @@ public class ConditionOptions {
         return until(new MethodCaller<T>(lastTarget, lastMethod, lastArgs), matcher);
     }
 
-    public static <T> ConditionEvaluator until(final Supplier<T> supplier, final Matcher<T> matcher) {
+    public static <T> ConditionEvaluator until(final Callable<T> supplier, final Matcher<T> matcher) {
         if (supplier == null) {
             throw new IllegalArgumentException("You must specify a supplier (was null).");
         }
@@ -102,7 +103,7 @@ public class ConditionOptions {
         return new ConditionEvaluator() {
             @Override
             public boolean evaluate() throws Exception {
-                return matcher.matches(supplier.get());
+                return matcher.matches(supplier.call());
             }
         };
     }
