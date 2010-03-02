@@ -184,8 +184,10 @@ public class SynchronizerTest {
     @Test(timeout = 2000, expected = TimeoutException.class)
     public void waitAtMostWorks() throws Exception {
         new ExceptionThrowingAsynch().perform();
-        withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS).waitAtMost(Duration.ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
+        withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS).atMost(Duration.ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
         waitAtMost(Duration.ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
+        await().atMost(Duration.ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
+        await().until(callTo(fakeRepository).getValue(), equalTo(1));
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)

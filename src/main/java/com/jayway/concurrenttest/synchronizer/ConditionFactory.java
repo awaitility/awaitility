@@ -27,7 +27,7 @@ public class ConditionFactory {
         return new ConditionFactory(timeout, pollInterval, catchUncaughtExceptions);
     }
 
-    public ConditionFactory waitAtMost(Duration timeout) {
+    public ConditionFactory atMost(Duration timeout) {
         return new ConditionFactory(timeout, pollInterval, catchUncaughtExceptions);
     }
 
