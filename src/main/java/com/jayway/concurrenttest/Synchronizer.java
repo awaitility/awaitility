@@ -15,14 +15,12 @@
  */
 package com.jayway.concurrenttest;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import com.jayway.concurrenttest.synchronizer.ConditionFactory;
-import com.jayway.concurrenttest.synchronizer.ConditionOptions;
 import com.jayway.concurrenttest.synchronizer.Duration;
 
-public class Synchronizer extends ConditionOptions {
+public class Synchronizer  {
 	private static volatile Duration defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
 
 	private static volatile Duration defaultTimeout = Duration.FOREVER;
@@ -40,37 +38,11 @@ public class Synchronizer extends ConditionOptions {
 		Thread.setDefaultUncaughtExceptionHandler(null);
 	}
 
-	public static void await(Callable<Boolean> condition) throws Exception {
-		await(defaultTimeout, condition);
-	}
-
-	public static void await(long timeout, TimeUnit unit, Callable<Boolean> condition) throws Exception {
-		await(duration(timeout, unit), condition);
-	}
-
-	public static void await(Duration duration, Callable<Boolean> condition) throws Exception {
-		await(duration, condition, defaultPollInterval);
-	}
-
-	public static void await(Callable<Boolean> condition, Duration pollInterval) throws Exception {
-		await(defaultTimeout, condition, pollInterval);
-	}
-
-	public static void await(long timeout, TimeUnit unit, Callable<Boolean> conditionEvaluator, Duration pollInterval)
-			throws Exception {
-		await(duration(timeout, unit), conditionEvaluator, pollInterval);
-	}
-
-	public static void await(Duration duration, Callable<Boolean> conditionEvaluator, Duration pollInterval)
-			throws Exception {
-		new ConditionFactory(duration, pollInterval, defaultCatchUncaughtExceptions).await(conditionEvaluator);
-	}
-
 	public static ConditionFactory await() {
-		return new ConditionFactory(defaultTimeout, defaultTimeout, defaultCatchUncaughtExceptions);
+		return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultCatchUncaughtExceptions);
 	}
 
-	public static ConditionFactory catchingUncaughExceptions() {
+	public static ConditionFactory catchingUncaughtExceptions() {
 		return new ConditionFactory(defaultTimeout, defaultPollInterval, true);
 	}
 
@@ -100,7 +72,7 @@ public class Synchronizer extends ConditionOptions {
 	}
 
 	public static void setDefaultTimeout(long timeout, TimeUnit unit) {
-		defaultTimeout = duration(timeout, unit);
+		defaultTimeout = new Duration(timeout, unit);
 	}
 
 	public static void setDefaultPollInterval(Duration pollInterval) {

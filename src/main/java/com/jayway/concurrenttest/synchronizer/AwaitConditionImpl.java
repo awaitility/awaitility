@@ -41,7 +41,7 @@ public class AwaitConditionImpl implements Condition, UncaughtExceptionHandler {
 		}
 		latch = new CountDownLatch(1);
 		this.maxWaitTime = maxWaitTime;
-		executor.scheduleAtFixedRate(new Runnable() {
+		Runnable command = new Runnable() {
 			public void run() {
 				try {
 					if (condition.call()) {
@@ -52,7 +52,8 @@ public class AwaitConditionImpl implements Condition, UncaughtExceptionHandler {
 					latch.countDown();
 				}
 			}
-		}, pollInterval.getValue(), pollInterval.getValue(), pollInterval.getTimeUnit());
+		};
+		executor.scheduleAtFixedRate(command, pollInterval.getValue(), pollInterval.getValue(), pollInterval.getTimeUnit());
 
 	}
 
