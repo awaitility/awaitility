@@ -18,14 +18,13 @@ package com.jayway.concurrenttest.classes;
 import java.util.concurrent.Callable;
 
 public class FakeRepositoryValue implements Callable<Integer> {
-	private final FakeRepository repository;
+    private final FakeRepository repository;
 
-	public FakeRepositoryValue(FakeRepository repository) {
-		this.repository = repository;
-	}
+    public FakeRepositoryValue(FakeRepository repository) {
+        this.repository = repository;
+    }
 
-	@Override
-	public Integer call() throws Exception {
-		return repository.getValue();
-	}
+    public Integer call() throws Exception {
+        return repository.getValue();
+    }
 }

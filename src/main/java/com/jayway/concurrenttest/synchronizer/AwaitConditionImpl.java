@@ -24,76 +24,81 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class AwaitConditionImpl implements Condition, UncaughtExceptionHandler {
-	private final Duration maxWaitTime;
-	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-	private final CountDownLatch latch;
-	private Exception exception = null;
+    private final Duration maxWaitTime;
+    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private final CountDownLatch latch;
+    private Exception exception = null;
+    private final String alias;
 
-	public AwaitConditionImpl(final Duration maxWaitTime, final Callable<Boolean> condition, Duration pollInterval) {
-		if (maxWaitTime == null) {
-			throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
-		}
-		if (condition == null) {
-			throw new IllegalArgumentException("You must specify a condition (was null).");
-		}
-		if (pollInterval == null) {
-			throw new IllegalArgumentException("You must specify a poll interval (was null).");
-		}
-		latch = new CountDownLatch(1);
-		this.maxWaitTime = maxWaitTime;
-		Runnable command = new Runnable() {
-			public void run() {
-				try {
-					if (condition.call()) {
-						latch.countDown();
-					}
-				} catch (Exception e) {
-					exception = e;
-					latch.countDown();
-				}
-			}
-		};
-		executor.scheduleAtFixedRate(command, pollInterval.getValue(), pollInterval.getValue(), pollInterval.getTimeUnit());
+    public AwaitConditionImpl(String alias, final Duration maxWaitTime, final Callable<Boolean> condition,
+            Duration pollInterval) {
+        if (maxWaitTime == null) {
+            throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
+        }
+        if (condition == null) {
+            throw new IllegalArgumentException("You must specify a condition (was null).");
+        }
+        if (pollInterval == null) {
+            throw new IllegalArgumentException("You must specify a poll interval (was null).");
+        }
+        this.alias = alias;
+        latch = new CountDownLatch(1);
+        this.maxWaitTime = maxWaitTime;
+        Runnable command = new Runnable() {
+            public void run() {
+                try {
+                    if (condition.call()) {
+                        latch.countDown();
+                    }
+                } catch (Exception e) {
+                    exception = e;
+                    latch.countDown();
+                }
+            }
+        };
+        executor.scheduleAtFixedRate(command, pollInterval.getValue(), pollInterval.getValue(), pollInterval
+                .getTimeUnit());
 
-	}
+    }
 
-	public void await() throws Exception {
-		try {
-			final long timeout = maxWaitTime.getValue();
-			final boolean finishedBeforeTimeout;
-			if (maxWaitTime == Duration.FOREVER) {
-				latch.await();
-				finishedBeforeTimeout = true;
-			} else {
-				finishedBeforeTimeout = latch.await(timeout, maxWaitTime.getTimeUnit());
-			}
-			if (exception != null) {
-				throw exception;
-			} else if (!finishedBeforeTimeout) {
-				throw new TimeoutException(String.format("Condition didn't complete within %s %s.", timeout,
-						maxWaitTime.getTimeUnit().toString().toLowerCase()));
-			}
-		} finally {
-			executor.shutdown();
-			if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-				executor.shutdownNow();
-			}
-		}
-	}
+    public void await() throws Exception {
+        try {
+            final long timeout = maxWaitTime.getValue();
+            final boolean finishedBeforeTimeout;
+            if (maxWaitTime == Duration.FOREVER) {
+                latch.await();
+                finishedBeforeTimeout = true;
+            } else {
+                finishedBeforeTimeout = latch.await(timeout, maxWaitTime.getTimeUnit());
+            }
+            if (exception != null) {
+                throw exception;
+            } else if (!finishedBeforeTimeout) {
+                throw new TimeoutException(String.format("Condition %s didn't complete within %s %s.",
+                        alias == null ? "" : String.format("with alias '%s'", alias), timeout, maxWaitTime
+                                .getTimeUnit().toString().toLowerCase()));
+            }
+        } finally {
+            executor.shutdown();
+            if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+            }
+        }
+    }
 
-	public void uncaughtException(Thread thread, Throwable throwable) {
-		if (throwable instanceof Exception) {
-			exception = (Exception) throwable;
-			if (latch.getCount() != 0) {
-				latch.countDown();
-			}
-		} else {
-			throw new RuntimeException(throwable);
-		}
-	}
+    public void uncaughtException(Thread thread, Throwable throwable) {
+        if (throwable instanceof Exception) {
+            exception = (Exception) throwable;
+            if (latch.getCount() != 0) {
+                latch.countDown();
+            }
+        } else {
+            throw new RuntimeException(throwable);
+        }
+    }
 
-	public Condition andCatchAllUncaughtExceptions() {
-		Thread.setDefaultUncaughtExceptionHandler(this);
-		return this;
-	}
+    public Condition andCatchAllUncaughtExceptions() {
+        Thread.setDefaultUncaughtExceptionHandler(this);
+        return this;
+    }
 }
