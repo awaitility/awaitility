@@ -130,6 +130,7 @@ public class ConditionFactory {
             this.target = target;
             this.method = method;
             this.args = args;
+            method.setAccessible(true);
         }
 
         @SuppressWarnings("unchecked")

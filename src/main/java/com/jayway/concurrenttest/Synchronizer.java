@@ -23,12 +23,16 @@ import com.jayway.concurrenttest.synchronizer.Duration;
 public class Synchronizer {
     private static volatile Duration defaultPollInterval = Duration.ONE_HUNDRED_MILLISECONDS;
 
-    private static volatile Duration defaultTimeout = Duration.FOREVER;
+    private static volatile Duration defaultTimeout = Duration.TEN_SECONDS;
 
-    private static volatile boolean defaultCatchUncaughtExceptions = false;
+    private static volatile boolean defaultCatchUncaughtExceptions = true;
 
     public static void catchUncaughtExceptions() {
         defaultCatchUncaughtExceptions = true;
+    }
+
+    public static void doNotCatchUncaughtExceptions() {
+        defaultCatchUncaughtExceptions = false;
     }
 
     public static void reset() {
