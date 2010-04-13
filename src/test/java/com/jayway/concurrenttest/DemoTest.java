@@ -62,7 +62,6 @@ class CounterServiceImpl implements CounterService {
     }
     public void run() {
         new Thread(new Runnable() {
-            @Override
             public void run() {
                 try {
                     for (int indx=0; indx<5; indx++) {
@@ -78,7 +77,6 @@ class CounterServiceImpl implements CounterService {
             }
         }).start();
     }
-    @Override
     public int getCount() {
         return count;
     }
