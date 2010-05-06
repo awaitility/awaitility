@@ -20,80 +20,178 @@ import java.util.concurrent.TimeUnit;
 import com.jayway.concurrenttest.synchronizer.ConditionFactory;
 import com.jayway.concurrenttest.synchronizer.Duration;
 
+/**
+ * 
+ */
 public class Synchronizer {
-    private static volatile Duration defaultPollInterval = Duration.ONE_HUNDRED_MILLISECONDS;
 
-    private static volatile Duration defaultTimeout = Duration.TEN_SECONDS;
+	private static volatile Duration defaultPollInterval = Duration.ONE_HUNDRED_MILLISECONDS;
 
-    private static volatile boolean defaultCatchUncaughtExceptions = true;
+	private static volatile Duration defaultTimeout = Duration.TEN_SECONDS;
 
-    public static void catchUncaughtExceptions() {
-        defaultCatchUncaughtExceptions = true;
-    }
+	private static volatile boolean defaultCatchUncaughtExceptions = true;
 
-    public static void doNotCatchUncaughtExceptions() {
-        defaultCatchUncaughtExceptions = false;
-    }
+	/**
+	 * Catch uncaught exceptions.
+	 */
+	public static void catchUncaughtExceptions() {
+		defaultCatchUncaughtExceptions = true;
+	}
 
-    public static void reset() {
-        defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
-        defaultTimeout = Duration.FOREVER;
-        defaultCatchUncaughtExceptions = false;
-        Thread.setDefaultUncaughtExceptionHandler(null);
-    }
+	/**
+	 * Do not catch uncaught exceptions.
+	 */
+	public static void doNotCatchUncaughtExceptions() {
+		defaultCatchUncaughtExceptions = false;
+	}
 
-    public static ConditionFactory await() {
-        return await(null);
-    }
+	/**
+	 * Reset.
+	 */
+	public static void reset() {
+		defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
+		defaultTimeout = Duration.FOREVER;
+		defaultCatchUncaughtExceptions = false;
+		Thread.setDefaultUncaughtExceptionHandler(null);
+	}
 
-    public static ConditionFactory await(String alias) {
-        return new ConditionFactory(alias, defaultTimeout, defaultPollInterval, defaultCatchUncaughtExceptions);
-    }
+	/**
+	 * Await.
+	 * 
+	 * @return the condition factory
+	 */
+	public static ConditionFactory await() {
+		return await(null);
+	}
 
-    public static ConditionFactory catchingUncaughtExceptions() {
-        return new ConditionFactory(defaultTimeout, defaultPollInterval, true);
-    }
+	/**
+	 * Await.
+	 * 
+	 * @param alias
+	 *            the alias
+	 * @return the condition factory
+	 */
+	public static ConditionFactory await(String alias) {
+		return new ConditionFactory(alias, defaultTimeout, defaultPollInterval, defaultCatchUncaughtExceptions);
+	}
 
-    public static ConditionFactory withPollInterval(long time, TimeUnit unit) {
-        return new ConditionFactory(defaultTimeout, new Duration(time, unit), defaultCatchUncaughtExceptions);
-    }
+	/**
+	 * Catching uncaught exceptions.
+	 * 
+	 * @return the condition factory
+	 */
+	public static ConditionFactory catchingUncaughtExceptions() {
+		return new ConditionFactory(defaultTimeout, defaultPollInterval, true);
+	}
 
-    public static ConditionFactory withPollInterval(Duration pollInterval) {
-        return new ConditionFactory(defaultTimeout, pollInterval, defaultCatchUncaughtExceptions);
-    }
+	/**
+	 * Specify the poll interval. This defines how often Awaitility will poll
+	 * for a result matching the stop criteria.
+	 * 
+	 * @param time
+	 *            the time
+	 * @param unit
+	 *            the unit
+	 * @return the condition factory
+	 */
+	public static ConditionFactory withPollInterval(long time, TimeUnit unit) {
+		return new ConditionFactory(defaultTimeout, new Duration(time, unit), defaultCatchUncaughtExceptions);
+	}
 
-    public static ConditionFactory withTimeout(Duration timeout) {
-        return new ConditionFactory(timeout, defaultPollInterval, defaultCatchUncaughtExceptions);
-    }
+	/**
+	 * With poll interval.
+	 * 
+	 * @param pollInterval
+	 *            the poll interval
+	 * @return the condition factory
+	 */
+	public static ConditionFactory withPollInterval(Duration pollInterval) {
+		return new ConditionFactory(defaultTimeout, pollInterval, defaultCatchUncaughtExceptions);
+	}
 
-    public static ConditionFactory withTimeout(long timeout, TimeUnit timeUnit) {
-        return new ConditionFactory(new Duration(timeout, timeUnit), defaultPollInterval,
-                defaultCatchUncaughtExceptions);
-    }
+	/**
+	 * With timeout.
+	 * 
+	 * @param timeout
+	 *            the timeout
+	 * @return the condition factory
+	 */
+	public static ConditionFactory withTimeout(Duration timeout) {
+		return new ConditionFactory(timeout, defaultPollInterval, defaultCatchUncaughtExceptions);
+	}
 
-    public static ConditionFactory waitAtMost(Duration timeout) {
-        return new ConditionFactory(timeout, defaultPollInterval, defaultCatchUncaughtExceptions);
-    }
+	/**
+	 * With timeout.
+	 * 
+	 * @param timeout
+	 *            the timeout
+	 * @param timeUnit
+	 *            the time unit
+	 * @return the condition factory
+	 */
+	public static ConditionFactory withTimeout(long timeout, TimeUnit timeUnit) {
+		return new ConditionFactory(new Duration(timeout, timeUnit), defaultPollInterval,
+				defaultCatchUncaughtExceptions);
+	}
 
-    public static void setDefaultPollInterval(long pollInterval, TimeUnit unit) {
-        defaultPollInterval = new Duration(pollInterval, unit);
-    }
+	/**
+	 * Wait at most.
+	 * 
+	 * @param timeout
+	 *            the timeout
+	 * @return the condition factory
+	 */
+	public static ConditionFactory waitAtMost(Duration timeout) {
+		return new ConditionFactory(timeout, defaultPollInterval, defaultCatchUncaughtExceptions);
+	}
 
-    public static void setDefaultTimeout(long timeout, TimeUnit unit) {
-        defaultTimeout = new Duration(timeout, unit);
-    }
+	/**
+	 * Sets the default poll interval.
+	 * 
+	 * @param pollInterval
+	 *            the poll interval
+	 * @param unit
+	 *            the unit
+	 */
+	public static void setDefaultPollInterval(long pollInterval, TimeUnit unit) {
+		defaultPollInterval = new Duration(pollInterval, unit);
+	}
 
-    public static void setDefaultPollInterval(Duration pollInterval) {
-        if (pollInterval == null) {
-            throw new IllegalArgumentException("You must specify a poll interval (was null).");
-        }
-        defaultPollInterval = pollInterval;
-    }
+	/**
+	 * Sets the default timeout.
+	 * 
+	 * @param timeout
+	 *            the timeout
+	 * @param unit
+	 *            the unit
+	 */
+	public static void setDefaultTimeout(long timeout, TimeUnit unit) {
+		defaultTimeout = new Duration(timeout, unit);
+	}
 
-    public static void setDefaultTimeout(Duration defaultTimeout) {
-        if (defaultTimeout == null) {
-            throw new IllegalArgumentException("You must specify a default timeout (was null).");
-        }
-        Synchronizer.defaultTimeout = defaultTimeout;
-    }
+	/**
+	 * Sets the default poll interval.
+	 * 
+	 * @param pollInterval
+	 *            the new default poll interval
+	 */
+	public static void setDefaultPollInterval(Duration pollInterval) {
+		if (pollInterval == null) {
+			throw new IllegalArgumentException("You must specify a poll interval (was null).");
+		}
+		defaultPollInterval = pollInterval;
+	}
+
+	/**
+	 * Sets the default timeout.
+	 * 
+	 * @param defaultTimeout
+	 *            the new default timeout
+	 */
+	public static void setDefaultTimeout(Duration defaultTimeout) {
+		if (defaultTimeout == null) {
+			throw new IllegalArgumentException("You must specify a default timeout (was null).");
+		}
+		Synchronizer.defaultTimeout = defaultTimeout;
+	}
 }
