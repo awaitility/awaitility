@@ -60,4 +60,8 @@ public class Duration {
 	public long getValue() {
 		return value;
 	}
+
+	public long getValueInMS() {
+		return MILLISECONDS.convert(value, unit);
+	}
 }

@@ -6,18 +6,26 @@ import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Matcher;
 
+// TODO: Auto-generated Javadoc
 /**
  * A factory for creating Condition objects.
  */
 public class ConditionFactory {
 
+	/** The timeout. */
 	private final Duration timeout;
 
+	/** The poll interval. */
 	private final Duration pollInterval;
 
+	/** The catch uncaught exceptions. */
 	private final boolean catchUncaughtExceptions;
 
+	/** The alias. */
 	private final String alias;
+
+	/** The poll delay. */
+	private final Duration pollDelay;
 
 	/**
 	 * Instantiates a new condition factory.
@@ -28,21 +36,28 @@ public class ConditionFactory {
 	 *            the timeout
 	 * @param pollInterval
 	 *            the poll interval
+	 * @param pollDelay
+	 *            TODO
 	 * @param catchUncaughtExceptions
 	 *            the catch uncaught exceptions
 	 */
-	public ConditionFactory(String alias, Duration timeout, Duration pollInterval, boolean catchUncaughtExceptions) {
+	public ConditionFactory(String alias, Duration timeout, Duration pollInterval, Duration pollDelay,
+			boolean catchUncaughtExceptions) {
 		if (pollInterval == null) {
 			throw new IllegalArgumentException("pollInterval cannot be null");
 		}
 		if (timeout == null) {
 			throw new IllegalArgumentException("timeout cannot be null");
 		}
+		if (pollDelay == null) {
+			throw new IllegalArgumentException("pollDelay cannot be null");
+		}
+
 		this.alias = alias;
 		this.timeout = timeout;
 		this.pollInterval = pollInterval;
 		this.catchUncaughtExceptions = catchUncaughtExceptions;
-
+		this.pollDelay = pollDelay;
 	}
 
 	/**
@@ -52,11 +67,13 @@ public class ConditionFactory {
 	 *            the timeout
 	 * @param pollInterval
 	 *            the poll interval
+	 * @param pollDelay
+	 *            TODO
 	 * @param catchUncaughtExceptions
 	 *            the catch uncaught exceptions
 	 */
-	public ConditionFactory(Duration timeout, Duration pollInterval, boolean catchUncaughtExceptions) {
-		this(null, timeout, pollInterval, catchUncaughtExceptions);
+	public ConditionFactory(Duration timeout, Duration pollInterval, Duration pollDelay, boolean catchUncaughtExceptions) {
+		this(null, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
 	}
 
 	/**
@@ -67,7 +84,7 @@ public class ConditionFactory {
 	 * @return the condition factory
 	 */
 	public ConditionFactory andWithTimeout(Duration timeout) {
-		return new ConditionFactory(alias, timeout, pollInterval, catchUncaughtExceptions);
+		return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
 	}
 
 	/**
@@ -78,7 +95,7 @@ public class ConditionFactory {
 	 * @return the condition factory
 	 */
 	public ConditionFactory atMost(Duration timeout) {
-		return new ConditionFactory(alias, timeout, pollInterval, catchUncaughtExceptions);
+		return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
 	}
 
 	/**
@@ -89,20 +106,20 @@ public class ConditionFactory {
 	 * @return the condition factory
 	 */
 	public ConditionFactory forever() {
-		return new ConditionFactory(alias, Duration.FOREVER, pollInterval, catchUncaughtExceptions);
+		return new ConditionFactory(alias, Duration.FOREVER, pollInterval, pollInterval, catchUncaughtExceptions);
 	}
 
 	/**
 	 * Specify the polling interval Awaitility will use for this await
 	 * statement. This means the frequency in which the condition is checked for
-	 * completetion.
+	 * completion.
 	 * 
 	 * @param pollInterval
 	 *            the poll interval
 	 * @return the condition factory
 	 */
 	public ConditionFactory andWithPollInterval(Duration pollInterval) {
-		return new ConditionFactory(alias, timeout, pollInterval, catchUncaughtExceptions);
+		return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
 	}
 
 	/**
@@ -115,7 +132,33 @@ public class ConditionFactory {
 	 * @return the condition factory
 	 */
 	public ConditionFactory andWithTimeout(long timeout, TimeUnit unit) {
-		return new ConditionFactory(alias, new Duration(timeout, unit), pollInterval, catchUncaughtExceptions);
+		return new ConditionFactory(alias, new Duration(timeout, unit), pollInterval, pollInterval,
+				catchUncaughtExceptions);
+	}
+
+	/**
+	 * And with poll delay.
+	 * 
+	 * @param delay
+	 *            the delay
+	 * @param unit
+	 *            the unit
+	 * @return the condition factory
+	 */
+	public ConditionFactory andWithPollDelay(long delay, TimeUnit unit) {
+		return new ConditionFactory(alias, this.timeout, pollInterval, new Duration(delay, unit),
+				catchUncaughtExceptions);
+	}
+
+	/**
+	 * And with poll delay.
+	 * 
+	 * @param pollDelay
+	 *            the poll delay
+	 * @return the condition factory
+	 */
+	public ConditionFactory andWithPollDelay(Duration pollDelay) {
+		return new ConditionFactory(alias, this.timeout, pollInterval, pollDelay, catchUncaughtExceptions);
 	}
 
 	/**
@@ -128,7 +171,8 @@ public class ConditionFactory {
 	 * @return the condition factory
 	 */
 	public ConditionFactory atMost(long timeout, TimeUnit unit) {
-		return new ConditionFactory(alias, new Duration(timeout, unit), pollInterval, catchUncaughtExceptions);
+		return new ConditionFactory(alias, new Duration(timeout, unit), pollInterval, pollInterval,
+				catchUncaughtExceptions);
 	}
 
 	/**
@@ -141,7 +185,8 @@ public class ConditionFactory {
 	 * @return the condition factory
 	 */
 	public ConditionFactory andWithPollInterval(long pollInterval, TimeUnit unit) {
-		return new ConditionFactory(alias, timeout, new Duration(pollInterval, unit), catchUncaughtExceptions);
+		return new ConditionFactory(alias, timeout, new Duration(pollInterval, unit), pollDelay,
+				catchUncaughtExceptions);
 	}
 
 	/**
@@ -150,7 +195,7 @@ public class ConditionFactory {
 	 * @return the condition factory
 	 */
 	public ConditionFactory andCatchUncaughtExceptions() {
-		return new ConditionFactory(alias, timeout, pollInterval, true);
+		return new ConditionFactory(alias, timeout, pollInterval, pollInterval, true);
 	}
 
 	/**
@@ -177,7 +222,7 @@ public class ConditionFactory {
 	 *             the exception
 	 */
 	public ConditionFactory await(String alias) throws Exception {
-		return new ConditionFactory(alias, timeout, pollInterval, catchUncaughtExceptions);
+		return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
 	}
 
 	/**
@@ -221,7 +266,7 @@ public class ConditionFactory {
 	 * @param ignore
 	 *            the return value of the method call
 	 * @param matcher
-	 *            The condition that must be met when 
+	 *            The condition that must be met when
 	 * @throws Exception
 	 *             the exception
 	 */
@@ -267,7 +312,8 @@ public class ConditionFactory {
 	 *             the exception
 	 */
 	public <T> void until(Callable<Boolean> conditionEvaluator) throws Exception {
-		AwaitConditionImpl condition = new AwaitConditionImpl(alias, timeout, conditionEvaluator, pollInterval);
+		AwaitConditionImpl condition = new AwaitConditionImpl(alias, timeout, conditionEvaluator, pollInterval,
+				pollDelay);
 		if (catchUncaughtExceptions) {
 			condition.andCatchAllUncaughtExceptions();
 		}

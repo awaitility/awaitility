@@ -31,7 +31,7 @@ public class AwaitConditionImpl implements Condition, UncaughtExceptionHandler {
 	private final String alias;
 
 	public AwaitConditionImpl(String alias, final Duration maxWaitTime, final Callable<Boolean> condition,
-			Duration pollInterval) {
+			Duration pollInterval, Duration pollDelay) {
 		if (maxWaitTime == null) {
 			throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
 		}
@@ -40,6 +40,9 @@ public class AwaitConditionImpl implements Condition, UncaughtExceptionHandler {
 		}
 		if (pollInterval == null) {
 			throw new IllegalArgumentException("You must specify a poll interval (was null).");
+		}
+		if (pollDelay == null) {
+			throw new IllegalArgumentException("You must specify a poll delay (was null).");
 		}
 		this.alias = alias;
 		latch = new CountDownLatch(1);
@@ -56,9 +59,8 @@ public class AwaitConditionImpl implements Condition, UncaughtExceptionHandler {
 				}
 			}
 		};
-		executor.scheduleAtFixedRate(command, pollInterval.getValue(), pollInterval.getValue(), pollInterval
-				.getTimeUnit());
-
+		executor.scheduleAtFixedRate(command, pollDelay.getValueInMS(), pollInterval.getValueInMS(),
+				TimeUnit.MILLISECONDS);
 	}
 
 	public void await() throws Exception {

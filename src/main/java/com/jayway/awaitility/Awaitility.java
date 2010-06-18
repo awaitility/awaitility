@@ -31,6 +31,9 @@ public class Awaitility {
 	/** The default timeout. */
 	private static volatile Duration defaultTimeout = Duration.TEN_SECONDS;
 
+	/** The default poll delay. */
+	private static volatile Duration defaultPollDelay = defaultPollInterval;
+
 	/** The default catch uncaught exceptions. */
 	private static volatile boolean defaultCatchUncaughtExceptions = true;
 
@@ -53,6 +56,7 @@ public class Awaitility {
 	 */
 	public static void reset() {
 		defaultPollInterval = Duration.FIVE_HUNDRED_MILLISECONDS;
+		defaultPollDelay = defaultPollInterval;
 		defaultTimeout = Duration.FOREVER;
 		defaultCatchUncaughtExceptions = false;
 		Thread.setDefaultUncaughtExceptionHandler(null);
@@ -75,7 +79,8 @@ public class Awaitility {
 	 * @return the condition factory
 	 */
 	public static ConditionFactory await(String alias) {
-		return new ConditionFactory(alias, defaultTimeout, defaultPollInterval, defaultCatchUncaughtExceptions);
+		return new ConditionFactory(alias, defaultTimeout, defaultPollInterval, defaultPollDelay,
+				defaultCatchUncaughtExceptions);
 	}
 
 	/**
@@ -84,7 +89,7 @@ public class Awaitility {
 	 * @return the condition factory
 	 */
 	public static ConditionFactory catchingUncaughtExceptions() {
-		return new ConditionFactory(defaultTimeout, defaultPollInterval, true);
+		return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay, true);
 	}
 
 	/**
@@ -98,7 +103,8 @@ public class Awaitility {
 	 * @return the condition factory
 	 */
 	public static ConditionFactory withPollInterval(long time, TimeUnit unit) {
-		return new ConditionFactory(defaultTimeout, new Duration(time, unit), defaultCatchUncaughtExceptions);
+		return new ConditionFactory(defaultTimeout, new Duration(time, unit), defaultPollDelay,
+				defaultCatchUncaughtExceptions);
 	}
 
 	/**
@@ -109,7 +115,16 @@ public class Awaitility {
 	 * @return the condition factory
 	 */
 	public static ConditionFactory withPollInterval(Duration pollInterval) {
-		return new ConditionFactory(defaultTimeout, pollInterval, defaultCatchUncaughtExceptions);
+		return new ConditionFactory(defaultTimeout, pollInterval, defaultPollDelay, defaultCatchUncaughtExceptions);
+	}
+
+	public static ConditionFactory withPollDelay(Duration pollDelay) {
+		return new ConditionFactory(defaultTimeout, defaultPollInterval, pollDelay, defaultCatchUncaughtExceptions);
+	}
+
+	public static ConditionFactory withPollDelay(long time, TimeUnit unit) {
+		return new ConditionFactory(defaultTimeout, defaultPollInterval, new Duration(time, unit),
+				defaultCatchUncaughtExceptions);
 	}
 
 	/**
@@ -120,7 +135,7 @@ public class Awaitility {
 	 * @return the condition factory
 	 */
 	public static ConditionFactory withTimeout(Duration timeout) {
-		return new ConditionFactory(timeout, defaultPollInterval, defaultCatchUncaughtExceptions);
+		return new ConditionFactory(timeout, defaultPollInterval, defaultPollDelay, defaultCatchUncaughtExceptions);
 	}
 
 	/**
@@ -133,7 +148,7 @@ public class Awaitility {
 	 * @return the condition factory
 	 */
 	public static ConditionFactory withTimeout(long timeout, TimeUnit timeUnit) {
-		return new ConditionFactory(new Duration(timeout, timeUnit), defaultPollInterval,
+		return new ConditionFactory(new Duration(timeout, timeUnit), defaultPollInterval, defaultPollDelay,
 				defaultCatchUncaughtExceptions);
 	}
 
@@ -145,7 +160,7 @@ public class Awaitility {
 	 * @return the condition factory
 	 */
 	public static ConditionFactory waitAtMost(Duration timeout) {
-		return new ConditionFactory(timeout, defaultPollInterval, defaultCatchUncaughtExceptions);
+		return new ConditionFactory(timeout, defaultPollInterval, defaultPollDelay, defaultCatchUncaughtExceptions);
 	}
 
 	/**
@@ -158,6 +173,10 @@ public class Awaitility {
 	 */
 	public static void setDefaultPollInterval(long pollInterval, TimeUnit unit) {
 		defaultPollInterval = new Duration(pollInterval, unit);
+	}
+
+	public static void setDefaultPollDelay(long pollDelay, TimeUnit unit) {
+		defaultPollDelay = new Duration(pollDelay, unit);
 	}
 
 	/**
@@ -183,6 +202,13 @@ public class Awaitility {
 			throw new IllegalArgumentException("You must specify a poll interval (was null).");
 		}
 		defaultPollInterval = pollInterval;
+	}
+
+	public static void setDefaultPollDelay(Duration pollDelay) {
+		if (pollDelay == null) {
+			throw new IllegalArgumentException("You must specify a poll delay (was null).");
+		}
+		defaultPollDelay = pollDelay;
 	}
 
 	/**
