@@ -21,14 +21,17 @@ import com.jayway.awaitility.synchronizer.ConditionFactory;
 import com.jayway.awaitility.synchronizer.Duration;
 
 /**
- * 
+ * The Class Awaitility.
  */
 public class Awaitility {
 
+	/** The default poll interval. */
 	private static volatile Duration defaultPollInterval = Duration.ONE_HUNDRED_MILLISECONDS;
 
+	/** The default timeout. */
 	private static volatile Duration defaultTimeout = Duration.TEN_SECONDS;
 
+	/** The default catch uncaught exceptions. */
 	private static volatile boolean defaultCatchUncaughtExceptions = true;
 
 	/**

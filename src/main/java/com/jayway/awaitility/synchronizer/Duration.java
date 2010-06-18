@@ -16,7 +16,6 @@
 package com.jayway.awaitility.synchronizer;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.concurrent.TimeUnit;
@@ -30,10 +29,10 @@ public class Duration {
 	public static final Duration TWO_SECONDS = new Duration(2, SECONDS);
 	public static final Duration FIVE_SECONDS = new Duration(5, SECONDS);
 	public static final Duration TEN_SECONDS = new Duration(10, SECONDS);
-	public static final Duration ONE_MINUTE = new Duration(1, MINUTES);
-	public static final Duration TWO_MINUTES = new Duration(2, MINUTES);
-	public static final Duration FIVE_MINUTES = new Duration(5, MINUTES);
-	public static final Duration TEN_MINUTES = new Duration(10, MINUTES);;
+	public static final Duration ONE_MINUTE = new Duration(60, SECONDS);
+	public static final Duration TWO_MINUTES = new Duration(120, SECONDS);
+	public static final Duration FIVE_MINUTES = new Duration(300, SECONDS);
+	public static final Duration TEN_MINUTES = new Duration(600, SECONDS);;
 
 	private final long value;
 	private final TimeUnit unit;
