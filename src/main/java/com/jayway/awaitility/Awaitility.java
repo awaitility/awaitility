@@ -62,14 +62,15 @@ import com.jayway.awaitility.synchronizer.Duration;
  * <p>
  * A word on poll interval and poll delay: Awaitility starts to check the
  * specified condition (the one you create using the Awaitility DSL) matches for
- * the first time after the specified poll delay (the initial delay before the
- * polling begins). By default Awaitility uses the same poll delay as poll
- * interval which means that it checks the condition periodically first after
- * the given poll delay, and subsequently with the given poll interval; that is
- * executions will commence after pollDelay then pollDelay+pollInterval, then
- * pollDelay + 2 * pollInterval, and so on. <br><b>Note:</b> If you change the poll
- * interval the poll delay will also change to match the specified poll interval
- * <i>unless</i> you've specified a poll delay explicitly.
+ * the first time after a "poll delay" (the initial delay before the polling
+ * begins). By default Awaitility uses the same poll delay as poll interval
+ * which means that it checks the condition periodically first after the given
+ * poll delay, and subsequently with the given poll interval; that is conditions
+ * are checked after pollDelay then pollDelay+pollInterval, then pollDelay + 2
+ * pollInterval, and so on.<br>
+ * <b>Note:</b> If you change the poll interval the poll delay will also change
+ * to match the specified poll interval <i>unless</i> you've specified a poll
+ * delay explicitly.
  * <p>
  * Note that since Awaitility uses polling to verify that a condition matches
  * it's not recommended to use it for precise performance testing. In these
