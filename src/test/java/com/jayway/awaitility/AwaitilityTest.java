@@ -19,9 +19,11 @@ import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.awaitility.Awaitility.catchUncaughtExceptions;
 import static com.jayway.awaitility.Awaitility.catchingUncaughtExceptions;
 import static com.jayway.awaitility.Awaitility.waitAtMost;
+import static com.jayway.awaitility.Awaitility.withPollDelay;
 import static com.jayway.awaitility.Awaitility.withPollInterval;
 import static com.jayway.awaitility.Awaitility.withTimeout;
 import static com.jayway.awaitility.synchronizer.ConditionFactory.callTo;
+import static com.jayway.awaitility.synchronizer.Duration.ONE_SECOND;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.equalTo;
@@ -105,11 +107,26 @@ public class AwaitilityTest {
 		withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
 		assertEquals(1, fakeRepository.getValue());
 	}
+	
+	@Test(timeout = 2000)
+	public void awaitOperationSupportsSpecifyingPollDelay() throws Exception {
+		new Asynch(fakeRepository).perform();
+		withPollDelay(Duration.ONE_HUNDRED_MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
+		assertEquals(1, fakeRepository.getValue());
+	}
+
 
 	@Test(expected = TimeoutException.class)
 	public void awaitOperationSupportsDefaultTimeout() throws Exception {
 		Awaitility.setDefaultTimeout(20, TimeUnit.MILLISECONDS);
 		await().until(value(), greaterThan(0));
+		assertEquals(1, fakeRepository.getValue());
+	}
+	
+	@Test(expected = TimeoutException.class)
+	public void awaitOperationSupportsDefaultPollDelay() throws Exception {
+		Awaitility.setDefaultPollDelay(3000, TimeUnit.MILLISECONDS);
+		await().atMost(ONE_SECOND).until(value(), greaterThan(0));
 		assertEquals(1, fakeRepository.getValue());
 	}
 
