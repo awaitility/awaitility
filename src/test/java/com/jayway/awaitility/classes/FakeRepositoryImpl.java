@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.concurrenttest.classes;
+package com.jayway.awaitility.classes;
 
-public class ExceptionThrowingAsynch {
+public class FakeRepositoryImpl implements FakeRepository {
 
-	public void perform() {
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				try {
-					Thread.sleep(600);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-				throw new IllegalStateException("Illegal state!");
-			}
-		});
+	private volatile int value = 0;
 
-		thread.start();
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.powermock.utils.classes.FakeRepository#getValue()
+	 */
+	public int getValue() {
+		return value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.powermock.utils.classes.FakeRepository#setValue(int)
+	 */
+	public void setValue(int value) {
+		this.value = value;
 	}
 }

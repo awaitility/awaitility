@@ -1,8 +1,4 @@
-package com.jayway.concurrenttest.synchronizer;
-
-import static com.jayway.concurrenttest.Synchronizer.await;
-import static com.jayway.concurrenttest.synchronizer.ConditionFactory.callTo;
-import static org.hamcrest.Matchers.greaterThan;
+package com.jayway.awaitility.synchronizer;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;

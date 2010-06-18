@@ -13,20 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.concurrenttest.classes;
+package com.jayway.awaitility.synchronizer;
 
-import com.jayway.concurrenttest.synchronizer.ConditionEvaluator;
+public interface ExceptionCatcher {
 
-public class FakeRepositoryEqualsOne implements ConditionEvaluator {
+	AwaitSupportedCondition andCatchAllUncaughtExceptions();
 
-	private final FakeRepository repository;
-
-	public FakeRepositoryEqualsOne(FakeRepository repository) {
-		super();
-		this.repository = repository;
-	}
-
-	public Boolean call() {
-		return repository.getValue() == 1;
-	}
 }

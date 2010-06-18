@@ -13,26 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.concurrenttest.classes;
+package com.jayway.awaitility.classes;
 
-public class Asynch {
-	private final FakeRepository repository;
+import java.util.concurrent.Callable;
 
-	public Asynch(FakeRepository repository) {
-		this.repository = repository;
-	}
+public class FakeRepositoryValue implements Callable<Integer> {
+    private final FakeRepository repository;
 
-	public void perform() {
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				try {
-					Thread.sleep(600);
-					repository.setValue(1);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
-			}
-		});
-		thread.start();
-	}
+    public FakeRepositoryValue(FakeRepository repository) {
+        this.repository = repository;
+    }
+
+    public Integer call() throws Exception {
+        return repository.getValue();
+    }
 }

@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.concurrenttest;
+package com.jayway.awaitility;
 
 import java.util.concurrent.TimeUnit;
 
-import com.jayway.concurrenttest.synchronizer.ConditionFactory;
-import com.jayway.concurrenttest.synchronizer.Duration;
+import com.jayway.awaitility.synchronizer.ConditionFactory;
+import com.jayway.awaitility.synchronizer.Duration;
 
 /**
  * 
  */
-public class Synchronizer {
+public class Awaitility {
 
 	private static volatile Duration defaultPollInterval = Duration.ONE_HUNDRED_MILLISECONDS;
 
@@ -192,6 +192,6 @@ public class Synchronizer {
 		if (defaultTimeout == null) {
 			throw new IllegalArgumentException("You must specify a default timeout (was null).");
 		}
-		Synchronizer.defaultTimeout = defaultTimeout;
+		Awaitility.defaultTimeout = defaultTimeout;
 	}
 }

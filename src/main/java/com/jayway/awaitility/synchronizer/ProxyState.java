@@ -1,4 +1,4 @@
-package com.jayway.concurrenttest.synchronizer;
+package com.jayway.awaitility.synchronizer;
 
 import java.lang.reflect.Method;
 

@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.concurrenttest;
+package com.jayway.awaitility;
 
-import static com.jayway.concurrenttest.Synchronizer.await;
-import static com.jayway.concurrenttest.Synchronizer.catchUncaughtExceptions;
-import static com.jayway.concurrenttest.Synchronizer.catchingUncaughtExceptions;
-import static com.jayway.concurrenttest.Synchronizer.waitAtMost;
-import static com.jayway.concurrenttest.Synchronizer.withPollInterval;
-import static com.jayway.concurrenttest.Synchronizer.withTimeout;
-import static com.jayway.concurrenttest.synchronizer.ConditionFactory.callTo;
+import static com.jayway.awaitility.Awaitility.await;
+import static com.jayway.awaitility.Awaitility.catchUncaughtExceptions;
+import static com.jayway.awaitility.Awaitility.catchingUncaughtExceptions;
+import static com.jayway.awaitility.Awaitility.waitAtMost;
+import static com.jayway.awaitility.Awaitility.withPollInterval;
+import static com.jayway.awaitility.Awaitility.withTimeout;
+import static com.jayway.awaitility.synchronizer.ConditionFactory.callTo;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.equalTo;
@@ -37,20 +37,21 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.jayway.concurrenttest.classes.Asynch;
-import com.jayway.concurrenttest.classes.ExceptionThrowingAsynch;
-import com.jayway.concurrenttest.classes.ExceptionThrowingFakeRepository;
-import com.jayway.concurrenttest.classes.FakeRepository;
-import com.jayway.concurrenttest.classes.FakeRepositoryEqualsOne;
-import com.jayway.concurrenttest.classes.FakeRepositoryImpl;
-import com.jayway.concurrenttest.classes.FakeRepositoryValue;
-import com.jayway.concurrenttest.classes.FinalClass;
-import com.jayway.concurrenttest.classes.FinalFakeRepositoryImpl;
-import com.jayway.concurrenttest.synchronizer.CannotCreateProxyException;
-import com.jayway.concurrenttest.synchronizer.ConditionEvaluator;
-import com.jayway.concurrenttest.synchronizer.Duration;
+import com.jayway.awaitility.Awaitility;
+import com.jayway.awaitility.classes.Asynch;
+import com.jayway.awaitility.classes.ExceptionThrowingAsynch;
+import com.jayway.awaitility.classes.ExceptionThrowingFakeRepository;
+import com.jayway.awaitility.classes.FakeRepository;
+import com.jayway.awaitility.classes.FakeRepositoryEqualsOne;
+import com.jayway.awaitility.classes.FakeRepositoryImpl;
+import com.jayway.awaitility.classes.FakeRepositoryValue;
+import com.jayway.awaitility.classes.FinalClass;
+import com.jayway.awaitility.classes.FinalFakeRepositoryImpl;
+import com.jayway.awaitility.synchronizer.CannotCreateProxyException;
+import com.jayway.awaitility.synchronizer.ConditionEvaluator;
+import com.jayway.awaitility.synchronizer.Duration;
 
-public class SynchronizerTest {
+public class AwaitilityTest {
 
 	private FakeRepository fakeRepository;
 
@@ -60,7 +61,7 @@ public class SynchronizerTest {
 	@Before
 	public void setup() {
 		fakeRepository = new FakeRepositoryImpl();
-		Synchronizer.reset();
+		Awaitility.reset();
 	}
 
 	@Test(timeout = 2000)
@@ -107,7 +108,7 @@ public class SynchronizerTest {
 
 	@Test(expected = TimeoutException.class)
 	public void awaitOperationSupportsDefaultTimeout() throws Exception {
-		Synchronizer.setDefaultTimeout(20, TimeUnit.MILLISECONDS);
+		Awaitility.setDefaultTimeout(20, TimeUnit.MILLISECONDS);
 		await().until(value(), greaterThan(0));
 		assertEquals(1, fakeRepository.getValue());
 	}
@@ -128,7 +129,7 @@ public class SynchronizerTest {
 
 	@Test(timeout = 2000)
 	public void specifyingDefaultPollIntervalImpactsAllSubsequentUndefinedPollIntervalStatements() throws Exception {
-		Synchronizer.setDefaultPollInterval(20, TimeUnit.MILLISECONDS);
+		Awaitility.setDefaultPollInterval(20, TimeUnit.MILLISECONDS);
 		new Asynch(fakeRepository).perform();
 		await().until(value(), equalTo(1));
 		assertEquals(1, fakeRepository.getValue());

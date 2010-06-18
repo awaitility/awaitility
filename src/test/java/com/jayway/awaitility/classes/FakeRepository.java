@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.concurrenttest.synchronizer;
+package com.jayway.awaitility.classes;
 
-public interface AwaitSupportedCondition {
-	void await() throws Exception;
+public interface FakeRepository {
+
+	int getValue();
+
+	void setValue(int value);
+
 }

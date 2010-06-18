@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.concurrenttest.classes;
+package com.jayway.awaitility.classes;
 
-import java.util.concurrent.Callable;
+import com.jayway.awaitility.synchronizer.ConditionEvaluator;
 
-public class FakeRepositoryValue implements Callable<Integer> {
-    private final FakeRepository repository;
+public class FakeRepositoryEqualsOne implements ConditionEvaluator {
 
-    public FakeRepositoryValue(FakeRepository repository) {
-        this.repository = repository;
-    }
+	private final FakeRepository repository;
 
-    public Integer call() throws Exception {
-        return repository.getValue();
-    }
+	public FakeRepositoryEqualsOne(FakeRepository repository) {
+		super();
+		this.repository = repository;
+	}
+
+	public Boolean call() {
+		return repository.getValue() == 1;
+	}
 }

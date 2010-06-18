@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.concurrenttest.synchronizer;
+package com.jayway.awaitility.classes;
 
-import java.util.concurrent.Callable;
-
-public interface ConditionEvaluator extends Callable<Boolean> {
+public final class FinalFakeRepositoryImpl extends FakeRepositoryImpl {
 }

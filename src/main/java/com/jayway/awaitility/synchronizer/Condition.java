@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.concurrenttest.synchronizer;
+package com.jayway.awaitility.synchronizer;
 
-public interface ExceptionCatcher {
-
-	AwaitSupportedCondition andCatchAllUncaughtExceptions();
+public interface Condition extends AwaitSupportedCondition, ExceptionCatcher {
 
 }

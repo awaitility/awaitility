@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.concurrenttest.classes;
+package com.jayway.awaitility.synchronizer;
 
-public interface FakeRepository {
+public class CannotCreateProxyException extends RuntimeException {
+	private static final long serialVersionUID = -2443849094145412513L;
 
-	int getValue();
-
-	void setValue(int value);
+	public CannotCreateProxyException(String message) {
+		super(message);
+	}
 
 }

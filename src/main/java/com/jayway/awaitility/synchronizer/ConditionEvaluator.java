@@ -13,27 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.concurrenttest.classes;
+package com.jayway.awaitility.synchronizer;
 
-public class FakeRepositoryImpl implements FakeRepository {
+import java.util.concurrent.Callable;
 
-	private volatile int value = 0;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.powermock.utils.classes.FakeRepository#getValue()
-	 */
-	public int getValue() {
-		return value;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.powermock.utils.classes.FakeRepository#setValue(int)
-	 */
-	public void setValue(int value) {
-		this.value = value;
-	}
+public interface ConditionEvaluator extends Callable<Boolean> {
 }

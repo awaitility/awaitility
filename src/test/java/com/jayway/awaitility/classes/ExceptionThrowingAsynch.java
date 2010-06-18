@@ -13,14 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.concurrenttest.classes;
+package com.jayway.awaitility.classes;
 
-public class ExceptionThrowingFakeRepository implements FakeRepository {
+public class ExceptionThrowingAsynch {
 
-	public int getValue() {
-		throw new IllegalStateException("illegal");
-	}
+	public void perform() {
+		Thread thread = new Thread(new Runnable() {
+			public void run() {
+				try {
+					Thread.sleep(600);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+				throw new IllegalStateException("Illegal state!");
+			}
+		});
 
-	public void setValue(int value) {
+		thread.start();
 	}
 }
