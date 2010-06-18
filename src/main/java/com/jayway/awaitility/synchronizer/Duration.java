@@ -33,7 +33,8 @@ public class Duration {
 	public static final Duration ONE_MINUTE = new Duration(60, SECONDS);
 	public static final Duration TWO_MINUTES = new Duration(120, SECONDS);
 	public static final Duration FIVE_MINUTES = new Duration(300, SECONDS);
-	public static final Duration TEN_MINUTES = new Duration(600, SECONDS);;
+	public static final Duration TEN_MINUTES = new Duration(600, SECONDS);
+	public static final Duration SAME_AS_POLL_INTERVAL = new Duration();
 
 	private final long value;
 	private final TimeUnit unit;

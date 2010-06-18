@@ -15,6 +15,8 @@
  */
 package com.jayway.awaitility;
 
+import static com.jayway.awaitility.synchronizer.Duration.SAME_AS_POLL_INTERVAL;
+
 import java.util.concurrent.TimeUnit;
 
 import com.jayway.awaitility.synchronizer.ConditionFactory;
@@ -58,6 +60,17 @@ import com.jayway.awaitility.synchronizer.Duration;
  * 
  * You can also reset to the default values using {@link Awaitility#reset()}.
  * <p>
+ * A word on poll interval and poll delay: Awaitility starts to check the
+ * specified condition (the one you create using the Awaitility DSL) matches for
+ * the first time after the specified poll delay (the initial delay before the
+ * polling begins). By default Awaitility uses the same poll delay as poll
+ * interval which means that it checks the condition periodically first after
+ * the given poll delay, and subsequently with the given poll interval; that is
+ * executions will commence after pollDelay then pollDelay+pollInterval, then
+ * pollDelay + 2 * pollInterval, and so on. <br><b>Note:</b> If you change the poll
+ * interval the poll delay will also change to match the specified poll interval
+ * <i>unless</i> you've specified a poll delay explicitly.
+ * <p>
  * Note that since Awaitility uses polling to verify that a condition matches
  * it's not recommended to use it for precise performance testing. In these
  * cases it's better to use an AOP framework such as AspectJ's compile-time
@@ -72,7 +85,7 @@ public class Awaitility {
 	private static volatile Duration defaultTimeout = Duration.TEN_SECONDS;
 
 	/** The default poll delay (same as {@link #defaultPollInterval}) */
-	private static volatile Duration defaultPollDelay = defaultPollInterval;
+	private static volatile Duration defaultPollDelay = SAME_AS_POLL_INTERVAL;
 
 	/** Catch all uncaught exceptions by default? */
 	private static volatile boolean defaultCatchUncaughtExceptions = true;
@@ -108,7 +121,7 @@ public class Awaitility {
 	 */
 	public static void reset() {
 		defaultPollInterval = Duration.ONE_HUNDRED_MILLISECONDS;
-		defaultPollDelay = defaultPollInterval;
+		defaultPollDelay = SAME_AS_POLL_INTERVAL;
 		defaultTimeout = Duration.TEN_SECONDS;
 		defaultCatchUncaughtExceptions = false;
 		Thread.setDefaultUncaughtExceptionHandler(null);
@@ -155,7 +168,7 @@ public class Awaitility {
 	 * @return the condition factory
 	 */
 	public static ConditionFactory withPollInterval(long time, TimeUnit unit) {
-		return new ConditionFactory(defaultTimeout, new Duration(time, unit), defaultPollDelay,
+		return new ConditionFactory(defaultTimeout, new Duration(time, unit), defaultPollInterval,
 				defaultCatchUncaughtExceptions);
 	}
 

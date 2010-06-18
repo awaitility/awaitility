@@ -1,12 +1,13 @@
 package com.jayway.awaitility.synchronizer;
 
+import static com.jayway.awaitility.synchronizer.Duration.SAME_AS_POLL_INTERVAL;
+
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Matcher;
 
-// TODO: Auto-generated Javadoc
 /**
  * A factory for creating Condition objects.
  */
@@ -37,7 +38,7 @@ public class ConditionFactory {
 	 * @param pollInterval
 	 *            the poll interval
 	 * @param pollDelay
-	 *            TODO
+	 *            The poll delay
 	 * @param catchUncaughtExceptions
 	 *            the catch uncaught exceptions
 	 */
@@ -312,8 +313,8 @@ public class ConditionFactory {
 	 *             the exception
 	 */
 	public <T> void until(Callable<Boolean> conditionEvaluator) throws Exception {
-		AwaitConditionImpl condition = new AwaitConditionImpl(alias, timeout, conditionEvaluator, pollInterval,
-				pollDelay);
+		Duration pollDelayToUse = pollDelay == SAME_AS_POLL_INTERVAL ? pollInterval : pollDelay;
+		Condition condition = new AwaitConditionImpl(alias, timeout, conditionEvaluator, pollInterval, pollDelayToUse);
 		if (catchUncaughtExceptions) {
 			condition.andCatchAllUncaughtExceptions();
 		}
