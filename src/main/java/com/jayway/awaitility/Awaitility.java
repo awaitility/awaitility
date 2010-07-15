@@ -18,6 +18,7 @@ package com.jayway.awaitility;
 import static com.jayway.awaitility.synchronizer.Duration.SAME_AS_POLL_INTERVAL;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import com.jayway.awaitility.synchronizer.ConditionFactory;
 import com.jayway.awaitility.synchronizer.Duration;
@@ -46,8 +47,8 @@ import com.jayway.awaitility.synchronizer.Duration;
  * statement that failed if you have multiple awaits in the same test.
  * 
  * <pre>
- * withPollInterval(ONE_HUNDERED_MILLISECONDS).andWithPollDelay(20, MILLISECONDS).await(&quot;customer registration&quot;).until(
- * 		costumerStatus(), equalTo(REGISTERED));
+ * withPollInterval(ONE_HUNDERED_MILLISECONDS).andWithPollDelay(20, MILLISECONDS).await(&quot;customer registration&quot;)
+ * 		.until(costumerStatus(), equalTo(REGISTERED));
  * </pre>
  * 
  * You can also specify a default timeout, poll interval and poll delay using:
@@ -59,6 +60,21 @@ import com.jayway.awaitility.synchronizer.Duration;
  * </pre>
  * 
  * You can also reset to the default values using {@link Awaitility#reset()}.
+ * <p>
+ * In order to use Awaitility effectively it's recommended to statically import
+ * the following methods from the Awaitility framework:
+ * <ul>
+ * <li>com.jayway.awaitility.Awaitlity.*</li>
+ * <li>com.jayway.awaitility.synchronizer.ConditionFactory.callTo</li>
+ * <li>com.jayway.awaitility.synchronizer.Duration.*</li>
+ * </ul>
+ * It may also be useful to import these methods:
+ * <ul>
+ * <li>java.util.concurrent.TimeUnit.*</li>
+ * <li>org.hamcrest.Matchers.*</li>
+ * <li>org.junit.Assert.*</li>
+ * </ul>
+ * </p>
  * <p>
  * A word on poll interval and poll delay: Awaitility starts to check the
  * specified condition (the one you create using the Awaitility DSL) matches for
@@ -76,6 +92,7 @@ import com.jayway.awaitility.synchronizer.Duration;
  * it's not recommended to use it for precise performance testing. In these
  * cases it's better to use an AOP framework such as AspectJ's compile-time
  * weaving.
+ * </p>
  */
 public class Awaitility {
 
@@ -129,7 +146,7 @@ public class Awaitility {
 	}
 
 	/**
-	 * Await.
+	 * Start building an await statement.
 	 * 
 	 * @return the condition factory
 	 */
@@ -138,10 +155,13 @@ public class Awaitility {
 	}
 
 	/**
-	 * Await.
+	 * Start building a named await statement. This is useful is cases when you
+	 * have several awaits in your test and you need to tell them apart. If a
+	 * named await timeout's the <code>alias</code> will be displayed indicating
+	 * which await statement that failed.
 	 * 
 	 * @param alias
-	 *            the alias
+	 *            the alias that will be shown if the await timeouts.
 	 * @return the condition factory
 	 */
 	public static ConditionFactory await(String alias) {
@@ -150,7 +170,9 @@ public class Awaitility {
 	}
 
 	/**
-	 * Catching uncaught exceptions.
+	 * Catching uncaught exceptions in other threads. This will make the await
+	 * statement fail even if exceptions occur in other threads. This is the
+	 * default behavior.
 	 * 
 	 * @return the condition factory
 	 */
@@ -161,6 +183,13 @@ public class Awaitility {
 	/**
 	 * Specify the poll interval. This defines how often Awaitility will poll
 	 * for a result matching the stop criteria.
+	 * <p>
+	 * Note that the poll delay will be automatically set as to the same value
+	 * as the interval unless it's specified explicitly using
+	 * {@link #withPollDelay(Duration)}, {@link #withPollDelay(long, TimeUnit)}
+	 * or {@link ConditionFactory#andWithPollDelay(Duration), or
+	 * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
+	 * </p>
 	 * 
 	 * @param time
 	 *            the time
@@ -174,7 +203,15 @@ public class Awaitility {
 	}
 
 	/**
-	 * With poll interval.
+	 * Specify the poll interval by passing a {@link Duration}. This defines how
+	 * often Awaitility will poll for a result matching the stop criteria.
+	 * <p>
+	 * Note that the poll delay will be automatically set as to the same value
+	 * as the interval unless it's specified explicitly using
+	 * {@link #withPollDelay(Duration)}, {@link #withPollDelay(long, TimeUnit)}
+	 * or {@link ConditionFactory#andWithPollDelay(Duration), or
+	 * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
+	 * </p>
 	 * 
 	 * @param pollInterval
 	 *            the poll interval
@@ -185,7 +222,9 @@ public class Awaitility {
 	}
 
 	/**
-	 * With poll delay.
+	 * Specify the delay that will be used before Awaitility starts polling for
+	 * the result the first time. If you don't specify a poll delay explicitly
+	 * it'll be the same as the poll interval.
 	 * 
 	 * @param pollDelay
 	 *            the poll delay
@@ -196,7 +235,9 @@ public class Awaitility {
 	}
 
 	/**
-	 * With poll delay.
+	 * Specify the delay that will be used before Awaitility starts polling for
+	 * the result the first time. If you don't specify a poll delay explicitly
+	 * it'll be the same as the poll interval.
 	 * 
 	 * @param time
 	 *            the time
@@ -210,7 +251,9 @@ public class Awaitility {
 	}
 
 	/**
-	 * With timeout.
+	 * Specify the timeout for the await statement. When the
+	 * <code>timeout</code> has been reached a {@link TimeoutException} is
+	 * thrown.
 	 * 
 	 * @param timeout
 	 *            the timeout
@@ -221,7 +264,9 @@ public class Awaitility {
 	}
 
 	/**
-	 * With timeout.
+	 * Specify the timeout for the await statement. When the
+	 * <code>timeout</code> has been reached a {@link TimeoutException} is
+	 * thrown.
 	 * 
 	 * @param timeout
 	 *            the timeout
@@ -235,7 +280,8 @@ public class Awaitility {
 	}
 
 	/**
-	 * Wait at most.
+	 * An alternative to using {@link #await()} if you want to specify a timeout
+	 * directly.
 	 * 
 	 * @param timeout
 	 *            the timeout
@@ -246,7 +292,7 @@ public class Awaitility {
 	}
 
 	/**
-	 * Sets the default poll interval.
+	 * Sets the default poll interval that all await statements will use.
 	 * 
 	 * @param pollInterval
 	 *            the poll interval
@@ -258,7 +304,7 @@ public class Awaitility {
 	}
 
 	/**
-	 * Sets the default poll delay.
+	 * Sets the default poll delay all await statements will use.
 	 * 
 	 * @param pollDelay
 	 *            the poll delay
@@ -270,7 +316,7 @@ public class Awaitility {
 	}
 
 	/**
-	 * Sets the default timeout.
+	 * Sets the default timeout all await statements will use.
 	 * 
 	 * @param timeout
 	 *            the timeout
@@ -282,7 +328,7 @@ public class Awaitility {
 	}
 
 	/**
-	 * Sets the default poll interval.
+	 * Sets the default poll interval that all await statements will use.
 	 * 
 	 * @param pollInterval
 	 *            the new default poll interval
@@ -295,7 +341,7 @@ public class Awaitility {
 	}
 
 	/**
-	 * Sets the default poll delay.
+	 * Sets the default poll delay that all await statements will use.
 	 * 
 	 * @param pollDelay
 	 *            the new default poll delay
@@ -308,7 +354,7 @@ public class Awaitility {
 	}
 
 	/**
-	 * Sets the default timeout.
+	 * Sets the default timeout that all await statements will use.
 	 * 
 	 * @param defaultTimeout
 	 *            the new default timeout

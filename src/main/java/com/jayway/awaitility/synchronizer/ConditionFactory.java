@@ -9,7 +9,8 @@ import java.util.concurrent.TimeUnit;
 import org.hamcrest.Matcher;
 
 /**
- * A factory for creating Condition objects.
+ * A factory for creating {@link Condition} objects. It's not recommended to
+ * instantiate this class directly.
  */
 public class ConditionFactory {
 
@@ -114,6 +115,13 @@ public class ConditionFactory {
 	 * Specify the polling interval Awaitility will use for this await
 	 * statement. This means the frequency in which the condition is checked for
 	 * completion.
+	 * <p>
+	 * Note that the poll delay will be automatically set as to the same value
+	 * as the interval unless it's specified explicitly using
+	 * {@link #withPollDelay(Duration)}, {@link #withPollDelay(long, TimeUnit)}
+	 * or {@link ConditionFactory#andWithPollDelay(Duration), or
+	 * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
+	 * </p>
 	 * 
 	 * @param pollInterval
 	 *            the poll interval
@@ -124,7 +132,7 @@ public class ConditionFactory {
 	}
 
 	/**
-	 * And with timeout.
+	 * Await at most <code>timeout</code> before throwing a timeout exception.
 	 * 
 	 * @param timeout
 	 *            the timeout
@@ -138,7 +146,10 @@ public class ConditionFactory {
 	}
 
 	/**
-	 * And with poll delay.
+	 * Specify the delay that will be used before Awaitility starts polling for
+	 * the result the first time. If you don't specify a poll delay explicitly
+	 * it'll be the same as the poll interval.
+	 * 
 	 * 
 	 * @param delay
 	 *            the delay
@@ -152,7 +163,10 @@ public class ConditionFactory {
 	}
 
 	/**
-	 * And with poll delay.
+	 * Specify the delay that will be used before Awaitility starts polling for
+	 * the result the first time. If you don't specify a poll delay explicitly
+	 * it'll be the same as the poll interval.
+	 * 
 	 * 
 	 * @param pollDelay
 	 *            the poll delay
@@ -163,7 +177,7 @@ public class ConditionFactory {
 	}
 
 	/**
-	 * At most.
+	 * Await at most <code>timeout</code> before throwing a timeout exception.
 	 * 
 	 * @param timeout
 	 *            the timeout
@@ -177,7 +191,18 @@ public class ConditionFactory {
 	}
 
 	/**
-	 * And with poll interval.
+	 * Specify the polling interval Awaitility will use for this await
+	 * statement. This means the frequency in which the condition is checked for
+	 * completion.
+	 * 
+	 * <p>
+	 * Note that the poll delay will be automatically set as to the same value
+	 * as the interval unless it's specified explicitly using
+	 * {@link #withPollDelay(Duration)}, {@link #withPollDelay(long, TimeUnit)}
+	 * or {@link ConditionFactory#andWithPollDelay(Duration), or
+	 * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
+	 * </p>
+	 * 
 	 * 
 	 * @param pollInterval
 	 *            the poll interval
@@ -191,7 +216,10 @@ public class ConditionFactory {
 	}
 
 	/**
-	 * And catch uncaught exceptions.
+	 * Instruct Awaitility to catch uncaught exceptions from other threads. This
+	 * is useful in multi-threaded systems when you want your test to fail
+	 * regardless of which thread throwing the exception. Default is
+	 * <code>true</code>.
 	 * 
 	 * @return the condition factory
 	 */
@@ -200,7 +228,9 @@ public class ConditionFactory {
 	}
 
 	/**
-	 * Await for an asynchronous operation.
+	 * Await for an asynchronous operation. This method returns the same
+	 * {@link ConditionFactory} instance and is used only to get a more
+	 * fluent-like syntax.
 	 * 
 	 * @return the condition factory
 	 * @throws Exception
@@ -277,14 +307,42 @@ public class ConditionFactory {
 	}
 
 	/**
-	 * Until.
+	 * Await until a {@link Callable} supplies a value matching the specified
+	 * {@link Matcher}. E.g.
+	 * 
+	 * <pre>
+	 * await().until(numberOfPersons(), is(greaterThan(2)));
+	 * </pre>
+	 * 
+	 * where "numberOfPersons()" returns a standard {@link Callable}:
+	 * 
+	 * <pre>
+	 * private Callable&lt;Integer&gt; numberOfPersons() {
+	 * 	return new Callable&lt;Integer&gt;() {
+	 * 		public Integer call() throws Exception {
+	 * 			return personRepository.size();
+	 * 		}
+	 * 	};
+	 * }
+	 * </pre>
+	 * 
+	 * Using a generic {@link Callable} as done by using this version of "until"
+	 * allows you to reuse the "numberOfPersons()" definition in multiple await
+	 * statements. I.e. you can easily create another await statement (perhaps
+	 * in a different test case) using e.g.
+	 * 
+	 * <pre>
+	 * await().until(numberOfPersons(), is(equalTo(6)));
+	 * </pre>
 	 * 
 	 * @param <T>
 	 *            the generic type
 	 * @param supplier
-	 *            the supplier
+	 *            the supplier that is responsible for getting the value that
+	 *            should be matched.
 	 * @param matcher
-	 *            the matcher
+	 *            the matcher The hamcrest matcher that checks whether the
+	 *            condition is fulfilled.
 	 * @throws Exception
 	 *             the exception
 	 */
@@ -303,14 +361,32 @@ public class ConditionFactory {
 	}
 
 	/**
-	 * Until.
+	 * Await until a {@link Callable} returns <code>true</code>. This is method
+	 * is not as generic as the other variants of "until" but it allows for a
+	 * more precise and in some cases even more english-like syntax. E.g.
+	 * 
+	 * <pre>
+	 * await().until(numberOfPersonsIsEqualToThree());
+	 * </pre>
+	 * 
+	 * where "numberOfPersonsIsEqualToThree()" returns a standard
+	 * {@link Callable} of type {@link Boolean}:
+	 * 
+	 * <pre>
+	 * private Callable&lt;Boolean&gt; numberOfPersons() {
+	 * 	return new Callable&lt;Boolean&gt;() {
+	 * 		public Boolean call() throws Exception {
+	 * 			return personRepository.size() == 3;
+	 * 		}
+	 * 	};
+	 * }
 	 * 
 	 * @param <T>
 	 *            the generic type
 	 * @param conditionEvaluator
 	 *            the condition evaluator
 	 * @throws Exception
-	 *             the exception
+	 * the exception
 	 */
 	public <T> void until(Callable<Boolean> conditionEvaluator) throws Exception {
 		Duration pollDelayToUse = pollDelay == SAME_AS_POLL_INTERVAL ? pollInterval : pollDelay;
