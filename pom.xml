@@ -24,7 +24,7 @@
 			<name>Johan Haleby</name>
 			<id>johan.haleby</id>
 			<organization>Jayway</organization>
-			<organizationUrl>http://www.jayway.se</organizationUrl>
+			<organizationUrl>http://www.jayway.com</organizationUrl>
 			<roles>
 				<role>Developer</role>
 			</roles>
@@ -33,7 +33,7 @@
 			<id>jakr</id>
 			<name>Jan Kronquist</name>
 			<organization>Jayway</organization>
-			<organizationUrl>http://www.jayway.se</organizationUrl>
+			<organizationUrl>http://www.jayway.com</organizationUrl>
 			<email>jan.kronquist at jayway.com</email>
 			<timezone>+1</timezone>
 			<roles>
@@ -41,6 +41,15 @@
 			</roles>
 		</developer>
 	</developers>
+	<properties>
+        <scm.branch>master</scm.branch>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>      
+	 <scm>
+        <url>http://github.com/jayway/awaitility/tree/${scm.branch}</url>
+        <connection>scm:git:git://github.com/jayway/awaitility.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/jayway/awaitility.git</developerConnection>
+    </scm>
 	<mailingLists>
 		<mailingList>
 			<name>Awaitility mailing-list</name>
@@ -55,6 +64,15 @@
 				<configuration>
 					<source>1.5</source>
 					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<useReleaseProfile>false</useReleaseProfile>
+					<arguments>-Prelease</arguments>
+					<goals>deploy</goals>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -82,4 +100,76 @@
 			<version>1.2</version>
 		</dependency>
 	</dependencies>
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<!-- We want to sign the artifact, the POM, and all attached artifacts -->
+					<plugin>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<configuration>
+							<useAgent>true</useAgent>
+						</configuration>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<!-- We want to deploy the artifact to a staging location for perusal -->
+					<plugin>
+						<inherited>true</inherited>
+						<artifactId>maven-deploy-plugin</artifactId>
+						<configuration>
+							<updateReleaseInfo>true</updateReleaseInfo>
+						</configuration>
+					</plugin>
+					<plugin>
+						<artifactId>maven-source-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<configuration>
+							<encoding>${project.build.sourceEncoding}</encoding>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+	
+	<distributionManagement>
+        <repository>
+            <id>oss.sonatype.org-jayway-staging</id>
+            <name>OpenSource Release Staging on Sonatype.org</name>
+            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>oss.sonatype.org-jayway-snapshots</id>
+            <name>Jayway OpenSource SNAPSHOTs on Sonatype.org</name>
+            <url>http://oss.sonatype.org/content/repositories/jayway-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+	
 </project>
