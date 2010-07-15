@@ -5,8 +5,48 @@
 	<artifactId>awaitility</artifactId>
 	<packaging>jar</packaging>
 	<version>0.5-SNAPSHOT</version>
-	<name>concurrenttest</name>
 	<url>http://github.com/jayway/awaitility</url>
+	<name>Awaitlity</name>
+	<description>A Java DSL for synchronizing asynchronous operations</description>
+	<inceptionYear>2010</inceptionYear>
+	<issueManagement>
+		<system>GitHub Issue Tracking</system>
+		<url></url>
+	</issueManagement>
+	<licenses>
+		<license>
+			<name>Apache 2.0</name>
+			<url>LICENSE.txt</url>
+		</license>
+	</licenses>
+	<developers>
+		<developer>
+			<name>Johan Haleby</name>
+			<id>johan.haleby</id>
+			<organization>Jayway</organization>
+			<organizationUrl>http://www.jayway.se</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>jakr</id>
+			<name>Jan Kronquist</name>
+			<organization>Jayway</organization>
+			<organizationUrl>http://www.jayway.se</organizationUrl>
+			<email>jan.kronquist at jayway.com</email>
+			<timezone>+1</timezone>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+	<mailingLists>
+		<mailingList>
+			<name>Awaitility mailing-list</name>
+			<archive>http://groups.google.com/group/awaitility/topics</archive>
+		</mailingList>
+	</mailingLists>
 	<build>
 		<plugins>
 			<plugin>
