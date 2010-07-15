@@ -37,7 +37,7 @@ import com.jayway.awaitility.synchronizer.Duration;
  * greater than 3.
  * 
  * <pre>
- * await().until(callTo(orderService).orderCount(), greaterThan(3));
+ * await().forever().until(callTo(orderService).orderCount(), greaterThan(3));
  * </pre>
  * 
  * Advanced usage: Use a poll interval of 100 milliseconds with an initial delay
