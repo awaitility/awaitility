@@ -29,35 +29,26 @@ public class ProxyState {
     private static ProxyCreator proxyCreator = new ProxyCreator() {
 		@Override
 		protected Object callReceived(Method method, Object[] args) {
-			ProxyState.setLastMethod(method);
-			ProxyState.setLastArgs(args);
+			lastMethod = method;
+			lastArgs = args;
 			return TypeUtils.getDefaultValue(method.getReturnType());
 		}
     };
 
 	public static Object createProxy(Object target) {
 		Object proxy = proxyCreator.create(target);
-		ProxyState.setLastTarget(target);
+		lastTarget = target;
 		return proxy;
 	}
 
 	public static Object getLastTarget() {
 		return lastTarget;
 	}
-	public static void setLastTarget(Object lastTarget) {
-		ProxyState.lastTarget = lastTarget;
-	}
 	public static Method getLastMethod() {
 		return lastMethod;
 	}
-	public static void setLastMethod(Method lastMethod) {
-		ProxyState.lastMethod = lastMethod;
-	}
 	public static Object[] getLastArgs() {
 		return lastArgs;
-	}
-	public static void setLastArgs(Object[] lastArgs) {
-		ProxyState.lastArgs = lastArgs;
 	}
 	
 }
