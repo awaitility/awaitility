@@ -15,13 +15,13 @@
  */
 package com.jayway.awaitility;
 
-import static com.jayway.awaitility.synchronizer.Duration.SAME_AS_POLL_INTERVAL;
+import static com.jayway.awaitility.core.Duration.SAME_AS_POLL_INTERVAL;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.jayway.awaitility.synchronizer.ConditionFactory;
-import com.jayway.awaitility.synchronizer.Duration;
+import com.jayway.awaitility.core.ConditionFactory;
+import com.jayway.awaitility.core.Duration;
 
 /**
  * Awaitility is a small Java DSL for synchronizing (waiting for) asynchronous
@@ -65,8 +65,8 @@ import com.jayway.awaitility.synchronizer.Duration;
  * the following methods from the Awaitility framework:
  * <ul>
  * <li>com.jayway.awaitility.Awaitlity.*</li>
- * <li>com.jayway.awaitility.synchronizer.ConditionFactory.callTo</li>
- * <li>com.jayway.awaitility.synchronizer.Duration.*</li>
+ * <li>com.jayway.awaitility.core.ConditionFactory.callTo</li>
+ * <li>com.jayway.awaitility.core.Duration.*</li>
  * </ul>
  * It may also be useful to import these methods:
  * <ul>

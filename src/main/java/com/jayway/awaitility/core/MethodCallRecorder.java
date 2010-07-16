@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.awaitility.synchronizer;
+package com.jayway.awaitility.core;
 
 import java.lang.reflect.Method;
 
 import com.jayway.awaitility.proxy.ProxyCreator;
 import com.jayway.awaitility.proxy.TypeUtils;
 
-public class ProxyState {
+public class MethodCallRecorder {
 	
 	private static Object lastTarget;
     private static Method lastMethod;

@@ -1,6 +1,6 @@
-package com.jayway.awaitility.synchronizer;
+package com.jayway.awaitility.core;
 
-import static com.jayway.awaitility.synchronizer.Duration.SAME_AS_POLL_INTERVAL;
+import static com.jayway.awaitility.core.Duration.SAME_AS_POLL_INTERVAL;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
@@ -286,7 +286,7 @@ public class ConditionFactory {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <S> S callTo(S service) {
-		return (S) ProxyState.createProxy(service);
+		return (S) MethodCallRecorder.createProxy(service);
 	}
 
 	/**
@@ -302,7 +302,7 @@ public class ConditionFactory {
 	 *             the exception
 	 */
 	public <T> void until(T ignore, final Matcher<T> matcher) throws Exception {
-		until(new MethodCaller<T>(ProxyState.getLastTarget(), ProxyState.getLastMethod(), ProxyState.getLastArgs()),
+		until(new MethodCaller<T>(MethodCallRecorder.getLastTarget(), MethodCallRecorder.getLastMethod(), MethodCallRecorder.getLastArgs()),
 				matcher);
 	}
 

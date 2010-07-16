@@ -15,9 +15,19 @@
  */
 package com.jayway.awaitility.proxy;
 
+/**
+ * The Class CannotCreateProxyException.
+ */
 public class CannotCreateProxyException extends RuntimeException {
+	
+	/** The Constant serialVersionUID. */
 	private static final long serialVersionUID = -2443849094145412513L;
 
+	/**
+	 * Instantiates a new cannot create proxy exception.
+	 *
+	 * @param message the message
+	 */
 	public CannotCreateProxyException(String message) {
 		super(message);
 	}

@@ -15,7 +15,7 @@
  */
 package com.jayway.awaitility.classes;
 
-import com.jayway.awaitility.synchronizer.ConditionEvaluator;
+import com.jayway.awaitility.core.ConditionEvaluator;
 
 public class FakeRepositoryEqualsOne implements ConditionEvaluator {
 

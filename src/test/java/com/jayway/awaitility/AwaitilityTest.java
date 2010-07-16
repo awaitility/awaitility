@@ -22,9 +22,9 @@ import static com.jayway.awaitility.Awaitility.waitAtMost;
 import static com.jayway.awaitility.Awaitility.withPollDelay;
 import static com.jayway.awaitility.Awaitility.withPollInterval;
 import static com.jayway.awaitility.Awaitility.withTimeout;
-import static com.jayway.awaitility.synchronizer.ConditionFactory.callTo;
-import static com.jayway.awaitility.synchronizer.Duration.ONE_SECOND;
-import static com.jayway.awaitility.synchronizer.Duration.SAME_AS_POLL_INTERVAL;
+import static com.jayway.awaitility.core.ConditionFactory.callTo;
+import static com.jayway.awaitility.core.Duration.ONE_SECOND;
+import static com.jayway.awaitility.core.Duration.SAME_AS_POLL_INTERVAL;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.equalTo;
@@ -49,9 +49,9 @@ import com.jayway.awaitility.classes.FakeRepositoryImpl;
 import com.jayway.awaitility.classes.FakeRepositoryValue;
 import com.jayway.awaitility.classes.FinalClass;
 import com.jayway.awaitility.classes.FinalFakeRepositoryImpl;
+import com.jayway.awaitility.core.ConditionEvaluator;
+import com.jayway.awaitility.core.Duration;
 import com.jayway.awaitility.proxy.CannotCreateProxyException;
-import com.jayway.awaitility.synchronizer.ConditionEvaluator;
-import com.jayway.awaitility.synchronizer.Duration;
 
 public class AwaitilityTest {
 

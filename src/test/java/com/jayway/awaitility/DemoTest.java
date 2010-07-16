@@ -16,7 +16,7 @@
 package com.jayway.awaitility;
 
 import static com.jayway.awaitility.Awaitility.await;
-import static com.jayway.awaitility.synchronizer.ConditionFactory.callTo;
+import static com.jayway.awaitility.core.ConditionFactory.callTo;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
