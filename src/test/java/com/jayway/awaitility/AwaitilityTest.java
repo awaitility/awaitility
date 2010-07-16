@@ -49,7 +49,7 @@ import com.jayway.awaitility.classes.FakeRepositoryImpl;
 import com.jayway.awaitility.classes.FakeRepositoryValue;
 import com.jayway.awaitility.classes.FinalClass;
 import com.jayway.awaitility.classes.FinalFakeRepositoryImpl;
-import com.jayway.awaitility.synchronizer.CannotCreateProxyException;
+import com.jayway.awaitility.proxy.CannotCreateProxyException;
 import com.jayway.awaitility.synchronizer.ConditionEvaluator;
 import com.jayway.awaitility.synchronizer.Duration;
 

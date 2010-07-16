@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.awaitility.synchronizer;
+package com.jayway.awaitility.proxy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -50,7 +50,6 @@ public abstract class ProxyCreator {
 		} else {
 			proxy = createCGLibProxy(targetClass);
 		}
-		ProxyState.setLastTarget(target);
 		return proxy;
 	}
 

@@ -17,6 +17,9 @@ package com.jayway.awaitility.synchronizer;
 
 import java.lang.reflect.Method;
 
+import com.jayway.awaitility.proxy.ProxyCreator;
+import com.jayway.awaitility.proxy.TypeUtils;
+
 public class ProxyState {
 	
 	private static Object lastTarget;
@@ -33,7 +36,9 @@ public class ProxyState {
     };
 
 	public static Object createProxy(Object target) {
-		return proxyCreator.create(target);
+		Object proxy = proxyCreator.create(target);
+		ProxyState.setLastTarget(target);
+		return proxy;
 	}
 
 	public static Object getLastTarget() {
