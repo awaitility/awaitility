@@ -1,3 +1,18 @@
+/*
+ * Copyright 2010 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.jayway.awaitility.synchronizer;
 
 import java.lang.reflect.InvocationHandler;
@@ -16,9 +31,9 @@ import net.sf.cglib.proxy.MethodProxy;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 
-public class ProxyCreator {
+public abstract class ProxyCreator {
 
-	public static Object create(Object target) {
+	public Object create(Object target) {
 		Object proxy = null;
 		Class<? extends Object> targetClass = target.getClass();
 		if (Modifier.isFinal(targetClass.getModifiers())) {
@@ -39,7 +54,7 @@ public class ProxyCreator {
 		return proxy;
 	}
 
-	private static Object createCGLibProxy(Class<? extends Object> targetClass) {
+	private Object createCGLibProxy(Class<? extends Object> targetClass) {
 		Object proxy;
 		// Create CGLib Method interceptor
 		MethodInterceptor interceptor = new MethodInterceptor() {
@@ -61,7 +76,7 @@ public class ProxyCreator {
 		return proxy;
 	}
 
-	private static Object createInterfaceProxy(Class<?> targetClass) {
+	private Object createInterfaceProxy(Class<?> targetClass) {
 		return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
 				getInterfaceHierarchy(targetClass), new InvocationHandler() {
 					public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -70,12 +85,12 @@ public class ProxyCreator {
 				});
 	}
 
-	private static boolean targetClassHasInterfaces(Class<? extends Object> targetClass) {
+	private boolean targetClassHasInterfaces(Class<? extends Object> targetClass) {
 		Class<?>[] interfaces = getInterfaceHierarchy(targetClass);
 		return interfaces != null && interfaces.length >= 1;
 	}
 
-	private static Class<?>[] getInterfaceHierarchy(Class<? extends Object> targetClass) {
+	private Class<?>[] getInterfaceHierarchy(Class<? extends Object> targetClass) {
 		if (targetClass == null || targetClass.equals(Object.class)) {
 			return new Class<?>[0];
 		}
@@ -85,9 +100,5 @@ public class ProxyCreator {
 		return interfaces.toArray(new Class<?>[interfaces.size()]);
 	}
 
-	private static Object callReceived(Method method, Object[] args) {
-		ProxyState.setLastMethod(method);
-		ProxyState.setLastArgs(args);
-		return TypeUtils.getDefaultValue(method.getReturnType());
-	}
+	protected abstract Object callReceived(Method method, Object[] args);
 }

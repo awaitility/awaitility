@@ -286,7 +286,7 @@ public class ConditionFactory {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <S> S callTo(S service) {
-		return (S) ProxyCreator.create(service);
+		return (S) ProxyState.createProxy(service);
 	}
 
 	/**
