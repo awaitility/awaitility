@@ -15,13 +15,13 @@
  */
 package com.jayway.awaitility;
 
-import static com.jayway.awaitility.core.Duration.SAME_AS_POLL_INTERVAL;
+import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.jayway.awaitility.core.ConditionFactory;
-import com.jayway.awaitility.core.Duration;
+import com.jayway.awaitility.core.MethodCallRecorder;
 
 /**
  * Awaitility is a small Java DSL for synchronizing (waiting for) asynchronous
@@ -47,8 +47,8 @@ import com.jayway.awaitility.core.Duration;
  * statement that failed if you have multiple awaits in the same test.
  * 
  * <pre>
- * withPollInterval(ONE_HUNDERED_MILLISECONDS).andWithPollDelay(20, MILLISECONDS).await(&quot;customer registration&quot;)
- * 		.until(costumerStatus(), equalTo(REGISTERED));
+ * withPollInterval(ONE_HUNDERED_MILLISECONDS).andWithPollDelay(20, MILLISECONDS).await(&quot;customer registration&quot;).until(
+ * 		costumerStatus(), equalTo(REGISTERED));
  * </pre>
  * 
  * You can also specify a default timeout, poll interval and poll delay using:
@@ -65,8 +65,7 @@ import com.jayway.awaitility.core.Duration;
  * the following methods from the Awaitility framework:
  * <ul>
  * <li>com.jayway.awaitility.Awaitlity.*</li>
- * <li>com.jayway.awaitility.core.ConditionFactory.callTo</li>
- * <li>com.jayway.awaitility.core.Duration.*</li>
+ * <li>com.jayway.awaitility.Duration.*</li>
  * </ul>
  * It may also be useful to import these methods:
  * <ul>
@@ -109,12 +108,12 @@ public class Awaitility {
 	private static volatile boolean defaultCatchUncaughtExceptions = true;
 
 	/**
-	 * Instruct Awaitility to catch uncaught exceptions from other threads. This
-	 * is useful in multi-threaded systems when you want your test to fail
-	 * regardless of which thread throwing the exception. Default is
+	 * Instruct Awaitility to catch uncaught exceptions from other threads by
+	 * default. This is useful in multi-threaded systems when you want your test
+	 * to fail regardless of which thread throwing the exception. Default is
 	 * <code>true</code>.
 	 */
-	public static void catchUncaughtExceptions() {
+	public static void catchUncaughtExceptionsByDefault() {
 		defaultCatchUncaughtExceptions = true;
 	}
 
@@ -122,7 +121,7 @@ public class Awaitility {
 	 * Instruct Awaitility not to catch uncaught exceptions from other threads.
 	 * Your test will not fail if another thread throws an exception.
 	 */
-	public static void doNotCatchUncaughtExceptions() {
+	public static void doNotCatchUncaughtExceptionsByDefault() {
 		defaultCatchUncaughtExceptions = false;
 	}
 
@@ -364,5 +363,26 @@ public class Awaitility {
 			throw new IllegalArgumentException("You must specify a default timeout (was null).");
 		}
 		Awaitility.defaultTimeout = defaultTimeout;
+	}
+
+	/**
+	 * Await until a specific method invocation returns something. E.g.
+	 * 
+	 * <pre>
+	 * await().until(callTo(service).getCount(), greaterThan(2));
+	 * </pre>
+	 * 
+	 * Here we tell Awaitility to wait until the <code>service.getCount()</code>
+	 * method returns a value that is greater than 2.
+	 * 
+	 * @param <S>
+	 *            The type of the service.
+	 * @param service
+	 *            the service that contains the method of interest.
+	 * @return A proxy of the service
+	 */
+	@SuppressWarnings("unchecked")
+	public static <S> S callTo(S service) {
+		return (S) MethodCallRecorder.createProxy(service);
 	}
 }

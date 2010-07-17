@@ -23,6 +23,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import com.jayway.awaitility.Duration;
+
 public class AwaitConditionImpl implements Condition, UncaughtExceptionHandler {
 	private final Duration maxWaitTime;
 	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);

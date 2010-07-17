@@ -16,15 +16,15 @@
 package com.jayway.awaitility;
 
 import static com.jayway.awaitility.Awaitility.await;
-import static com.jayway.awaitility.Awaitility.catchUncaughtExceptions;
+import static com.jayway.awaitility.Awaitility.callTo;
+import static com.jayway.awaitility.Awaitility.catchUncaughtExceptionsByDefault;
 import static com.jayway.awaitility.Awaitility.catchingUncaughtExceptions;
 import static com.jayway.awaitility.Awaitility.waitAtMost;
 import static com.jayway.awaitility.Awaitility.withPollDelay;
 import static com.jayway.awaitility.Awaitility.withPollInterval;
 import static com.jayway.awaitility.Awaitility.withTimeout;
-import static com.jayway.awaitility.core.ConditionFactory.callTo;
-import static com.jayway.awaitility.core.Duration.ONE_SECOND;
-import static com.jayway.awaitility.core.Duration.SAME_AS_POLL_INTERVAL;
+import static com.jayway.awaitility.Duration.ONE_SECOND;
+import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.equalTo;
@@ -50,7 +50,6 @@ import com.jayway.awaitility.classes.FakeRepositoryValue;
 import com.jayway.awaitility.classes.FinalClass;
 import com.jayway.awaitility.classes.FinalFakeRepositoryImpl;
 import com.jayway.awaitility.core.ConditionEvaluator;
-import com.jayway.awaitility.core.Duration;
 import com.jayway.awaitility.proxy.CannotCreateProxyException;
 
 public class AwaitilityTest {
@@ -94,7 +93,7 @@ public class AwaitilityTest {
 	}
 
 	@Test(timeout = 2000)
-	public void awaitOperationSupportsSpecifyingPollSpecification() throws Exception {
+	public void awaitOperationSupportsSpecifyingPollIntervalUsingTimeunit() throws Exception {
 		new Asynch(fakeRepository).perform();
 		withPollInterval(20, TimeUnit.MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
 		withPollInterval(20, TimeUnit.MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
@@ -132,14 +131,14 @@ public class AwaitilityTest {
 	@Test(timeout = 2000)
 	public void foreverConditionSpecificationUsingUntilWithDirectBlock() throws Exception {
 		new Asynch(fakeRepository).perform();
-		await().until(fakeRepositoryValueEqualsOne());
+		await().forever().until(fakeRepositoryValueEqualsOne());
 		assertEquals(1, fakeRepository.getValue());
 	}
 
 	@Test(timeout = 2000)
 	public void foreverConditionWithHamcrestMatchersWithDirectBlock() throws Exception {
 		new Asynch(fakeRepository).perform();
-		await().until(value(), equalTo(1));
+		await().forever().until(value(), equalTo(1));
 		assertEquals(1, fakeRepository.getValue());
 	}
 
@@ -161,9 +160,9 @@ public class AwaitilityTest {
 	@Test(timeout = 2000, expected = IllegalStateException.class)
 	public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockWhenSetToCatchAllUncaughtExceptions()
 			throws Exception {
-		catchUncaughtExceptions();
+		catchUncaughtExceptionsByDefault();
 		new ExceptionThrowingAsynch().perform();
-		await().until(value(), equalTo(1));
+		await().forever().until(value(), equalTo(1));
 	}
 
 	@Test(timeout = 2000, expected = IllegalStateException.class)

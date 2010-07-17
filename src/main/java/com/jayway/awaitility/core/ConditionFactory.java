@@ -1,12 +1,14 @@
 package com.jayway.awaitility.core;
 
-import static com.jayway.awaitility.core.Duration.SAME_AS_POLL_INTERVAL;
+import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Matcher;
+
+import com.jayway.awaitility.Duration;
 
 /**
  * A factory for creating {@link Condition} objects. It's not recommended to
@@ -266,27 +268,6 @@ public class ConditionFactory {
 	 */
 	public ConditionFactory and() throws Exception {
 		return this;
-	}
-
-	/**
-	 * Await until a specific method invocation returns something. E.g.
-	 * 
-	 * <pre>
-	 * await().until(callTo(service).getCount(), greaterThan(2));
-	 * </pre>
-	 * 
-	 * Here we tell Awaitility to wait until the <code>service.getCount()</code>
-	 * method returns a value that is greater than 2.
-	 * 
-	 * @param <S>
-	 *            The type of the service.
-	 * @param service
-	 *            the service that contains the method of interest.
-	 * @return A proxy of the service
-	 */
-	@SuppressWarnings("unchecked")
-	public static <S> S callTo(S service) {
-		return (S) MethodCallRecorder.createProxy(service);
 	}
 
 	/**
