@@ -17,8 +17,9 @@ package com.jayway.awaitility;
 
 import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.awaitility.Awaitility.callTo;
+import static com.jayway.awaitility.Awaitility.catchUncaughtExceptions;
 import static com.jayway.awaitility.Awaitility.catchUncaughtExceptionsByDefault;
-import static com.jayway.awaitility.Awaitility.catchingUncaughtExceptions;
+import static com.jayway.awaitility.Awaitility.dontCatchUncaughtExceptions;
 import static com.jayway.awaitility.Awaitility.waitAtMost;
 import static com.jayway.awaitility.Awaitility.withPollDelay;
 import static com.jayway.awaitility.Awaitility.withPollInterval;
@@ -30,7 +31,10 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -169,23 +173,57 @@ public class AwaitilityTest {
 	public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockWhenCatchingAllUncaughtExceptions()
 			throws Exception {
 		new ExceptionThrowingAsynch().perform();
-		catchingUncaughtExceptions().and().await().forever().until(value(), equalTo(1));
+		catchUncaughtExceptions().and().await().forever().until(value(), equalTo(1));
+	}
+
+	@Test(timeout = 2000, expected = TimeoutException.class)
+	public void whenDontCatchUncaughtExceptionsIsSpecifiedThenExceptionsFromOtherThreadsAreNotCaught() throws Exception {
+		new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
+			@Override
+			public void testLogic() throws Exception {
+				new ExceptionThrowingAsynch().perform();
+				dontCatchUncaughtExceptions().and().await().atMost(ONE_SECOND).until(value(), equalTo(1));
+			}
+		};
+	}
+
+	@Test(timeout = 2000, expected = TimeoutException.class)
+	public void whenDontCatchUncaughtExceptionsIsSpecifiedAndTheBuildOfTheAwaitStatementHasStartedThenExceptionsFromOtherThreadsAreNotCaught()
+			throws Exception {
+		new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
+			@Override
+			public void testLogic() throws Exception {
+				new ExceptionThrowingAsynch().perform();
+				await().andDontCatchUncaughtExceptions().andWithTimeout(ONE_SECOND).until(value(), equalTo(1));
+			}
+		};
 	}
 
 	@Test(timeout = 2000, expected = TimeoutException.class)
 	public void catchUncaughtExceptionsIsReset() throws Exception {
-		new ExceptionThrowingAsynch().perform();
-		await().atMost(Duration.ONE_SECOND).until(value(), equalTo(1));
+		new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
+			@Override
+			public void testLogic() throws Exception {
+				new ExceptionThrowingAsynch().perform();
+				await().atMost(Duration.ONE_SECOND).until(value(), equalTo(1));
+			}
+		};
 	}
 
 	@Test(timeout = 2000, expected = TimeoutException.class)
 	public void waitAtMostWorks() throws Exception {
-		new ExceptionThrowingAsynch().perform();
-		withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS).atMost(Duration.ONE_SECOND).until(
-				callTo(fakeRepository).getValue(), equalTo(1));
-		waitAtMost(Duration.ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
-		await().atMost(Duration.ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
-		await().until(callTo(fakeRepository).getValue(), equalTo(1));
+		new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
+			
+			@Override
+			public void testLogic() throws Exception {
+				new ExceptionThrowingAsynch().perform();
+				withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS).atMost(ONE_SECOND).until(callTo(fakeRepository).getValue(),
+						equalTo(1));
+				waitAtMost(ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
+				await().atMost(ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
+				await().until(callTo(fakeRepository).getValue(), equalTo(1));				
+			}
+		};
 	}
 
 	@Test(timeout = 2000, expected = IllegalStateException.class)
@@ -221,5 +259,24 @@ public class AwaitilityTest {
 
 	private Callable<Integer> value() {
 		return new FakeRepositoryValue(fakeRepository);
+	}
+
+	private abstract class AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest {
+		public AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() throws Exception {
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			System.setErr(new PrintStream(byteArrayOutputStream, true));
+			try {
+				testLogic();
+			} finally {
+				String errorMessage = byteArrayOutputStream.toString();
+				try {
+					assertTrue(errorMessage.contains("Illegal state!"));
+				} finally {
+					System.setErr(System.err);
+				}
+			}
+		}
+
+		public abstract void testLogic() throws Exception;
 	}
 }

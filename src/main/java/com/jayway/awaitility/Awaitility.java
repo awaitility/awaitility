@@ -47,8 +47,8 @@ import com.jayway.awaitility.core.MethodCallRecorder;
  * statement that failed if you have multiple awaits in the same test.
  * 
  * <pre>
- * withPollInterval(ONE_HUNDERED_MILLISECONDS).andWithPollDelay(20, MILLISECONDS).await(&quot;customer registration&quot;).until(
- * 		costumerStatus(), equalTo(REGISTERED));
+ * withPollInterval(ONE_HUNDERED_MILLISECONDS).andWithPollDelay(20, MILLISECONDS).await(&quot;customer registration&quot;)
+ * 		.until(costumerStatus(), equalTo(REGISTERED));
  * </pre>
  * 
  * You can also specify a default timeout, poll interval and poll delay using:
@@ -175,8 +175,19 @@ public class Awaitility {
 	 * 
 	 * @return the condition factory
 	 */
-	public static ConditionFactory catchingUncaughtExceptions() {
+	public static ConditionFactory catchUncaughtExceptions() {
 		return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay, true);
+	}
+
+	/**
+	 * Don't catch uncaught exceptions in other threads. This will <i>not</i>
+	 * make the await statement fail if exceptions occur in other threads.
+	 * 
+	 * 
+	 * @return the condition factory
+	 */
+	public static ConditionFactory dontCatchUncaughtExceptions() {
+		return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay, false);
 	}
 
 	/**

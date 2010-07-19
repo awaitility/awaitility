@@ -72,7 +72,7 @@ public class ConditionFactory {
 	 * @param pollInterval
 	 *            the poll interval
 	 * @param pollDelay
-	 *            TODO
+	 *            The delay before the polling starts
 	 * @param catchUncaughtExceptions
 	 *            the catch uncaught exceptions
 	 */
@@ -271,6 +271,16 @@ public class ConditionFactory {
 	}
 
 	/**
+	 * Don't catch uncaught exceptions in other threads. This will <i>not</i>
+	 * make the await statement fail if exceptions occur in other threads.
+	 * 
+	 * @return the condition factory
+	 */
+	public ConditionFactory andDontCatchUncaughtExceptions() {
+		return new ConditionFactory(timeout, pollInterval, pollDelay, false);
+	}
+
+	/**
 	 * Specify the condition that must be met when waiting for a method call.
 	 * 
 	 * @param <T>
@@ -283,8 +293,8 @@ public class ConditionFactory {
 	 *             the exception
 	 */
 	public <T> void until(T ignore, final Matcher<T> matcher) throws Exception {
-		until(new MethodCaller<T>(MethodCallRecorder.getLastTarget(), MethodCallRecorder.getLastMethod(), MethodCallRecorder.getLastArgs()),
-				matcher);
+		until(new MethodCaller<T>(MethodCallRecorder.getLastTarget(), MethodCallRecorder.getLastMethod(),
+				MethodCallRecorder.getLastArgs()), matcher);
 	}
 
 	/**
