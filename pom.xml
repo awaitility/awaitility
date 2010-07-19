@@ -42,14 +42,14 @@
 		</developer>
 	</developers>
 	<properties>
-        <scm.branch>master</scm.branch>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>      
-	 <scm>
-        <url>http://github.com/jayway/awaitility/tree/${scm.branch}</url>
-        <connection>scm:git:git://github.com/jayway/awaitility.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/jayway/awaitility.git</developerConnection>
-    </scm>
+		<scm.branch>master</scm.branch>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<scm>
+		<url>http://github.com/jayway/awaitility/tree/${scm.branch}</url>
+		<connection>scm:git:git://github.com/jayway/awaitility.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/jayway/awaitility.git</developerConnection>
+	</scm>
 	<mailingLists>
 		<mailingList>
 			<name>Awaitility mailing-list</name>
@@ -73,6 +73,10 @@
 					<useReleaseProfile>false</useReleaseProfile>
 					<arguments>-Prelease</arguments>
 					<goals>deploy</goals>
+					<!-- This accounts for the fact, that the Release Plugin forks Maven 
+						and system properties of the current Maven session are unfortunately not 
+						automatically propagated to the forked Maven session -->
+					<mavenExecutorId>forked-path</mavenExecutorId>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -158,18 +162,18 @@
 			</build>
 		</profile>
 	</profiles>
-	
+
 	<distributionManagement>
-        <repository>
-            <id>oss.sonatype.org-jayway-staging</id>
-            <name>OpenSource Release Staging on Sonatype.org</name>
-            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-        <snapshotRepository>
-            <id>oss.sonatype.org-jayway-snapshots</id>
-            <name>Jayway OpenSource SNAPSHOTs on Sonatype.org</name>
-            <url>http://oss.sonatype.org/content/repositories/jayway-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
-	
+		<repository>
+			<id>oss.sonatype.org-jayway-staging</id>
+			<name>OpenSource Release Staging on Sonatype.org</name>
+			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+		<snapshotRepository>
+			<id>oss.sonatype.org-jayway-snapshots</id>
+			<name>Jayway OpenSource SNAPSHOTs on Sonatype.org</name>
+			<url>http://oss.sonatype.org/content/repositories/jayway-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 </project>
