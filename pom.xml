@@ -109,7 +109,7 @@
 					<plugin>
 						<artifactId>maven-gpg-plugin</artifactId>
 						<configuration>
-							<useAgent>true</useAgent>
+							<useAgent>false</useAgent>
 						</configuration>
 						<executions>
 							<execution>
