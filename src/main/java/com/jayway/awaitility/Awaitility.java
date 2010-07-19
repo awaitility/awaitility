@@ -33,7 +33,7 @@ import com.jayway.awaitility.core.MethodCallRecorder;
  * await().atMost(5, SECONDS).until(customerStatusHasUpdated());
  * </pre>
  * 
- * Wait forever until the call to <code>orderService).orderCount()</code> is
+ * Wait forever until the call to <code>orderService.orderCount()</code> is
  * greater than 3.
  * 
  * <pre>
