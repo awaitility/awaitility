@@ -1,17 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.jayway.awaitility</groupId>
 	<artifactId>awaitility</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<url>http://github.com/jayway/awaitility</url>
 	<name>Awaitlity</name>
 	<description>A Java DSL for synchronizing asynchronous operations</description>
 	<inceptionYear>2010</inceptionYear>
 	<issueManagement>
 		<system>GitHub Issue Tracking</system>
-		<url></url>
+		<url />
 	</issueManagement>
 	<licenses>
 		<license>
