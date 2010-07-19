@@ -22,7 +22,6 @@ import java.util.concurrent.TimeUnit;
 import com.jayway.awaitility.core.ConditionFactory;
 import com.jayway.awaitility.core.MethodCallRecorder;
 
-// TODO: Auto-generated Javadoc
 /**
  * Awaitility is a small Java DSL for synchronizing (waiting for) asynchronous
  * operations. It makes it very easy to test asynchronous code. Examples:
@@ -47,7 +46,7 @@ import com.jayway.awaitility.core.MethodCallRecorder;
  * statement that failed if you have multiple awaits in the same test.
  * 
  * <pre>
- * withPollInterval(ONE_HUNDERED_MILLISECONDS).andWithPollDelay(20, MILLISECONDS).await(&quot;customer registration&quot;)
+ * with().pollInterval(ONE_HUNDERED_MILLISECONDS).and().with().pollDelay(20, MILLISECONDS).await(&quot;customer registration&quot;)
  * 		.until(costumerStatus(), equalTo(REGISTERED));
  * </pre>
  * 
@@ -65,10 +64,10 @@ import com.jayway.awaitility.core.MethodCallRecorder;
  * the following methods from the Awaitility framework:
  * <ul>
  * <li>com.jayway.awaitility.Awaitlity.*</li>
- * <li>com.jayway.awaitility.Duration.*</li>
  * </ul>
  * It may also be useful to import these methods:
  * <ul>
+ * <li>com.jayway.awaitility.Duration.*</li>
  * <li>java.util.concurrent.TimeUnit.*</li>
  * <li>org.hamcrest.Matchers.*</li>
  * <li>org.junit.Assert.*</li>
