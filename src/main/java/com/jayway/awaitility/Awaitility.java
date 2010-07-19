@@ -246,21 +246,6 @@ public class Awaitility {
 	}
 
 	/**
-	 * An alternative to using {@link #await()} if you want to specify a timeout
-	 * directly.
-	 * 
-	 * @param value
-	 *            the value
-	 * @param unit
-	 *            the unit
-	 * @return the condition factory
-	 */
-	public static ConditionFactory waitAtMost(long value, TimeUnit unit) {
-		return new ConditionFactory(new Duration(value, unit), defaultPollInterval, defaultPollDelay,
-				defaultCatchUncaughtExceptions);
-	}
-
-	/**
 	 * Sets the default poll interval that all await statements will use.
 	 * 
 	 * @param pollInterval
