@@ -20,10 +20,9 @@ import static com.jayway.awaitility.Awaitility.callTo;
 import static com.jayway.awaitility.Awaitility.catchUncaughtExceptions;
 import static com.jayway.awaitility.Awaitility.catchUncaughtExceptionsByDefault;
 import static com.jayway.awaitility.Awaitility.dontCatchUncaughtExceptions;
+import static com.jayway.awaitility.Awaitility.given;
 import static com.jayway.awaitility.Awaitility.waitAtMost;
-import static com.jayway.awaitility.Awaitility.withPollDelay;
-import static com.jayway.awaitility.Awaitility.withPollInterval;
-import static com.jayway.awaitility.Awaitility.withTimeout;
+import static com.jayway.awaitility.Awaitility.with;
 import static com.jayway.awaitility.Duration.ONE_SECOND;
 import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -99,22 +98,22 @@ public class AwaitilityTest {
 	@Test(timeout = 2000)
 	public void awaitOperationSupportsSpecifyingPollIntervalUsingTimeunit() throws Exception {
 		new Asynch(fakeRepository).perform();
-		withPollInterval(20, TimeUnit.MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
-		withPollInterval(20, TimeUnit.MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
+		with().pollInterval(20, TimeUnit.MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
+		given().pollInterval(20, TimeUnit.MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
 		assertEquals(1, fakeRepository.getValue());
 	}
 
 	@Test(timeout = 2000)
 	public void awaitOperationSupportsSpecifyingPollInterval() throws Exception {
 		new Asynch(fakeRepository).perform();
-		withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
+		with().pollInterval(Duration.ONE_HUNDRED_MILLISECONDS).then().await().until(fakeRepositoryValueEqualsOne());
 		assertEquals(1, fakeRepository.getValue());
 	}
 
 	@Test(timeout = 2000)
 	public void awaitOperationSupportsSpecifyingPollDelay() throws Exception {
 		new Asynch(fakeRepository).perform();
-		withPollDelay(Duration.ONE_HUNDRED_MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
+		with().pollDelay(Duration.ONE_HUNDRED_MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
 		assertEquals(1, fakeRepository.getValue());
 	}
 
@@ -194,7 +193,7 @@ public class AwaitilityTest {
 			@Override
 			public void testLogic() throws Exception {
 				new ExceptionThrowingAsynch().perform();
-				await().andDontCatchUncaughtExceptions().andWithTimeout(ONE_SECOND).until(value(), equalTo(1));
+				await().and().dontCatchUncaughtExceptions().given().timeout(ONE_SECOND).until(value(), equalTo(1));
 			}
 		};
 	}
@@ -213,15 +212,15 @@ public class AwaitilityTest {
 	@Test(timeout = 2000, expected = TimeoutException.class)
 	public void waitAtMostWorks() throws Exception {
 		new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
-			
+
 			@Override
 			public void testLogic() throws Exception {
 				new ExceptionThrowingAsynch().perform();
-				withPollInterval(Duration.ONE_HUNDRED_MILLISECONDS).atMost(ONE_SECOND).until(callTo(fakeRepository).getValue(),
-						equalTo(1));
+				with().pollInterval(Duration.ONE_HUNDRED_MILLISECONDS).then().await().atMost(ONE_SECOND)
+						.until(callTo(fakeRepository).getValue(), equalTo(1));
 				waitAtMost(ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
 				await().atMost(ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
-				await().until(callTo(fakeRepository).getValue(), equalTo(1));				
+				await().until(callTo(fakeRepository).getValue(), equalTo(1));
 			}
 		};
 	}
@@ -236,7 +235,7 @@ public class AwaitilityTest {
 	@Test(timeout = 4000)
 	public void awaitWithTimeout() throws Exception {
 		new Asynch(fakeRepository).perform();
-		withTimeout(1, SECONDS).await().until(callTo(fakeRepository).getValue(), greaterThan(0));
+		with().timeout(1, SECONDS).await().until(callTo(fakeRepository).getValue(), greaterThan(0));
 	}
 
 	@Test(timeout = 2000)

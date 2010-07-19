@@ -18,11 +18,11 @@ package com.jayway.awaitility;
 import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
 
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import com.jayway.awaitility.core.ConditionFactory;
 import com.jayway.awaitility.core.MethodCallRecorder;
 
+// TODO: Auto-generated Javadoc
 /**
  * Awaitility is a small Java DSL for synchronizing (waiting for) asynchronous
  * operations. It makes it very easy to test asynchronous code. Examples:
@@ -95,16 +95,16 @@ import com.jayway.awaitility.core.MethodCallRecorder;
  */
 public class Awaitility {
 
-	/** The default poll interval (100 ms) */
+	/** The default poll interval (100 ms). */
 	private static volatile Duration defaultPollInterval = Duration.ONE_HUNDRED_MILLISECONDS;
 
-	/** The default timeout (10 seconds) */
+	/** The default timeout (10 seconds). */
 	private static volatile Duration defaultTimeout = Duration.TEN_SECONDS;
 
-	/** The default poll delay (same as {@link #defaultPollInterval}) */
+	/** The default poll delay (same as {@link #defaultPollInterval}). */
 	private static volatile Duration defaultPollDelay = SAME_AS_POLL_INTERVAL;
 
-	/** Catch all uncaught exceptions by default? */
+	/** Catch all uncaught exceptions by default?. */
 	private static volatile boolean defaultCatchUncaughtExceptions = true;
 
 	/**
@@ -134,7 +134,7 @@ public class Awaitility {
 	 * <li>poll interval - 100 milliseconds</li>
 	 * <li>poll delay - 100 milliseconds</li>
 	 * <li>Catch all uncaught exceptions - true</li>
-	 * </ul>
+	 * </ul>.
 	 */
 	public static void reset() {
 		defaultPollInterval = Duration.ONE_HUNDRED_MILLISECONDS;
@@ -191,101 +191,30 @@ public class Awaitility {
 	}
 
 	/**
-	 * Specify the poll interval. This defines how often Awaitility will poll
-	 * for a result matching the stop criteria.
-	 * <p>
-	 * Note that the poll delay will be automatically set as to the same value
-	 * as the interval unless it's specified explicitly using
-	 * {@link #withPollDelay(Duration)}, {@link #withPollDelay(long, TimeUnit)}
-	 * or {@link ConditionFactory#andWithPollDelay(Duration), or
-	 * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
-	 * </p>
+	 * Start constructing an await statement with some settings. E.g.
 	 * 
-	 * @param time
-	 *            the time
-	 * @param unit
-	 *            the unit
+	 * <pre>
+	 * with().pollInterval(20, MILLISECONDS).await().until(something());
+	 * </pre>
+	 * 
 	 * @return the condition factory
 	 */
-	public static ConditionFactory withPollInterval(long time, TimeUnit unit) {
-		return new ConditionFactory(defaultTimeout, new Duration(time, unit), defaultPollInterval,
+	public static ConditionFactory with() {
+		return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay,
 				defaultCatchUncaughtExceptions);
 	}
 
 	/**
-	 * Specify the poll interval by passing a {@link Duration}. This defines how
-	 * often Awaitility will poll for a result matching the stop criteria.
-	 * <p>
-	 * Note that the poll delay will be automatically set as to the same value
-	 * as the interval unless it's specified explicitly using
-	 * {@link #withPollDelay(Duration)}, {@link #withPollDelay(long, TimeUnit)}
-	 * or {@link ConditionFactory#andWithPollDelay(Duration), or
-	 * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
-	 * </p>
+	 * Start constructing an await statement given some settings. E.g.
 	 * 
-	 * @param pollInterval
-	 *            the poll interval
+	 * <pre>
+	 * given().pollInterval(20, MILLISECONDS).then().await().until(something());
+	 * </pre>
+	 * 
 	 * @return the condition factory
 	 */
-	public static ConditionFactory withPollInterval(Duration pollInterval) {
-		return new ConditionFactory(defaultTimeout, pollInterval, defaultPollDelay, defaultCatchUncaughtExceptions);
-	}
-
-	/**
-	 * Specify the delay that will be used before Awaitility starts polling for
-	 * the result the first time. If you don't specify a poll delay explicitly
-	 * it'll be the same as the poll interval.
-	 * 
-	 * @param pollDelay
-	 *            the poll delay
-	 * @return the condition factory
-	 */
-	public static ConditionFactory withPollDelay(Duration pollDelay) {
-		return new ConditionFactory(defaultTimeout, defaultPollInterval, pollDelay, defaultCatchUncaughtExceptions);
-	}
-
-	/**
-	 * Specify the delay that will be used before Awaitility starts polling for
-	 * the result the first time. If you don't specify a poll delay explicitly
-	 * it'll be the same as the poll interval.
-	 * 
-	 * @param time
-	 *            the time
-	 * @param unit
-	 *            the unit
-	 * @return the condition factory
-	 */
-	public static ConditionFactory withPollDelay(long time, TimeUnit unit) {
-		return new ConditionFactory(defaultTimeout, defaultPollInterval, new Duration(time, unit),
-				defaultCatchUncaughtExceptions);
-	}
-
-	/**
-	 * Specify the timeout for the await statement. When the
-	 * <code>timeout</code> has been reached a {@link TimeoutException} is
-	 * thrown.
-	 * 
-	 * @param timeout
-	 *            the timeout
-	 * @return the condition factory
-	 */
-	public static ConditionFactory withTimeout(Duration timeout) {
-		return new ConditionFactory(timeout, defaultPollInterval, defaultPollDelay, defaultCatchUncaughtExceptions);
-	}
-
-	/**
-	 * Specify the timeout for the await statement. When the
-	 * <code>timeout</code> has been reached a {@link TimeoutException} is
-	 * thrown.
-	 * 
-	 * @param timeout
-	 *            the timeout
-	 * @param timeUnit
-	 *            the time unit
-	 * @return the condition factory
-	 */
-	public static ConditionFactory withTimeout(long timeout, TimeUnit timeUnit) {
-		return new ConditionFactory(new Duration(timeout, timeUnit), defaultPollInterval, defaultPollDelay,
+	public static ConditionFactory given() {
+		return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay,
 				defaultCatchUncaughtExceptions);
 	}
 
@@ -299,6 +228,21 @@ public class Awaitility {
 	 */
 	public static ConditionFactory waitAtMost(Duration timeout) {
 		return new ConditionFactory(timeout, defaultPollInterval, defaultPollDelay, defaultCatchUncaughtExceptions);
+	}
+
+	/**
+	 * An alternative to using {@link #await()} if you want to specify a timeout
+	 * directly.
+	 * 
+	 * @param value
+	 *            the value
+	 * @param unit
+	 *            the unit
+	 * @return the condition factory
+	 */
+	public static ConditionFactory waitAtMost(long value, TimeUnit unit) {
+		return new ConditionFactory(new Duration(value, unit), defaultPollInterval, defaultPollDelay,
+				defaultCatchUncaughtExceptions);
 	}
 
 	/**

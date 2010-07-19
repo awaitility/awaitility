@@ -87,7 +87,7 @@ public class ConditionFactory {
 	 *            the timeout
 	 * @return the condition factory
 	 */
-	public ConditionFactory andWithTimeout(Duration timeout) {
+	public ConditionFactory timeout(Duration timeout) {
 		return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
 	}
 
@@ -120,8 +120,8 @@ public class ConditionFactory {
 	 * <p>
 	 * Note that the poll delay will be automatically set as to the same value
 	 * as the interval unless it's specified explicitly using
-	 * {@link #withPollDelay(Duration)}, {@link #withPollDelay(long, TimeUnit)}
-	 * or {@link ConditionFactory#andWithPollDelay(Duration), or
+	 * {@link #pollDelay(Duration)}, {@link #pollDelay(long, TimeUnit)} or
+	 * {@link ConditionFactory#andWithPollDelay(Duration), or
 	 * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
 	 * </p>
 	 * 
@@ -129,7 +129,7 @@ public class ConditionFactory {
 	 *            the poll interval
 	 * @return the condition factory
 	 */
-	public ConditionFactory andWithPollInterval(Duration pollInterval) {
+	public ConditionFactory pollInterval(Duration pollInterval) {
 		return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
 	}
 
@@ -142,7 +142,7 @@ public class ConditionFactory {
 	 *            the unit
 	 * @return the condition factory
 	 */
-	public ConditionFactory andWithTimeout(long timeout, TimeUnit unit) {
+	public ConditionFactory timeout(long timeout, TimeUnit unit) {
 		return new ConditionFactory(alias, new Duration(timeout, unit), pollInterval, pollInterval,
 				catchUncaughtExceptions);
 	}
@@ -159,7 +159,7 @@ public class ConditionFactory {
 	 *            the unit
 	 * @return the condition factory
 	 */
-	public ConditionFactory andWithPollDelay(long delay, TimeUnit unit) {
+	public ConditionFactory pollDelay(long delay, TimeUnit unit) {
 		return new ConditionFactory(alias, this.timeout, pollInterval, new Duration(delay, unit),
 				catchUncaughtExceptions);
 	}
@@ -174,7 +174,7 @@ public class ConditionFactory {
 	 *            the poll delay
 	 * @return the condition factory
 	 */
-	public ConditionFactory andWithPollDelay(Duration pollDelay) {
+	public ConditionFactory pollDelay(Duration pollDelay) {
 		return new ConditionFactory(alias, this.timeout, pollInterval, pollDelay, catchUncaughtExceptions);
 	}
 
@@ -200,8 +200,8 @@ public class ConditionFactory {
 	 * <p>
 	 * Note that the poll delay will be automatically set as to the same value
 	 * as the interval unless it's specified explicitly using
-	 * {@link #withPollDelay(Duration)}, {@link #withPollDelay(long, TimeUnit)}
-	 * or {@link ConditionFactory#andWithPollDelay(Duration), or
+	 * {@link #pollDelay(Duration)}, {@link #pollDelay(long, TimeUnit)} or
+	 * {@link ConditionFactory#andWithPollDelay(Duration), or
 	 * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
 	 * </p>
 	 * 
@@ -212,7 +212,7 @@ public class ConditionFactory {
 	 *            the unit
 	 * @return the condition factory
 	 */
-	public ConditionFactory andWithPollInterval(long pollInterval, TimeUnit unit) {
+	public ConditionFactory pollInterval(long pollInterval, TimeUnit unit) {
 		return new ConditionFactory(alias, timeout, new Duration(pollInterval, unit), pollDelay,
 				catchUncaughtExceptions);
 	}
@@ -225,7 +225,7 @@ public class ConditionFactory {
 	 * 
 	 * @return the condition factory
 	 */
-	public ConditionFactory andCatchUncaughtExceptions() {
+	public ConditionFactory catchUncaughtExceptions() {
 		return new ConditionFactory(alias, timeout, pollInterval, pollInterval, true);
 	}
 
@@ -271,12 +271,48 @@ public class ConditionFactory {
 	}
 
 	/**
+	 * A method to increase the readability of the Awaitility DSL. It simply
+	 * returns the same condition factory instance.
+	 * 
+	 * @return the condition factory
+	 * @throws Exception
+	 *             the exception
+	 */
+	public ConditionFactory with() throws Exception {
+		return this;
+	}
+
+	/**
+	 * A method to increase the readability of the Awaitility DSL. It simply
+	 * returns the same condition factory instance.
+	 * 
+	 * @return the condition factory
+	 * @throws Exception
+	 *             the exception
+	 */
+	public ConditionFactory then() throws Exception {
+		return this;
+	}
+
+	/**
+	 * A method to increase the readability of the Awaitility DSL. It simply
+	 * returns the same condition factory instance.
+	 * 
+	 * @return the condition factory
+	 * @throws Exception
+	 *             the exception
+	 */
+	public ConditionFactory given() throws Exception {
+		return this;
+	}
+
+	/**
 	 * Don't catch uncaught exceptions in other threads. This will <i>not</i>
 	 * make the await statement fail if exceptions occur in other threads.
 	 * 
 	 * @return the condition factory
 	 */
-	public ConditionFactory andDontCatchUncaughtExceptions() {
+	public ConditionFactory dontCatchUncaughtExceptions() {
 		return new ConditionFactory(timeout, pollInterval, pollDelay, false);
 	}
 
