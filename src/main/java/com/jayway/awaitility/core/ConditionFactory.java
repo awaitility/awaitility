@@ -318,6 +318,11 @@ public class ConditionFactory {
 
 	/**
 	 * Specify the condition that must be met when waiting for a method call.
+	 * E.g.
+	 * 
+	 * <pre>
+	 * await().until(callTo(orderService).size(), is(greaterThan(2)));
+	 * </pre>
 	 * 
 	 * @param <T>
 	 *            the generic type
