@@ -15,9 +15,9 @@
  */
 package com.jayway.awaitility.classes;
 
-import com.jayway.awaitility.core.ConditionEvaluator;
+import java.util.concurrent.Callable;
 
-public class FakeRepositoryEqualsOne implements ConditionEvaluator {
+public class FakeRepositoryEqualsOne implements Callable<Boolean> {
 
 	private final FakeRepository repository;
 

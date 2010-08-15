@@ -52,7 +52,6 @@ import com.jayway.awaitility.classes.FakeRepositoryImpl;
 import com.jayway.awaitility.classes.FakeRepositoryValue;
 import com.jayway.awaitility.classes.FinalClass;
 import com.jayway.awaitility.classes.FinalFakeRepositoryImpl;
-import com.jayway.awaitility.core.ConditionEvaluator;
 import com.jayway.awaitility.proxy.CannotCreateProxyException;
 
 public class AwaitilityTest {
@@ -252,7 +251,7 @@ public class AwaitilityTest {
 		await().atMost(SAME_AS_POLL_INTERVAL).until(value(), greaterThan(0));
 	}
 
-	private ConditionEvaluator fakeRepositoryValueEqualsOne() {
+	private Callable<Boolean> fakeRepositoryValueEqualsOne() {
 		return new FakeRepositoryEqualsOne(fakeRepository);
 	}
 

@@ -385,7 +385,7 @@ public class ConditionFactory {
 		if (matcher == null) {
 			throw new IllegalArgumentException("You must specify a matcher (was null).");
 		}
-		until(new ConditionEvaluator() {
+		until(new Callable<Boolean>() {
 			public Boolean call() throws Exception {
 				return matcher.matches(supplier.call());
 			}
