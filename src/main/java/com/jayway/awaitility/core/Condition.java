@@ -15,6 +15,7 @@
  */
 package com.jayway.awaitility.core;
 
-public interface Condition extends AwaitSupportedCondition, ExceptionCatcher {
+interface Condition {
 
+	void await() throws Exception;
 }

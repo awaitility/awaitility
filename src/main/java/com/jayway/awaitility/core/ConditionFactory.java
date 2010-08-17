@@ -1,7 +1,5 @@
 package com.jayway.awaitility.core;
 
-import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
-
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -334,8 +332,10 @@ public class ConditionFactory {
 	 *             the exception
 	 */
 	public <T> void until(T ignore, final Matcher<T> matcher) throws Exception {
-		until(new MethodCaller<T>(MethodCallRecorder.getLastTarget(), MethodCallRecorder.getLastMethod(),
-				MethodCallRecorder.getLastArgs()), matcher);
+		final MethodCaller<T> supplier = new MethodCaller<T>(MethodCallRecorder.getLastTarget(), MethodCallRecorder
+				.getLastMethod(), MethodCallRecorder.getLastArgs());
+		final ProxyHamcrestCondition<T> proxyCondition = new ProxyHamcrestCondition<T>(supplier, matcher, generateConditionSettings());
+		until(proxyCondition);
 	}
 
 	/**
@@ -379,17 +379,7 @@ public class ConditionFactory {
 	 *             the exception
 	 */
 	public <T> void until(final Callable<T> supplier, final Matcher<T> matcher) throws Exception {
-		if (supplier == null) {
-			throw new IllegalArgumentException("You must specify a supplier (was null).");
-		}
-		if (matcher == null) {
-			throw new IllegalArgumentException("You must specify a matcher (was null).");
-		}
-		until(new Callable<Boolean>() {
-			public Boolean call() throws Exception {
-				return matcher.matches(supplier.call());
-			}
-		});
+		until(new CallableHamcrestCondition<T>(supplier, matcher, generateConditionSettings()));
 	}
 
 	/**
@@ -421,11 +411,14 @@ public class ConditionFactory {
 	 * the exception
 	 */
 	public <T> void until(Callable<Boolean> conditionEvaluator) throws Exception {
-		Duration pollDelayToUse = pollDelay == SAME_AS_POLL_INTERVAL ? pollInterval : pollDelay;
-		Condition condition = new AwaitConditionImpl(alias, timeout, conditionEvaluator, pollInterval, pollDelayToUse);
-		if (catchUncaughtExceptions) {
-			condition.andCatchAllUncaughtExceptions();
-		}
+		until(new CallableCondition(conditionEvaluator, generateConditionSettings()));
+	}
+
+	private ConditionSettings generateConditionSettings() {
+		return new ConditionSettings(alias, catchUncaughtExceptions, timeout, pollInterval, pollDelay);
+	}
+
+	private <T> void until(Condition condition) throws Exception {
 		condition.await();
 	}
 
@@ -438,13 +431,13 @@ public class ConditionFactory {
 	static class MethodCaller<T> implements Callable<T> {
 
 		/** The target. */
-		private final Object target;
+		final Object target;
 
 		/** The method. */
-		private final Method method;
+		final Method method;
 
 		/** The args. */
-		private final Object[] args;
+		final Object[] args;
 
 		/**
 		 * Instantiates a new method caller.

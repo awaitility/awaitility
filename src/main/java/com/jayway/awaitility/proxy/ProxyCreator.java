@@ -68,6 +68,7 @@ public abstract class ProxyCreator {
 		enhancer.setCallbackType(interceptor.getClass());
 		Class<?> proxiedClass = enhancer.createClass();
 		Enhancer.registerCallbacks(proxiedClass, new Callback[] { interceptor });
+		// FIXME: Set correct classloader to work with OSGi
 
 		// Instantiate the proxied class
 		Objenesis objenesis = new ObjenesisStd();

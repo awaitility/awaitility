@@ -25,31 +25,31 @@ import java.util.concurrent.TimeoutException;
 
 import com.jayway.awaitility.Duration;
 
-public class AwaitConditionImpl implements Condition, UncaughtExceptionHandler {
-	private final Duration maxWaitTime;
+class ConditionAwaiter implements UncaughtExceptionHandler {
 	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 	private final CountDownLatch latch;
 	private Exception exception = null;
-	private final String alias;
+	private final ConditionSettings conditionSettings;
+	private final String timeoutMessage;
 
-	public AwaitConditionImpl(String alias, final Duration maxWaitTime, final Callable<Boolean> condition,
-			Duration pollInterval, Duration pollDelay) {
-		if (maxWaitTime == null) {
-			throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
-		}
+	public ConditionAwaiter(final Callable<Boolean> condition, String timeoutMessage,
+			ConditionSettings conditionSettings) {
 		if (condition == null) {
 			throw new IllegalArgumentException("You must specify a condition (was null).");
 		}
-		if (pollInterval == null) {
-			throw new IllegalArgumentException("You must specify a poll interval (was null).");
+		if (conditionSettings == null) {
+			throw new IllegalArgumentException("You must specify the condition settings (was null).");
 		}
-		if (pollDelay == null) {
-			throw new IllegalArgumentException("You must specify a poll delay (was null).");
+		if (timeoutMessage == null && !conditionSettings.hasAlias()) {
+			throw new IllegalArgumentException("You must specify the timeout message (was null).");
 		}
-		this.alias = alias;
-		latch = new CountDownLatch(1);
-		this.maxWaitTime = maxWaitTime;
-		Runnable command = new Runnable() {
+		if (conditionSettings.shouldCatchUncaughtExceptions()) {
+			Thread.setDefaultUncaughtExceptionHandler(this);
+		}
+		this.conditionSettings = conditionSettings;
+		this.timeoutMessage = timeoutMessage;
+		this.latch = new CountDownLatch(1);
+		Runnable poller = new Runnable() {
 			public void run() {
 				try {
 					if (condition.call()) {
@@ -61,12 +61,13 @@ public class AwaitConditionImpl implements Condition, UncaughtExceptionHandler {
 				}
 			}
 		};
-		executor.scheduleAtFixedRate(command, pollDelay.getValueInMS(), pollInterval.getValueInMS(),
-				TimeUnit.MILLISECONDS);
+		executor.scheduleAtFixedRate(poller, conditionSettings.getPollDelay().getValueInMS(), conditionSettings
+				.getPollInterval().getValueInMS(), TimeUnit.MILLISECONDS);
 	}
 
 	public void await() throws Exception {
 		try {
+			final Duration maxWaitTime = conditionSettings.getMaxWaitTime();
 			final long timeout = maxWaitTime.getValue();
 			final boolean finishedBeforeTimeout;
 			if (maxWaitTime == Duration.FOREVER) {
@@ -80,9 +81,15 @@ public class AwaitConditionImpl implements Condition, UncaughtExceptionHandler {
 			if (exception != null) {
 				throw exception;
 			} else if (!finishedBeforeTimeout) {
-				throw new TimeoutException(String.format("Condition%sdidn't complete within %s %s.",
-						alias == null ? " " : String.format(" with alias '%s' ", alias), timeout, maxWaitTime
-								.getTimeUnit().toString().toLowerCase()));
+				final String maxWaitTimeLowerCase = maxWaitTime.getTimeUnit().toString().toLowerCase();
+				final String message;
+				if (conditionSettings.hasAlias()) {
+					message = String.format("Condition with alias '%s' didn't complete within %s %s.",
+							conditionSettings.getAlias(), timeout, maxWaitTimeLowerCase);
+				} else {
+					message = String.format("%s within %s %s.", timeoutMessage, timeout, maxWaitTimeLowerCase);
+				}
+				throw new TimeoutException(message);
 			}
 		} finally {
 			executor.shutdown();
@@ -101,10 +108,5 @@ public class AwaitConditionImpl implements Condition, UncaughtExceptionHandler {
 		} else {
 			throw new RuntimeException(throwable);
 		}
-	}
-
-	public Condition andCatchAllUncaughtExceptions() {
-		Thread.setDefaultUncaughtExceptionHandler(this);
-		return this;
 	}
 }
