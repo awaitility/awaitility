@@ -2,3 +2,4 @@ Changelog version 1.1
 ---------------------
 * Major internal refactoring to allow for better default error messages when a timeout occurs.
 * Support for using proxy-based conditions when testing Eclipse applications.
+* Calls to the method Object.finalize should not be recorded as this is part of gc
