@@ -29,9 +29,15 @@ public class MethodCallRecorder {
     private static ProxyCreator proxyCreator = new ProxyCreator() {
 		@Override
 		protected Object callReceived(Method method, Object[] args) {
-			lastMethod = method;
-			lastArgs = args;
+			if (shouldBeRecorded(method)) {
+				lastMethod = method;
+				lastArgs = args;
+			}
 			return TypeUtils.getDefaultValue(method.getReturnType());
+		}
+
+		private boolean shouldBeRecorded(Method method) {
+			return !(method.getDeclaringClass().equals(Object.class) && method.getName().equals("finalize"));
 		}
     };
 
