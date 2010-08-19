@@ -38,7 +38,6 @@ public abstract class ProxyCreator {
 		Class<? extends Object> targetClass = target.getClass();
 		if (Modifier.isFinal(targetClass.getModifiers())) {
 			if (targetClassHasInterfaces(targetClass)) {
-				// TODO Issue warning?
 				proxy = createInterfaceProxy(targetClass);
 			} else {
 				throw new CannotCreateProxyException(
@@ -68,7 +67,8 @@ public abstract class ProxyCreator {
 		enhancer.setCallbackType(interceptor.getClass());
 		Class<?> proxiedClass = enhancer.createClass();
 		Enhancer.registerCallbacks(proxiedClass, new Callback[] { interceptor });
-		// FIXME: Set correct classloader to work with OSGi
+		/* To make the proxy creator work with Eclipse plugins */
+		enhancer.setClassLoader(getClass().getClassLoader());
 
 		// Instantiate the proxied class
 		Objenesis objenesis = new ObjenesisStd();
