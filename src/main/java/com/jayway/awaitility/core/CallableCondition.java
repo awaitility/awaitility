@@ -22,12 +22,12 @@ class CallableCondition implements Condition {
 
 	private final ConditionAwaiter conditionAwaiter;
 
-	@SuppressWarnings("unchecked")
 	public CallableCondition(Callable<Boolean> matcher, ConditionSettings settings) {
 		final String timeoutMessage;
 		if (matcher == null) {
 			timeoutMessage = "";
 		} else {
+			@SuppressWarnings("rawtypes")
 			final Class<? extends Callable> type = matcher.getClass();
 			final Method enclosingMethod = type.getEnclosingMethod();
 			if (type.isAnonymousClass() && enclosingMethod != null) {
