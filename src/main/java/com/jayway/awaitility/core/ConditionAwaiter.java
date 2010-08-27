@@ -25,14 +25,13 @@ import java.util.concurrent.TimeoutException;
 
 import com.jayway.awaitility.Duration;
 
-class ConditionAwaiter implements UncaughtExceptionHandler {
+abstract class ConditionAwaiter implements UncaughtExceptionHandler {
 	private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
 	private final CountDownLatch latch;
 	private Exception exception = null;
 	private final ConditionSettings conditionSettings;
-	private final String timeoutMessage;
 
-	public ConditionAwaiter(final Callable<Boolean> condition, String timeoutMessage,
+	public ConditionAwaiter(final Callable<Boolean> condition,
 			ConditionSettings conditionSettings) {
 		if (condition == null) {
 			throw new IllegalArgumentException("You must specify a condition (was null).");
@@ -40,14 +39,10 @@ class ConditionAwaiter implements UncaughtExceptionHandler {
 		if (conditionSettings == null) {
 			throw new IllegalArgumentException("You must specify the condition settings (was null).");
 		}
-		if (timeoutMessage == null && !conditionSettings.hasAlias()) {
-			throw new IllegalArgumentException("You must specify the timeout message (was null).");
-		}
 		if (conditionSettings.shouldCatchUncaughtExceptions()) {
 			Thread.setDefaultUncaughtExceptionHandler(this);
 		}
 		this.conditionSettings = conditionSettings;
-		this.timeoutMessage = timeoutMessage;
 		this.latch = new CountDownLatch(1);
 		Runnable poller = new Runnable() {
 			public void run() {
@@ -87,7 +82,7 @@ class ConditionAwaiter implements UncaughtExceptionHandler {
 					message = String.format("Condition with alias '%s' didn't complete within %s %s.",
 							conditionSettings.getAlias(), timeout, maxWaitTimeLowerCase);
 				} else {
-					message = String.format("%s within %s %s.", timeoutMessage, timeout, maxWaitTimeLowerCase);
+					message = String.format("%s within %s %s.", getTimeoutMessage(), timeout, maxWaitTimeLowerCase);
 				}
 				throw new TimeoutException(message);
 			}
@@ -98,6 +93,8 @@ class ConditionAwaiter implements UncaughtExceptionHandler {
 			}
 		}
 	}
+
+	protected abstract String getTimeoutMessage();
 
 	public void uncaughtException(Thread thread, Throwable throwable) {
 		if (throwable instanceof Exception) {

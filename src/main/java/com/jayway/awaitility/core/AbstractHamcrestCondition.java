@@ -23,6 +23,8 @@ abstract class AbstractHamcrestCondition<T> implements Condition {
 
 	private ConditionAwaiter conditionAwaiter;
 
+	private T lastResult;
+
 	public AbstractHamcrestCondition(final Callable<T> supplier, final Matcher<T> matcher, ConditionSettings settings) {
 		if (supplier == null) {
 			throw new IllegalArgumentException("You must specify a supplier (was null).");
@@ -32,11 +34,16 @@ abstract class AbstractHamcrestCondition<T> implements Condition {
 		}
 		Callable<Boolean> callable = new Callable<Boolean>() {
 			public Boolean call() throws Exception {
-				return matcher.matches(supplier.call());
+				lastResult = supplier.call();
+				return matcher.matches(lastResult);
 			}
 		};
-		conditionAwaiter = new ConditionAwaiter(callable, getTimeoutMessage(supplier, HamcrestToStringFilter
-				.filter(matcher)), settings);
+		conditionAwaiter = new ConditionAwaiter(callable, settings) {
+			@Override
+			protected String getTimeoutMessage() {
+				return AbstractHamcrestCondition.this.getTimeoutMessage(supplier, HamcrestToStringFilter.filter(matcher)) + " but got <" + lastResult + ">";
+			}
+		};
 	}
 
 	public void await() throws Exception {

@@ -255,7 +255,7 @@ public class AwaitilityTest {
 	public void awaitDisplaysSupplierAndMatcherNameWhenTimeoutExceptionOccurs() throws Exception {
 		exception.expect(TimeoutException.class);
 		exception.expectMessage(FakeRepositoryValue.class.getName()
-				+ " was not a value greater than <0> within 20 milliseconds.");
+				+ " was not a value greater than <0> but got <null> within 20 milliseconds.");
 
 		await().atMost(20, MILLISECONDS).until(value(), greaterThan(0));
 	}
@@ -287,7 +287,7 @@ public class AwaitilityTest {
 			throws Exception {
 		exception.expect(TimeoutException.class);
 		exception.expectMessage(FakeRepositoryImpl.class.getName()
-				+ ".getValue() was not a value greater than <0> within 50 milliseconds.");
+				+ ".getValue() was not a value greater than <0> but got <null> within 50 milliseconds.");
 
 		new Asynch(fakeRepository).perform();
 		with().timeout(50, MILLISECONDS).await().until(callTo(fakeRepository).getValue(), greaterThan(0));
@@ -298,7 +298,7 @@ public class AwaitilityTest {
 			throws Exception {
 		exception.expect(TimeoutException.class);
 		exception.expectMessage(String.format(
-				"Condition returned by method \"valueAsAnonymous\" in class %s was not %s within 20 milliseconds.",
+				"Condition returned by method \"valueAsAnonymous\" in class %s was not %s but got <null> within 20 milliseconds.",
 				AwaitilityTest.class.getName(), equalTo(2).toString()));
 
 		await().atMost(20, MILLISECONDS).until(valueAsAnonymous(), equalTo(2));

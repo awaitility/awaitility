@@ -22,22 +22,27 @@ class CallableCondition implements Condition {
 
 	private final ConditionAwaiter conditionAwaiter;
 
-	public CallableCondition(Callable<Boolean> matcher, ConditionSettings settings) {
-		final String timeoutMessage;
-		if (matcher == null) {
-			timeoutMessage = "";
-		} else {
-			@SuppressWarnings("rawtypes")
-			final Class<? extends Callable> type = matcher.getClass();
-			final Method enclosingMethod = type.getEnclosingMethod();
-			if (type.isAnonymousClass() && enclosingMethod != null) {
-				timeoutMessage = String.format("Condition returned by method \"%s\" in class %s was not fulfilled",
-						enclosingMethod.getName(), enclosingMethod.getDeclaringClass().getName());
-			} else {
-				timeoutMessage = String.format("Condition %s was not fulfilled", type.getName());
+	@SuppressWarnings("unchecked")
+	public CallableCondition(final Callable<Boolean> matcher, ConditionSettings settings) {
+		conditionAwaiter = new ConditionAwaiter(matcher, settings) {
+			@Override
+			protected String getTimeoutMessage() {
+				final String timeoutMessage;
+				if (matcher == null) {
+					timeoutMessage = "";
+				} else {
+					final Class<? extends Callable> type = matcher.getClass();
+					final Method enclosingMethod = type.getEnclosingMethod();
+					if (type.isAnonymousClass() && enclosingMethod != null) {
+						timeoutMessage = String.format("Condition returned by method \"%s\" in class %s was not fulfilled",
+								enclosingMethod.getName(), enclosingMethod.getDeclaringClass().getName());
+					} else {
+						timeoutMessage = String.format("Condition %s was not fulfilled", type.getName());
+					}
+				}
+				return timeoutMessage;
 			}
-		}
-		conditionAwaiter = new ConditionAwaiter(matcher, timeoutMessage, settings);
+		};
 	}
 
 	public void await() throws Exception {

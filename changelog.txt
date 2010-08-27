@@ -1,3 +1,7 @@
+Changelog next version
+---------------------
+* Improved error messages for timeouts to include actual value.
+
 Changelog version 1.1
 ---------------------
 * Major internal refactoring to allow for better default error messages when a timeout occurs.
