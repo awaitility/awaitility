@@ -23,8 +23,6 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.concurrent.Callable;
 
-import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Test;
 
 public class DemoTest {
