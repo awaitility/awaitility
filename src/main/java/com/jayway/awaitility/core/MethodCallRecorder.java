@@ -15,6 +15,7 @@
  */
 package com.jayway.awaitility.core;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 import com.jayway.awaitility.proxy.ProxyCreator;
@@ -26,9 +27,8 @@ public class MethodCallRecorder {
     private static Method lastMethod;
     private static Object[] lastArgs;
     
-    private static ProxyCreator proxyCreator = new ProxyCreator() {
-		@Override
-		protected Object callReceived(Method method, Object[] args) {
+    private static InvocationHandler invocationHandler = new InvocationHandler() {
+		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			if (shouldBeRecorded(method)) {
 				lastMethod = method;
 				lastArgs = args;
@@ -39,10 +39,11 @@ public class MethodCallRecorder {
 		private boolean shouldBeRecorded(Method method) {
 			return !(method.getDeclaringClass().equals(Object.class) && method.getName().equals("finalize"));
 		}
+
     };
 
 	public static Object createProxy(Object target) {
-		Object proxy = proxyCreator.create(target);
+		Object proxy = ProxyCreator.create(target.getClass(), invocationHandler);
 		lastTarget = target;
 		return proxy;
 	}
