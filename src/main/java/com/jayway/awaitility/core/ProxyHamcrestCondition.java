@@ -28,9 +28,8 @@ class ProxyHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
 	}
 
 	@Override
-	String getTimeoutMessage(Callable<T> supplier, String matcherDescription) {
-		MethodCaller<T> methodCaller = (MethodCaller<T>) supplier;
-		return String.format("%s.%s() was not %s", methodCaller.target.getClass().getName(), methodCaller.method
-				.getName(), matcherDescription);
+	String getCallableDescription(Callable<T> supplier) {
+		final MethodCaller<T> methodCaller = (MethodCaller<T>) supplier;
+		return methodCaller.target.getClass().getName() + "." + methodCaller.method.getName() + "()";
 	}
 }

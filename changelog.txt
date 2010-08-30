@@ -1,6 +1,7 @@
 Changelog
 ---------------------
 * Changed ProxyCreator to use the standard InvocationHandler interface
+* Refactored for even better error messsages.
 
 Changelog version 1.2
 ---------------------

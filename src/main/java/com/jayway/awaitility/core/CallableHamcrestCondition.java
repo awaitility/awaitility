@@ -27,16 +27,12 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
 	}
 
 	@Override
-	String getTimeoutMessage(Callable<T> supplier, String matcherDescription) {
-		final String message;
+	String getCallableDescription(final Callable<T> supplier) {
 		Method enclosingMethod = supplier.getClass().getEnclosingMethod();
 		if (supplier.getClass().isAnonymousClass() && enclosingMethod != null) {
-			message = String.format("Condition returned by method \"%s\" in class %s was not %s", enclosingMethod
-					.getName(), enclosingMethod.getDeclaringClass().getName(), matcherDescription);
-
+			return enclosingMethod.getDeclaringClass().getName() + "." + enclosingMethod.getName() + " Callable";
 		} else {
-			message = String.format("%s was not %s", supplier.getClass().getName(), matcherDescription);
+			return supplier.getClass().getName();
 		}
-		return message;
 	}
 }
