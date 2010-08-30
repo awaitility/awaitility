@@ -29,6 +29,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -46,6 +47,7 @@ import org.junit.rules.ExpectedException;
 import com.jayway.awaitility.classes.Asynch;
 import com.jayway.awaitility.classes.ExceptionThrowingAsynch;
 import com.jayway.awaitility.classes.ExceptionThrowingFakeRepository;
+import com.jayway.awaitility.classes.FakeObjectRepository;
 import com.jayway.awaitility.classes.FakeRepository;
 import com.jayway.awaitility.classes.FakeRepositoryEqualsOne;
 import com.jayway.awaitility.classes.FakeRepositoryImpl;
@@ -215,8 +217,8 @@ public class AwaitilityTest {
 			@Override
 			public void testLogic() throws Exception {
 				new ExceptionThrowingAsynch().perform();
-				with().pollInterval(Duration.ONE_HUNDRED_MILLISECONDS).then().await().atMost(ONE_SECOND).until(
-						callTo(fakeRepository).getValue(), equalTo(1));
+				with().pollInterval(Duration.ONE_HUNDRED_MILLISECONDS).then().await().atMost(ONE_SECOND)
+						.until(callTo(fakeRepository).getValue(), equalTo(1));
 				waitAtMost(ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
 				await().atMost(ONE_SECOND).until(callTo(fakeRepository).getValue(), equalTo(1));
 				await().until(callTo(fakeRepository).getValue(), equalTo(1));
@@ -255,9 +257,9 @@ public class AwaitilityTest {
 	public void awaitDisplaysSupplierAndMatcherNameWhenTimeoutExceptionOccurs() throws Exception {
 		exception.expect(TimeoutException.class);
 		exception.expectMessage(FakeRepositoryValue.class.getName()
-				+ " was not a value greater than <0> but got <null> within 20 milliseconds.");
+				+ " was not a value greater than <0> but was <0> within 20 milliseconds.");
 
-		await().atMost(20, MILLISECONDS).until(value(), greaterThan(0));
+		with().pollInterval(10, MILLISECONDS).then().await().atMost(20, MILLISECONDS).until(value(), greaterThan(0));
 	}
 
 	@Test(timeout = 2000)
@@ -275,8 +277,7 @@ public class AwaitilityTest {
 		exception.expect(TimeoutException.class);
 		exception
 				.expectMessage(String
-						.format(
-								"Condition returned by method \"fakeRepositoryValueEqualsOneAsAnonymous\" in class %s was not fulfilled within 20 milliseconds.",
+						.format("Condition returned by method \"fakeRepositoryValueEqualsOneAsAnonymous\" in class %s was not fulfilled within 20 milliseconds.",
 								AwaitilityTest.class.getName()));
 
 		await().atMost(20, MILLISECONDS).until(fakeRepositoryValueEqualsOneAsAnonymous());
@@ -287,21 +288,37 @@ public class AwaitilityTest {
 			throws Exception {
 		exception.expect(TimeoutException.class);
 		exception.expectMessage(FakeRepositoryImpl.class.getName()
-				+ ".getValue() was not a value greater than <0> but got <null> within 50 milliseconds.");
+				+ ".getValue() was not a value greater than <0> but was <0> within 50 milliseconds.");
 
 		new Asynch(fakeRepository).perform();
-		with().timeout(50, MILLISECONDS).await().until(callTo(fakeRepository).getValue(), greaterThan(0));
+		with().pollInterval(10, MILLISECONDS).and().timeout(50, MILLISECONDS).await()
+				.until(callTo(fakeRepository).getValue(), greaterThan(0));
 	}
 
 	@Test(timeout = 2000)
 	public void awaitDisplaysMethodDeclaringTheSupplierWhenSupplierIsAnonymousClassAndTimeoutExceptionOccurs()
 			throws Exception {
 		exception.expect(TimeoutException.class);
-		exception.expectMessage(String.format(
-				"Condition returned by method \"valueAsAnonymous\" in class %s was not %s but got <null> within 20 milliseconds.",
-				AwaitilityTest.class.getName(), equalTo(2).toString()));
+		exception
+				.expectMessage(String
+						.format("Condition returned by method \"valueAsAnonymous\" in class %s was not %s but was <0> within 20 milliseconds.",
+								AwaitilityTest.class.getName(), equalTo(2).toString()));
 
-		await().atMost(20, MILLISECONDS).until(valueAsAnonymous(), equalTo(2));
+		with().pollInterval(10, MILLISECONDS).await().atMost(20, MILLISECONDS).until(valueAsAnonymous(), equalTo(2));
+	}
+
+	@Test(timeout = 2000)
+	public void awaitDisplaysLastPollResultOnTimeout() throws Exception {
+		FakeObjectRepository fakeObjectRepository = new FakeObjectRepository();
+		Object actualObject = fakeObjectRepository.getObject();
+		Object expectedObject = new Object();
+
+		exception.expect(TimeoutException.class);
+		exception.expectMessage(String.format("%s.getObject() was not <%s> but was <%s> within 50 milliseconds.",
+				FakeObjectRepository.class.getName(), expectedObject.toString(), actualObject.toString()));
+
+		with().pollInterval(10, MILLISECONDS).and().timeout(50, MILLISECONDS).await()
+				.until(callTo(fakeObjectRepository).getObject(), is(expectedObject));
 	}
 
 	private Callable<Boolean> fakeRepositoryValueEqualsOne() {

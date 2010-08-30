@@ -22,9 +22,9 @@ class CallableCondition implements Condition {
 
 	private final ConditionAwaiter conditionAwaiter;
 
-	@SuppressWarnings("unchecked")
 	public CallableCondition(final Callable<Boolean> matcher, ConditionSettings settings) {
 		conditionAwaiter = new ConditionAwaiter(matcher, settings) {
+			@SuppressWarnings("rawtypes")
 			@Override
 			protected String getTimeoutMessage() {
 				final String timeoutMessage;
