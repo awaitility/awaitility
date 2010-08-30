@@ -1,4 +1,4 @@
-Changelog next version
+Changelog version 1.2
 ---------------------
 * Improved error messages for timeouts to include actual value.
 
