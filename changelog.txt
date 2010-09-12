@@ -1,5 +1,5 @@
-Changelog
----------------------
+Changelog version 1.2.1
+-----------------------
 * Changed ProxyCreator to use the standard InvocationHandler interface
 * Refactored for even better error messsages.
 
