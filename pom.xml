@@ -3,7 +3,7 @@
 	<groupId>com.jayway.awaitility</groupId>
 	<artifactId>awaitility</artifactId>
 	<packaging>jar</packaging>
-	<version>1.3-SNAPSHOT</version>
+	<version>1.2.1</version>
 	<url>http://github.com/jayway/awaitility</url>
 	<name>Awaitlity</name>
 	<description>A Java DSL for synchronizing asynchronous operations</description>
