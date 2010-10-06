@@ -1,3 +1,6 @@
+* MethodCallRecorder generates an exception on getLastXXX if no method call have been recorded. 
+* MethodCallRecorder is reset after retrieving last calls and on Awaitility.reset 
+
 Changelog version 1.2.1
 -----------------------
 * Changed ProxyCreator to use the standard InvocationHandler interface
