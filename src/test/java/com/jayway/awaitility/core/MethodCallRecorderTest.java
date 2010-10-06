@@ -18,17 +18,29 @@ package com.jayway.awaitility.core;
 import static com.jayway.awaitility.Awaitility.callTo;
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.jayway.awaitility.classes.FakeRepository;
 import com.jayway.awaitility.classes.FakeRepositoryImpl;
 
 public class MethodCallRecorderTest {
+	
+	@Before
+	public void before() {
+		MethodCallRecorder.reset();
+	}
+
 	@Test
 	public void finalizeShouldNotBeRecorded() throws Exception {
 		recordCall(new FakeRepositoryImpl());
 		suggestGarbageCollection();
 		assertEquals("getValue", MethodCallRecorder.getLastMethod().getName());
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void exceptionIfNoMethodWasRecorded() throws Exception {
+		MethodCallRecorder.getLastTarget();
 	}
 
 	private void recordCall(FakeRepository service) {

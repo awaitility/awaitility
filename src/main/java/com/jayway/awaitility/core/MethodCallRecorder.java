@@ -49,13 +49,30 @@ public class MethodCallRecorder {
 	}
 
 	public static Object getLastTarget() {
+		if (lastTarget == null) {
+			throw new IllegalStateException("No method call have been recorded!");
+		}
 		return lastTarget;
 	}
+	
 	public static Method getLastMethod() {
+		if (lastMethod == null) {
+			throw new IllegalStateException("No method call have been recorded!");
+		}
 		return lastMethod;
 	}
+	
 	public static Object[] getLastArgs() {
+		if (lastTarget == null) {
+			throw new IllegalStateException("No method call have been recorded!");
+		}
 		return lastArgs;
+	}
+
+	public static void reset() {
+		lastTarget = null;
+		lastMethod = null;
+		lastArgs = null;
 	}
 	
 }

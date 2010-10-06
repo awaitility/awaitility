@@ -141,6 +141,7 @@ public class Awaitility {
 		defaultTimeout = Duration.TEN_SECONDS;
 		defaultCatchUncaughtExceptions = false;
 		Thread.setDefaultUncaughtExceptionHandler(null);
+		MethodCallRecorder.reset();
 	}
 
 	/**

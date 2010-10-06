@@ -334,6 +334,7 @@ public class ConditionFactory {
 	public <T> void until(T ignore, final Matcher<T> matcher) throws Exception {
 		final MethodCaller<T> supplier = new MethodCaller<T>(MethodCallRecorder.getLastTarget(), MethodCallRecorder
 				.getLastMethod(), MethodCallRecorder.getLastArgs());
+		MethodCallRecorder.reset();
 		final ProxyHamcrestCondition<T> proxyCondition = new ProxyHamcrestCondition<T>(supplier, matcher, generateConditionSettings());
 		until(proxyCondition);
 	}
