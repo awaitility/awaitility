@@ -85,7 +85,7 @@ public class FieldSupplierBuilder {
         }
 
         public Type call() throws Exception {
-            return WhiteboxImpl.getInternalState(object, expectedFieldName);
+            return (Type) WhiteboxImpl.getInternalState(object, expectedFieldName);
         }
     }
 
