@@ -9,7 +9,7 @@
 	<artifactId>awaitility</artifactId>
 	<packaging>jar</packaging>
 	<url>http://github.com/jayway/awaitility</url>
-	<name>Awaitlity</name>
+	<name>Awaitility</name>
 	<description>A Java DSL for synchronizing asynchronous operations</description>
 	<build>
 		<plugins>

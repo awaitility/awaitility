@@ -7,7 +7,7 @@
 		<version>1.2.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>awaitility-scala</artifactId>
-	<name>Awaitlity support for Scala</name>
+	<name>Awaitility support for Scala</name>
 	<description>Simplifies Awaitility usage from Scala</description>
 	<properties>
 		<scala.version>2.8.0</scala.version>

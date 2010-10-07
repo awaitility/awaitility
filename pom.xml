@@ -5,7 +5,7 @@
 	<packaging>pom</packaging>
 	<version>1.2.2-SNAPSHOT</version>
 	<url>http://github.com/jayway/awaitility</url>
-	<name>Awaitlity Parent POM</name>
+	<name>Awaitility Parent POM</name>
 	<description>A Java DSL for synchronizing asynchronous operations</description>
 	<inceptionYear>2010</inceptionYear>
 	<issueManagement>
