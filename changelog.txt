@@ -1,5 +1,6 @@
 * MethodCallRecorder generates an exception on getLastXXX if no method call have been recorded. 
 * MethodCallRecorder is reset after retrieving last calls and on Awaitility.reset 
+* Added basic support for Scala functions
 
 Changelog version 1.2.1
 -----------------------
