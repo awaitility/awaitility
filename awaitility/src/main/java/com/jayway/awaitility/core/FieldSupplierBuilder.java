@@ -1,11 +1,11 @@
 package com.jayway.awaitility.core;
 
+import com.jayway.awaitility.reflect.WhiteboxImpl;
+import com.jayway.awaitility.reflect.exception.FieldNotFoundException;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.concurrent.Callable;
-
-import com.jayway.awaitility.reflect.WhiteboxImpl;
-import com.jayway.awaitility.reflect.exception.FieldNotFoundException;
 
 public class FieldSupplierBuilder {
 
@@ -85,7 +85,7 @@ public class FieldSupplierBuilder {
         }
 
         public Type call() throws Exception {
-            return (Type) WhiteboxImpl.getInternalState(object, expectedFieldName);
+            return WhiteboxImpl.<Type> getInternalState(object, expectedFieldName);
         }
     }
 
