@@ -1,6 +1,9 @@
+Changelog next version 
+----------------------
 * MethodCallRecorder generates an exception on getLastXXX if no method call have been recorded. 
 * MethodCallRecorder is reset after retrieving last calls and on Awaitility.reset 
 * Added basic support for Scala functions
+* Added a fieldIn method to Awaitility which allows you to build a supplier using a field, e.g. await().until(fieldIn(object).ofType(int.class), equalTo(1));
 
 Changelog version 1.2.1
 -----------------------
