@@ -145,5 +145,6 @@
 	</distributionManagement>
 	<modules>
 		<module>awaitility</module>
+		<module>awaitility-scala</module>
 	</modules>
 </project>

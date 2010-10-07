@@ -6,8 +6,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.hamcrest.Matcher;
 
-import scala.Function0;
-
 import com.jayway.awaitility.Duration;
 
 /**
@@ -383,27 +381,6 @@ public class ConditionFactory {
 	 */
 	public <T> void until(final Callable<T> supplier, final Matcher<T> matcher) throws Exception {
 		until(new CallableHamcrestCondition<T>(supplier, matcher, generateConditionSettings()));
-	}
-
-	/**
-	 * Await until a Scala function returns true, for example:
-	 * 
-	 * <pre>
-	 * await().until(() => group1.countPersons() + group2.countPersons() > 2);
-	 * </pre>
-	 * 
-	 * @param conditionEvaluator
-	 *            the function to evaluate 
-	 * @throws Exception
-	 *             the exception
-	 */
-	public void until(final Function0<Boolean> conditionEvaluator) throws Exception {
-		until(new Callable<Boolean>() {
-			@Override
-			public Boolean call() throws Exception {
-				return conditionEvaluator.apply();
-			}
-		});
 	}
 
 	/**
