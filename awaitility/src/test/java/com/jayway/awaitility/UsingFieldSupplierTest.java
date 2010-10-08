@@ -48,7 +48,7 @@ public class UsingFieldSupplierTest {
     @Test(timeout = 2000)
     public void nameOnly() throws Exception {
         new Asynch(fakeRepository).perform();
-        Object expected = (Object) 1;
+        Object expected = 1;
         await().until(fieldIn(fakeRepository).withName("value"), equalTo(expected));
         assertEquals(1, fakeRepository.getValue());
     }
@@ -64,7 +64,7 @@ public class UsingFieldSupplierTest {
     public void annotationOnly() throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
-        Object one = (Object) 1;
+        Object one = 1;
         await().until(fieldIn(repository).annotatedWith(ExampleAnnotation.class), equalTo(one));
         assertEquals(1, repository.getValue());
     }
@@ -73,7 +73,7 @@ public class UsingFieldSupplierTest {
     public void annotationAndName() throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
-        Object one = (Object) 1;
+        Object one = 1;
         await().until(fieldIn(repository).annotatedWith(ExampleAnnotation.class).andWithName("value"), equalTo(one));
         assertEquals(1, repository.getValue());
     }
@@ -162,7 +162,7 @@ public class UsingFieldSupplierTest {
             throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
-        Object one = (Object) 1;
+        Object one = 1;
         await().until(fieldIn(repository).annotatedWith(ExampleAnnotation2.class).andWithName("value"), equalTo(one));
         assertEquals(1, repository.getValue());
     }
@@ -195,7 +195,7 @@ public class UsingFieldSupplierTest {
             throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
-        Object one = (Object) 1;
+        Object one = 1;
         await().until(fieldIn(repository).annotatedWith(ExampleAnnotation.class).andWithName("value2"), equalTo(one));
         assertEquals(1, repository.getValue());
     }
