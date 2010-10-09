@@ -19,7 +19,7 @@ class AwaitilitySupportTest extends AwaitilitySupport {
     def functionAsCondition() = {
 		val c1 = new Counter()
 		val c2 = new Counter()
-//		await().until( () => c1.count() + c2.count() > 3)
+//		await().untilCall( () => c1.count() + c2.count() > 3)
 		await until { c1.count() + c2.count() > 3 }
 		await until { isDone() }
 		await until isDone 

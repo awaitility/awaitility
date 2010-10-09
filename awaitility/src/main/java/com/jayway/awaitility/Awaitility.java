@@ -27,28 +27,28 @@ import com.jayway.awaitility.core.MethodCallRecorder;
  * Awaitility is a small Java DSL for synchronizing (waiting for) asynchronous
  * operations. It makes it very easy to test asynchronous code. Examples:
  * <p>
- * Wait at most 5 seconds until customer status has been updated:
+ * Wait at most 5 seconds untilCall customer status has been updated:
  * 
  * <pre>
- * await().atMost(5, SECONDS).until(customerStatusHasUpdated());
+ * await().atMost(5, SECONDS).untilCall(customerStatusHasUpdated());
  * </pre>
  * 
- * Wait forever until the call to <code>orderService.orderCount()</code> is
+ * Wait forever untilCall the call to <code>orderService.orderCount()</code> is
  * greater than 3.
  * 
  * <pre>
- * await().forever().until(callTo(orderService).orderCount(), greaterThan(3));
+ * await().forever().untilCall(to(orderService).orderCount(), greaterThan(3));
  * </pre>
  * 
  * Advanced usage: Use a poll interval of 100 milliseconds with an initial delay
- * of 20 milliseconds until customer status is equal to "REGISTERED". This
+ * of 20 milliseconds untilCall customer status is equal to "REGISTERED". This
  * example also uses a named await by specifying an alias
  * ("customer registration"). This makes it easy to find out which await
  * statement that failed if you have multiple awaits in the same test.
  * 
  * <pre>
  * with().pollInterval(ONE_HUNDERED_MILLISECONDS).and().with().pollDelay(20, MILLISECONDS).await(&quot;customer registration&quot;)
- *         .until(costumerStatus(), equalTo(REGISTERED));
+ *         .untilCall(costumerStatus(), equalTo(REGISTERED));
  * </pre>
  * 
  * You can also specify a default timeout, poll interval and poll delay using:
@@ -140,7 +140,7 @@ public class Awaitility {
         defaultPollInterval = Duration.ONE_HUNDRED_MILLISECONDS;
         defaultPollDelay = SAME_AS_POLL_INTERVAL;
         defaultTimeout = Duration.TEN_SECONDS;
-        defaultCatchUncaughtExceptions = false;
+        defaultCatchUncaughtExceptions = true;
         Thread.setDefaultUncaughtExceptionHandler(null);
         MethodCallRecorder.reset();
     }
@@ -195,7 +195,7 @@ public class Awaitility {
      * Start constructing an await statement with some settings. E.g.
      * 
      * <pre>
-     * with().pollInterval(20, MILLISECONDS).await().until(something());
+     * with().pollInterval(20, MILLISECONDS).await().untilCall(something());
      * </pre>
      * 
      * @return the condition factory
@@ -209,7 +209,7 @@ public class Awaitility {
      * Start constructing an await statement given some settings. E.g.
      * 
      * <pre>
-     * given().pollInterval(20, MILLISECONDS).then().await().until(something());
+     * given().pollInterval(20, MILLISECONDS).then().await().untilCall(something());
      * </pre>
      * 
      * @return the condition factory
@@ -322,13 +322,13 @@ public class Awaitility {
     }
 
     /**
-     * Await until a specific method invocation returns something. E.g.
+     * Await untilCall a specific method invocation returns something. E.g.
      * 
      * <pre>
-     * await().until(callTo(service).getCount(), greaterThan(2));
+     * await().untilCall(to(service).getCount(), greaterThan(2));
      * </pre>
      * 
-     * Here we tell Awaitility to wait until the <code>service.getCount()</code>
+     * Here we tell Awaitility to wait untilCall the <code>service.getCount()</code>
      * method returns a value that is greater than 2.
      * 
      * @param <S>
@@ -338,15 +338,15 @@ public class Awaitility {
      * @return A proxy of the service
      */
     @SuppressWarnings("unchecked")
-    public static <S> S callTo(S service) {
+    public static <S> S to(S service) {
         return (S) MethodCallRecorder.createProxy(service);
     }
 
-    public static FieldSupplierBuilder fieldIn(Object object) {
+    public static FieldSupplierBuilder in(Object object) {
         return new FieldSupplierBuilder(object);
     }
 
-    public static FieldSupplierBuilder fieldIn(Class<?> clazz) {
+    public static FieldSupplierBuilder in(Class<?> clazz) {
         return new FieldSupplierBuilder(clazz);
     }
 }

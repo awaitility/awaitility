@@ -15,7 +15,7 @@
  */
 package com.jayway.awaitility.core;
 
-import static com.jayway.awaitility.Awaitility.callTo;
+import static com.jayway.awaitility.Awaitility.to;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
@@ -44,7 +44,7 @@ public class MethodCallRecorderTest {
 	}
 
 	private void recordCall(FakeRepository service) {
-		callTo(service).getValue();
+		to(service).getValue();
 	}
 
 	private void suggestGarbageCollection() throws InterruptedException {

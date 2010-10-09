@@ -16,7 +16,8 @@
 package com.jayway.awaitility;
 
 import static com.jayway.awaitility.Awaitility.await;
-import static com.jayway.awaitility.Awaitility.callTo;
+import static com.jayway.awaitility.Awaitility.to;
+import static com.jayway.awaitility.Awaitility.catchUncaughtExceptions;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
@@ -42,21 +43,21 @@ public class DemoTest {
 	public void testUsingCallTo() throws Exception {
 		final CounterService service = new CounterServiceImpl();
 		service.run();
-		await().until(callTo(service).getCount(), is(equalTo(1)));
+		await().untilCall(to(service).getCount(), is(equalTo(1)));
 	}
 
 	@Test
 	public void testUsingGreaterThan() throws Exception {
 		final CounterService service = new CounterServiceImpl();
 		service.run();
-		await().until(callTo(service).getCount(), greaterThan(2));
+		await().untilCall(to(service).getCount(), greaterThan(2));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void testCrash() throws Exception {
 		final CounterService service = new CounterServiceImpl(new IllegalArgumentException());
 		service.run();
-		await().until(callTo(service).getCount(), is(equalTo(1)));
+		await().untilCall(to(service).getCount(), is(equalTo(1)));
 	}
 }
 
