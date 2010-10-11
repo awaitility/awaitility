@@ -27,10 +27,10 @@ import com.jayway.awaitility.core.MethodCallRecorder;
  * Awaitility is a small Java DSL for synchronizing (waiting for) asynchronous
  * operations. It makes it very easy to test asynchronous code. Examples:
  * <p>
- * Wait at most 5 seconds untilCall customer status has been updated:
+ * Wait at most 5 seconds until customer status has been updated:
  * 
  * <pre>
- * await().atMost(5, SECONDS).untilCall(customerStatusHasUpdated());
+ * await().atMost(5, SECONDS).until(customerStatusHasUpdated());
  * </pre>
  * 
  * Wait forever untilCall the call to <code>orderService.orderCount()</code> is
@@ -88,9 +88,13 @@ import com.jayway.awaitility.core.MethodCallRecorder;
  * delay explicitly.
  * <p>
  * Note that since Awaitility uses polling to verify that a condition matches
- * it's not recommended to use it for precise performance testing. In these
- * cases it's better to use an AOP framework such as AspectJ's compile-time
- * weaving.
+ * it's not intended to use it for precise performance testing. 
+ * </p>
+ * <p>
+ * <b>IMPORTANT:</b> Awaitility does nothing to ensure thread safety or thread
+ * synchronization! This is your responsibility! Make sure your code is correctly
+ * synchronized or that you are using thread safe data structures such as volatile
+ * fields or classes such as AtomicInteger and ConcurrentHashMap. 
  * </p>
  */
 public class Awaitility {
