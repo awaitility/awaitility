@@ -25,40 +25,47 @@ import com.jayway.awaitility.core.MethodCallRecorder;
 
 /**
  * Awaitility is a small Java DSL for synchronizing (waiting for) asynchronous
- * operations. It makes it very easy to test asynchronous code. Examples:
+ * operations. It makes it easy to test asynchronous code. Examples:
  * <p>
  * Wait at most 5 seconds until customer status has been updated:
- * 
+ *
  * <pre>
  * await().atMost(5, SECONDS).until(customerStatusHasUpdated());
  * </pre>
- * 
- * Wait forever untilCall the call to <code>orderService.orderCount()</code> is
+ *
+ * Wait forever until the call to <code>orderService.orderCount()</code> is
  * greater than 3.
- * 
+ *
  * <pre>
  * await().forever().untilCall(to(orderService).orderCount(), greaterThan(3));
  * </pre>
- * 
+ *
+ * Wait 300 milliseconds until field in object <code>myObject</code> with name
+ * <code>fieldName</code> and of type <code>int.class</code> is equal to 4.
+ *
+ * <pre>
+ * await().atMost(300, MILLISECONDS).until(fieldIn(orderService).withName("fieldName").andOfType(int.class), equalTo(3));
+ * </pre>
+ *
  * Advanced usage: Use a poll interval of 100 milliseconds with an initial delay
- * of 20 milliseconds untilCall customer status is equal to "REGISTERED". This
+ * of 20 milliseconds until customer status is equal to "REGISTERED". This
  * example also uses a named await by specifying an alias
  * ("customer registration"). This makes it easy to find out which await
  * statement that failed if you have multiple awaits in the same test.
- * 
+ *
  * <pre>
  * with().pollInterval(ONE_HUNDERED_MILLISECONDS).and().with().pollDelay(20, MILLISECONDS).await(&quot;customer registration&quot;)
- *         .untilCall(costumerStatus(), equalTo(REGISTERED));
+ *         .until(costumerStatus(), equalTo(REGISTERED));
  * </pre>
- * 
+ *
  * You can also specify a default timeout, poll interval and poll delay using:
- * 
+ *
  * <pre>
  * Awaitility.setDefaultTimeout(..)
  * Awaitility.setDefaultPollInterval(..)
  * Awaitility.setDefaultPollDelay(..)
  * </pre>
- * 
+ *
  * You can also reset to the default values using {@link Awaitility#reset()}.
  * <p>
  * In order to use Awaitility effectively it's recommended to statically import
@@ -151,7 +158,7 @@ public class Awaitility {
 
     /**
      * Start building an await statement.
-     * 
+     *
      * @return the condition factory
      */
     public static ConditionFactory await() {
@@ -163,7 +170,7 @@ public class Awaitility {
      * have several awaits in your test and you need to tell them apart. If a
      * named await timeout's the <code>alias</code> will be displayed indicating
      * which await statement that failed.
-     * 
+     *
      * @param alias
      *            the alias that will be shown if the await timeouts.
      * @return the condition factory
@@ -177,7 +184,7 @@ public class Awaitility {
      * Catching uncaught exceptions in other threads. This will make the await
      * statement fail even if exceptions occur in other threads. This is the
      * default behavior.
-     * 
+     *
      * @return the condition factory
      */
     public static ConditionFactory catchUncaughtExceptions() {
@@ -187,8 +194,8 @@ public class Awaitility {
     /**
      * Don't catch uncaught exceptions in other threads. This will <i>not</i>
      * make the await statement fail if exceptions occur in other threads.
-     * 
-     * 
+     *
+     *
      * @return the condition factory
      */
     public static ConditionFactory dontCatchUncaughtExceptions() {
@@ -197,11 +204,11 @@ public class Awaitility {
 
     /**
      * Start constructing an await statement with some settings. E.g.
-     * 
+     *
      * <pre>
-     * with().pollInterval(20, MILLISECONDS).await().untilCall(something());
+     * with().pollInterval(20, MILLISECONDS).await().until(somethingHappens());
      * </pre>
-     * 
+     *
      * @return the condition factory
      */
     public static ConditionFactory with() {
@@ -211,11 +218,11 @@ public class Awaitility {
 
     /**
      * Start constructing an await statement given some settings. E.g.
-     * 
+     *
      * <pre>
-     * given().pollInterval(20, MILLISECONDS).then().await().untilCall(something());
+     * given().pollInterval(20, MILLISECONDS).then().await().until(somethingHappens());
      * </pre>
-     * 
+     *
      * @return the condition factory
      */
     public static ConditionFactory given() {
@@ -226,7 +233,7 @@ public class Awaitility {
     /**
      * An alternative to using {@link #await()} if you want to specify a timeout
      * directly.
-     * 
+     *
      * @param timeout
      *            the timeout
      * @return the condition factory
@@ -238,7 +245,7 @@ public class Awaitility {
     /**
      * An alternative to using {@link #await()} if you want to specify a timeout
      * directly.
-     * 
+     *
      * @param value
      *            the value
      * @param unit
@@ -252,7 +259,7 @@ public class Awaitility {
 
     /**
      * Sets the default poll interval that all await statements will use.
-     * 
+     *
      * @param pollInterval
      *            the poll interval
      * @param unit
@@ -264,7 +271,7 @@ public class Awaitility {
 
     /**
      * Sets the default poll delay all await statements will use.
-     * 
+     *
      * @param pollDelay
      *            the poll delay
      * @param unit
@@ -276,7 +283,7 @@ public class Awaitility {
 
     /**
      * Sets the default timeout all await statements will use.
-     * 
+     *
      * @param timeout
      *            the timeout
      * @param unit
@@ -288,7 +295,7 @@ public class Awaitility {
 
     /**
      * Sets the default poll interval that all await statements will use.
-     * 
+     *
      * @param pollInterval
      *            the new default poll interval
      */
@@ -301,7 +308,7 @@ public class Awaitility {
 
     /**
      * Sets the default poll delay that all await statements will use.
-     * 
+     *
      * @param pollDelay
      *            the new default poll delay
      */
@@ -314,7 +321,7 @@ public class Awaitility {
 
     /**
      * Sets the default timeout that all await statements will use.
-     * 
+     *
      * @param defaultTimeout
      *            the new default timeout
      */
@@ -326,31 +333,62 @@ public class Awaitility {
     }
 
     /**
-     * Await untilCall a specific method invocation returns something. E.g.
-     * 
+     * Await until a specific method invocation returns something. E.g.
+     *
      * <pre>
      * await().untilCall(to(service).getCount(), greaterThan(2));
      * </pre>
-     * 
-     * Here we tell Awaitility to wait untilCall the <code>service.getCount()</code>
+     *
+     * Here we tell Awaitility to wait until the <code>service.getCount()</code>
      * method returns a value that is greater than 2.
-     * 
+     *
      * @param <S>
      *            The type of the service.
-     * @param service
-     *            the service that contains the method of interest.
+     * @param object
+     *            the object that contains the method of interest.
      * @return A proxy of the service
      */
     @SuppressWarnings("unchecked")
-    public static <S> S to(S service) {
-        return (S) MethodCallRecorder.createProxy(service);
+    public static <S> S to(S object) {
+        return (S) MethodCallRecorder.createProxy(object);
     }
 
-    public static FieldSupplierBuilder in(Object object) {
+
+    /**
+     * Await until an instance field matches something. E.g.
+     *
+     * <pre>
+     * await().until(fieldIn(service).withName("fieldName").andOfType(int.class), greaterThan(2));
+     * </pre>
+     *
+     * Here Awaitility waits until a field with name <code>fieldName</code> and of the <code>int.class</code>
+     * in object <code>service</code> is greater than 2.
+     *
+     * Note that the field must be thread-safe in order to guarantee correct behavior.
+     *
+     * @param object The object that contains the field.
+     * @return A field supplier builder which lets you specify the parameters needed to find the field.
+     */
+    public static FieldSupplierBuilder fieldIn(Object object) {
         return new FieldSupplierBuilder(object);
     }
 
-    public static FieldSupplierBuilder in(Class<?> clazz) {
+    /**
+     * Await until a static field matches something. E.g.
+     *
+     * <pre>
+     * await().until(fieldIn(Service.class).withName("fieldName").andOfType(int.class), greaterThan(2));
+     * </pre>
+     *
+     * Here Awaitility waits until a static field with name <code>fieldName</code> and of the
+     * <code>int.class</code> in object <code>service</code> is greater than 2.
+     *
+     * Note that the field must be thread-safe in order to guarantee correct behavior.
+     *
+     * @param clazz The class that contains the static field.
+     * @return A field supplier builder which lets you specify the parameters needed to find the field.
+     */
+    public static FieldSupplierBuilder fieldIn(Class<?> clazz) {
         return new FieldSupplierBuilder(clazz);
     }
 }

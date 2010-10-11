@@ -1,3 +1,18 @@
+/*
+ * Copyright 2010 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.jayway.awaitility.core;
 
 import java.lang.reflect.Method;
@@ -101,7 +116,7 @@ public class ConditionFactory {
 	}
 
 	/**
-	 * Await forever untilCall the condition is satisfied. Caution: You can block
+	 * Await forever until the condition is satisfied. Caution: You can block
 	 * subsequent tests and the entire build can hang indefinitely, it's
 	 * recommended to always use a timeout.
 	 * 
@@ -340,11 +355,11 @@ public class ConditionFactory {
 	}
 
 	/**
-	 * Await untilCall a {@link Callable} supplies a value matching the specified
+	 * Await until a {@link Callable} supplies a value matching the specified
 	 * {@link Matcher}. E.g.
 	 * 
 	 * <pre>
-	 * await().untilCall(numberOfPersons(), is(greaterThan(2)));
+	 * await().until(numberOfPersons(), is(greaterThan(2)));
 	 * </pre>
 	 * 
 	 * where "numberOfPersons()" returns a standard {@link Callable}:
@@ -359,13 +374,13 @@ public class ConditionFactory {
 	 * }
 	 * </pre>
 	 * 
-	 * Using a generic {@link Callable} as done by using this version of "untilCall"
+	 * Using a generic {@link Callable} as done by using this version of "until"
 	 * allows you to reuse the "numberOfPersons()" definition in multiple await
 	 * statements. I.e. you can easily create another await statement (perhaps
 	 * in a different test case) using e.g.
 	 * 
 	 * <pre>
-	 * await().untilCall(numberOfPersons(), is(equalTo(6)));
+	 * await().until(numberOfPersons(), is(equalTo(6)));
 	 * </pre>
 	 * 
 	 * @param <T>
@@ -384,12 +399,12 @@ public class ConditionFactory {
 	}
 
 	/**
-	 * Await untilCall a {@link Callable} returns <code>true</code>. This is method
-	 * is not as generic as the other variants of "untilCall" but it allows for a
+	 * Await until a {@link Callable} returns <code>true</code>. This is method
+	 * is not as generic as the other variants of "until" but it allows for a
 	 * more precise and in some cases even more english-like syntax. E.g.
 	 * 
 	 * <pre>
-	 * await().untilCall(numberOfPersonsIsEqualToThree());
+	 * await().until(numberOfPersonsIsEqualToThree());
 	 * </pre>
 	 * 
 	 * where "numberOfPersonsIsEqualToThree()" returns a standard

@@ -150,7 +150,7 @@ public class WhiteboxImpl {
 
     /**
      * Get the value of a field using reflection. This method will traverse the
-     * super class hierarchy untilCall the first field of type <tt>fieldType</tt> is
+     * super class hierarchy until the first field of type <tt>fieldType</tt> is
      * found. The value of this field will be returned.
      * 
      * @param <T>

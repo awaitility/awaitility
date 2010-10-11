@@ -1,3 +1,18 @@
+/*
+ * Copyright 2010 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.jayway.awaitility.core;
 
 import com.jayway.awaitility.reflect.WhiteboxImpl;
@@ -7,6 +22,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.concurrent.Callable;
 
+/**
+ * The field supplier builder allows you to create a supplier based a field.
+ */
 public class FieldSupplierBuilder {
 
     private final Object object;
@@ -18,16 +36,46 @@ public class FieldSupplierBuilder {
         this.object = object;
     }
 
+    /**
+     * Find a field based on a type. E.g.
+     *
+     * <code>
+     * await().until(fieldIn(object).ofType(int.class), equalTo(2));
+     * </code>
+     *
+     * @param fieldType The type of the field.
+     * @param <T> The type of the field
+     * @return The supplier
+     */
     public <T> NameFieldSupplier<T> ofType(Class<T> fieldType) {
         this.expectedFieldType = fieldType;
         return new NameFieldSupplier<T>();
     }
-
+    /**
+     * Find a field based on the field name. E.g.
+     *
+     * <code>
+     * await().until(fieldIn(object).withName("fieldName"), equalTo(someObject));
+     * </code>
+     *
+     * @param fieldName The name of the field.
+     * @return The supplier
+     */
     public <T> TypeFieldSupplier<T> withName(String fieldName) {
         this.expectedFieldName = fieldName;
         return new TypeFieldSupplier<T>();
     }
 
+    /**
+     * Find a field based that is annotated with a specific annotation. E.g.
+     *
+     * <code>
+     * await().until(fieldIn(object).annotatedWith(MyAnnotation.class), equalTo(someObject));
+     * </code>
+     *
+     * @param annotationType The field annotation
+     * @return The supplier
+     */
     public <T> NameAndTypeFieldSupplier<T> annotatedWith(Class<? extends Annotation> annotationType) {
         expectedAnnotation = annotationType;
         return new NameAndTypeFieldSupplier<T>();
@@ -48,6 +96,16 @@ public class FieldSupplierBuilder {
             }
         }
 
+        /**
+         * Find a field based on the type and name. E.g.
+         *
+         * <code>
+         * await().until(fieldIn(object).ofType(int.class).andWithName("fieldName"), equalTo(2));
+         * </code>
+         *
+         * @param fieldName The name of the field
+         * @return The supplier
+         */
         public Callable<T> andWithName(final String fieldName) {
             return new Callable<T>() {
                 @SuppressWarnings("rawtypes")
@@ -76,6 +134,16 @@ public class FieldSupplierBuilder {
             }
         }
 
+        /**
+         * Find a field based on the name and type. E.g.
+         *
+         * <code>
+         * await().until(fieldIn(object).withName("fieldName").andOfType(int.class), equalTo(2));
+         * </code>
+         *
+         * @param fieldType The type of the field
+         * @return The supplier
+         */
         public <T> Callable<T> andOfType(final Class<T> fieldType) {
             return new Callable<T>() {
                 public T call() throws Exception {
@@ -90,11 +158,31 @@ public class FieldSupplierBuilder {
     }
 
     public class NameAndTypeFieldSupplier<Type> implements Callable<Type> {
+        /**
+         * Find a field based on the annotation and field name. E.g.
+         *
+         * <code>
+         * await().until(fieldIn(object).annotatedWith(MyAnnotation.class).andWithName("fieldName"), equalTo(someObject));
+         * </code>
+         *
+         * @param fieldName The type of name of the field
+         * @return The supplier
+         */
         public TypeFieldSupplier<Type> andWithName(String fieldName) {
             FieldSupplierBuilder.this.expectedFieldName = fieldName;
             return new TypeFieldSupplier<Type>();
         }
 
+        /**
+         * Find a field based on the annotation and field type. E.g.
+         *
+         * <code>
+         * await().until(fieldIn(object).annotatedWith(MyAnnotation.class).andOfType(int.class), equalTo(2));
+         * </code>
+         *
+         * @param type The type of the field
+         * @return The supplier
+         */
         public <T> NameFieldSupplier<T> andOfType(Class<T> type) {
             FieldSupplierBuilder.this.expectedFieldType = type;
             return new NameFieldSupplier<T>();

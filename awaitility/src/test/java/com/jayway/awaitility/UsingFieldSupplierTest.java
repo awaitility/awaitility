@@ -1,23 +1,31 @@
+/*
+ * Copyright 2010 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.jayway.awaitility;
 
-import static com.jayway.awaitility.Awaitility.await;
-import static com.jayway.awaitility.Awaitility.in;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-
+import com.jayway.awaitility.classes.*;
+import com.jayway.awaitility.reflect.exception.FieldNotFoundException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import com.jayway.awaitility.classes.Asynch;
-import com.jayway.awaitility.classes.ExampleAnnotation;
-import com.jayway.awaitility.classes.ExampleAnnotation2;
-import com.jayway.awaitility.classes.FakeRepository;
-import com.jayway.awaitility.classes.FakeRepositoryImpl;
-import com.jayway.awaitility.classes.FakeRepositoryWithAnnotation;
-import com.jayway.awaitility.classes.FakeRepositoryWithStaticFieldAndAnnotation;
-import com.jayway.awaitility.reflect.exception.FieldNotFoundException;
+import static com.jayway.awaitility.Awaitility.await;
+import static com.jayway.awaitility.Awaitility.fieldIn;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
 
 public class UsingFieldSupplierTest {
     private FakeRepository fakeRepository;
@@ -34,14 +42,14 @@ public class UsingFieldSupplierTest {
     @Test(timeout = 2000)
     public void ofTypeAndName() throws Exception {
         new Asynch(fakeRepository).perform();
-        await().until(in(fakeRepository).ofType(int.class).andWithName("value"), equalTo(1));
+        await().until(fieldIn(fakeRepository).ofType(int.class).andWithName("value"), equalTo(1));
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
     public void nameAndOfType() throws Exception {
         new Asynch(fakeRepository).perform();
-        await().until(in(fakeRepository).withName("value").andOfType(int.class), equalTo(1));
+        await().until(fieldIn(fakeRepository).withName("value").andOfType(int.class), equalTo(1));
         assertEquals(1, fakeRepository.getValue());
     }
 
@@ -49,14 +57,14 @@ public class UsingFieldSupplierTest {
     public void nameOnly() throws Exception {
         new Asynch(fakeRepository).perform();
         Object expected = 1;
-        await().until(in(fakeRepository).withName("value"), equalTo(expected));
+        await().until(fieldIn(fakeRepository).withName("value"), equalTo(expected));
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
     public void typeOnly() throws Exception {
         new Asynch(fakeRepository).perform();
-        await().until(in(fakeRepository).ofType(int.class), equalTo(1));
+        await().until(fieldIn(fakeRepository).ofType(int.class), equalTo(1));
         assertEquals(1, fakeRepository.getValue());
     }
 
@@ -65,7 +73,7 @@ public class UsingFieldSupplierTest {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         Object one = 1;
-        await().until(in(repository).annotatedWith(ExampleAnnotation.class), equalTo(one));
+        await().until(fieldIn(repository).annotatedWith(ExampleAnnotation.class), equalTo(one));
         assertEquals(1, repository.getValue());
     }
 
@@ -74,7 +82,7 @@ public class UsingFieldSupplierTest {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         Object one = 1;
-        await().until(in(repository).annotatedWith(ExampleAnnotation.class).andWithName("value"), equalTo(one));
+        await().until(fieldIn(repository).annotatedWith(ExampleAnnotation.class).andWithName("value"), equalTo(one));
         assertEquals(1, repository.getValue());
     }
 
@@ -83,7 +91,7 @@ public class UsingFieldSupplierTest {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         await().until(
-                in(repository).annotatedWith(ExampleAnnotation.class).andWithName("value").andOfType(int.class),
+                fieldIn(repository).annotatedWith(ExampleAnnotation.class).andWithName("value").andOfType(int.class),
                 equalTo(1));
         assertEquals(1, repository.getValue());
     }
@@ -92,7 +100,7 @@ public class UsingFieldSupplierTest {
     public void annotationAndType() throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
-        await().until(in(repository).annotatedWith(ExampleAnnotation.class).andOfType(int.class), equalTo(1));
+        await().until(fieldIn(repository).annotatedWith(ExampleAnnotation.class).andOfType(int.class), equalTo(1));
         assertEquals(1, repository.getValue());
     }
 
@@ -101,7 +109,7 @@ public class UsingFieldSupplierTest {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         await().until(
-                in(repository).annotatedWith(ExampleAnnotation.class).andOfType(int.class).andWithName("value"),
+                fieldIn(repository).annotatedWith(ExampleAnnotation.class).andOfType(int.class).andWithName("value"),
                 equalTo(1));
         assertEquals(1, repository.getValue());
     }
@@ -110,7 +118,7 @@ public class UsingFieldSupplierTest {
     public void givenStaticFieldAndUsingOfTypeAndName() throws Exception {
         FakeRepositoryWithStaticFieldAndAnnotation repository = new FakeRepositoryWithStaticFieldAndAnnotation();
         new Asynch(repository).perform();
-        await().until(in(FakeRepositoryWithStaticFieldAndAnnotation.class).ofType(int.class).andWithName("value"),
+        await().until(fieldIn(FakeRepositoryWithStaticFieldAndAnnotation.class).ofType(int.class).andWithName("value"),
                 equalTo(1));
         assertEquals(1, repository.getValue());
     }
@@ -119,7 +127,7 @@ public class UsingFieldSupplierTest {
     public void givenStaticFieldAndUsingOfTypeAndNameThrowsFieldNotFoundExceptionWhenUsingInstance() throws Exception {
         FakeRepositoryWithStaticFieldAndAnnotation repository = new FakeRepositoryWithStaticFieldAndAnnotation();
         new Asynch(repository).perform();
-        await().until(in(repository).ofType(int.class).andWithName("value"), equalTo(1));
+        await().until(fieldIn(repository).ofType(int.class).andWithName("value"), equalTo(1));
         assertEquals(1, repository.getValue());
     }
 
@@ -128,7 +136,7 @@ public class UsingFieldSupplierTest {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         byte one = (byte) 1;
-        await().until(in(repository).ofType(byte.class).andWithName("value"), equalTo(one));
+        await().until(fieldIn(repository).ofType(byte.class).andWithName("value"), equalTo(one));
         assertEquals(1, repository.getValue());
     }
 
@@ -136,7 +144,7 @@ public class UsingFieldSupplierTest {
     public void givenTypeAndNameWhenTypeMatchButNameDoesntThenFieldNotFoundExceptionIsThrown() throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
-        await().until(in(repository).ofType(int.class).andWithName("value2"), equalTo(1));
+        await().until(fieldIn(repository).ofType(int.class).andWithName("value2"), equalTo(1));
         assertEquals(1, repository.getValue());
     }
 
@@ -145,7 +153,7 @@ public class UsingFieldSupplierTest {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         byte one = (byte) 1;
-        await().until(in(repository).withName("value").andOfType(byte.class), equalTo(one));
+        await().until(fieldIn(repository).withName("value").andOfType(byte.class), equalTo(one));
         assertEquals(1, repository.getValue());
     }
 
@@ -153,7 +161,7 @@ public class UsingFieldSupplierTest {
     public void givenNameAndTypeWhenTypeMatchButNameDoesntThenFieldNotFoundExceptionIsThrown() throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
-        await().until(in(repository).withName("value2").andOfType(int.class), equalTo(1));
+        await().until(fieldIn(repository).withName("value2").andOfType(int.class), equalTo(1));
         assertEquals(1, repository.getValue());
     }
 
@@ -163,7 +171,7 @@ public class UsingFieldSupplierTest {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         Object one = 1;
-        await().until(in(repository).annotatedWith(ExampleAnnotation2.class).andWithName("value"), equalTo(one));
+        await().until(fieldIn(repository).annotatedWith(ExampleAnnotation2.class).andWithName("value"), equalTo(one));
         assertEquals(1, repository.getValue());
     }
 
@@ -173,7 +181,7 @@ public class UsingFieldSupplierTest {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         await().until(
-                in(repository).annotatedWith(ExampleAnnotation2.class).andWithName("value").andOfType(int.class),
+                fieldIn(repository).annotatedWith(ExampleAnnotation2.class).andWithName("value").andOfType(int.class),
                 equalTo(1));
         assertEquals(1, repository.getValue());
     }
@@ -185,7 +193,7 @@ public class UsingFieldSupplierTest {
         new Asynch(repository).perform();
         byte one = (byte) 1;
         await().until(
-                in(repository).annotatedWith(ExampleAnnotation.class).andWithName("value").andOfType(byte.class),
+                fieldIn(repository).annotatedWith(ExampleAnnotation.class).andWithName("value").andOfType(byte.class),
                 equalTo(one));
         assertEquals(1, repository.getValue());
     }
@@ -196,7 +204,7 @@ public class UsingFieldSupplierTest {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         Object one = 1;
-        await().until(in(repository).annotatedWith(ExampleAnnotation.class).andWithName("value2"), equalTo(one));
+        await().until(fieldIn(repository).annotatedWith(ExampleAnnotation.class).andWithName("value2"), equalTo(one));
         assertEquals(1, repository.getValue());
     }
 
@@ -206,7 +214,7 @@ public class UsingFieldSupplierTest {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         byte one = (byte) 1;
-        await().until(in(repository).annotatedWith(ExampleAnnotation.class).andOfType(byte.class), equalTo(one));
+        await().until(fieldIn(repository).annotatedWith(ExampleAnnotation.class).andOfType(byte.class), equalTo(one));
         assertEquals(1, repository.getValue());
     }
 
@@ -215,7 +223,7 @@ public class UsingFieldSupplierTest {
             throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
-        await().until(in(repository).annotatedWith(ExampleAnnotation2.class).andOfType(int.class), equalTo(1));
+        await().until(fieldIn(repository).annotatedWith(ExampleAnnotation2.class).andOfType(int.class), equalTo(1));
         assertEquals(1, repository.getValue());
     }
 
