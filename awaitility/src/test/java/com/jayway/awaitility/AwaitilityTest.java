@@ -16,12 +16,11 @@
 package com.jayway.awaitility;
 
 import static com.jayway.awaitility.Awaitility.await;
-import static com.jayway.awaitility.Awaitility.to;
-import static com.jayway.awaitility.Awaitility.dontCatchUncaughtExceptions;
 import static com.jayway.awaitility.Awaitility.catchUncaughtExceptions;
 import static com.jayway.awaitility.Awaitility.catchUncaughtExceptionsByDefault;
 import static com.jayway.awaitility.Awaitility.dontCatchUncaughtExceptions;
 import static com.jayway.awaitility.Awaitility.given;
+import static com.jayway.awaitility.Awaitility.to;
 import static com.jayway.awaitility.Awaitility.waitAtMost;
 import static com.jayway.awaitility.Awaitility.with;
 import static com.jayway.awaitility.Duration.ONE_SECOND;

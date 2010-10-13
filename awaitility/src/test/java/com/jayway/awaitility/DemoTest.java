@@ -17,7 +17,6 @@ package com.jayway.awaitility;
 
 import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.awaitility.Awaitility.to;
-import static com.jayway.awaitility.Awaitility.catchUncaughtExceptions;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
