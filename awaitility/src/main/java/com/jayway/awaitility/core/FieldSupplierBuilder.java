@@ -122,7 +122,7 @@ public class FieldSupplierBuilder {
         }
     }
 
-    public class TypeFieldSupplier<Type> implements Callable<Type> {
+    public class TypeFieldSupplier<T> implements Callable<T> {
         public TypeFieldSupplier() {
             if (expectedAnnotation != null) {
                 Field field = WhiteboxImpl.getFieldAnnotatedWith(object, expectedAnnotation);
@@ -144,20 +144,20 @@ public class FieldSupplierBuilder {
          * @param fieldType The type of the field
          * @return The supplier
          */
-        public <T> Callable<T> andOfType(final Class<T> fieldType) {
-            return new Callable<T>() {
-                public T call() throws Exception {
+        public <S> Callable<S> andOfType(final Class<S> fieldType) {
+            return new Callable<S>() {
+                public S call() throws Exception {
                     return WhiteboxImpl.getByNameAndType(object, expectedFieldName, fieldType);
                 }
             };
         }
 
-        public Type call() throws Exception {
-            return WhiteboxImpl.<Type> getInternalState(object, expectedFieldName);
+        public T call() throws Exception {
+            return WhiteboxImpl.<T> getInternalState(object, expectedFieldName);
         }
     }
 
-    public class NameAndTypeFieldSupplier<Type> implements Callable<Type> {
+    public class NameAndTypeFieldSupplier<T> implements Callable<T> {
         /**
          * Find a field based on the annotation and field name. E.g.
          *
@@ -168,9 +168,9 @@ public class FieldSupplierBuilder {
          * @param fieldName The type of name of the field
          * @return The supplier
          */
-        public TypeFieldSupplier<Type> andWithName(String fieldName) {
+        public TypeFieldSupplier<T> andWithName(String fieldName) {
             FieldSupplierBuilder.this.expectedFieldName = fieldName;
-            return new TypeFieldSupplier<Type>();
+            return new TypeFieldSupplier<T>();
         }
 
         /**
@@ -183,14 +183,14 @@ public class FieldSupplierBuilder {
          * @param type The type of the field
          * @return The supplier
          */
-        public <T> NameFieldSupplier<T> andOfType(Class<T> type) {
+        public <S> NameFieldSupplier<S> andOfType(Class<S> type) {
             FieldSupplierBuilder.this.expectedFieldType = type;
-            return new NameFieldSupplier<T>();
+            return new NameFieldSupplier<S>();
         }
 
         @SuppressWarnings("rawtypes")
-        public Type call() throws Exception {
-            return (Type) WhiteboxImpl.getFieldAnnotatedWith(object, expectedAnnotation).get(object);
+        public T call() throws Exception {
+            return (T) WhiteboxImpl.getFieldAnnotatedWith(object, expectedAnnotation).get(object);
         }
     }
 }
