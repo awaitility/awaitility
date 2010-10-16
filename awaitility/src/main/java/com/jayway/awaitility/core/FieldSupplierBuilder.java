@@ -33,6 +33,7 @@ public class FieldSupplierBuilder {
     private Class<? extends Annotation> expectedAnnotation;
 
     public FieldSupplierBuilder(Object object) {
+        assertNotNullParameter(object, "Object passed to fieldIn");
         this.object = object;
     }
 
@@ -43,56 +44,37 @@ public class FieldSupplierBuilder {
      * await().until(fieldIn(object).ofType(int.class), equalTo(2));
      * </code>
      *
+     * You can also specify the field more accurately by continuing the statement:
+     * E.g.
+     * <code>
+     * await().until(fieldIn(object).ofType(int.class).andWithName("fieldName"), equalTo(2));
+     * </code>
+     *
+     * or
+     *
+     * <code>
+     * await().until(fieldIn(object).ofType(int.class).andAnnotatedWith(MyAnnotation.class).andWithName("fieldName"), equalTo(2));
+     * </code>
+     *
      * @param fieldType The type of the field.
      * @param <T> The type of the field
-     * @return The supplier
+     * @return The field supplier
      */
-    public <T> NameFieldSupplier<T> ofType(Class<T> fieldType) {
+    public <T> NameAndAnnotationFieldSupplier<T> ofType(Class<T> fieldType) {
         this.expectedFieldType = fieldType;
-        return new NameFieldSupplier<T>();
-    }
-    /**
-     * Find a field based on the field name. E.g.
-     *
-     * <code>
-     * await().until(fieldIn(object).withName("fieldName"), equalTo(someObject));
-     * </code>
-     *
-     * @param fieldName The name of the field.
-     * @return The supplier
-     */
-    public <T> TypeFieldSupplier<T> withName(String fieldName) {
-        this.expectedFieldName = fieldName;
-        return new TypeFieldSupplier<T>();
-    }
-
-    /**
-     * Find a field based that is annotated with a specific annotation. E.g.
-     *
-     * <code>
-     * await().until(fieldIn(object).annotatedWith(MyAnnotation.class), equalTo(someObject));
-     * </code>
-     *
-     * @param annotationType The field annotation
-     * @return The supplier
-     */
-    public <T> NameAndTypeFieldSupplier<T> annotatedWith(Class<? extends Annotation> annotationType) {
-        expectedAnnotation = annotationType;
-        return new NameAndTypeFieldSupplier<T>();
+        return new NameAndAnnotationFieldSupplier<T>();
     }
 
     public class NameFieldSupplier<T> implements Callable<T> {
         private Field foundField;
 
         public NameFieldSupplier() {
-            if (expectedAnnotation != null) {
-                foundField = WhiteboxImpl.getFieldAnnotatedWith(object, expectedAnnotation);
-                if (!foundField.getType().isAssignableFrom(expectedFieldType)) {
-                    throw new FieldNotFoundException(String.format(
-                            "Couldn't find a field of type %s annotated with %s in %s.", expectedFieldType.getClass()
-                                    .getName(), expectedAnnotation.getClass().getName(), WhiteboxImpl.getType(object)
-                                    .getName()));
-                }
+            foundField = WhiteboxImpl.getFieldAnnotatedWith(object, expectedAnnotation);
+            if (!foundField.getType().isAssignableFrom(expectedFieldType)) {
+                throw new FieldNotFoundException(String.format(
+                        "Couldn't find a field of type %s annotated with %s in %s.", expectedFieldType.getClass()
+                                .getName(), expectedAnnotation.getClass().getName(), WhiteboxImpl.getType(object)
+                                .getName()));
             }
         }
 
@@ -107,53 +89,90 @@ public class FieldSupplierBuilder {
          * @return The supplier
          */
         public Callable<T> andWithName(final String fieldName) {
+            assertNotNullParameter(fieldName, "fieldName");
             return new Callable<T>() {
-                @SuppressWarnings("rawtypes")
                 public T call() throws Exception {
                     return (T) WhiteboxImpl.getByNameAndType(object, fieldName, expectedFieldType);
                 }
             };
         }
 
-        @SuppressWarnings("rawtypes")
         public T call() throws Exception {
             return (T) ((T) foundField == null ? WhiteboxImpl.getInternalState(object, expectedFieldType) : foundField
                     .get(object));
         }
     }
 
-    public class TypeFieldSupplier<T> implements Callable<T> {
-        public TypeFieldSupplier() {
-            if (expectedAnnotation != null) {
-                Field field = WhiteboxImpl.getFieldAnnotatedWith(object, expectedAnnotation);
-                if (!field.getName().equals(expectedFieldName)) {
-                    throw new FieldNotFoundException(String.format(
-                            "Couldn't find a field with name %s annotated with %s in %s.", expectedFieldName,
-                            expectedAnnotation.getClass().getName(), WhiteboxImpl.getType(object).getName()));
-                }
-            }
+
+    public class NameAndAnnotationFieldSupplier<T> implements Callable<T> {
+        /**
+         * Find a field based on the type and name. E.g.
+         *
+         * <code>
+         * await().until(fieldIn(object).ofType(int.class).andWithName("fieldName"), equalTo(2));
+         * </code>
+         *
+         * @param fieldName The name of the field
+         * @return The supplier
+         */
+        public AnnotationFieldSupplier<T> andWithName(final String fieldName) {
+            assertNotNullParameter(fieldName, "fieldName");
+            expectedFieldName = fieldName;
+            return new AnnotationFieldSupplier<T>();
         }
 
         /**
-         * Find a field based on the name and type. E.g.
+         * Find a field based on the type and an annotation. E.g.
          *
          * <code>
-         * await().until(fieldIn(object).withName("fieldName").andOfType(int.class), equalTo(2));
+         * await().until(fieldIn(object).ofType(int.class).andAnnotatedWith(MyAnnotation.class), equalTo(2));
          * </code>
          *
-         * @param fieldType The type of the field
+         * @param annotationType The name of the field
          * @return The supplier
          */
-        public <S> Callable<S> andOfType(final Class<S> fieldType) {
-            return new Callable<S>() {
-                public S call() throws Exception {
-                    return WhiteboxImpl.getByNameAndType(object, expectedFieldName, fieldType);
+        public NameFieldSupplier<T> andAnnotatedWith(Class<? extends Annotation> annotationType) {
+            assertNotNullParameter(annotationType, "annotationType");
+            expectedAnnotation = annotationType;
+            return new NameFieldSupplier<T>();
+        }
+
+        public T call() throws Exception {
+            return (T) WhiteboxImpl.getInternalState(object, expectedFieldType);
+        }
+    }
+
+    public class AnnotationFieldSupplier<T> implements Callable<T> {
+        public AnnotationFieldSupplier() {
+        }
+
+        /**
+         * Find a field based on a name, type and annotation. E.g.
+         *
+         * <code>
+         * await().until(fieldIn(object).ofType(int.class).andWithName("fieldName").andAnnotatedWith(MyAnnotation.class), equalTo(2));
+         * </code>
+         *
+         * @param annotationType The type of the annotation
+         * @return The supplier
+         */
+        public Callable<T> andAnnotatedWith(final Class<? extends Annotation> annotationType) {
+            assertNotNullParameter(annotationType, "annotationType");
+            Field field = WhiteboxImpl.getFieldAnnotatedWith(object, annotationType);
+            if (!field.getName().equals(expectedFieldName)) {
+                throw new FieldNotFoundException(String.format(
+                        "Couldn't find a field with name %s annotated with %s in %s.", expectedFieldName,
+                        annotationType.getClass().getName(), WhiteboxImpl.getType(object).getName()));
+            }
+            return new Callable<T>() {
+                public T call() throws Exception {
+                    return AnnotationFieldSupplier.this.call();
                 }
             };
         }
 
         public T call() throws Exception {
-            return WhiteboxImpl.<T> getInternalState(object, expectedFieldName);
+            return (T) WhiteboxImpl.getByNameAndType(object, expectedFieldName, expectedFieldType);
         }
     }
 
@@ -168,9 +187,10 @@ public class FieldSupplierBuilder {
          * @param fieldName The type of name of the field
          * @return The supplier
          */
-        public TypeFieldSupplier<T> andWithName(String fieldName) {
+        public AnnotationFieldSupplier<T> andWithName(String fieldName) {
+            assertNotNullParameter(fieldName, "fieldName");
             FieldSupplierBuilder.this.expectedFieldName = fieldName;
-            return new TypeFieldSupplier<T>();
+            return new AnnotationFieldSupplier<T>();
         }
 
         /**
@@ -183,14 +203,21 @@ public class FieldSupplierBuilder {
          * @param type The type of the field
          * @return The supplier
          */
-        public <S> NameFieldSupplier<S> andOfType(Class<S> type) {
+        public <S> NameAndAnnotationFieldSupplier<S> andOfType(Class<S> type) {
+            assertNotNullParameter(type, "Expected field type");
             FieldSupplierBuilder.this.expectedFieldType = type;
-            return new NameFieldSupplier<S>();
+            return new NameAndAnnotationFieldSupplier<S>();
         }
 
         @SuppressWarnings("rawtypes")
         public T call() throws Exception {
             return (T) WhiteboxImpl.getFieldAnnotatedWith(object, expectedAnnotation).get(object);
+        }
+    }
+
+    private void assertNotNullParameter(Object parameterValue, String name) {
+        if(parameterValue == null) {
+            throw new IllegalArgumentException(name + " cannot be null");
         }
     }
 }
