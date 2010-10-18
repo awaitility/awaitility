@@ -358,7 +358,7 @@ public class Awaitility {
      * Await until an instance field matches something. E.g.
      *
      * <pre>
-     * await().until(fieldIn(service).withName("fieldName").andOfType(int.class), greaterThan(2));
+     * await().until(fieldIn(service).ofType(int.class).andWithName("fieldName"), greaterThan(2));
      * </pre>
      *
      * Here Awaitility waits until a field with name <code>fieldName</code> and of the <code>int.class</code>
@@ -377,7 +377,7 @@ public class Awaitility {
      * Await until a static field matches something. E.g.
      *
      * <pre>
-     * await().until(fieldIn(Service.class).withName("fieldName").andOfType(int.class), greaterThan(2));
+     * await().until(fieldIn(Service.class).ofType(int.class).andWithName("fieldName"), greaterThan(2));
      * </pre>
      *
      * Here Awaitility waits until a static field with name <code>fieldName</code> and of the
