@@ -3,7 +3,7 @@
 	<groupId>com.jayway.awaitility</groupId>
 	<artifactId>awaitility-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.3.1</version>
+	<version>1.2.2-SNAPSHOT</version>
 	<url>http://github.com/jayway/awaitility</url>
 	<name>Awaitility Parent POM</name>
 	<description>A Java DSL for synchronizing asynchronous operations</description>
