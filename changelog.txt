@@ -1,9 +1,10 @@
-Changelog next version 
-----------------------
+Changelog 1.3
+-------------
 * MethodCallRecorder generates an exception on getLastXXX if no method call have been recorded. 
 * MethodCallRecorder is reset after retrieving last calls and on Awaitility.reset 
 * Added basic support for Scala functions
 * Added a fieldIn method to Awaitility which allows you to build a supplier using a field, e.g. await().until(fieldIn(object).ofType(int.class), equalTo(1));
+* Backward incompatible refactoring: until(callTo(..)) has been renamed to untilCall(to(..)). This to allow for extension DSL's (such as the Scala DSL) to work appropriately.
 * Fixed a bug that failed to set Awaitility to catch uncaught exceptions on reset
 
 Changelog version 1.2.1
