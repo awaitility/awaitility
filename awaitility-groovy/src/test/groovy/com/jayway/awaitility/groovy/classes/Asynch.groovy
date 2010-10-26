@@ -13,36 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.awaitility.scala
+package com.jayway.awaitility.groovy.classes
 
-import org.junit._
-import com.jayway.awaitility.Awaitility._;
+import java.util.concurrent.atomic.AtomicInteger
 
+class Asynch {
+  private final AtomicInteger value = new AtomicInteger();
 
-@Test
-class AwaitilitySupportTest extends AwaitilitySupport {
-	class Counter {
-		var value = 0
-		def count() = {
-			value = value + 1
-			value
-		}
-	}
+  def Asynch perform() {
+    Thread thread = new Thread(new Runnable() {
+      public void run() {
+        try {
+          Thread.sleep(600);
+          value.set(1);
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    });
+    thread.start();
+    return this;
+  }
 
-    @Test
-    def functionAsCondition() = {
-		val c1 = new Counter()
-		val c2 = new Counter()
-		await until { c1.count() + c2.count() > 3 }
-		await until { isDone() }
-		await until isDone 
-	}
-	
-	def isDone() : Boolean = true
-
-	var c = 0
-	def count() = {
-		c = c + 1
-		c
-	}
+  def int getValue() {
+    return value.get();
+  }
 }

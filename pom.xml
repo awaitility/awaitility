@@ -147,5 +147,6 @@
 	<modules>
 		<module>awaitility</module>
 		<module>awaitility-scala</module>
+		<module>awaitility-groovy</module>
 	</modules>
 </project>
