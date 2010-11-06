@@ -44,4 +44,14 @@ class AwaitilitySupportTest extends AwaitilitySupport {
 
     await().atMost(500, MILLISECONDS).until { asynch.getValue() == 2 }
   }
+
+  @Test
+  def void awaitWithAlias() throws Exception {
+    exception.expect TimeoutException.class
+    exception.expectMessage "Condition with alias 'groovy' didn't complete within 500 milliseconds"
+
+    def asynch = new Asynch().perform()
+
+    await("groovy").atMost(500, MILLISECONDS).until { asynch.getValue() == 2 }
+  }
 }
