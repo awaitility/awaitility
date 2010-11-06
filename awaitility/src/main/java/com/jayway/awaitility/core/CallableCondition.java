@@ -15,18 +15,23 @@
  */
 package com.jayway.awaitility.core;
 
+import static com.jayway.awaitility.spi.Timeout.timeout_message;
+
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
 class CallableCondition implements Condition {
 
-	private final ConditionAwaiter conditionAwaiter;
+    private final ConditionAwaiter conditionAwaiter;
 
 	public CallableCondition(final Callable<Boolean> matcher, ConditionSettings settings) {
 		conditionAwaiter = new ConditionAwaiter(matcher, settings) {
 			@SuppressWarnings("rawtypes")
 			@Override
 			protected String getTimeoutMessage() {
+                if(timeout_message != null) {
+                    return timeout_message;
+                }
 				final String timeoutMessage;
 				if (matcher == null) {
 					timeoutMessage = "";

@@ -15,13 +15,16 @@
 */
 package com.jayway.awaitility.groovy
 
+import com.jayway.awaitility.Awaitility
 import com.jayway.awaitility.core.ConditionFactory
 import java.util.concurrent.Callable
-import com.jayway.awaitility.Awaitility
+import static com.jayway.awaitility.spi.Timeout.timeout_message
 
 class AwaitilitySupport extends Awaitility {
 
   AwaitilitySupport() {
+    timeout_message = "Condition was not fulfilled"
+
     ConditionFactory.metaClass.until { Closure closure ->
       delegate.until(new Callable<Boolean>() {
         Boolean call() {

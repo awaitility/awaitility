@@ -16,15 +16,32 @@
 package com.jayway.awaitility.groovy
 
 import com.jayway.awaitility.groovy.classes.Asynch
+import java.util.concurrent.TimeoutException
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.ExpectedException
+import static java.util.concurrent.TimeUnit.MILLISECONDS
 
 // @Mixin(AwaitilitySupport)
 class AwaitilitySupportTest extends AwaitilitySupport {
+
+  @Rule
+  public def ExpectedException exception = ExpectedException.none()
 
   @Test
   def void groovyClosureSupport() throws Exception {
     def asynch = new Asynch().perform()
 
     await().until { asynch.getValue() == 1 }
+  }
+
+  @Test
+  def void timeoutMessagesDoesntContainAnonymousClassDetails() throws Exception {
+    exception.expect TimeoutException.class
+    exception.expectMessage "Condition was not fulfilled within 500 milliseconds"
+
+    def asynch = new Asynch().perform()
+
+    await().atMost(500, MILLISECONDS).until { asynch.getValue() == 2 }
   }
 }

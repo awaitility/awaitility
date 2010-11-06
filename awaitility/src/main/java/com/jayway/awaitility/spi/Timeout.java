@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jayway.awaitility.scala
+package com.jayway.awaitility.spi;
 
-import java.util.concurrent.Callable
-import com.jayway.awaitility.spi.Timeout._
+/**
+ * Allow Awaitility extensions to define their own error messages. E.g. the groovy extension would publish
+ * ugly error messages such as
+ * <pre>
+ *  Condition com.jayway.awaitility.groovy.AwaitilitySupport$1 was not fulfilled within 500 milliseconds.
+ * </pre>
+ * if it where not to set a specific message.
+ */
+public class Timeout {
 
-trait AwaitilitySupport {
-  timeout_message = "Condition was not fulfilled"
-
-  implicit def byNameFunctionToCallable(function : => scala.Boolean) : Callable[java.lang.Boolean] = {
-    new Callable[java.lang.Boolean] {
-      def call() : java.lang.Boolean = function
-    }
-  }
+    public static String timeout_message = null;
 }
-
-
