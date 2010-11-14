@@ -22,7 +22,6 @@ import org.junit.Test
 import org.junit.rules.ExpectedException
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 
-// @Mixin(AwaitilitySupport)
 class AwaitilitySupportTest extends AwaitilitySupport {
 
   @Rule
