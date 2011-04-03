@@ -15,14 +15,13 @@
  */
 package com.jayway.awaitility.proxy;
 
-import static org.junit.Assert.assertEquals;
+import com.jayway.awaitility.classes.ClassWithMethods;
+import org.junit.Test;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-import org.junit.Test;
-
-import com.jayway.awaitility.classes.ClassWithMethods;
+import static org.junit.Assert.assertEquals;
 
 public class ProxyCreatorTest {
 

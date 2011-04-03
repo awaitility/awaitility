@@ -15,9 +15,9 @@
  */
 package com.jayway.awaitility.core;
 
-import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
-
 import com.jayway.awaitility.Duration;
+
+import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
 
 class ConditionSettings {
 	private final String alias;

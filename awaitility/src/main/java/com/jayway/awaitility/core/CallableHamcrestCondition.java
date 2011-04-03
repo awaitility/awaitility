@@ -15,10 +15,10 @@
  */
 package com.jayway.awaitility.core;
 
+import org.hamcrest.Matcher;
+
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
-
-import org.hamcrest.Matcher;
 
 class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
 

@@ -15,10 +15,10 @@
  */
 package com.jayway.awaitility;
 
+import java.util.concurrent.TimeUnit;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-
-import java.util.concurrent.TimeUnit;
 
 public class Duration {
 	
@@ -35,12 +35,13 @@ public class Duration {
 	public static final Duration FIVE_MINUTES = new Duration(300, SECONDS);
 	public static final Duration TEN_MINUTES = new Duration(600, SECONDS);
 	public static final Duration SAME_AS_POLL_INTERVAL = new Duration();
+    private static final int NONE = -1;
 
-	private final long value;
+    private final long value;
 	private final TimeUnit unit;
 
 	private Duration() {
-		this.value = -1;
+		this.value = NONE;
 		this.unit = null;
 	}
 
@@ -59,11 +60,22 @@ public class Duration {
 		return unit;
 	}
 
+    public String getTimeUnitAsString() {
+		return unit == null ? "<not defined>" : unit.toString().toLowerCase();
+	}
+
+    public boolean isForever() {
+        return unit == null && value == NONE;
+    }
+
 	public long getValue() {
 		return value;
 	}
 
 	public long getValueInMS() {
+        if(value == NONE) {
+            return value;
+        }
 		return MILLISECONDS.convert(value, unit);
 	}
 }

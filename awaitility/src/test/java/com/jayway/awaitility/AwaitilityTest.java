@@ -15,23 +15,12 @@
  */
 package com.jayway.awaitility;
 
-import static com.jayway.awaitility.Awaitility.await;
-import static com.jayway.awaitility.Awaitility.catchUncaughtExceptions;
-import static com.jayway.awaitility.Awaitility.catchUncaughtExceptionsByDefault;
-import static com.jayway.awaitility.Awaitility.dontCatchUncaughtExceptions;
-import static com.jayway.awaitility.Awaitility.given;
-import static com.jayway.awaitility.Awaitility.to;
-import static com.jayway.awaitility.Awaitility.waitAtMost;
-import static com.jayway.awaitility.Awaitility.with;
-import static com.jayway.awaitility.Duration.ONE_SECOND;
-import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import com.jayway.awaitility.classes.*;
+import com.jayway.awaitility.proxy.CannotCreateProxyException;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -39,22 +28,15 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import com.jayway.awaitility.classes.Asynch;
-import com.jayway.awaitility.classes.ExceptionThrowingAsynch;
-import com.jayway.awaitility.classes.ExceptionThrowingFakeRepository;
-import com.jayway.awaitility.classes.FakeObjectRepository;
-import com.jayway.awaitility.classes.FakeRepository;
-import com.jayway.awaitility.classes.FakeRepositoryEqualsOne;
-import com.jayway.awaitility.classes.FakeRepositoryImpl;
-import com.jayway.awaitility.classes.FakeRepositoryValue;
-import com.jayway.awaitility.classes.FinalClass;
-import com.jayway.awaitility.classes.FinalFakeRepositoryImpl;
-import com.jayway.awaitility.proxy.CannotCreateProxyException;
+import static com.jayway.awaitility.Awaitility.*;
+import static com.jayway.awaitility.Duration.ONE_SECOND;
+import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AwaitilityTest {
 
@@ -120,7 +102,7 @@ public class AwaitilityTest {
 
     @Test(expected = TimeoutException.class)
     public void awaitOperationSupportsDefaultTimeout() throws Exception {
-        Awaitility.setDefaultTimeout(20, TimeUnit.MILLISECONDS);
+        Awaitility.setDefaultTimeout(120, TimeUnit.MILLISECONDS);
         await().until(value(), greaterThan(0));
         assertEquals(1, fakeRepository.getValue());
     }
@@ -245,7 +227,7 @@ public class AwaitilityTest {
         exception.expect(TimeoutException.class);
         exception.expectMessage(alias);
 
-        await(alias).atMost(20, MILLISECONDS).until(value(), greaterThan(0));
+        await(alias).atMost(120, MILLISECONDS).until(value(), greaterThan(0));
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)
@@ -257,18 +239,18 @@ public class AwaitilityTest {
     public void awaitDisplaysSupplierAndMatcherNameWhenTimeoutExceptionOccurs() throws Exception {
         exception.expect(TimeoutException.class);
         exception.expectMessage(FakeRepositoryValue.class.getName()
-                + " expected a value greater than <0> but was <0> within 20 milliseconds.");
+                + " expected a value greater than <0> but was <0> within 120 milliseconds.");
 
-        with().pollInterval(10, MILLISECONDS).then().await().atMost(20, MILLISECONDS).until(value(), greaterThan(0));
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(value(), greaterThan(0));
     }
 
     @Test(timeout = 2000)
     public void awaitDisplaysCallableNameWhenTimeoutExceptionOccurs() throws Exception {
         exception.expect(TimeoutException.class);
-        exception.expectMessage(String.format("Condition %s was not fulfilled within 20 milliseconds.",
+        exception.expectMessage(String.format("Condition %s was not fulfilled within 120 milliseconds.",
                 FakeRepositoryEqualsOne.class.getName()));
 
-        await().atMost(20, MILLISECONDS).until(fakeRepositoryValueEqualsOne());
+        await().atMost(120, MILLISECONDS).until(fakeRepositoryValueEqualsOne());
     }
 
     @Test(timeout = 2000)
@@ -277,10 +259,10 @@ public class AwaitilityTest {
         exception.expect(TimeoutException.class);
         exception
                 .expectMessage(String
-                        .format("Condition returned by method \"fakeRepositoryValueEqualsOneAsAnonymous\" in class %s was not fulfilled within 20 milliseconds.",
+                        .format("Condition returned by method \"fakeRepositoryValueEqualsOneAsAnonymous\" in class %s was not fulfilled within 120 milliseconds.",
                         AwaitilityTest.class.getName()));
 
-        await().atMost(20, MILLISECONDS).until(fakeRepositoryValueEqualsOneAsAnonymous());
+        await().atMost(120, MILLISECONDS).until(fakeRepositoryValueEqualsOneAsAnonymous());
     }
 
     @Test(timeout = 2000)
@@ -301,10 +283,10 @@ public class AwaitilityTest {
         exception.expect(TimeoutException.class);
         exception
                 .expectMessage(String
-                        .format("%s.valueAsAnonymous Callable expected %s but was <0> within 20 milliseconds.",
+                        .format("%s.valueAsAnonymous Callable expected %s but was <0> within 120 milliseconds.",
                         AwaitilityTest.class.getName(), equalTo(2).toString()));
 
-        with().pollInterval(10, MILLISECONDS).await().atMost(20, MILLISECONDS).until(valueAsAnonymous(), equalTo(2));
+        with().pollInterval(10, MILLISECONDS).await().atMost(120, MILLISECONDS).until(valueAsAnonymous(), equalTo(2));
     }
 
     @Test(timeout = 2000)
@@ -319,6 +301,38 @@ public class AwaitilityTest {
 
         with().pollInterval(10, MILLISECONDS).and().timeout(50, MILLISECONDS).await()
                 .untilCall(to(fakeObjectRepository).getObject(), is(expectedObject));
+    }
+
+    @Test
+    public void awaitilityThrowsIllegalStateExceptionWhenTimeoutIsLessThanPollInterval() throws Exception {
+        exception.expect(IllegalStateException.class);
+        exception.expectMessage(is("Timeout (10 seconds) must be greater than the poll interval (10 minutes)."));
+
+        with().pollInterval(10, MINUTES).await().atMost(10, MILLISECONDS).until(fakeRepositoryValueEqualsOne());
+    }
+
+    @Test
+    public void awaitilityThrowsIllegalStateExceptionWhenTimeoutIsEqualToPollInterval() throws Exception {
+        exception.expect(IllegalStateException.class);
+        exception.expectMessage(is("Timeout (10 milliseconds) must be greater than the poll interval (10 milliseconds)."));
+
+        with().pollInterval(10, MILLISECONDS).await().atMost(10, MILLISECONDS).until(fakeRepositoryValueEqualsOne());
+    }
+
+    @Test
+    public void awaitilityThrowsIllegalStateExceptionWhenTimeoutIsLessThanPollDelay() throws Exception {
+        exception.expect(IllegalStateException.class);
+        exception.expectMessage(is("Timeout (10 seconds) must be greater than the poll delay (10 minutes)."));
+
+        with().pollDelay(10, MINUTES).await().atMost(10, SECONDS).until(fakeRepositoryValueEqualsOne());
+    }
+
+    @Test
+    public void awaitilityThrowsIllegalStateExceptionWhenTimeoutIsEqualToPollDelay() throws Exception {
+        exception.expect(IllegalStateException.class);
+        exception.expectMessage(is("Timeout (200 milliseconds) must be greater than the poll delay (200 milliseconds)."));
+
+        with().pollDelay(200, MILLISECONDS).await().atMost(200, MILLISECONDS).until(fakeRepositoryValueEqualsOne());
     }
 
     private Callable<Boolean> fakeRepositoryValueEqualsOne() {

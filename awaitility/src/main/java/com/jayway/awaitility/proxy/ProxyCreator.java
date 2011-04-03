@@ -15,6 +15,13 @@
  */
 package com.jayway.awaitility.proxy;
 
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -22,14 +29,6 @@ import java.lang.reflect.Proxy;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
-
-import org.objenesis.Objenesis;
-import org.objenesis.ObjenesisStd;
 
 public final class ProxyCreator {
 	
@@ -66,9 +65,9 @@ public final class ProxyCreator {
 		Enhancer enhancer = new Enhancer();
 		enhancer.setSuperclass(targetClass);
 		enhancer.setCallbackType(interceptor.getClass());
-		Class<?> proxiedClass = enhancer.createClass();
-		Enhancer.registerCallbacks(proxiedClass, new Callback[] { interceptor });
-		/* To make the proxy creator work with Eclipse plugins */
+        Class<?> proxiedClass = enhancer.createClass();
+        Enhancer.registerCallbacks(proxiedClass, new Callback[] { interceptor });
+        /* To make the proxy creator work with Eclipse plugins */
 		enhancer.setClassLoader(ProxyCreator.class.getClassLoader());
 
 		// Instantiate the proxied class

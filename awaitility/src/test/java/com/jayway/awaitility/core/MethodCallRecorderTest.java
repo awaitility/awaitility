@@ -15,14 +15,13 @@
  */
 package com.jayway.awaitility.core;
 
-import static com.jayway.awaitility.Awaitility.to;
-import static org.junit.Assert.assertEquals;
-
+import com.jayway.awaitility.classes.FakeRepository;
+import com.jayway.awaitility.classes.FakeRepositoryImpl;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.jayway.awaitility.classes.FakeRepository;
-import com.jayway.awaitility.classes.FakeRepositoryImpl;
+import static com.jayway.awaitility.Awaitility.to;
+import static org.junit.Assert.assertEquals;
 
 public class MethodCallRecorderTest {
 	

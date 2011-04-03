@@ -15,10 +15,10 @@
  */
 package com.jayway.awaitility.reflect;
 
+import com.jayway.awaitility.reflect.exception.FieldNotFoundException;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-
-import com.jayway.awaitility.reflect.exception.FieldNotFoundException;
 
 public class FieldAnnotationMatcherStrategy extends FieldMatcherStrategy {
 

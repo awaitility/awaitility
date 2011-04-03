@@ -15,11 +15,10 @@
  */
 package com.jayway.awaitility.core;
 
-import java.util.concurrent.Callable;
-
+import com.jayway.awaitility.core.ConditionFactory.MethodCaller;
 import org.hamcrest.Matcher;
 
-import com.jayway.awaitility.core.ConditionFactory.MethodCaller;
+import java.util.concurrent.Callable;
 
 class ProxyHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
 

@@ -15,9 +15,9 @@
  */
 package com.jayway.awaitility.core;
 
-import java.util.concurrent.Callable;
-
 import org.hamcrest.Matcher;
+
+import java.util.concurrent.Callable;
 
 abstract class AbstractHamcrestCondition<T> implements Condition {
 

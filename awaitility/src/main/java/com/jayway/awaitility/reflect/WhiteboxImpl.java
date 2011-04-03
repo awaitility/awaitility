@@ -15,12 +15,12 @@
  */
 package com.jayway.awaitility.reflect;
 
+import com.jayway.awaitility.reflect.exception.FieldNotFoundException;
+import com.jayway.awaitility.reflect.exception.TooManyFieldsFoundException;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-
-import com.jayway.awaitility.reflect.exception.FieldNotFoundException;
-import com.jayway.awaitility.reflect.exception.TooManyFieldsFoundException;
 
 /**
  * Various utilities for accessing internals of a class. Basically a simplified

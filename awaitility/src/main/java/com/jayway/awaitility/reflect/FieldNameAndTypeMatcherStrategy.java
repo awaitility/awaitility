@@ -15,9 +15,9 @@
  */
 package com.jayway.awaitility.reflect;
 
-import java.lang.reflect.Field;
-
 import com.jayway.awaitility.reflect.exception.FieldNotFoundException;
+
+import java.lang.reflect.Field;
 
 class FieldNameAndTypeMatcherStrategy extends FieldMatcherStrategy {
 

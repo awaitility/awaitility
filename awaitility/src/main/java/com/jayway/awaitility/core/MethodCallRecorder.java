@@ -15,11 +15,11 @@
  */
 package com.jayway.awaitility.core;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-
 import com.jayway.awaitility.proxy.ProxyCreator;
 import com.jayway.awaitility.proxy.TypeUtils;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 
 public class MethodCallRecorder {
 	

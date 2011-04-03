@@ -15,10 +15,10 @@
  */
 package com.jayway.awaitility.core;
 
-import static com.jayway.awaitility.spi.Timeout.timeout_message;
-
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
+
+import static com.jayway.awaitility.spi.Timeout.timeout_message;
 
 class CallableCondition implements Condition {
 
