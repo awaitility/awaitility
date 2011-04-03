@@ -15,24 +15,66 @@
  */
 package com.jayway.awaitility.core;
 
+import com.jayway.awaitility.reflect.WhiteboxImpl;
 import org.hamcrest.Matcher;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
 class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
 
-	public CallableHamcrestCondition(final Callable<T> supplier, final Matcher<T> matcher, ConditionSettings settings) {
-		super(supplier, matcher, settings);
-	}
+    public CallableHamcrestCondition(final Callable<T> supplier, final Matcher<T> matcher, ConditionSettings settings) {
+        super(supplier, matcher, settings);
+    }
 
-	@Override
-	String getCallableDescription(final Callable<T> supplier) {
-		Method enclosingMethod = supplier.getClass().getEnclosingMethod();
-		if (supplier.getClass().isAnonymousClass() && enclosingMethod != null) {
-			return enclosingMethod.getDeclaringClass().getName() + "." + enclosingMethod.getName() + " Callable";
-		} else {
-			return supplier.getClass().getName();
-		}
-	}
+    @Override
+    String getCallableDescription(final Callable<T> supplier) {
+        final Class<? extends Callable> supplierClass = supplier.getClass();
+        Method enclosingMethod = supplierClass.getEnclosingMethod();
+        if(isFieldSupplier(supplierClass)) {
+            return generateFieldSupplierErrorMessage(supplier);
+        } else if (supplierClass.isAnonymousClass() && enclosingMethod != null) {
+            return enclosingMethod.getDeclaringClass().getName() + "." + enclosingMethod.getName() + " Callable";
+        } else {
+            return supplierClass.getName();
+        }
+    }
+
+    private boolean isFieldSupplier(Class<?> supplierClass) {
+        return supplierClass.isMemberClass() && supplierClass.getEnclosingClass() == FieldSupplierBuilder.class;
+    }
+
+    private String generateFieldSupplierErrorMessage(Callable<T> supplier) {
+        final FieldSupplierBuilder fieldSupplier = WhiteboxImpl.getInternalState(supplier, "this$0");
+        final Class<? extends Annotation> expectedAnnotation = fieldSupplier.getExpectedAnnotation();
+        final String expectedFieldName = fieldSupplier.getExpectedFieldName();
+        final Class<?> expectedFieldType = fieldSupplier.getExpectedFieldType();
+        final Object object = fieldSupplier.getObject();
+
+        StringBuilder builder = new StringBuilder();
+        if(expectedFieldName == null) {
+            builder.append("Field in ");
+            builder.append(object.getClass().getName());
+            if(expectedAnnotation != null) {
+                builder.append(" annotated with ");
+                builder.append(expectedAnnotation.getName());
+                builder.append(" and");
+            }
+            builder.append(" of type ");
+            builder.append(expectedFieldType);
+        } else {
+
+            try {
+                final Field declaredField = object.getClass().getDeclaredField(expectedFieldName);
+                builder.append("Field ");
+                builder.append(declaredField);
+            } catch (Exception e) {
+                throw new RuntimeException("Internal error", e);
+            }
+        }
+
+        return builder.toString();
+    }
 }

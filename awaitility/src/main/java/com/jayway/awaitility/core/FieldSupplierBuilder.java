@@ -164,11 +164,8 @@ public class FieldSupplierBuilder {
                         "Couldn't find a field with name %s annotated with %s in %s.", expectedFieldName,
                         annotationType.getClass().getName(), WhiteboxImpl.getType(object).getName()));
             }
-            return new Callable<T>() {
-                public T call() throws Exception {
-                    return AnnotationFieldSupplier.this.call();
-                }
-            };
+            expectedAnnotation = annotationType;
+            return this;
         }
 
         public T call() throws Exception {
@@ -219,5 +216,21 @@ public class FieldSupplierBuilder {
         if(parameterValue == null) {
             throw new IllegalArgumentException(name + " cannot be null");
         }
+    }
+
+    Object getObject() {
+        return object;
+    }
+
+    String getExpectedFieldName() {
+        return expectedFieldName;
+    }
+
+    Class<?> getExpectedFieldType() {
+        return expectedFieldType;
+    }
+
+    Class<? extends Annotation> getExpectedAnnotation() {
+        return expectedAnnotation;
     }
 }
