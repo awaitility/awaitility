@@ -6,13 +6,11 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.jayway.awaitility.Awaitility.await;
-import static com.jayway.awaitility.Awaitility.to;
 import static com.jayway.awaitility.Duration.FIVE_SECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class WaitForAtomicBooleanTest {
     private AtomicBoolean wasAdded = new AtomicBoolean(false);
-
 
     @Test(timeout = 2000L)
     public void atomicBooleanExample() throws Exception {
