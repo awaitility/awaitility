@@ -15,21 +15,27 @@
  */
 package com.jayway.awaitility;
 
-import com.jayway.awaitility.classes.*;
-import com.jayway.awaitility.reflect.exception.FieldNotFoundException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.awaitility.Awaitility.fieldIn;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
+
+import java.util.concurrent.TimeoutException;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import com.jayway.awaitility.classes.Asynch;
+import com.jayway.awaitility.classes.ExampleAnnotation;
+import com.jayway.awaitility.classes.ExampleAnnotation2;
+import com.jayway.awaitility.classes.FakeRepository;
+import com.jayway.awaitility.classes.FakeRepositoryImpl;
+import com.jayway.awaitility.classes.FakeRepositoryWithAnnotation;
+import com.jayway.awaitility.classes.FakeRepositoryWithStaticFieldAndAnnotation;
+import com.jayway.awaitility.reflect.exception.FieldNotFoundException;
 
 public class UsingFieldSupplierTest {
     private FakeRepository fakeRepository;
@@ -43,6 +49,7 @@ public class UsingFieldSupplierTest {
         Awaitility.reset();
     }
 
+    
     @Test(timeout = 2000)
     public void ofTypeAndName() throws Exception {
         new Asynch(fakeRepository).perform();

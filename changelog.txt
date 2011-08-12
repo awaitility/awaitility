@@ -1,3 +1,7 @@
+Changelog NEXT
+---------------
+* Added support for AtomicInteger, AtomicLong, AtomicReference and AtomicBoolean, e.g. await().untilAtomic(atomic, equalTo(2)).
+
 Changelog 1.3.2
 ---------------
 * Fixed an issue where poll interval overrode the poll delay.

@@ -17,10 +17,15 @@ package com.jayway.awaitility.core;
 
 import com.jayway.awaitility.Duration;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * A factory for creating {@link Condition} objects. It's not recommended to
@@ -405,6 +410,114 @@ public class ConditionFactory {
      */
     public <T> void until(final Callable<T> supplier, final Matcher<T> matcher) throws Exception {
         until(new CallableHamcrestCondition<T>(supplier, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a Atomic variable has a value matching the specified
+     * {@link Matcher}. E.g.
+     *
+     * <pre>
+     * await().untilAtomic(myAtomic, is(greaterThan(2)));
+     * </pre>
+     *
+     * @param atomic
+     *            the atomic variable
+     * @param matcher
+     *            the matcher The hamcrest matcher that checks whether the
+     *            condition is fulfilled.
+     * @throws Exception
+     *             the exception
+     */
+    public void untilAtomic(final AtomicInteger atomic, final Matcher<Integer> matcher) throws Exception {
+        until(new CallableHamcrestCondition<Integer>(new Callable<Integer>() {
+			public Integer call() throws Exception {
+				return atomic.get();
+			}
+		}, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a Atomic variable has a value matching the specified
+     * {@link Matcher}. E.g.
+     *
+     * <pre>
+     * await().untilAtomic(myAtomic, is(greaterThan(2)));
+     * </pre>
+     *
+     * @param atomic
+     *            the atomic variable
+     * @param matcher
+     *            the matcher The hamcrest matcher that checks whether the
+     *            condition is fulfilled.
+     * @throws Exception
+     *             the exception
+     */
+    public void untilAtomic(final AtomicLong atomic, final Matcher<Long> matcher) throws Exception {
+        until(new CallableHamcrestCondition<Long>(new Callable<Long>() {
+			public Long call() throws Exception {
+				return atomic.get();
+			}
+		}, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a Atomic variable has a value matching the specified
+     * {@link Matcher}. E.g.
+     *
+     * <pre>
+     * await().untilAtomic(myAtomic, is(greaterThan(2)));
+     * </pre>
+     *
+     * @param atomic
+     *            the atomic variable
+     * @param matcher
+     *            the matcher The hamcrest matcher that checks whether the
+     *            condition is fulfilled.
+     * @throws Exception
+     *             the exception
+     */
+    public void untilAtomic(final AtomicBoolean atomic, final Matcher<Boolean> matcher) throws Exception {
+        until(new CallableHamcrestCondition<Boolean>(new Callable<Boolean>() {
+			public Boolean call() throws Exception {
+				return atomic.get();
+			}
+		}, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a Atomic boolean becomes true.
+     *
+     * @param atomic
+     *            the atomic variable
+     * @throws Exception
+     *             the exception
+     */
+    public void untilTrue(final AtomicBoolean atomic) throws Exception {
+    	untilAtomic(atomic, Matchers.is(Boolean.TRUE));
+    }
+
+    /**
+     * Await until a Atomic variable has a value matching the specified
+     * {@link Matcher}. E.g.
+     *
+     * <pre>
+     * await().untilAtomic(myAtomic, is(greaterThan(2)));
+     * </pre>
+     *
+     * @param number
+     *            the atomic variable
+     * @param matcher
+     *            the matcher The hamcrest matcher that checks whether the
+     *            condition is fulfilled.
+     * @throws Exception
+     *             the exception
+     */
+    public <V> void untilAtomic(final AtomicReference<V> atomic, final Matcher<V> matcher) throws Exception {
+        until(new CallableHamcrestCondition<V>(new Callable<V>() {
+			public V call() throws Exception {
+				return atomic.get();
+			}
+		}, matcher, generateConditionSettings()));
     }
 
     /**

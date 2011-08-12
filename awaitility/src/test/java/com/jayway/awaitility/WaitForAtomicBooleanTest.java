@@ -19,6 +19,13 @@ public class WaitForAtomicBooleanTest {
         await().atMost(FIVE_SECONDS).until(wasAdded(), equalTo(true));
     }
 
+    @Test(timeout = 2000L)
+    public void atomicBooleanSimple() throws Exception {
+        new WasAddedModifier().start();
+
+        await().atMost(FIVE_SECONDS).untilTrue(wasAdded);
+    }
+
     private Callable<Boolean> wasAdded() {
         return new Callable<Boolean>() {
             public Boolean call() throws Exception {
