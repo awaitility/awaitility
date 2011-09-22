@@ -1,4 +1,4 @@
-Changelog NEXT
+Changelog 1.3.3
 ---------------
 * Added support for AtomicInteger, AtomicLong, AtomicReference and AtomicBoolean, e.g. await().untilAtomic(atomic, equalTo(2)).
 
