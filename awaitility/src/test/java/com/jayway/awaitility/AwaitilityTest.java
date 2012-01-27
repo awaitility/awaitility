@@ -24,6 +24,8 @@ import org.junit.rules.ExpectedException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -125,6 +127,13 @@ public class AwaitilityTest {
     public void foreverConditionWithHamcrestMatchersWithDirectBlock() throws Exception {
         new Asynch(fakeRepository).perform();
         await().forever().until(value(), equalTo(1));
+        assertEquals(1, fakeRepository.getValue());
+    }
+    
+    @Test(timeout = 2000)
+    public void foreverConditionWithHamcrestCollectionMatchersWithDirectBlock() throws Exception {
+        new Asynch(fakeRepository).perform();
+        await().forever().until(valueAsList(), contains(1));
         assertEquals(1, fakeRepository.getValue());
     }
 
@@ -356,6 +365,14 @@ public class AwaitilityTest {
         return new Callable<Integer>() {
             public Integer call() throws Exception {
                 return fakeRepository.getValue();
+            }
+        };
+    }
+    
+    private Callable<List<Integer>> valueAsList() {
+        return new Callable<List<Integer>>() {
+            public List<Integer> call() throws Exception {
+                return Collections.singletonList(fakeRepository.getValue());
             }
         };
     }

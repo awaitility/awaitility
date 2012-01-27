@@ -25,7 +25,7 @@ import java.util.concurrent.Callable;
 
 class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
 
-    public CallableHamcrestCondition(final Callable<T> supplier, final Matcher<T> matcher, ConditionSettings settings) {
+    public CallableHamcrestCondition(final Callable<T> supplier, final Matcher<? super T> matcher, ConditionSettings settings) {
         super(supplier, matcher, settings);
     }
 

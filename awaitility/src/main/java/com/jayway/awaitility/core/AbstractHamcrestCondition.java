@@ -25,7 +25,7 @@ abstract class AbstractHamcrestCondition<T> implements Condition {
 
 	private T lastResult;
 
-	public AbstractHamcrestCondition(final Callable<T> supplier, final Matcher<T> matcher, ConditionSettings settings) {
+	public AbstractHamcrestCondition(final Callable<T> supplier, final Matcher<? super T> matcher, ConditionSettings settings) {
 		if (supplier == null) {
 			throw new IllegalArgumentException("You must specify a supplier (was null).");
 		}
