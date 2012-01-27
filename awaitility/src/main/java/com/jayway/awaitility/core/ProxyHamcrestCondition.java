@@ -22,7 +22,7 @@ import java.util.concurrent.Callable;
 
 class ProxyHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
 
-	public ProxyHamcrestCondition(final MethodCaller<T> supplier, final Matcher<T> matcher, ConditionSettings settings) {
+	public ProxyHamcrestCondition(final MethodCaller<T> supplier, final Matcher<? super T> matcher, ConditionSettings settings) {
 		super(supplier, matcher, settings);
 	}
 
