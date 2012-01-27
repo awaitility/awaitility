@@ -360,7 +360,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public <T> void untilCall(T ignore, final Matcher<T> matcher) throws Exception {
+    public <T> void untilCall(T ignore, final Matcher<? super T> matcher) throws Exception {
         final MethodCaller<T> supplier = new MethodCaller<T>(MethodCallRecorder.getLastTarget(), MethodCallRecorder
                 .getLastMethod(), MethodCallRecorder.getLastArgs());
         MethodCallRecorder.reset();
@@ -408,7 +408,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public <T> void until(final Callable<T> supplier, final Matcher<T> matcher) throws Exception {
+    public <T> void until(final Callable<T> supplier, final Matcher<? super T> matcher) throws Exception {
         until(new CallableHamcrestCondition<T>(supplier, matcher, generateConditionSettings()));
     }
 
@@ -428,7 +428,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public void untilAtomic(final AtomicInteger atomic, final Matcher<Integer> matcher) throws Exception {
+    public void untilAtomic(final AtomicInteger atomic, final Matcher<? super Integer> matcher) throws Exception {
         until(new CallableHamcrestCondition<Integer>(new Callable<Integer>() {
 			public Integer call() throws Exception {
 				return atomic.get();
@@ -452,7 +452,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public void untilAtomic(final AtomicLong atomic, final Matcher<Long> matcher) throws Exception {
+    public void untilAtomic(final AtomicLong atomic, final Matcher<? super Long> matcher) throws Exception {
         until(new CallableHamcrestCondition<Long>(new Callable<Long>() {
 			public Long call() throws Exception {
 				return atomic.get();
@@ -476,7 +476,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public void untilAtomic(final AtomicBoolean atomic, final Matcher<Boolean> matcher) throws Exception {
+    public void untilAtomic(final AtomicBoolean atomic, final Matcher<? super Boolean> matcher) throws Exception {
         until(new CallableHamcrestCondition<Boolean>(new Callable<Boolean>() {
 			public Boolean call() throws Exception {
 				return atomic.get();
@@ -512,7 +512,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public <V> void untilAtomic(final AtomicReference<V> atomic, final Matcher<V> matcher) throws Exception {
+    public <V> void untilAtomic(final AtomicReference<V> atomic, final Matcher<? super V> matcher) throws Exception {
         until(new CallableHamcrestCondition<V>(new Callable<V>() {
 			public V call() throws Exception {
 				return atomic.get();
