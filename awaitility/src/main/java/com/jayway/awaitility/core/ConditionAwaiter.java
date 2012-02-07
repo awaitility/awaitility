@@ -51,7 +51,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
 				}
 			}
 		};
-		executor.scheduleAtFixedRate(poller, conditionSettings.getPollDelay().getValueInMS(), conditionSettings
+		executor.scheduleWithFixedDelay(poller, conditionSettings.getPollDelay().getValueInMS(), conditionSettings
 				.getPollInterval().getValueInMS(), TimeUnit.MILLISECONDS);
 	}
 
