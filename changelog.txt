@@ -3,6 +3,7 @@ Changlog next version
 * Updated Scala module to use Scala 2.9.1
 * Updated Groovy module to use Groovy 1.8.5
 * Now uses the poll internal as delay when _between_ scheduled tasks. This means that if the supplier takes more time to return the value than what's defined by the poll interval the supplier won't be called twice (or more) (issue 12).
+* Now supports usage of more flexible Hamcrest matchers (thanks to Xavier Dury for the patch) (issue 15).
 
 Changelog 1.3.3
 ---------------
