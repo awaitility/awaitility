@@ -133,7 +133,7 @@ public class AwaitilityTest {
     @Test(timeout = 2000)
     public void foreverConditionWithHamcrestCollectionMatchersWithDirectBlock() throws Exception {
         new Asynch(fakeRepository).perform();
-        await().forever().until(valueAsList(), contains(1));
+        await().forever().until(valueAsList(), hasItem(1));
         assertEquals(1, fakeRepository.getValue());
     }
 
