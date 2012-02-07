@@ -1,6 +1,7 @@
 Changlog next version
 ---------------------
 * Updated Scala module to use Scala 2.9.1
+* Updated Groovy module to use Groovy 1.8.5
 
 Changelog 1.3.3
 ---------------
