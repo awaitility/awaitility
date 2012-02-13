@@ -20,10 +20,18 @@ public class WaitForAtomicBooleanTest {
     }
 
     @Test(timeout = 2000L)
-    public void atomicBooleanSimple() throws Exception {
+    public void atomicBooleanWithUntilTrue() throws Exception {
         new WasAddedModifier().start();
 
         await().atMost(FIVE_SECONDS).untilTrue(wasAdded);
+    }
+
+    @Test(timeout = 2000L)
+    public void atomicBooleanWithUntilFalse() throws Exception {
+        wasAdded.set(true);
+        new WasAddedModifier().start();
+
+        await().atMost(FIVE_SECONDS).untilFalse(wasAdded);
     }
 
     private Callable<Boolean> wasAdded() {
@@ -42,7 +50,7 @@ public class WaitForAtomicBooleanTest {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            wasAdded.set(true);
+            wasAdded.set(!wasAdded.get());
         }
     }
 }

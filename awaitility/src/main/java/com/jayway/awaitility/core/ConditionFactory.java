@@ -430,10 +430,10 @@ public class ConditionFactory {
      */
     public void untilAtomic(final AtomicInteger atomic, final Matcher<? super Integer> matcher) throws Exception {
         until(new CallableHamcrestCondition<Integer>(new Callable<Integer>() {
-			public Integer call() throws Exception {
-				return atomic.get();
-			}
-		}, matcher, generateConditionSettings()));
+            public Integer call() throws Exception {
+                return atomic.get();
+            }
+        }, matcher, generateConditionSettings()));
     }
 
     /**
@@ -454,10 +454,10 @@ public class ConditionFactory {
      */
     public void untilAtomic(final AtomicLong atomic, final Matcher<? super Long> matcher) throws Exception {
         until(new CallableHamcrestCondition<Long>(new Callable<Long>() {
-			public Long call() throws Exception {
-				return atomic.get();
-			}
-		}, matcher, generateConditionSettings()));
+            public Long call() throws Exception {
+                return atomic.get();
+            }
+        }, matcher, generateConditionSettings()));
     }
 
     /**
@@ -478,10 +478,10 @@ public class ConditionFactory {
      */
     public void untilAtomic(final AtomicBoolean atomic, final Matcher<? super Boolean> matcher) throws Exception {
         until(new CallableHamcrestCondition<Boolean>(new Callable<Boolean>() {
-			public Boolean call() throws Exception {
-				return atomic.get();
-			}
-		}, matcher, generateConditionSettings()));
+            public Boolean call() throws Exception {
+                return atomic.get();
+            }
+        }, matcher, generateConditionSettings()));
     }
 
     /**
@@ -493,7 +493,19 @@ public class ConditionFactory {
      *             the exception
      */
     public void untilTrue(final AtomicBoolean atomic) throws Exception {
-    	untilAtomic(atomic, Matchers.is(Boolean.TRUE));
+        untilAtomic(atomic, Matchers.is(Boolean.TRUE));
+    }
+
+    /**
+     * Await until a Atomic boolean becomes false.
+     *
+     * @param atomic
+     *            the atomic variable
+     * @throws Exception
+     *             the exception
+     */
+    public void untilFalse(final AtomicBoolean atomic) throws Exception {
+        untilAtomic(atomic, Matchers.is(Boolean.FALSE));
     }
 
     /**
@@ -514,10 +526,10 @@ public class ConditionFactory {
      */
     public <V> void untilAtomic(final AtomicReference<V> atomic, final Matcher<? super V> matcher) throws Exception {
         until(new CallableHamcrestCondition<V>(new Callable<V>() {
-			public V call() throws Exception {
-				return atomic.get();
-			}
-		}, matcher, generateConditionSettings()));
+            public V call() throws Exception {
+                return atomic.get();
+            }
+        }, matcher, generateConditionSettings()));
     }
 
     /**
