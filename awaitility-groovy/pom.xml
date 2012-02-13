@@ -9,7 +9,7 @@
     <name>Awaitility support for Groovy</name>
     <description>Simplifies Awaitility usage from Groovy</description>
     <properties>
-        <groovy.version>1.8.4</groovy.version>
+        <groovy.version>1.7.5</groovy.version>
         <gmaven.version>1.3</gmaven.version>
     </properties>
     <dependencies>
