@@ -22,8 +22,9 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 public class MethodCallRecorder {
-	
-	private static Object lastTarget;
+
+    private static final String NO_METHOD_CALL_RECORDED_MESSAGE = "No method call has been recorded. Perhaps the method was final?";
+    private static Object lastTarget;
     private static Method lastMethod;
     private static Object[] lastArgs;
     
@@ -50,21 +51,21 @@ public class MethodCallRecorder {
 
 	public static Object getLastTarget() {
 		if (lastTarget == null) {
-			throw new IllegalStateException("No method call have been recorded!");
+			throw new IllegalStateException(NO_METHOD_CALL_RECORDED_MESSAGE);
 		}
 		return lastTarget;
 	}
-	
+
 	public static Method getLastMethod() {
 		if (lastMethod == null) {
-			throw new IllegalStateException("No method call have been recorded!");
+			throw new IllegalStateException(NO_METHOD_CALL_RECORDED_MESSAGE);
 		}
 		return lastMethod;
 	}
 	
 	public static Object[] getLastArgs() {
 		if (lastTarget == null) {
-			throw new IllegalStateException("No method call have been recorded!");
+			throw new IllegalStateException(NO_METHOD_CALL_RECORDED_MESSAGE);
 		}
 		return lastArgs;
 	}

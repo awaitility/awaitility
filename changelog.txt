@@ -2,6 +2,7 @@ Changelog next version
 ----------------------
 * Added untilFalse method to make it easier to wait until an atomic boolean is false: await().untilFalse(myAtomicBoolean);
 * Removed all checked exceptions from Awaitility so that you don't need to catch them (issue 19).
+* Improved error message when trying to proxy final methods (issue 10).
 
 Changelog 1.3.4 (2012-02-13)
 ----------------------------
