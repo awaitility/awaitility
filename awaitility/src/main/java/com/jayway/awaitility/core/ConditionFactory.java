@@ -265,7 +265,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public ConditionFactory await() throws Exception {
+    public ConditionFactory await() {
         return this;
     }
 
@@ -281,7 +281,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public ConditionFactory await(String alias) throws Exception {
+    public ConditionFactory await(String alias) {
         return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
     }
 
@@ -293,7 +293,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public ConditionFactory and() throws Exception {
+    public ConditionFactory and(){
         return this;
     }
 
@@ -305,7 +305,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public ConditionFactory with() throws Exception {
+    public ConditionFactory with() {
         return this;
     }
 
@@ -317,7 +317,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public ConditionFactory then() throws Exception {
+    public ConditionFactory then() {
         return this;
     }
 
@@ -329,7 +329,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public ConditionFactory given() throws Exception {
+    public ConditionFactory given() {
         return this;
     }
 
@@ -360,7 +360,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public <T> void untilCall(T ignore, final Matcher<? super T> matcher) throws Exception {
+    public <T> void untilCall(T ignore, final Matcher<? super T> matcher) {
         final MethodCaller<T> supplier = new MethodCaller<T>(MethodCallRecorder.getLastTarget(), MethodCallRecorder
                 .getLastMethod(), MethodCallRecorder.getLastArgs());
         MethodCallRecorder.reset();
@@ -381,7 +381,7 @@ public class ConditionFactory {
      * <pre>
      * private Callable&lt;Integer&gt; numberOfPersons() {
      * 	return new Callable&lt;Integer&gt;() {
-     * 		public Integer call() throws Exception {
+     * 		public Integer call() {
      * 			return personRepository.size();
      * 		}
      * 	};
@@ -408,7 +408,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public <T> void until(final Callable<T> supplier, final Matcher<? super T> matcher) throws Exception {
+    public <T> void until(final Callable<T> supplier, final Matcher<? super T> matcher) {
         until(new CallableHamcrestCondition<T>(supplier, matcher, generateConditionSettings()));
     }
 
@@ -428,9 +428,9 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public void untilAtomic(final AtomicInteger atomic, final Matcher<? super Integer> matcher) throws Exception {
+    public void untilAtomic(final AtomicInteger atomic, final Matcher<? super Integer> matcher) {
         until(new CallableHamcrestCondition<Integer>(new Callable<Integer>() {
-            public Integer call() throws Exception {
+            public Integer call() {
                 return atomic.get();
             }
         }, matcher, generateConditionSettings()));
@@ -452,9 +452,9 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public void untilAtomic(final AtomicLong atomic, final Matcher<? super Long> matcher) throws Exception {
+    public void untilAtomic(final AtomicLong atomic, final Matcher<? super Long> matcher) {
         until(new CallableHamcrestCondition<Long>(new Callable<Long>() {
-            public Long call() throws Exception {
+            public Long call() {
                 return atomic.get();
             }
         }, matcher, generateConditionSettings()));
@@ -476,9 +476,9 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public void untilAtomic(final AtomicBoolean atomic, final Matcher<? super Boolean> matcher) throws Exception {
+    public void untilAtomic(final AtomicBoolean atomic, final Matcher<? super Boolean> matcher) {
         until(new CallableHamcrestCondition<Boolean>(new Callable<Boolean>() {
-            public Boolean call() throws Exception {
+            public Boolean call() {
                 return atomic.get();
             }
         }, matcher, generateConditionSettings()));
@@ -492,7 +492,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public void untilTrue(final AtomicBoolean atomic) throws Exception {
+    public void untilTrue(final AtomicBoolean atomic) {
         untilAtomic(atomic, Matchers.is(Boolean.TRUE));
     }
 
@@ -504,7 +504,7 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public void untilFalse(final AtomicBoolean atomic) throws Exception {
+    public void untilFalse(final AtomicBoolean atomic) {
         untilAtomic(atomic, Matchers.is(Boolean.FALSE));
     }
 
@@ -516,7 +516,7 @@ public class ConditionFactory {
      * await().untilAtomic(myAtomic, is(greaterThan(2)));
      * </pre>
      *
-     * @param number
+     * @param atomic
      *            the atomic variable
      * @param matcher
      *            the matcher The hamcrest matcher that checks whether the
@@ -524,9 +524,9 @@ public class ConditionFactory {
      * @throws Exception
      *             the exception
      */
-    public <V> void untilAtomic(final AtomicReference<V> atomic, final Matcher<? super V> matcher) throws Exception {
+    public <V> void untilAtomic(final AtomicReference<V> atomic, final Matcher<? super V> matcher) {
         until(new CallableHamcrestCondition<V>(new Callable<V>() {
-            public V call() throws Exception {
+            public V call() {
                 return atomic.get();
             }
         }, matcher, generateConditionSettings()));
@@ -547,7 +547,7 @@ public class ConditionFactory {
      * <pre>
      * private Callable&lt;Boolean&gt; numberOfPersons() {
      * 	return new Callable&lt;Boolean&gt;() {
-     * 		public Boolean call() throws Exception {
+     * 		public Boolean call() {
      * 			return personRepository.size() == 3;
      * 		}
      * 	};
@@ -560,7 +560,7 @@ public class ConditionFactory {
      * @throws Exception
      * the exception
      */
-    public <T> void until(Callable<Boolean> conditionEvaluator) throws Exception {
+    public <T> void until(Callable<Boolean> conditionEvaluator) {
         until(new CallableCondition(conditionEvaluator, generateConditionSettings()));
     }
 
@@ -568,7 +568,7 @@ public class ConditionFactory {
         return new ConditionSettings(alias, catchUncaughtExceptions, timeout, pollInterval, pollDelay);
     }
 
-    private <T> void until(Condition condition) throws Exception {
+    private <T> void until(Condition condition) {
         condition.await();
     }
 
@@ -612,8 +612,12 @@ public class ConditionFactory {
            * @see java.util.concurrent.Callable#call()
            */
         @SuppressWarnings("unchecked")
-        public T call() throws Exception {
-            return (T) method.invoke(target, args);
+        public T call() {
+            try {
+                return (T) method.invoke(target, args);
+            } catch (Exception e) {
+                return SafeExceptionRethrower.safeRethrow(e);
+            }
         }
     }
 }

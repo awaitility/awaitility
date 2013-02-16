@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 the original author or authors.
+ * Copyright 2010 PowerMock original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,16 @@
  */
 package com.jayway.awaitility.core;
 
-interface Condition {
+class SafeExceptionRethrower {
 
-	void await();
+    public static <T> T safeRethrow(Throwable t) {
+        SafeExceptionRethrower.<RuntimeException> safeRethrow0(t);
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends Throwable> void safeRethrow0(Throwable t) throws T {
+        throw (T) t;
+    }
+
 }

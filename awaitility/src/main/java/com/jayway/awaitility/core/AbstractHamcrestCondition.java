@@ -46,7 +46,7 @@ abstract class AbstractHamcrestCondition<T> implements Condition {
 		};
 	}
 
-	public void await() throws Exception {
+	public void await() {
 		conditionAwaiter.await();
 	}
 

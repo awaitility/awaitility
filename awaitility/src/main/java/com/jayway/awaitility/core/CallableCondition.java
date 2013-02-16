@@ -50,7 +50,7 @@ class CallableCondition implements Condition {
 		};
 	}
 
-	public void await() throws Exception {
+	public void await() {
 		conditionAwaiter.await();
 	}
 }
