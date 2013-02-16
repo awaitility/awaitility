@@ -16,10 +16,12 @@
 package com.jayway.awaitility.groovy
 
 import com.jayway.awaitility.groovy.classes.Asynch
-import java.util.concurrent.TimeoutException
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
+
+import java.util.concurrent.TimeoutException
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 
 class AwaitilitySupportTest extends AwaitilitySupport {

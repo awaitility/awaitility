@@ -17,7 +17,9 @@ package com.jayway.awaitility.groovy
 
 import com.jayway.awaitility.Awaitility
 import com.jayway.awaitility.core.ConditionFactory
+
 import java.util.concurrent.Callable
+
 import static com.jayway.awaitility.spi.Timeout.timeout_message
 
 class AwaitilitySupport extends Awaitility {
