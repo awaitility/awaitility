@@ -24,8 +24,8 @@ import java.util.concurrent.TimeoutException
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 
-//alternatively @Mixin(AwaitilitySupport) can be used instead
-class AwaitilitySupportTest extends AwaitilitySupport {
+@Mixin(AwaitilitySupport)
+class AwaitilitySupportTest {
 
   @Rule
   public def ExpectedException exception = ExpectedException.none()

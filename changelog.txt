@@ -1,4 +1,8 @@
-Changelog 1.3.5 (2014-02-16)
+Changelog next version
+----------------------
+* Updated Groovy to version 2.1.2
+
+Changelog 1.3.5 (2013-02-16)
 ----------------------------
 * Added untilFalse method to make it easier to wait until an atomic boolean is false: await().untilFalse(myAtomicBoolean);
 * Removed all checked exceptions from Awaitility so that you don't need to catch them (issue 19).
