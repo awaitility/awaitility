@@ -24,21 +24,22 @@ import java.util.concurrent.TimeoutException
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 
+//alternatively @Mixin(AwaitilitySupport) can be used instead
 class AwaitilitySupportTest extends AwaitilitySupport {
 
   @Rule
   public def ExpectedException exception = ExpectedException.none()
 
   @Test
-  def void groovyClosureSupport() throws Exception {
+  def void groovyClosureSupport() {
     def asynch = new Asynch().perform()
 
     await().until { asynch.getValue() == 1 }
   }
 
   @Test
-  def void timeoutMessagesDoesntContainAnonymousClassDetails() throws Exception {
-    exception.expect TimeoutException.class
+  def void timeoutMessagesDoesntContainAnonymousClassDetails() {
+    exception.expect TimeoutException
     exception.expectMessage "Condition was not fulfilled within 500 milliseconds"
 
     def asynch = new Asynch().perform()
@@ -47,8 +48,8 @@ class AwaitilitySupportTest extends AwaitilitySupport {
   }
 
   @Test
-  def void awaitWithAlias() throws Exception {
-    exception.expect TimeoutException.class
+  def void awaitWithAlias() {
+    exception.expect TimeoutException
     exception.expectMessage "Condition with alias 'groovy' didn't complete within 500 milliseconds"
 
     def asynch = new Asynch().perform()
