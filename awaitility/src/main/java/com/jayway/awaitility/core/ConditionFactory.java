@@ -104,7 +104,7 @@ public class ConditionFactory {
      *            the catch uncaught exceptions
      */
     public ConditionFactory(Duration timeout, Duration pollInterval, Duration pollDelay, boolean catchUncaughtExceptions) {
-        this(null, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
+        this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions);
     }
 
     /**

@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * Updated Groovy to version 2.1.2
+* Fixed a bug that sometimes accidentally used poll interval as poll delay
 
 Changelog 1.3.5 (2013-02-16)
 ----------------------------
