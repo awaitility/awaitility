@@ -152,7 +152,7 @@ class FakeRepositoryWithAtomicBoolean implements FakeRepository {
 	}
 
 	public void setValue(int value) {
-		atomic.set(value > 0 ? true : false);
+		atomic.set(value > 0);
 	}
 
 }
