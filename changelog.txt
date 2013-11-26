@@ -1,5 +1,5 @@
-Changelog next version
-----------------------
+Changelog 1.4.0 (2013-11-26)
+----------------------------
 * Updated Groovy to version 2.2.0
 * Fixed a bug that sometimes accidentally used poll interval as poll delay
 * Updated to Hamcrest 1.3
