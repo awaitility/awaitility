@@ -9,7 +9,7 @@
 	<name>Awaitility support for Scala</name>
 	<description>Simplifies Awaitility usage from Scala</description>
 	<properties>
-		<scala.version>2.9.1</scala.version>
+		<scala.version>2.10.3</scala.version>
 	</properties>
 	<dependencies>
 		<dependency>
