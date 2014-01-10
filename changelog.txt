@@ -1,3 +1,7 @@
+Changelog next version
+----------------------
+* Updated Objenesis dependency to version 2.1
+
 Changelog 1.4.0 (2013-11-26)
 ----------------------------
 * Updated Groovy to version 2.2.0
