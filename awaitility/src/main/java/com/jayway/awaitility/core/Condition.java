@@ -15,7 +15,7 @@
  */
 package com.jayway.awaitility.core;
 
-interface Condition {
+interface Condition<T> {
 
-	void await();
+	T await();
 }

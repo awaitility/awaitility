@@ -19,7 +19,7 @@ import org.hamcrest.Matcher;
 
 import java.util.concurrent.Callable;
 
-abstract class AbstractHamcrestCondition<T> implements Condition {
+abstract class AbstractHamcrestCondition<T> implements Condition<T> {
 
 	private ConditionAwaiter conditionAwaiter;
 
@@ -46,8 +46,9 @@ abstract class AbstractHamcrestCondition<T> implements Condition {
 		};
 	}
 
-	public void await() {
+	public T await() {
 		conditionAwaiter.await();
+		return lastResult;
 	}
 
 	abstract String getCallableDescription(final Callable<T> supplier);
