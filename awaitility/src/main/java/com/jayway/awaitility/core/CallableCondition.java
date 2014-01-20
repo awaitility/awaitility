@@ -20,7 +20,7 @@ import java.util.concurrent.Callable;
 
 import static com.jayway.awaitility.spi.Timeout.timeout_message;
 
-class CallableCondition implements Condition {
+class CallableCondition implements Condition<Void> {
 
     private final ConditionAwaiter conditionAwaiter;
 
@@ -50,7 +50,8 @@ class CallableCondition implements Condition {
 		};
 	}
 
-	public void await() {
+	public Void await() {
 		conditionAwaiter.await();
+		return null;
 	}
 }
