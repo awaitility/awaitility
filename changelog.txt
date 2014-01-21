@@ -2,6 +2,7 @@ Changelog next version
 ----------------------
 * Updated Objenesis dependency to version 2.1
 * Added support for returning the last polled value from Awaitility. For example: X x = await().until(x()); (issue 13).
+* Updated Groovy dependency to 2.2.1.
 
 Changelog 1.4.0 (2013-11-26)
 ----------------------------
