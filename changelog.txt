@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * Updated Objenesis dependency to version 2.1
+* Added support for returning the last polled value from Awaitility. For example: X x = await().until(x());
 
 Changelog 1.4.0 (2013-11-26)
 ----------------------------
