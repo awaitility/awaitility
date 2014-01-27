@@ -239,9 +239,31 @@ public class AwaitilityTest {
     public void awaitWithAliasDisplaysAliasWhenConditionTimeoutExceptionOccurs() throws Exception {
         String alias = "test";
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage(alias);
+        exception.expectMessage("Condition with alias 'test' didn't complete within 120 milliseconds because com.jayway.awaitility.classes.FakeRepositoryValue expected a value greater than <0> but was <0>.");
 
         await(alias).atMost(120, MILLISECONDS).until(value(), greaterThan(0));
+    }
+
+    @Test(timeout = 2000)
+    public void awaitWithAliasDisplaysAliasWhenConditionTimeoutExceptionAndConditionIsACallableOccurs() throws Exception {
+        String alias = "test";
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage("Condition with alias 'test' didn't complete within 120 milliseconds because condition returned by method \"awaitWithAliasDisplaysAliasWhenConditionTimeoutExceptionAndConditionIsACallableOccurs\" in class com.jayway.awaitility.AwaitilityTest was not fulfilled.");
+
+        await(alias).atMost(120, MILLISECONDS).until(new Callable<Boolean>() {
+            public Boolean call() throws Exception {
+                return fakeRepository.getValue() > 0;
+            }
+        });
+    }
+
+    @Test(timeout = 2000)
+    public void awaitWithAliasDisplaysAliasWhenConditionTimeoutExceptionAndConditionIsCallTo() throws Exception {
+        String alias = "test";
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage("Condition with alias 'test' didn't complete within 120 milliseconds because com.jayway.awaitility.classes.FakeRepositoryImpl.getValue() expected a value greater than <0> but was <0>.");
+
+        await(alias).atMost(120, MILLISECONDS).untilCall(to(fakeRepository).getValue(), greaterThan(0));
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)

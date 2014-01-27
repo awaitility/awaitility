@@ -48,6 +48,6 @@ class AwaitilitySupportGroovyTest extends Specification {
 
         then:
         ConditionTimeoutException e = thrown()
-        e.message == "Condition with alias 'groovy' didn't complete within 500 milliseconds."
+        e.message == "Condition with alias 'groovy' didn't complete within 500 milliseconds because condition was not fulfilled."
     }
 }

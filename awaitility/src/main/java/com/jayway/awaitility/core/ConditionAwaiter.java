@@ -17,6 +17,7 @@ package com.jayway.awaitility.core;
 
 import com.jayway.awaitility.Duration;
 
+import java.beans.Introspector;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.*;
 
@@ -75,8 +76,8 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                     final String maxWaitTimeLowerCase = maxWaitTime.getTimeUnitAsString();
                     final String message;
                     if (conditionSettings.hasAlias()) {
-                        message = String.format("Condition with alias '%s' didn't complete within %s %s.",
-                                conditionSettings.getAlias(), timeout, maxWaitTimeLowerCase);
+                        message = String.format("Condition with alias '%s' didn't complete within %s %s because %s.",
+                                conditionSettings.getAlias(), timeout, maxWaitTimeLowerCase, Introspector.decapitalize(getTimeoutMessage()));
                     } else {
                         message = String.format("%s within %s %s.", getTimeoutMessage(), timeout, maxWaitTimeLowerCase);
                     }

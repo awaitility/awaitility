@@ -46,7 +46,7 @@ class AwaitilitySupportTest extends AwaitilitySupport {
       fail("Expected timeout exception")
     } catch {
         case e : ConditionTimeoutException =>
-          assertEquals("Condition with alias 'scala' didn't complete within 500 milliseconds.", e getMessage)
+          assertEquals("Condition with alias 'scala' didn't complete within 500 milliseconds because condition was not fulfilled.", e getMessage)
     }
   }
 
