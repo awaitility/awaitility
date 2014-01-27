@@ -15,12 +15,11 @@
 */
 package com.jayway.awaitility.groovy
 
+import com.jayway.awaitility.core.ConditionTimeoutException
 import com.jayway.awaitility.groovy.classes.Asynch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
-
-import java.util.concurrent.TimeoutException
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 
@@ -39,7 +38,7 @@ class AwaitilitySupportTest {
 
   @Test
   def void timeoutMessagesDoesntContainAnonymousClassDetails() {
-    exception.expect TimeoutException
+    exception.expect ConditionTimeoutException
     exception.expectMessage "Condition was not fulfilled within 500 milliseconds"
 
     def asynch = new Asynch().perform()
@@ -49,7 +48,7 @@ class AwaitilitySupportTest {
 
   @Test
   def void awaitWithAlias() {
-    exception.expect TimeoutException
+    exception.expect ConditionTimeoutException
     exception.expectMessage "Condition with alias 'groovy' didn't complete within 500 milliseconds"
 
     def asynch = new Asynch().perform()

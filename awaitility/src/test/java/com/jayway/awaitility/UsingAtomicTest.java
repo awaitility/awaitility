@@ -17,12 +17,12 @@ package com.jayway.awaitility;
 
 import com.jayway.awaitility.classes.Asynch;
 import com.jayway.awaitility.classes.FakeRepository;
+import com.jayway.awaitility.core.ConditionTimeoutException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -50,7 +50,7 @@ public class UsingAtomicTest {
 
     @Test(timeout = 2000)
     public void usingAtomicIntegerAndTimeout() throws Exception {
-        exception.expect(TimeoutException.class);
+        exception.expect(ConditionTimeoutException.class);
         exception.expectMessage("expected <1> but was <0> within 200 milliseconds.");
         AtomicInteger atomic = new AtomicInteger(0);
 		await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo(1));
@@ -65,7 +65,7 @@ public class UsingAtomicTest {
 
     @Test(timeout = 2000)
     public void usingAtomicBooleanAndTimeout() throws Exception {
-        exception.expect(TimeoutException.class);
+        exception.expect(ConditionTimeoutException.class);
         exception.expectMessage("expected <true> but was <false> within 200 milliseconds.");
         AtomicBoolean atomic = new AtomicBoolean(false);
 		await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo(true));
@@ -80,7 +80,7 @@ public class UsingAtomicTest {
 
     @Test(timeout = 2000)
     public void usingAtomicLongAndTimeout() throws Exception {
-        exception.expect(TimeoutException.class);
+        exception.expect(ConditionTimeoutException.class);
         exception.expectMessage("expected <1L> but was <0> within 200 milliseconds.");
         AtomicLong atomic = new AtomicLong(0);
 		await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo(1L));
@@ -95,7 +95,7 @@ public class UsingAtomicTest {
 
     @Test(timeout = 2000)
     public void usingAtomicReferenceAndTimeout() throws Exception {
-        exception.expect(TimeoutException.class);
+        exception.expect(ConditionTimeoutException.class);
         exception.expectMessage("expected \"1\" but was <0> within 200 milliseconds.");
         AtomicReference<String> atomic = new AtomicReference<String>("0");
 		await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo("1"));

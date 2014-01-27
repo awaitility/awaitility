@@ -19,7 +19,7 @@ import org.junit._
 import org.junit.Assert._
 import com.jayway.awaitility.Awaitility._
 import java.util.concurrent.TimeUnit.MILLISECONDS
-import java.util.concurrent.TimeoutException
+import com.jayway.awaitility.core.ConditionTimeoutException
 
 @Test
 class AwaitilitySupportTest extends AwaitilitySupport {
@@ -34,7 +34,7 @@ class AwaitilitySupportTest extends AwaitilitySupport {
     await until isDone
   }
 
-  @Test(expected = classOf[TimeoutException])
+  @Test(expected = classOf[ConditionTimeoutException])
   def timeout() = {
     await atMost(500, MILLISECONDS) until { 2 == 1 }
   }
@@ -45,7 +45,7 @@ class AwaitilitySupportTest extends AwaitilitySupport {
       await("scala") atMost(500, MILLISECONDS) until { 2 == 1 }
       fail("Expected timeout exception")
     } catch {
-        case e : TimeoutException => 
+        case e : ConditionTimeoutException =>
           assertEquals("Condition with alias 'scala' didn't complete within 500 milliseconds.", e getMessage)
     }
   }

@@ -3,6 +3,7 @@ Changelog next version
 * Updated Objenesis dependency to version 2.1
 * Added support for returning the last polled value from Awaitility. For example: X x = await().until(x()); (issue 13).
 * Updated Groovy dependency to 2.2.1.
+* Non backward-compatible change: Awaitility now throws com.jayway.awaitility.core.ConditionTimeoutException instead of java.concurrent.TimeoutException. The reason is that ConditionTimeoutException a runtime exception and the latter couldn't be caught since "await" didn't declare the checked exception.
 
 Changelog 1.4.0 (2013-11-26)
 ----------------------------

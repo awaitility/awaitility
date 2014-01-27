@@ -19,6 +19,7 @@ import com.jayway.awaitility.Duration;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -34,34 +35,39 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ConditionFactory {
 
     private static final int FOREVER = -1;
-    /** The timeout. */
+    /**
+     * The timeout.
+     */
     private final Duration timeout;
 
-    /** The poll interval. */
+    /**
+     * The poll interval.
+     */
     private final Duration pollInterval;
 
-    /** The catch uncaught exceptions. */
+    /**
+     * The catch uncaught exceptions.
+     */
     private final boolean catchUncaughtExceptions;
 
-    /** The alias. */
+    /**
+     * The alias.
+     */
     private final String alias;
 
-    /** The poll delay. */
+    /**
+     * The poll delay.
+     */
     private final Duration pollDelay;
 
     /**
      * Instantiates a new condition factory.
      *
-     * @param alias
-     *            the alias
-     * @param timeout
-     *            the timeout
-     * @param pollInterval
-     *            the poll interval
-     * @param pollDelay
-     *            The poll delay
-     * @param catchUncaughtExceptions
-     *            the catch uncaught exceptions
+     * @param alias                   the alias
+     * @param timeout                 the timeout
+     * @param pollInterval            the poll interval
+     * @param pollDelay               The poll delay
+     * @param catchUncaughtExceptions the catch uncaught exceptions
      */
     public ConditionFactory(String alias, Duration timeout, Duration pollInterval, Duration pollDelay,
                             boolean catchUncaughtExceptions) {
@@ -76,10 +82,10 @@ public class ConditionFactory {
         }
 
         final long timeoutInMS = timeout.getValueInMS();
-        if(!timeout.isForever() && timeoutInMS <= pollInterval.getValueInMS()) {
+        if (!timeout.isForever() && timeoutInMS <= pollInterval.getValueInMS()) {
             throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll interval (%s %s).",
                     timeout.getValue(), timeout.getTimeUnitAsString(), pollInterval.getValue(), pollInterval.getTimeUnitAsString()));
-        } else if((!pollDelay.isForever() && !timeout.isForever())  && timeoutInMS <= pollDelay.getValueInMS()) {
+        } else if ((!pollDelay.isForever() && !timeout.isForever()) && timeoutInMS <= pollDelay.getValueInMS()) {
             throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll delay (%s %s).",
                     timeout.getValue(), timeout.getTimeUnitAsString(), pollDelay.getValue(), pollDelay.getTimeUnitAsString()));
         }
@@ -94,14 +100,10 @@ public class ConditionFactory {
     /**
      * Instantiates a new condition factory.
      *
-     * @param timeout
-     *            the timeout
-     * @param pollInterval
-     *            the poll interval
-     * @param pollDelay
-     *            The delay before the polling starts
-     * @param catchUncaughtExceptions
-     *            the catch uncaught exceptions
+     * @param timeout                 the timeout
+     * @param pollInterval            the poll interval
+     * @param pollDelay               The delay before the polling starts
+     * @param catchUncaughtExceptions the catch uncaught exceptions
      */
     public ConditionFactory(Duration timeout, Duration pollInterval, Duration pollDelay, boolean catchUncaughtExceptions) {
         this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions);
@@ -110,8 +112,7 @@ public class ConditionFactory {
     /**
      * Await at most <code>timeout</code> before throwing a timeout exception.
      *
-     * @param timeout
-     *            the timeout
+     * @param timeout the timeout
      * @return the condition factory
      */
     public ConditionFactory timeout(Duration timeout) {
@@ -121,8 +122,7 @@ public class ConditionFactory {
     /**
      * Await at most <code>timeout</code> before throwing a timeout exception.
      *
-     * @param timeout
-     *            the timeout
+     * @param timeout the timeout
      * @return the condition factory
      */
     public ConditionFactory atMost(Duration timeout) {
@@ -152,8 +152,7 @@ public class ConditionFactory {
      * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
      * </p>
      *
-     * @param pollInterval
-     *            the poll interval
+     * @param pollInterval the poll interval
      * @return the condition factory
      */
     public ConditionFactory pollInterval(Duration pollInterval) {
@@ -163,10 +162,8 @@ public class ConditionFactory {
     /**
      * Await at most <code>timeout</code> before throwing a timeout exception.
      *
-     * @param timeout
-     *            the timeout
-     * @param unit
-     *            the unit
+     * @param timeout the timeout
+     * @param unit    the unit
      * @return the condition factory
      */
     public ConditionFactory timeout(long timeout, TimeUnit unit) {
@@ -179,11 +176,8 @@ public class ConditionFactory {
      * the result the first time. If you don't specify a poll delay explicitly
      * it'll be the same as the poll interval.
      *
-     *
-     * @param delay
-     *            the delay
-     * @param unit
-     *            the unit
+     * @param delay the delay
+     * @param unit  the unit
      * @return the condition factory
      */
     public ConditionFactory pollDelay(long delay, TimeUnit unit) {
@@ -196,9 +190,7 @@ public class ConditionFactory {
      * the result the first time. If you don't specify a poll delay explicitly
      * it'll be the same as the poll interval.
      *
-     *
-     * @param pollDelay
-     *            the poll delay
+     * @param pollDelay the poll delay
      * @return the condition factory
      */
     public ConditionFactory pollDelay(Duration pollDelay) {
@@ -208,10 +200,8 @@ public class ConditionFactory {
     /**
      * Await at most <code>timeout</code> before throwing a timeout exception.
      *
-     * @param timeout
-     *            the timeout
-     * @param unit
-     *            the unit
+     * @param timeout the timeout
+     * @param unit    the unit
      * @return the condition factory
      */
     public ConditionFactory atMost(long timeout, TimeUnit unit) {
@@ -223,7 +213,7 @@ public class ConditionFactory {
      * Specify the polling interval Awaitility will use for this await
      * statement. This means the frequency in which the condition is checked for
      * completion.
-     *
+     * <p/>
      * <p>
      * Note that the poll delay will be automatically set as to the same value
      * as the interval unless it's specified explicitly using
@@ -232,11 +222,8 @@ public class ConditionFactory {
      * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
      * </p>
      *
-     *
-     * @param pollInterval
-     *            the poll interval
-     * @param unit
-     *            the unit
+     * @param pollInterval the poll interval
+     * @param unit         the unit
      * @return the condition factory
      */
     public ConditionFactory pollInterval(long pollInterval, TimeUnit unit) {
@@ -262,8 +249,7 @@ public class ConditionFactory {
      * fluent-like syntax.
      *
      * @return the condition factory
-     * @throws Exception
-     *             the exception
+     * @throws Exception the exception
      */
     public ConditionFactory await() {
         return this;
@@ -275,11 +261,9 @@ public class ConditionFactory {
      * statements in one test and you want to know which one that fails (the
      * alias will be shown if a timeout exception occurs).
      *
-     * @param alias
-     *            the alias
+     * @param alias the alias
      * @return the condition factory
-     * @throws Exception
-     *             the exception
+     * @throws Exception the exception
      */
     public ConditionFactory await(String alias) {
         return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
@@ -290,10 +274,9 @@ public class ConditionFactory {
      * returns the same condition factory instance.
      *
      * @return the condition factory
-     * @throws Exception
-     *             the exception
+     * @throws Exception the exception
      */
-    public ConditionFactory and(){
+    public ConditionFactory and() {
         return this;
     }
 
@@ -302,8 +285,7 @@ public class ConditionFactory {
      * returns the same condition factory instance.
      *
      * @return the condition factory
-     * @throws Exception
-     *             the exception
+     * @throws Exception the exception
      */
     public ConditionFactory with() {
         return this;
@@ -314,8 +296,7 @@ public class ConditionFactory {
      * returns the same condition factory instance.
      *
      * @return the condition factory
-     * @throws Exception
-     *             the exception
+     * @throws Exception the exception
      */
     public ConditionFactory then() {
         return this;
@@ -326,8 +307,7 @@ public class ConditionFactory {
      * returns the same condition factory instance.
      *
      * @return the condition factory
-     * @throws Exception
-     *             the exception
+     * @throws Exception the exception
      */
     public ConditionFactory given() {
         return this;
@@ -346,19 +326,15 @@ public class ConditionFactory {
     /**
      * Specify the condition that must be met when waiting for a method call.
      * E.g.
-     *
+     * <p/>
      * <pre>
      * await().untilCall(to(orderService).size(), is(greaterThan(2)));
      * </pre>
      *
-     * @param <T>
-     *            the generic type
-     * @param ignore
-     *            the return value of the method call
-     * @param matcher
-     *            The condition that must be met when
-     * @throws Exception
-     *             the exception
+     * @param <T>     the generic type
+     * @param ignore  the return value of the method call
+     * @param matcher The condition that must be met when
+     * @throws Exception the exception
      */
     public <T> T untilCall(T ignore, final Matcher<? super T> matcher) {
         final MethodCaller<T> supplier = new MethodCaller<T>(MethodCallRecorder.getLastTarget(), MethodCallRecorder
@@ -371,42 +347,38 @@ public class ConditionFactory {
     /**
      * Await until a {@link Callable} supplies a value matching the specified
      * {@link Matcher}. E.g.
-     *
+     * <p/>
      * <pre>
      * await().until(numberOfPersons(), is(greaterThan(2)));
      * </pre>
-     *
+     * <p/>
      * where "numberOfPersons()" returns a standard {@link Callable}:
-     *
+     * <p/>
      * <pre>
      * private Callable&lt;Integer&gt; numberOfPersons() {
      * 	return new Callable&lt;Integer&gt;() {
      * 		public Integer call() {
      * 			return personRepository.size();
-     * 		}
-     * 	};
+     *        }
+     *    };
      * }
      * </pre>
-     *
+     * <p/>
      * Using a generic {@link Callable} as done by using this version of "until"
      * allows you to reuse the "numberOfPersons()" definition in multiple await
      * statements. I.e. you can easily create another await statement (perhaps
      * in a different test case) using e.g.
-     *
+     * <p/>
      * <pre>
      * await().until(numberOfPersons(), is(equalTo(6)));
      * </pre>
      *
-     * @param <T>
-     *            the generic type
-     * @param supplier
-     *            the supplier that is responsible for getting the value that
-     *            should be matched.
-     * @param matcher
-     *            the matcher The hamcrest matcher that checks whether the
-     *            condition is fulfilled.
-     * @throws Exception
-     *             the exception
+     * @param <T>      the generic type
+     * @param supplier the supplier that is responsible for getting the value that
+     *                 should be matched.
+     * @param matcher  the matcher The hamcrest matcher that checks whether the
+     *                 condition is fulfilled.
+     * @throws Exception the exception
      */
     public <T> T until(final Callable<T> supplier, final Matcher<? super T> matcher) {
         return until(new CallableHamcrestCondition<T>(supplier, matcher, generateConditionSettings()));
@@ -415,18 +387,15 @@ public class ConditionFactory {
     /**
      * Await until a Atomic variable has a value matching the specified
      * {@link Matcher}. E.g.
-     *
+     * <p/>
      * <pre>
      * await().untilAtomic(myAtomic, is(greaterThan(2)));
      * </pre>
      *
-     * @param atomic
-     *            the atomic variable
-     * @param matcher
-     *            the matcher The hamcrest matcher that checks whether the
-     *            condition is fulfilled.
-     * @throws Exception
-     *             the exception
+     * @param atomic  the atomic variable
+     * @param matcher the matcher The hamcrest matcher that checks whether the
+     *                condition is fulfilled.
+     * @throws Exception the exception
      */
     public Integer untilAtomic(final AtomicInteger atomic, final Matcher<? super Integer> matcher) {
         return until(new CallableHamcrestCondition<Integer>(new Callable<Integer>() {
@@ -439,18 +408,15 @@ public class ConditionFactory {
     /**
      * Await until a Atomic variable has a value matching the specified
      * {@link Matcher}. E.g.
-     *
+     * <p/>
      * <pre>
      * await().untilAtomic(myAtomic, is(greaterThan(2)));
      * </pre>
      *
-     * @param atomic
-     *            the atomic variable
-     * @param matcher
-     *            the matcher The hamcrest matcher that checks whether the
-     *            condition is fulfilled.
-     * @throws Exception
-     *             the exception
+     * @param atomic  the atomic variable
+     * @param matcher the matcher The hamcrest matcher that checks whether the
+     *                condition is fulfilled.
+     * @throws Exception the exception
      */
     public Long untilAtomic(final AtomicLong atomic, final Matcher<? super Long> matcher) {
         return until(new CallableHamcrestCondition<Long>(new Callable<Long>() {
@@ -463,18 +429,15 @@ public class ConditionFactory {
     /**
      * Await until a Atomic variable has a value matching the specified
      * {@link Matcher}. E.g.
-     *
+     * <p/>
      * <pre>
      * await().untilAtomic(myAtomic, is(greaterThan(2)));
      * </pre>
      *
-     * @param atomic
-     *            the atomic variable
-     * @param matcher
-     *            the matcher The hamcrest matcher that checks whether the
-     *            condition is fulfilled.
-     * @throws Exception
-     *             the exception
+     * @param atomic  the atomic variable
+     * @param matcher the matcher The hamcrest matcher that checks whether the
+     *                condition is fulfilled.
+     * @throws Exception the exception
      */
     public void untilAtomic(final AtomicBoolean atomic, final Matcher<? super Boolean> matcher) {
         until(new CallableHamcrestCondition<Boolean>(new Callable<Boolean>() {
@@ -487,10 +450,8 @@ public class ConditionFactory {
     /**
      * Await until a Atomic boolean becomes true.
      *
-     * @param atomic
-     *            the atomic variable
-     * @throws Exception
-     *             the exception
+     * @param atomic the atomic variable
+     * @throws Exception the exception
      */
     public void untilTrue(final AtomicBoolean atomic) {
         untilAtomic(atomic, Matchers.is(Boolean.TRUE));
@@ -499,10 +460,8 @@ public class ConditionFactory {
     /**
      * Await until a Atomic boolean becomes false.
      *
-     * @param atomic
-     *            the atomic variable
-     * @throws Exception
-     *             the exception
+     * @param atomic the atomic variable
+     * @throws Exception the exception
      */
     public void untilFalse(final AtomicBoolean atomic) {
         untilAtomic(atomic, Matchers.is(Boolean.FALSE));
@@ -511,18 +470,15 @@ public class ConditionFactory {
     /**
      * Await until a Atomic variable has a value matching the specified
      * {@link Matcher}. E.g.
-     *
+     * <p/>
      * <pre>
      * await().untilAtomic(myAtomic, is(greaterThan(2)));
      * </pre>
      *
-     * @param atomic
-     *            the atomic variable
-     * @param matcher
-     *            the matcher The hamcrest matcher that checks whether the
-     *            condition is fulfilled.
-     * @throws Exception
-     *             the exception
+     * @param atomic  the atomic variable
+     * @param matcher the matcher The hamcrest matcher that checks whether the
+     *                condition is fulfilled.
+     * @throws Exception the exception
      */
     public <V> V untilAtomic(final AtomicReference<V> atomic, final Matcher<? super V> matcher) {
         return until(new CallableHamcrestCondition<V>(new Callable<V>() {
@@ -536,29 +492,26 @@ public class ConditionFactory {
      * Await until a {@link Callable} returns <code>true</code>. This is method
      * is not as generic as the other variants of "until" but it allows for a
      * more precise and in some cases even more english-like syntax. E.g.
-     *
+     * <p/>
      * <pre>
      * await().until(numberOfPersonsIsEqualToThree());
      * </pre>
-     *
+     * <p/>
      * where "numberOfPersonsIsEqualToThree()" returns a standard
      * {@link Callable} of type {@link Boolean}:
-     *
+     * <p/>
      * <pre>
      * private Callable&lt;Boolean&gt; numberOfPersons() {
      * 	return new Callable&lt;Boolean&gt;() {
      * 		public Boolean call() {
      * 			return personRepository.size() == 3;
-     * 		}
-     * 	};
+     *        }
+     *    };
      * }
      *
-     * @param <T>
-     *            the generic type
-     * @param conditionEvaluator
-     *            the condition evaluator
-     * @throws Exception
-     * the exception
+     * @param <T>                the generic type
+     * @param conditionEvaluator the condition evaluator
+     * @throws Exception the exception
      */
     public <T> void until(Callable<Boolean> conditionEvaluator) {
         until(new CallableCondition(conditionEvaluator, generateConditionSettings()));
@@ -575,29 +528,31 @@ public class ConditionFactory {
     /**
      * The Class MethodCaller.
      *
-     * @param <T>
-     *            the generic type
+     * @param <T> the generic type
      */
     static class MethodCaller<T> implements Callable<T> {
 
-        /** The target. */
+        /**
+         * The target.
+         */
         final Object target;
 
-        /** The method. */
+        /**
+         * The method.
+         */
         final Method method;
 
-        /** The args. */
+        /**
+         * The args.
+         */
         final Object[] args;
 
         /**
          * Instantiates a new method caller.
          *
-         * @param target
-         *            the target
-         * @param method
-         *            the method
-         * @param args
-         *            the args
+         * @param target the target
+         * @param method the method
+         * @param args   the args
          */
         public MethodCaller(Object target, Method method, Object[] args) {
             this.target = target;
@@ -615,8 +570,10 @@ public class ConditionFactory {
         public T call() {
             try {
                 return (T) method.invoke(target, args);
-            } catch (Exception e) {
+            } catch (IllegalAccessException e) {
                 return SafeExceptionRethrower.safeRethrow(e);
+            } catch (InvocationTargetException e) {
+                return SafeExceptionRethrower.safeRethrow(e.getCause());
             }
         }
     }

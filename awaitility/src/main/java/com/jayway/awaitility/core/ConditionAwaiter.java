@@ -80,7 +80,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                     } else {
                         message = String.format("%s within %s %s.", getTimeoutMessage(), timeout, maxWaitTimeLowerCase);
                     }
-                    throw new TimeoutException(message);
+                    throw new ConditionTimeoutException(message);
                 }
             } finally {
                 executor.shutdown();
@@ -91,7 +91,6 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         } catch (Exception e) {
             SafeExceptionRethrower.safeRethrow(e);
         }
-
     }
 
     protected abstract String getTimeoutMessage();

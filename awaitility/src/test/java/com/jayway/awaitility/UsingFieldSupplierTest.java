@@ -16,13 +16,12 @@
 package com.jayway.awaitility;
 
 import com.jayway.awaitility.classes.*;
+import com.jayway.awaitility.core.ConditionTimeoutException;
 import com.jayway.awaitility.reflect.exception.FieldNotFoundException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.util.concurrent.TimeoutException;
 
 import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.awaitility.Awaitility.fieldIn;
@@ -183,7 +182,7 @@ public class UsingFieldSupplierTest {
 
     @Test
     public void showsErrorMessageContainingClassAndTypeWhenOnlyTypeSpecifiedWhenTimeout() throws Exception {
-        exception.expect(TimeoutException.class);
+        exception.expect(ConditionTimeoutException.class);
         exception.expectMessage("Field in com.jayway.awaitility.classes.FakeRepositoryWithAnnotation of type int expected <1> but was <0> within 200 milliseconds.");
 
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
@@ -193,7 +192,7 @@ public class UsingFieldSupplierTest {
 
     @Test
     public void showsErrorMessageContainingClassAndTypeAndFieldNameWhenTypeAndNameSpecifiedWhenTimeout() throws Exception {
-        exception.expect(TimeoutException.class);
+        exception.expect(ConditionTimeoutException.class);
         exception.expectMessage("Field private volatile int com.jayway.awaitility.classes.FakeRepositoryWithAnnotation.value expected <1> but was <0> within 200 milliseconds.");
 
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
@@ -203,7 +202,7 @@ public class UsingFieldSupplierTest {
 
     @Test
     public void showsErrorMessageContainingClassAndTypeAndFieldNameAndAnnotationWhenTypeAndNameAndAnnotationTypeSpecifiedWhenTimeout() throws Exception {
-        exception.expect(TimeoutException.class);
+        exception.expect(ConditionTimeoutException.class);
         exception.expectMessage("Field private volatile int com.jayway.awaitility.classes.FakeRepositoryWithAnnotation.value expected <1> but was <0> within 200 milliseconds.");
 
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
@@ -213,7 +212,7 @@ public class UsingFieldSupplierTest {
 
     @Test
     public void showsErrorMessageContainingClassAndTypeAndAnnotationWhenTypeAndAnnotationTypeSpecifiedWhenTimeout() throws Exception {
-        exception.expect(TimeoutException.class);
+        exception.expect(ConditionTimeoutException.class);
         exception.expectMessage("Field in com.jayway.awaitility.classes.FakeRepositoryWithAnnotation annotated with com.jayway.awaitility.classes.ExampleAnnotation and of type int expected <1> but was <0> within 200 milliseconds.");
 
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();

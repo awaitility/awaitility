@@ -16,6 +16,7 @@
 package com.jayway.awaitility;
 
 import com.jayway.awaitility.classes.*;
+import com.jayway.awaitility.core.ConditionTimeoutException;
 import com.jayway.awaitility.proxy.CannotCreateProxyException;
 import org.junit.Before;
 import org.junit.Rule;
@@ -28,15 +29,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import static com.jayway.awaitility.Awaitility.*;
 import static com.jayway.awaitility.Duration.ONE_SECOND;
 import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
 import static java.util.concurrent.TimeUnit.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class AwaitilityTest {
 
@@ -100,14 +99,14 @@ public class AwaitilityTest {
         assertEquals(1, fakeRepository.getValue());
     }
 
-    @Test(expected = TimeoutException.class)
+    @Test(expected = ConditionTimeoutException.class)
     public void awaitOperationSupportsDefaultTimeout() throws Exception {
         Awaitility.setDefaultTimeout(120, TimeUnit.MILLISECONDS);
         await().until(value(), greaterThan(0));
         assertEquals(1, fakeRepository.getValue());
     }
 
-    @Test(expected = TimeoutException.class)
+    @Test(expected = ConditionTimeoutException.class)
     public void awaitOperationSupportsDefaultPollDelay() throws Exception {
         Awaitility.setDefaultPollDelay(3000, TimeUnit.MILLISECONDS);
         await().atMost(ONE_SECOND).until(value(), greaterThan(0));
@@ -127,7 +126,7 @@ public class AwaitilityTest {
         await().forever().until(value(), equalTo(1));
         assertEquals(1, fakeRepository.getValue());
     }
-    
+
     @Test(timeout = 2000)
     public void foreverConditionWithHamcrestCollectionMatchersWithDirectBlock() throws Exception {
         new Asynch(fakeRepository).perform();
@@ -143,7 +142,7 @@ public class AwaitilityTest {
         assertEquals(1, fakeRepository.getValue());
     }
 
-    @Test(timeout = 2000, expected = TimeoutException.class)
+    @Test(timeout = 2000, expected = ConditionTimeoutException.class)
     public void conditionBreaksAfterDurationTimeout() throws Exception {
         new Asynch(fakeRepository).perform();
         await().atMost(200, TimeUnit.MILLISECONDS).until(value(), equalTo(1));
@@ -165,7 +164,7 @@ public class AwaitilityTest {
         catchUncaughtExceptions().and().await().forever().until(value(), equalTo(1));
     }
 
-    @Test(timeout = 2000, expected = TimeoutException.class)
+    @Test(timeout = 2000, expected = ConditionTimeoutException.class)
     public void whenDontCatchUncaughtExceptionsIsSpecifiedThenExceptionsFromOtherThreadsAreNotCaught() throws Exception {
         new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
             @Override
@@ -176,7 +175,7 @@ public class AwaitilityTest {
         };
     }
 
-    @Test(timeout = 2000, expected = TimeoutException.class)
+    @Test(timeout = 2000, expected = ConditionTimeoutException.class)
     public void whenDontCatchUncaughtExceptionsIsSpecifiedAndTheBuildOfTheAwaitStatementHasStartedThenExceptionsFromOtherThreadsAreNotCaught()
             throws Exception {
         new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
@@ -188,7 +187,7 @@ public class AwaitilityTest {
         };
     }
 
-    @Test(timeout = 2000, expected = TimeoutException.class)
+    @Test(timeout = 2000, expected = ConditionTimeoutException.class)
     public void catchUncaughtExceptionsIsReset() throws Exception {
         new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
             @Override
@@ -199,7 +198,7 @@ public class AwaitilityTest {
         };
     }
 
-    @Test(timeout = 2000, expected = TimeoutException.class)
+    @Test(timeout = 2000, expected = ConditionTimeoutException.class)
     public void waitAtMostWorks() throws Exception {
         new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
 
@@ -229,9 +228,9 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-    public void awaitWithAliasDisplaysAliasWhenTimeoutExceptionOccurs() throws Exception {
+    public void awaitWithAliasDisplaysAliasWhenConditionTimeoutExceptionOccurs() throws Exception {
         String alias = "test";
-        exception.expect(TimeoutException.class);
+        exception.expect(ConditionTimeoutException.class);
         exception.expectMessage(alias);
 
         await(alias).atMost(120, MILLISECONDS).until(value(), greaterThan(0));
@@ -243,8 +242,8 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-    public void awaitDisplaysSupplierAndMatcherNameWhenTimeoutExceptionOccurs() throws Exception {
-        exception.expect(TimeoutException.class);
+    public void awaitDisplaysSupplierAndMatcherNameWhenConditionTimeoutExceptionOccurs() throws Exception {
+        exception.expect(ConditionTimeoutException.class);
         exception.expectMessage(FakeRepositoryValue.class.getName()
                 + " expected a value greater than <0> but was <0> within 120 milliseconds.");
 
@@ -252,8 +251,8 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-    public void awaitDisplaysCallableNameWhenTimeoutExceptionOccurs() throws Exception {
-        exception.expect(TimeoutException.class);
+    public void awaitDisplaysCallableNameWhenConditionTimeoutExceptionOccurs() throws Exception {
+        exception.expect(ConditionTimeoutException.class);
         exception.expectMessage(String.format("Condition %s was not fulfilled within 120 milliseconds.",
                 FakeRepositoryEqualsOne.class.getName()));
 
@@ -261,21 +260,21 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-    public void awaitDisplaysMethodDeclaringTheCallableWhenCallableIsAnonymousClassAndTimeoutExceptionOccurs()
+    public void awaitDisplaysMethodDeclaringTheCallableWhenCallableIsAnonymousClassAndConditionTimeoutExceptionOccurs()
             throws Exception {
-        exception.expect(TimeoutException.class);
+        exception.expect(ConditionTimeoutException.class);
         exception
                 .expectMessage(String
                         .format("Condition returned by method \"fakeRepositoryValueEqualsOneAsAnonymous\" in class %s was not fulfilled within 120 milliseconds.",
-                        AwaitilityTest.class.getName()));
+                                AwaitilityTest.class.getName()));
 
         await().atMost(120, MILLISECONDS).until(fakeRepositoryValueEqualsOneAsAnonymous());
     }
 
     @Test(timeout = 2000)
-    public void awaitDisplaysMethodInvocationNameAndMatcherNameWhenUsingCallToAndTimeoutExceptionOccurs()
+    public void awaitDisplaysMethodInvocationNameAndMatcherNameWhenUsingCallToAndConditionTimeoutExceptionOccurs()
             throws Exception {
-        exception.expect(TimeoutException.class);
+        exception.expect(ConditionTimeoutException.class);
         exception.expectMessage(FakeRepositoryImpl.class.getName()
                 + ".getValue() expected a value greater than <0> but was <0> within 50 milliseconds.");
 
@@ -285,13 +284,13 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-    public void awaitDisplaysMethodDeclaringTheSupplierWhenSupplierIsAnonymousClassAndTimeoutExceptionOccurs()
+    public void awaitDisplaysMethodDeclaringTheSupplierWhenSupplierIsAnonymousClassAndConditionTimeoutExceptionOccurs()
             throws Exception {
-        exception.expect(TimeoutException.class);
+        exception.expect(ConditionTimeoutException.class);
         exception
                 .expectMessage(String
                         .format("%s.valueAsAnonymous Callable expected %s but was <0> within 120 milliseconds.",
-                        AwaitilityTest.class.getName(), equalTo(2).toString()));
+                                AwaitilityTest.class.getName(), equalTo(2).toString()));
 
         with().pollInterval(10, MILLISECONDS).await().atMost(120, MILLISECONDS).until(valueAsAnonymous(), equalTo(2));
     }
@@ -302,7 +301,7 @@ public class AwaitilityTest {
         Object actualObject = fakeObjectRepository.getObject();
         Object expectedObject = new Object();
 
-        exception.expect(TimeoutException.class);
+        exception.expect(ConditionTimeoutException.class);
         exception.expectMessage(String.format("%s.getObject() expected <%s> but was <%s> within 50 milliseconds.",
                 FakeObjectRepository.class.getName(), expectedObject.toString(), actualObject.toString()));
 
@@ -342,6 +341,17 @@ public class AwaitilityTest {
         with().pollDelay(200, MILLISECONDS).await().atMost(200, MILLISECONDS).until(fakeRepositoryValueEqualsOne());
     }
 
+    @Test(timeout = 2000)
+    public void throwsConditionConditionTimeoutExceptionOnTimeout() throws Exception {
+        new Asynch(fakeRepository).perform();
+        try {
+            await().atMost(500, MILLISECONDS).untilCall(to(fakeRepository).getValue(), greaterThan(2));
+            fail("Should throw timeout exception");
+        } catch (ConditionTimeoutException e) {
+            assertEquals(0, fakeRepository.getValue());
+        }
+    }
+
     private Callable<Boolean> fakeRepositoryValueEqualsOne() {
         return new FakeRepositoryEqualsOne(fakeRepository);
     }
@@ -366,7 +376,7 @@ public class AwaitilityTest {
             }
         };
     }
-    
+
     private Callable<List<Integer>> valueAsList() {
         return new Callable<List<Integer>>() {
             public List<Integer> call() throws Exception {

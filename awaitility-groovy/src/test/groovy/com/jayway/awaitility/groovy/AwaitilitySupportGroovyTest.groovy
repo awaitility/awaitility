@@ -15,10 +15,9 @@
 */
 package com.jayway.awaitility.groovy
 
+import com.jayway.awaitility.core.ConditionTimeoutException
 import com.jayway.awaitility.groovy.classes.Asynch
 import spock.lang.Specification
-
-import java.util.concurrent.TimeoutException
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 
@@ -38,7 +37,7 @@ class AwaitilitySupportGroovyTest extends Specification {
         await().atMost(500, MILLISECONDS).until { asynch.getValue() == 2 }
 
         then:
-        TimeoutException e = thrown()
+        ConditionTimeoutException e = thrown()
         e.message == "Condition was not fulfilled within 500 milliseconds."
     }
 
@@ -48,7 +47,7 @@ class AwaitilitySupportGroovyTest extends Specification {
         await("groovy").atMost(500, MILLISECONDS).until { asynch.getValue() == 2 }
 
         then:
-        TimeoutException e = thrown()
+        ConditionTimeoutException e = thrown()
         e.message == "Condition with alias 'groovy' didn't complete within 500 milliseconds."
     }
 }
