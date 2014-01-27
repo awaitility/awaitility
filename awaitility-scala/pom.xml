@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.jayway.awaitility</groupId>
 		<artifactId>awaitility-parent</artifactId>
-		<version>1.5.0</version>
+		<version>1.5.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>awaitility-scala</artifactId>
 	<name>Awaitility support for Scala</name>
