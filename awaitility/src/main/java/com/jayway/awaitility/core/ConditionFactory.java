@@ -34,7 +34,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ConditionFactory {
 
-    private static final int FOREVER = -1;
     /**
      * The timeout.
      */
@@ -249,7 +248,6 @@ public class ConditionFactory {
      * fluent-like syntax.
      *
      * @return the condition factory
-     * @throws Exception the exception
      */
     public ConditionFactory await() {
         return this;
@@ -263,7 +261,6 @@ public class ConditionFactory {
      *
      * @param alias the alias
      * @return the condition factory
-     * @throws Exception the exception
      */
     public ConditionFactory await(String alias) {
         return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
@@ -274,7 +271,6 @@ public class ConditionFactory {
      * returns the same condition factory instance.
      *
      * @return the condition factory
-     * @throws Exception the exception
      */
     public ConditionFactory and() {
         return this;
@@ -285,7 +281,6 @@ public class ConditionFactory {
      * returns the same condition factory instance.
      *
      * @return the condition factory
-     * @throws Exception the exception
      */
     public ConditionFactory with() {
         return this;
@@ -296,7 +291,6 @@ public class ConditionFactory {
      * returns the same condition factory instance.
      *
      * @return the condition factory
-     * @throws Exception the exception
      */
     public ConditionFactory then() {
         return this;
@@ -307,7 +301,6 @@ public class ConditionFactory {
      * returns the same condition factory instance.
      *
      * @return the condition factory
-     * @throws Exception the exception
      */
     public ConditionFactory given() {
         return this;
@@ -334,7 +327,7 @@ public class ConditionFactory {
      * @param <T>     the generic type
      * @param ignore  the return value of the method call
      * @param matcher The condition that must be met when
-     * @throws Exception the exception
+     * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public <T> T untilCall(T ignore, final Matcher<? super T> matcher) {
         final MethodCaller<T> supplier = new MethodCaller<T>(MethodCallRecorder.getLastTarget(), MethodCallRecorder
@@ -378,7 +371,7 @@ public class ConditionFactory {
      *                 should be matched.
      * @param matcher  the matcher The hamcrest matcher that checks whether the
      *                 condition is fulfilled.
-     * @throws Exception the exception
+     * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public <T> T until(final Callable<T> supplier, final Matcher<? super T> matcher) {
         return until(new CallableHamcrestCondition<T>(supplier, matcher, generateConditionSettings()));
@@ -395,7 +388,7 @@ public class ConditionFactory {
      * @param atomic  the atomic variable
      * @param matcher the matcher The hamcrest matcher that checks whether the
      *                condition is fulfilled.
-     * @throws Exception the exception
+     * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public Integer untilAtomic(final AtomicInteger atomic, final Matcher<? super Integer> matcher) {
         return until(new CallableHamcrestCondition<Integer>(new Callable<Integer>() {
@@ -416,7 +409,7 @@ public class ConditionFactory {
      * @param atomic  the atomic variable
      * @param matcher the matcher The hamcrest matcher that checks whether the
      *                condition is fulfilled.
-     * @throws Exception the exception
+     * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public Long untilAtomic(final AtomicLong atomic, final Matcher<? super Long> matcher) {
         return until(new CallableHamcrestCondition<Long>(new Callable<Long>() {
@@ -437,7 +430,7 @@ public class ConditionFactory {
      * @param atomic  the atomic variable
      * @param matcher the matcher The hamcrest matcher that checks whether the
      *                condition is fulfilled.
-     * @throws Exception the exception
+     * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAtomic(final AtomicBoolean atomic, final Matcher<? super Boolean> matcher) {
         until(new CallableHamcrestCondition<Boolean>(new Callable<Boolean>() {
@@ -451,7 +444,7 @@ public class ConditionFactory {
      * Await until a Atomic boolean becomes true.
      *
      * @param atomic the atomic variable
-     * @throws Exception the exception
+     * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilTrue(final AtomicBoolean atomic) {
         untilAtomic(atomic, Matchers.is(Boolean.TRUE));
@@ -461,7 +454,7 @@ public class ConditionFactory {
      * Await until a Atomic boolean becomes false.
      *
      * @param atomic the atomic variable
-     * @throws Exception the exception
+     * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilFalse(final AtomicBoolean atomic) {
         untilAtomic(atomic, Matchers.is(Boolean.FALSE));
@@ -478,7 +471,7 @@ public class ConditionFactory {
      * @param atomic  the atomic variable
      * @param matcher the matcher The hamcrest matcher that checks whether the
      *                condition is fulfilled.
-     * @throws Exception the exception
+     * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public <V> V untilAtomic(final AtomicReference<V> atomic, final Matcher<? super V> matcher) {
         return until(new CallableHamcrestCondition<V>(new Callable<V>() {
@@ -511,7 +504,7 @@ public class ConditionFactory {
      *
      * @param <T>                the generic type
      * @param conditionEvaluator the condition evaluator
-     * @throws Exception the exception
+     * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public <T> void until(Callable<Boolean> conditionEvaluator) {
         until(new CallableCondition(conditionEvaluator, generateConditionSettings()));
