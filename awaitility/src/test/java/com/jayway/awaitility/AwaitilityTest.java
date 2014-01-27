@@ -17,8 +17,10 @@ package com.jayway.awaitility;
 
 import com.jayway.awaitility.classes.*;
 import com.jayway.awaitility.core.ConditionTimeoutException;
+import com.jayway.awaitility.core.ExceptionThrowingAsynch;
 import com.jayway.awaitility.proxy.CannotCreateProxyException;
 import org.junit.Before;
+import org.junit.ComparisonFailure;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -153,14 +155,20 @@ public class AwaitilityTest {
     public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockWhenSetToCatchAllUncaughtExceptions()
             throws Exception {
         catchUncaughtExceptionsByDefault();
-        new ExceptionThrowingAsynch().perform();
+        new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
+        await().forever().until(value(), equalTo(1));
+    }
+
+    @Test(timeout = 2000, expected = ComparisonFailure.class)
+    public void uncaughtThrowablesArePropagatedToAwaitingThreadAndBreaksForeverBlockWhenSetToCatchAllUncaughtExceptions() {
+        new ExceptionThrowingAsynch(new ComparisonFailure("Message", "Something", "Something else")).perform();
         await().forever().until(value(), equalTo(1));
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)
     public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockWhenCatchingAllUncaughtExceptions()
             throws Exception {
-        new ExceptionThrowingAsynch().perform();
+        new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
         catchUncaughtExceptions().and().await().forever().until(value(), equalTo(1));
     }
 
@@ -169,7 +177,7 @@ public class AwaitilityTest {
         new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
             @Override
             public void testLogic() throws Exception {
-                new ExceptionThrowingAsynch().perform();
+                new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
                 dontCatchUncaughtExceptions().and().await().atMost(ONE_SECOND).until(value(), equalTo(1));
             }
         };
@@ -181,7 +189,7 @@ public class AwaitilityTest {
         new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
             @Override
             public void testLogic() throws Exception {
-                new ExceptionThrowingAsynch().perform();
+                new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
                 await().and().dontCatchUncaughtExceptions().given().timeout(ONE_SECOND).until(value(), equalTo(1));
             }
         };
@@ -192,7 +200,7 @@ public class AwaitilityTest {
         new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
             @Override
             public void testLogic() throws Exception {
-                new ExceptionThrowingAsynch().perform();
+                new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
                 dontCatchUncaughtExceptions().and().await().atMost(Duration.ONE_SECOND).until(value(), equalTo(1));
             }
         };
@@ -204,7 +212,7 @@ public class AwaitilityTest {
 
             @Override
             public void testLogic() throws Exception {
-                new ExceptionThrowingAsynch().perform();
+                new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
                 dontCatchUncaughtExceptions().and().given().pollInterval(Duration.ONE_HUNDRED_MILLISECONDS).then().await().atMost(ONE_SECOND)
                         .untilCall(to(fakeRepository).getValue(), equalTo(1));
                 waitAtMost(ONE_SECOND).and().dontCatchUncaughtExceptions().untilCall(to(fakeRepository).getValue(), equalTo(1));

@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     private final CountDownLatch latch;
-    private Exception exception = null;
+    private Throwable throwable = null;
     private final ConditionSettings conditionSettings;
 
     public ConditionAwaiter(final Callable<Boolean> condition,
@@ -46,7 +46,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                         latch.countDown();
                     }
                 } catch (Exception e) {
-                    exception = e;
+                    throwable = e;
                     latch.countDown();
                 }
             }
@@ -69,8 +69,8 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 } else {
                     finishedBeforeTimeout = latch.await(timeout, maxWaitTime.getTimeUnit());
                 }
-                if (exception != null) {
-                    throw exception;
+                if (throwable != null) {
+                    throw throwable;
                 } else if (!finishedBeforeTimeout) {
                     final String maxWaitTimeLowerCase = maxWaitTime.getTimeUnitAsString();
                     final String message;
@@ -88,7 +88,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                     executor.shutdownNow();
                 }
             }
-        } catch (Exception e) {
+        } catch (Throwable e) {
             SafeExceptionRethrower.safeRethrow(e);
         }
     }
@@ -96,13 +96,9 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     protected abstract String getTimeoutMessage();
 
     public void uncaughtException(Thread thread, Throwable throwable) {
-        if (throwable instanceof Exception) {
-            exception = (Exception) throwable;
-            if (latch.getCount() != 0) {
-                latch.countDown();
-            }
-        } else {
-            SafeExceptionRethrower.safeRethrow(throwable);
+        this.throwable = throwable;
+        if (latch.getCount() != 0) {
+            latch.countDown();
         }
     }
 }

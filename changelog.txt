@@ -4,6 +4,7 @@ Changelog next version
 * Added support for returning the last polled value from Awaitility. For example: X x = await().until(x()); (issue 13).
 * Updated Groovy dependency to 2.2.1.
 * Non backward-compatible change: Awaitility now throws com.jayway.awaitility.core.ConditionTimeoutException instead of java.concurrent.TimeoutException. The reason is that ConditionTimeoutException a runtime exception and the latter couldn't be caught since "await" didn't declare the checked exception. (issue 24)
+* Awaitility now catches all uncaught throwables from each thread and propagates them to the main thread (issue 22).
 
 Changelog 1.4.0 (2013-11-26)
 ----------------------------
