@@ -378,6 +378,44 @@ public class ConditionFactory {
     }
 
     /**
+     * Await until a {@link Runnable} supplier execution passes (ends without throwing an exception). E.g. with Java 8:
+     * </p>
+     * <pre>
+     * await().untilPass(() -> Assertions.assertThat(personRepository.size()).isEqualTo(6));
+     * </pre>
+     * or
+     * <pre>
+     * await().untilPass(() -> assertEquals(6, personRepository.size()));
+     * </pre>
+     *
+     * This method is intended to benefit from lambda expressions introduced in Java 8. It allows to use standard AssertJ/FEST Assert assertions
+     * (by the way also standard JUnit/TestNG assertions) to test asynchronous calls and systems.
+     *
+     * {@link AssertionError} instances thrown by the supplier are treated as an assertion failure and proper error message is propagated on timeout.
+     * Other exceptions are rethrown immediately as an execution errors.
+     *
+     * Why technically it is completely valid to use plain Runnable class in Java 7 code, the resulting expression is very verbose and can decrease
+     * the readability of the test case, e.g.
+     * </p>
+     * <pre>
+     * await().untilPass(new Runnable() {
+     *     <verbatim>@Override</verbatim>
+     *     public void run() {
+     *         Assertions.assertThat(personRepository.size()).isEqualTo(6);
+     *     }
+     * });
+     * </pre>
+     *
+     * @param supplier the supplier that is responsible for executing the assertion and throwing AssertionError on failure.
+     * @throws ConditionTimeoutException If condition was not fulfilled within the given time period.
+     *
+     * @since 1.6.0
+     */
+    public void untilPass(final Runnable supplier) {
+        until(new AssertionCondition(supplier, generateConditionSettings()));
+    }
+
+    /**
      * Await until a Atomic variable has a value matching the specified
      * {@link Matcher}. E.g.
      * <p/>

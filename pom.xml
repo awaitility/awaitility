@@ -59,6 +59,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5</version>
 				<configuration>
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<useReleaseProfile>false</useReleaseProfile>
@@ -70,7 +71,26 @@
 					<mavenExecutorId>forked-path</mavenExecutorId>
 				</configuration>
 			</plugin>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.1</version>
+					<configuration>
+						<source>1.5</source>
+						<target>1.5</target>
+					</configuration>
+				</plugin>
+				<plugin>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>2.4</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 	<profiles>
 		<profile>
@@ -80,6 +100,7 @@
 					<!-- We want to sign the artifact, the POM, and all attached artifacts -->
 					<plugin>
 						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
 						<configuration>
 							<useAgent>false</useAgent>
 						</configuration>
@@ -97,12 +118,14 @@
 					<plugin>
 						<inherited>true</inherited>
 						<artifactId>maven-deploy-plugin</artifactId>
+						<version>2.8.1</version>
 						<configuration>
 							<updateReleaseInfo>true</updateReleaseInfo>
 						</configuration>
 					</plugin>
 					<plugin>
 						<artifactId>maven-source-plugin</artifactId>
+						<version>2.2.1</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
@@ -148,5 +171,6 @@
 		<module>awaitility</module>
 		<module>awaitility-scala</module>
 		<module>awaitility-groovy</module>
+		<module>awaitility-java8</module>
 	</modules>
 </project>
