@@ -20,6 +20,8 @@ import com.jayway.awaitility.groovy.classes.Asynch
 import spock.lang.Specification
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS
+import static org.hamcrest.Matchers.equalTo
+import static org.junit.Assert.assertThat
 
 @Mixin(AwaitilitySupport)
 class AwaitilitySupportGroovyTest extends Specification {
@@ -29,6 +31,17 @@ class AwaitilitySupportGroovyTest extends Specification {
   def "groovy closure support should work"() {
     when: asynch.perform()
     then: await().until { asynch.getValue() == 1 }
+  }
+
+  def "groovy closure runnable should work in spock"() {
+    when: asynch.perform()
+    then: await().until(new Runnable() {
+
+      @Override
+      void run() {
+        assertThat(asynch.getValue(), equalTo(1))
+      }
+    });
   }
 
   def "timeout messages shouldn't contain anonymous class details"() {

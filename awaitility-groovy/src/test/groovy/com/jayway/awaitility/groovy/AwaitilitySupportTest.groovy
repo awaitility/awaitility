@@ -22,6 +22,8 @@ import org.junit.Test
 import org.junit.rules.ExpectedException
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS
+import static org.hamcrest.Matchers.equalTo
+import static org.junit.Assert.assertThat
 
 @Mixin(AwaitilitySupport)
 class AwaitilitySupportTest {
@@ -43,7 +45,7 @@ class AwaitilitySupportTest {
     await().until(new Runnable() {
       @Override
       void run() {
-        asynch.getValue() == 1
+        assertThat(asynch.getValue(), equalTo(1))
       }
     });
   }
