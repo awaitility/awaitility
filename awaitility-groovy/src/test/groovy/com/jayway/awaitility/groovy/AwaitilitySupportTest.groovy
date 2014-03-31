@@ -37,6 +37,18 @@ class AwaitilitySupportTest {
   }
 
   @Test
+  def void groovyRunnableSupport() {
+    def asynch = new Asynch().perform()
+
+    await().until(new Runnable() {
+      @Override
+      void run() {
+        asynch.getValue() == 1
+      }
+    });
+  }
+
+  @Test
   def void timeoutMessagesDoesntContainAnonymousClassDetails() {
     exception.expect ConditionTimeoutException
     exception.expectMessage "Condition was not fulfilled within 500 milliseconds"

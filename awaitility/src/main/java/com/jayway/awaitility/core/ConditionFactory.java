@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ConditionFactory {
 
+    private static final String GROOVY_LANG_CLOSURE = "groovy.lang.Closure";
     /**
      * The timeout.
      */
@@ -381,19 +382,19 @@ public class ConditionFactory {
      * Await until a {@link Runnable} supplier execution passes (ends without throwing an exception). E.g. with Java 8:
      * </p>
      * <pre>
-     * await().untilPass(() -> Assertions.assertThat(personRepository.size()).isEqualTo(6));
+     * await().until(() -> Assertions.assertThat(personRepository.size()).isEqualTo(6));
      * </pre>
      * or
      * <pre>
-     * await().untilPass(() -> assertEquals(6, personRepository.size()));
+     * await().until(() -> assertEquals(6, personRepository.size()));
      * </pre>
-     *
+     * <p/>
      * This method is intended to benefit from lambda expressions introduced in Java 8. It allows to use standard AssertJ/FEST Assert assertions
      * (by the way also standard JUnit/TestNG assertions) to test asynchronous calls and systems.
-     *
+     * <p/>
      * {@link AssertionError} instances thrown by the supplier are treated as an assertion failure and proper error message is propagated on timeout.
      * Other exceptions are rethrown immediately as an execution errors.
-     *
+     * <p/>
      * Why technically it is completely valid to use plain Runnable class in Java 7 code, the resulting expression is very verbose and can decrease
      * the readability of the test case, e.g.
      * </p>
@@ -408,10 +409,9 @@ public class ConditionFactory {
      *
      * @param supplier the supplier that is responsible for executing the assertion and throwing AssertionError on failure.
      * @throws ConditionTimeoutException If condition was not fulfilled within the given time period.
-     *
      * @since 1.6.0
      */
-    public void untilPass(final Runnable supplier) {
+    public void until(final Runnable supplier) {
         until(new AssertionCondition(supplier, generateConditionSettings()));
     }
 
@@ -606,6 +606,27 @@ public class ConditionFactory {
             } catch (InvocationTargetException e) {
                 return SafeExceptionRethrower.safeRethrow(e.getCause());
             }
+        }
+    }
+
+    private static boolean isInstanceOf(Object object, String className) {
+        try {
+            object.getClass().isAssignableFrom(loadClass(className));
+            return true;
+        } catch (Throwable e) {
+            return false;
+        }
+    }
+
+    private static Class<?> loadClass(String className) throws ClassNotFoundException {
+        return Class.forName(className, false, Thread.currentThread().getContextClassLoader());
+    }
+
+    private static Class<?> loadClassAndThrowRuntimeExceptionIfNotFound(String className) {
+        try {
+            return loadClass(className);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -24,30 +24,30 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS
 @Mixin(AwaitilitySupport)
 class AwaitilitySupportGroovyTest extends Specification {
 
-    def asynch = new Asynch()
+  def asynch = new Asynch()
 
-    def "groovy closure support should work"() {
-        when: asynch.perform()
-        then: await().until { asynch.getValue() == 1 }
-    }
+  def "groovy closure support should work"() {
+    when: asynch.perform()
+    then: await().until { asynch.getValue() == 1 }
+  }
 
-    def "timeout messages shouldn't contain anonymous class details"() {
-        when:
-        asynch.perform()
-        await().atMost(500, MILLISECONDS).until { asynch.getValue() == 2 }
+  def "timeout messages shouldn't contain anonymous class details"() {
+    when:
+    asynch.perform()
+    await().atMost(500, MILLISECONDS).until { asynch.getValue() == 2 }
 
-        then:
-        ConditionTimeoutException e = thrown()
-        e.message == "Condition was not fulfilled within 500 milliseconds."
-    }
+    then:
+    ConditionTimeoutException e = thrown()
+    e.message == "Condition was not fulfilled within 500 milliseconds."
+  }
 
-    def "await alias should be preserved in timeout messages"() {
-        when:
-        asynch.perform()
-        await("groovy").atMost(500, MILLISECONDS).until { asynch.getValue() == 2 }
+  def "await alias should be preserved in timeout messages"() {
+    when:
+    asynch.perform()
+    await("groovy").atMost(500, MILLISECONDS).until { asynch.getValue() == 2 }
 
-        then:
-        ConditionTimeoutException e = thrown()
-        e.message == "Condition with alias 'groovy' didn't complete within 500 milliseconds because condition was not fulfilled."
-    }
+    then:
+    ConditionTimeoutException e = thrown()
+    e.message == "Condition with alias 'groovy' didn't complete within 500 milliseconds because condition was not fulfilled."
+  }
 }

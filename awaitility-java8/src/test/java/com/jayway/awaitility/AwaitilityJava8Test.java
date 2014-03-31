@@ -38,14 +38,14 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000)
     public void awaitAssertJAssertionAsLambda() {
         new Asynch(fakeRepository).perform();
-        await().untilPass(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+        await().until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
     @SuppressWarnings("Convert2Lambda")
     @Test(timeout = 2000)
     public void awaitAssertJAssertionAsAnonymousClass() {
         new Asynch(fakeRepository).perform();
-        await().untilPass(new Runnable() {
+        await().until(new Runnable() {
             @Override
             public void run() {
                 Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1);
@@ -60,14 +60,14 @@ public class AwaitilityJava8Test {
         exception.expectMessage(endsWith("expected:<[1]> but was:<[0]> within 120 milliseconds."));
 
         new Asynch(fakeRepository).perform();
-        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).untilPass(
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(
                 () -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
     @Test(timeout = 2000)
     public void awaitJUnitAssertionAsLambda() {
         new Asynch(fakeRepository).perform();
-        await().untilPass(() -> assertEquals(1, fakeRepository.getValue()));
+        await().until(() -> assertEquals(1, fakeRepository.getValue()));
     }
 
     @Test(timeout = 2000)
@@ -76,7 +76,7 @@ public class AwaitilityJava8Test {
         exception.expectMessage(startsWith(AwaitilityJava8Test.class.getName()));
         exception.expectMessage(endsWith("expected:<1> but was:<0> within 120 milliseconds."));
 
-        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).untilPass(
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(
                 () -> assertEquals(1, fakeRepository.getValue()));
     }
 }

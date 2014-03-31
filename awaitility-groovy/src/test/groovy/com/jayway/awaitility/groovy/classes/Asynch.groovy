@@ -18,14 +18,14 @@ package com.jayway.awaitility.groovy.classes
 import java.util.concurrent.atomic.AtomicInteger
 
 class Asynch {
-  private final AtomicInteger value = new AtomicInteger();
+  private final AtomicInteger atomic = new AtomicInteger();
 
   def Asynch perform() {
     Thread thread = new Thread(new Runnable() {
       public void run() {
         try {
           Thread.sleep(600);
-          value.set(1);
+          atomic.set(1);
         } catch (InterruptedException e) {
           throw new RuntimeException(e);
         }
@@ -36,6 +36,6 @@ class Asynch {
   }
 
   def int getValue() {
-    return value.get();
+    return atomic.get();
   }
 }
