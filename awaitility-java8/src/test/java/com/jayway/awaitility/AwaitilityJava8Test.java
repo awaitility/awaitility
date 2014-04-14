@@ -14,6 +14,7 @@ import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.awaitility.Awaitility.with;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.hamcrest.Matchers.endsWith;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 
@@ -78,5 +79,30 @@ public class AwaitilityJava8Test {
 
         with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(
                 () -> assertEquals(1, fakeRepository.getValue()));
+    }
+
+    @Test(timeout = 2000)
+    public void lambdaErrorMessageLooksAlrightWhenUsingMethodReferences() {
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage("Lambda expression in com.jayway.awaitility.AwaitilityJava8Test that uses com.jayway.awaitility.classes.FakeRepository: expected <1> but was <0> within 120 milliseconds.");
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(fakeRepository::getValue, equalTo(1));
+    }
+
+    @SuppressWarnings("Convert2MethodRef")
+    @Test(timeout = 2000)
+    public void lambdaErrorMessageLooksAlrightWhenUsingLambda() {
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage("Lambda expression in com.jayway.awaitility.AwaitilityJava8Test: expected <1> but was <0> within 120 milliseconds.");
+
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(() -> fakeRepository.getValue(), equalTo(1));
+    }
+
+    @SuppressWarnings({"Convert2MethodRef", "CodeBlock2Expr"})
+    @Test(timeout = 2000)
+    public void lambdaErrorMessageLooksAlrightWhenUsingLambdaWithCurlyBraces() {
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage("Lambda expression in com.jayway.awaitility.AwaitilityJava8Test: expected <1> but was <0> within 120 milliseconds.");
+
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(() -> {return fakeRepository.getValue();}, equalTo(1));
     }
 }

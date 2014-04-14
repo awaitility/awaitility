@@ -21,9 +21,13 @@ import org.hamcrest.Matcher;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.concurrent.Callable;
 
 class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
+
+    private static final String LAMBDA_CLASS_NAME = "$$Lambda$";
+    private static final String LAMBDA_METHOD_NAME = "$Lambda";
 
     public CallableHamcrestCondition(final Callable<T> supplier, final Matcher<? super T> matcher, ConditionSettings settings) {
         super(supplier, matcher, settings);
@@ -33,14 +37,54 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
     String getCallableDescription(final Callable<T> supplier) {
         final Class<? extends Callable> supplierClass = supplier.getClass();
         Method enclosingMethod = supplierClass.getEnclosingMethod();
-        if(isFieldSupplier(supplierClass)) {
+        if (isFieldSupplier(supplierClass)) {
             return generateFieldSupplierErrorMessage(supplier);
         } else if (supplierClass.isAnonymousClass() && enclosingMethod != null) {
             return enclosingMethod.getDeclaringClass().getName() + "." + enclosingMethod.getName() + " Callable";
+        } else if (supplierClass.getSimpleName().contains(LAMBDA_CLASS_NAME)) {
+            String name = supplierClass.getName();
+            int indexOfLambda = name.indexOf(LAMBDA_CLASS_NAME);
+            String nameWithoutLambda = name.substring(0, indexOfLambda);
+            nameWithoutLambda = addLambdaDetailsIfFound(supplierClass, nameWithoutLambda);
+            return nameWithoutLambda;
         } else {
             return supplierClass.getName();
         }
     }
+
+    private String addLambdaDetailsIfFound(Class<? extends Callable> supplierClass, String nameWithoutLambda) {
+        String nameToReturn = nameWithoutLambda;
+        Method[] declaredMethods = supplierClass.getDeclaredMethods();
+        Method lambdaMethod = null;
+        for (Method declaredMethod : declaredMethods) {
+            if (declaredMethod.getName().contains(LAMBDA_METHOD_NAME)) {
+                lambdaMethod = declaredMethod;
+                break;
+            }
+        }
+        if (lambdaMethod != null) {
+            Parameter[] lambdaParams = lambdaMethod.getParameters();
+            if (lambdaParams.length > 0) {
+                nameToReturn = "Lambda expression in " + nameToReturn;
+                if (nameWithoutLambda.equals(lambdaParams[0].getType().getName())) {
+                    nameToReturn += ":";
+                } else {
+                    nameToReturn += " that uses ";
+                    for (int i = 0; i < lambdaParams.length; i++) {
+                        Parameter lambdaParam = lambdaParams[i];
+                        nameToReturn += lambdaParam.getType().getName();
+                        if (i + 1 == lambdaParams.length) {
+                            nameToReturn += ":";
+                        } else {
+                            nameToReturn += ", " + lambdaParam.getName();
+                        }
+                    }
+                }
+            }
+        }
+        return nameToReturn;
+    }
+
 
     private boolean isFieldSupplier(Class<?> supplierClass) {
         return supplierClass.isMemberClass() && supplierClass.getEnclosingClass() == FieldSupplierBuilder.class;
@@ -54,10 +98,10 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
         final Object object = fieldSupplier.getObject();
 
         StringBuilder builder = new StringBuilder();
-        if(expectedFieldName == null) {
+        if (expectedFieldName == null) {
             builder.append("Field in ");
             builder.append(object.getClass().getName());
-            if(expectedAnnotation != null) {
+            if (expectedAnnotation != null) {
                 builder.append(" annotated with ");
                 builder.append(expectedAnnotation.getName());
                 builder.append(" and");
