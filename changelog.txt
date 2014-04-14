@@ -1,6 +1,6 @@
 Changelog next version
 ----------------------
-* Support for using fest-assertj and AssertJ: await().until(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
+* Support for using Fest Assert and AssertJ: await().until(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
 * Better Java 8 support
 
 Changelog 1.5.0 (2014-01-27)
