@@ -21,7 +21,6 @@ import org.hamcrest.Matcher;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.concurrent.Callable;
 
 class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
@@ -63,16 +62,16 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
             }
         }
         if (lambdaMethod != null) {
-            Parameter[] lambdaParams = lambdaMethod.getParameters();
+            Class<?>[] lambdaParams = lambdaMethod.getParameterTypes();
             if (lambdaParams.length > 0) {
                 nameToReturn = "Lambda expression in " + nameToReturn;
-                if (nameWithoutLambda.equals(lambdaParams[0].getType().getName())) {
+                if (nameWithoutLambda.equals(lambdaParams[0].getName())) {
                     nameToReturn += ":";
                 } else {
                     nameToReturn += " that uses ";
                     for (int i = 0; i < lambdaParams.length; i++) {
-                        Parameter lambdaParam = lambdaParams[i];
-                        nameToReturn += lambdaParam.getType().getName();
+                        Class<?> lambdaParam = lambdaParams[i];
+                        nameToReturn += lambdaParam.getName();
                         if (i + 1 == lambdaParams.length) {
                             nameToReturn += ":";
                         } else {
