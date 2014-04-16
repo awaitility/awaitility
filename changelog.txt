@@ -3,6 +3,7 @@ Changelog next version
 * Support for using Fest Assert and AssertJ: await().until(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
 * Better Java 8 support
 * Updated Groovy module to use Groovy 2.2.2
+* Updated CgLib to version 3.1
 
 Changelog 1.5.0 (2014-01-27)
 ----------------------------
