@@ -140,6 +140,7 @@
 						<version>2.7</version>
 						<configuration>
 							<encoding>${project.build.sourceEncoding}</encoding>
+                            <failOnError>false</failOnError>
 						</configuration>
 						<executions>
 							<execution>
