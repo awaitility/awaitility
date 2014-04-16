@@ -13,9 +13,7 @@ import org.junit.rules.ExpectedException;
 import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.awaitility.Awaitility.with;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.startsWith;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -40,6 +38,12 @@ public class AwaitilityJava8Test {
     public void awaitAssertJAssertionAsLambda() {
         new Asynch(fakeRepository).perform();
         await().until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+    }
+
+    @Test(timeout = 2000)
+    public void awaitUsingLambdaVersionOfCallableBoolean() {
+        new Asynch(fakeRepository).perform();
+        await().until(() -> fakeRepository.getValue() == 1);
     }
 
     @SuppressWarnings("Convert2Lambda")
@@ -104,5 +108,13 @@ public class AwaitilityJava8Test {
         exception.expectMessage("Lambda expression in com.jayway.awaitility.AwaitilityJava8Test: expected <1> but was <0> within 120 milliseconds.");
 
         with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(() -> {return fakeRepository.getValue();}, equalTo(1));
+    }
+
+    @Test(timeout = 2000)
+    public void lambdaErrorMessageLooksAlrightWhenAwaitUsingLambdaVersionOfCallableBoolean() {
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage("Condition with lambda expression in com.jayway.awaitility.AwaitilityJava8Test was not fulfilled within 200 milliseconds.");
+
+        await().atMost(200, MILLISECONDS).until(() -> fakeRepository.getValue() == 2);
     }
 }

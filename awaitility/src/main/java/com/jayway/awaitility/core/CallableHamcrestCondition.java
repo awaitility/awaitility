@@ -23,10 +23,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
+import static com.jayway.awaitility.core.LambdaErrorMessageGenerator.generateLambdaErrorMessagePrefix;
+import static com.jayway.awaitility.core.LambdaErrorMessageGenerator.isLambdaClass;
+
 class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
 
-    private static final String LAMBDA_CLASS_NAME = "$$Lambda$";
-    private static final String LAMBDA_METHOD_NAME = "$Lambda";
 
     public CallableHamcrestCondition(final Callable<T> supplier, final Matcher<? super T> matcher, ConditionSettings settings) {
         super(supplier, matcher, settings);
@@ -40,50 +41,12 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
             return generateFieldSupplierErrorMessage(supplier);
         } else if (supplierClass.isAnonymousClass() && enclosingMethod != null) {
             return enclosingMethod.getDeclaringClass().getName() + "." + enclosingMethod.getName() + " Callable";
-        } else if (supplierClass.getSimpleName().contains(LAMBDA_CLASS_NAME)) {
-            String name = supplierClass.getName();
-            int indexOfLambda = name.indexOf(LAMBDA_CLASS_NAME);
-            String nameWithoutLambda = name.substring(0, indexOfLambda);
-            nameWithoutLambda = addLambdaDetailsIfFound(supplierClass, nameWithoutLambda);
-            return nameWithoutLambda;
+        } else if (isLambdaClass(supplierClass)) {
+            return generateLambdaErrorMessagePrefix(supplierClass, true);
         } else {
             return supplierClass.getName();
         }
     }
-
-    private String addLambdaDetailsIfFound(Class<? extends Callable> supplierClass, String nameWithoutLambda) {
-        String nameToReturn = nameWithoutLambda;
-        Method[] declaredMethods = supplierClass.getDeclaredMethods();
-        Method lambdaMethod = null;
-        for (Method declaredMethod : declaredMethods) {
-            if (declaredMethod.getName().contains(LAMBDA_METHOD_NAME)) {
-                lambdaMethod = declaredMethod;
-                break;
-            }
-        }
-        if (lambdaMethod != null) {
-            Class<?>[] lambdaParams = lambdaMethod.getParameterTypes();
-            if (lambdaParams.length > 0) {
-                nameToReturn = "Lambda expression in " + nameToReturn;
-                if (nameWithoutLambda.equals(lambdaParams[0].getName())) {
-                    nameToReturn += ":";
-                } else {
-                    nameToReturn += " that uses ";
-                    for (int i = 0; i < lambdaParams.length; i++) {
-                        Class<?> lambdaParam = lambdaParams[i];
-                        nameToReturn += lambdaParam.getName();
-                        if (i + 1 == lambdaParams.length) {
-                            nameToReturn += ":";
-                        } else {
-                            nameToReturn += ", " + lambdaParam.getName();
-                        }
-                    }
-                }
-            }
-        }
-        return nameToReturn;
-    }
-
 
     private boolean isFieldSupplier(Class<?> supplierClass) {
         return supplierClass.isMemberClass() && supplierClass.getEnclosingClass() == FieldSupplierBuilder.class;

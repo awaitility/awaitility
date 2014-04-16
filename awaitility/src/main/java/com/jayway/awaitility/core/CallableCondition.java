@@ -18,40 +18,48 @@ package com.jayway.awaitility.core;
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
+import static com.jayway.awaitility.core.LambdaErrorMessageGenerator.generateLambdaErrorMessagePrefix;
+import static com.jayway.awaitility.core.LambdaErrorMessageGenerator.isLambdaClass;
 import static com.jayway.awaitility.spi.Timeout.timeout_message;
 
 class CallableCondition implements Condition<Void> {
 
     private final ConditionAwaiter conditionAwaiter;
 
-	public CallableCondition(final Callable<Boolean> matcher, ConditionSettings settings) {
-		conditionAwaiter = new ConditionAwaiter(matcher, settings) {
-			@SuppressWarnings("rawtypes")
-			@Override
-			protected String getTimeoutMessage() {
-                if(timeout_message != null) {
+    public CallableCondition(final Callable<Boolean> matcher, ConditionSettings settings) {
+        conditionAwaiter = new ConditionAwaiter(matcher, settings) {
+            @SuppressWarnings("rawtypes")
+            @Override
+            protected String getTimeoutMessage() {
+                if (timeout_message != null) {
                     return timeout_message;
                 }
-				final String timeoutMessage;
-				if (matcher == null) {
-					timeoutMessage = "";
-				} else {
-					final Class<? extends Callable> type = matcher.getClass();
-					final Method enclosingMethod = type.getEnclosingMethod();
-					if (type.isAnonymousClass() && enclosingMethod != null) {
-						timeoutMessage = String.format("Condition returned by method \"%s\" in class %s was not fulfilled",
-								enclosingMethod.getName(), enclosingMethod.getDeclaringClass().getName());
-					} else {
-						timeoutMessage = String.format("Condition %s was not fulfilled", type.getName());
-					}
-				}
-				return timeoutMessage;
-			}
-		};
-	}
+                final String timeoutMessage;
+                if (matcher == null) {
+                    timeoutMessage = "";
+                } else {
+                    final Class<? extends Callable> type = matcher.getClass();
+                    final Method enclosingMethod = type.getEnclosingMethod();
+                    if (type.isAnonymousClass() && enclosingMethod != null) {
+                        timeoutMessage = String.format("Condition returned by method \"%s\" in class %s was not fulfilled",
+                                enclosingMethod.getName(), enclosingMethod.getDeclaringClass().getName());
+                    } else {
+                        final String message;
+                        if (isLambdaClass(type)) {
+                            message = "with " + generateLambdaErrorMessagePrefix(type, false);
+                        } else {
+                            message = type.getName();
+                        }
+                        timeoutMessage = String.format("Condition %s was not fulfilled", message);
+                    }
+                }
+                return timeoutMessage;
+            }
+        };
+    }
 
-	public Void await() {
-		conditionAwaiter.await();
-		return null;
-	}
+    public Void await() {
+        conditionAwaiter.await();
+        return null;
+    }
 }
