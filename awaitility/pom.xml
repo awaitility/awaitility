@@ -3,7 +3,7 @@
     <parent>
 		<groupId>com.jayway.awaitility</groupId>
 		<artifactId>awaitility-parent</artifactId>
-		<version>1.5.1-SNAPSHOT</version>
+		<version>1.6.0</version>
 	</parent>
 	<artifactId>awaitility</artifactId>
 	<packaging>jar</packaging>
