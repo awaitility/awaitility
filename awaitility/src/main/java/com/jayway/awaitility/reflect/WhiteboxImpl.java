@@ -33,15 +33,11 @@ public class WhiteboxImpl {
      * through the entire class hierarchy and return the value of the first
      * field named <tt>fieldName</tt>. If you want to get a specific field value
      * at specific place in the class hierarchy please refer to
-     * 
-     * @param <T>
-     *            the generic type
-     * @param object
-     *            the object to modify
-     * @param fieldName
-     *            the name of the field
-     * @return the internal state
-     *         {@link #getInternalState(Object, String, Class)}.
+     *
+     * @param <T>       the generic type
+     * @param object    the object to modify
+     * @param fieldName the name of the field
+     * @return the internal state.
      */
     @SuppressWarnings("unchecked")
     public static <T> T getInternalState(Object object, String fieldName) {
@@ -55,11 +51,9 @@ public class WhiteboxImpl {
 
     /**
      * Find field in hierarchy.
-     * 
-     * @param object
-     *            the object
-     * @param fieldName
-     *            the field name
+     *
+     * @param object    the object
+     * @param fieldName the field name
      * @return the field
      */
     private static Field findFieldInHierarchy(Object object, String fieldName) {
@@ -68,11 +62,9 @@ public class WhiteboxImpl {
 
     /**
      * Find field in hierarchy.
-     * 
-     * @param object
-     *            the object
-     * @param strategy
-     *            the strategy
+     *
+     * @param object   the object
+     * @param strategy the strategy
      * @return the field
      */
     private static Field findFieldInHierarchy(Object object, FieldMatcherStrategy strategy) {
@@ -82,9 +74,8 @@ public class WhiteboxImpl {
 
     /**
      * Assert object in get internal state is not null.
-     * 
-     * @param object
-     *            the object
+     *
+     * @param object the object
      */
     private static void assertObjectInGetInternalStateIsNotNull(Object object) {
         if (object == null) {
@@ -94,19 +85,15 @@ public class WhiteboxImpl {
 
     /**
      * Find single field using strategy.
-     * 
-     * @param strategy
-     *            the strategy
-     * @param object
-     *            the object
-     * @param checkHierarchy
-     *            the check hierarchy
-     * @param startClass
-     *            the start class
+     *
+     * @param strategy       the strategy
+     * @param object         the object
+     * @param checkHierarchy the check hierarchy
+     * @param startClass     the start class
      * @return the field
      */
     private static Field findSingleFieldUsingStrategy(FieldMatcherStrategy strategy, Object object,
-            boolean checkHierarchy, Class<?> startClass) {
+                                                      boolean checkHierarchy, Class<?> startClass) {
         assertObjectInGetInternalStateIsNotNull(object);
         Field foundField = null;
         final Class<?> originalStartClass = startClass;
@@ -136,11 +123,9 @@ public class WhiteboxImpl {
 
     /**
      * Checks for field proper modifier.
-     * 
-     * @param object
-     *            the object
-     * @param field
-     *            the field
+     *
+     * @param object the object
+     * @param field  the field
      * @return true, if successful
      */
     private static boolean hasFieldProperModifier(Object object, Field field) {
@@ -152,13 +137,10 @@ public class WhiteboxImpl {
      * Get the value of a field using reflection. This method will traverse the
      * super class hierarchy until the first field of type <tt>fieldType</tt> is
      * found. The value of this field will be returned.
-     * 
-     * @param <T>
-     *            the generic type
-     * @param object
-     *            the object to modify
-     * @param fieldType
-     *            the type of the field
+     *
+     * @param <T>       the generic type
+     * @param object    the object to modify
+     * @param fieldType the type of the field
      * @return the internal state
      */
     @SuppressWarnings("unchecked")
@@ -173,13 +155,10 @@ public class WhiteboxImpl {
 
     /**
      * Throw exception if field was not found.
-     * 
-     * @param type
-     *            the type
-     * @param fieldName
-     *            the field name
-     * @param field
-     *            the field
+     *
+     * @param type      the type
+     * @param fieldName the field name
+     * @param field     the field
      */
     public static void throwExceptionIfFieldWasNotFound(Class<?> type, String fieldName, Field field) {
         if (field == null) {
@@ -190,9 +169,8 @@ public class WhiteboxImpl {
 
     /**
      * Gets the type.
-     * 
-     * @param object
-     *            the object
+     *
+     * @param object the object
      * @return The type of the of an object.
      */
     public static Class<?> getType(Object object) {
@@ -208,13 +186,11 @@ public class WhiteboxImpl {
     /**
      * Get field annotated with a particular annotation. This method traverses
      * the class hierarchy when checking for the annotation.
-     * 
-     * @param object
-     *            The object to look for annotations. Note that if're you're
-     *            passing an object only instance fields are checked, passing a
-     *            class will only check static fields.
-     * @param annotationTypes
-     *            The annotation types to look for
+     *
+     * @param object         The object to look for annotations. Note that if're you're
+     *                       passing an object only instance fields are checked, passing a
+     *                       class will only check static fields.
+     * @param annotationType The annotation types to look for
      * @return A set of all fields containing the particular annotation(s).
      * @since 1.3
      */
@@ -225,9 +201,8 @@ public class WhiteboxImpl {
 
     /**
      * Checks if is class.
-     * 
-     * @param argument
-     *            the argument
+     *
+     * @param argument the argument
      * @return true, if is class
      */
     public static boolean isClass(Object argument) {
