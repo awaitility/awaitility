@@ -65,20 +65,6 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <useReleaseProfile>false</useReleaseProfile>
-                    <arguments>-Prelease</arguments>
-                    <goals>deploy</goals>
-                    <!-- This accounts for the fact, that the Release Plugin forks Maven
-                        and system properties of the current Maven session are unfortunately not
-                        automatically propagated to the forked Maven session -->
-                    <mavenExecutorId>forked-path</mavenExecutorId>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
             <plugin>
