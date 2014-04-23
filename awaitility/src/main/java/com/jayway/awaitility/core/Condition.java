@@ -17,5 +17,10 @@ package com.jayway.awaitility.core;
 
 interface Condition<T> {
 
+	/**
+	 * <p>Await for the condition to complete</p>
+	 *
+	 * @return The awaited object.
+	 */
 	T await();
 }

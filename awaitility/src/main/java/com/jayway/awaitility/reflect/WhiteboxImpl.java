@@ -158,6 +158,7 @@ public class WhiteboxImpl {
      *
      * @param type      the type
      * @param fieldName the field name
+     * @param fieldName the field name
      * @param field     the field
      */
     public static void throwExceptionIfFieldWasNotFound(Class<?> type, String fieldName, Field field) {
@@ -203,12 +204,21 @@ public class WhiteboxImpl {
      * Checks if is class.
      *
      * @param argument the argument
-     * @return true, if is class
+     * @return a boolean.
      */
     public static boolean isClass(Object argument) {
         return argument instanceof Class<?>;
     }
 
+    /**
+     * <p>getByNameAndType.</p>
+     *
+     * @param object a {@link java.lang.Object} object.
+     * @param fieldName a {@link java.lang.String} object.
+     * @param expectedFieldType a {@link java.lang.Class} object.
+     * @param <T> a T object.
+     * @return a T object.
+     */
     @SuppressWarnings("unchecked")
     public static <T> T getByNameAndType(Object object, String fieldName, Class<T> expectedFieldType) {
         Field foundField = findSingleFieldUsingStrategy(new FieldNameAndTypeMatcherStrategy(fieldName,

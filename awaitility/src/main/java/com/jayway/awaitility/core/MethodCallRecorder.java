@@ -21,6 +21,9 @@ import com.jayway.awaitility.proxy.TypeUtils;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
+/**
+ * <p>MethodCallRecorder class.</p>
+ */
 public class MethodCallRecorder {
 
     private static final String NO_METHOD_CALL_RECORDED_MESSAGE = "No method call has been recorded. Perhaps the method was final?";
@@ -43,12 +46,23 @@ public class MethodCallRecorder {
 
     };
 
+	/**
+	 * <p>createProxy.</p>
+	 *
+	 * @param target a {@link java.lang.Object} object.
+	 * @return a {@link java.lang.Object} object.
+	 */
 	public static Object createProxy(Object target) {
 		Object proxy = ProxyCreator.create(target.getClass(), invocationHandler);
 		lastTarget = target;
 		return proxy;
 	}
 
+	/**
+	 * <p>Getter for the field <code>lastTarget</code>.</p>
+	 *
+	 * @return a {@link java.lang.Object} object.
+	 */
 	public static Object getLastTarget() {
 		if (lastTarget == null) {
 			throw new IllegalStateException(NO_METHOD_CALL_RECORDED_MESSAGE);
@@ -56,6 +70,11 @@ public class MethodCallRecorder {
 		return lastTarget;
 	}
 
+	/**
+	 * <p>Getter for the field <code>lastMethod</code>.</p>
+	 *
+	 * @return a {@link java.lang.reflect.Method} object.
+	 */
 	public static Method getLastMethod() {
 		if (lastMethod == null) {
 			throw new IllegalStateException(NO_METHOD_CALL_RECORDED_MESSAGE);
@@ -63,6 +82,11 @@ public class MethodCallRecorder {
 		return lastMethod;
 	}
 	
+	/**
+	 * <p>Getter for the field <code>lastArgs</code>.</p>
+	 *
+	 * @return an array of {@link java.lang.Object} objects.
+	 */
 	public static Object[] getLastArgs() {
 		if (lastTarget == null) {
 			throw new IllegalStateException(NO_METHOD_CALL_RECORDED_MESSAGE);
@@ -70,6 +94,9 @@ public class MethodCallRecorder {
 		return lastArgs;
 	}
 
+	/**
+	 * <p>reset.</p>
+	 */
 	public static void reset() {
 		lastTarget = null;
 		lastMethod = null;

@@ -26,7 +26,7 @@ import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
 /**
  * Awaitility is a small Java DSL for synchronizing (waiting for) asynchronous
  * operations. It makes it easy to test asynchronous code. Examples:
- * <p>
+ * <p>&nbsp;</p>
  * Wait at most 5 seconds until customer status has been updated:
  *
  * <pre>
@@ -54,7 +54,7 @@ import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
  * statement that failed if you have multiple awaits in the same test.
  *
  * <pre>
- * with().pollInterval(ONE_HUNDERED_MILLISECONDS).and().with().pollDelay(20, MILLISECONDS).await(&quot;customer registration&quot;)
+ * with().pollInterval(ONE_HUNDERED_MILLISECONDS).and().with().pollDelay(20, MILLISECONDS).await("customer registration")
  *         .until(costumerStatus(), equalTo(REGISTERED));
  * </pre>
  *
@@ -66,10 +66,10 @@ import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
  * Awaitility.setDefaultPollDelay(..)
  * </pre>
  *
- * You can also reset to the default values using {@link Awaitility#reset()}.
- * <p>
+ * You can also reset to the default values using {@link com.jayway.awaitility.Awaitility#reset()}.
  * In order to use Awaitility effectively it's recommended to statically import
  * the following methods from the Awaitility framework:
+ * <p>&nbsp;</p>
  * <ul>
  * <li>com.jayway.awaitility.Awaitlity.*</li>
  * </ul>
@@ -80,8 +80,7 @@ import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
  * <li>org.hamcrest.Matchers.*</li>
  * <li>org.junit.Assert.*</li>
  * </ul>
- * </p>
- * <p>
+ * <p>&nbsp;</p>
  * A word on poll interval and poll delay: Awaitility starts to check the
  * specified condition (the one you create using the Awaitility DSL) matches for
  * the first time after a "poll delay" (the initial delay before the polling
@@ -93,16 +92,14 @@ import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
  * <b>Note:</b> If you change the poll interval the poll delay will also change
  * to match the specified poll interval <i>unless</i> you've specified a poll
  * delay explicitly.
- * <p>
+ * <p>&nbsp;</p>
  * Note that since Awaitility uses polling to verify that a condition matches
- * it's not intended to use it for precise performance testing. 
- * </p>
- * <p>
+ * it's not intended to use it for precise performance testing.
+ * <p>&nbsp;</p>
  * <b>IMPORTANT:</b> Awaitility does nothing to ensure thread safety or thread
  * synchronization! This is your responsibility! Make sure your code is correctly
  * synchronized or that you are using thread safe data structures such as volatile
- * fields or classes such as AtomicInteger and ConcurrentHashMap. 
- * </p>
+ * fields or classes such as AtomicInteger and ConcurrentHashMap.
  */
 public class Awaitility {
 
@@ -139,13 +136,13 @@ public class Awaitility {
     /**
      * Reset the timeout, poll interval, poll delay, uncaught exception handling
      * to their default values:
-     * <p>
+     * <p>&nbsp;</p>
      * <ul>
      * <li>timeout - 10 seconds</li>
      * <li>poll interval - 100 milliseconds</li>
      * <li>poll delay - 100 milliseconds</li>
      * <li>Catch all uncaught exceptions - true</li>
-     * </ul>.
+     * </ul>
      */
     public static void reset() {
         defaultPollInterval = Duration.ONE_HUNDRED_MILLISECONDS;
@@ -194,7 +191,6 @@ public class Awaitility {
     /**
      * Don't catch uncaught exceptions in other threads. This will <i>not</i>
      * make the await statement fail if exceptions occur in other threads.
-     *
      *
      * @return the condition factory
      */

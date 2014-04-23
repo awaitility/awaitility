@@ -25,5 +25,6 @@ package com.jayway.awaitility.spi;
  */
 public class Timeout {
 
+    /** Constant <code>timeout_message="null"</code> */
     public static String timeout_message = null;
 }

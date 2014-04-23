@@ -26,24 +26,24 @@ abstract class FieldMatcherStrategy {
 
     /**
      * A field matcher that checks if a field matches a given criteria.
-     * 
+     *
      * @param field
      *            The field to check whether it matches the strategy or not.
      * @return <code>true</code> if this field matches the strategy,
      *         <code>false</code> otherwise.
-     * 
      */
     public abstract boolean matches(Field field);
 
     /**
-     * Throws an {@link FieldNotFoundException} if the strategy criteria could
+     * Throws an {@link com.jayway.awaitility.reflect.exception.FieldNotFoundException} if the strategy criteria could
      * not be found.
-     * 
+     *
      * @param type
      *            The type of the object that was not found.
      * @param isInstanceField
      *            <code>true</code> if the field that was looked after was an
      *            instance field or <code>false</code> if it was a static field.
+     * @throws com.jayway.awaitility.reflect.exception.FieldNotFoundException if any.
      */
     public abstract void notFound(Class<?> type, boolean isInstanceField) throws FieldNotFoundException;
 }

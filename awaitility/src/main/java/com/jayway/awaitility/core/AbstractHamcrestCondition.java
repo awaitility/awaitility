@@ -25,6 +25,13 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
 
 	private T lastResult;
 
+	/**
+	 * <p>Constructor for AbstractHamcrestCondition.</p>
+	 *
+	 * @param supplier a {@link java.util.concurrent.Callable} object.
+	 * @param matcher a {@link org.hamcrest.Matcher} object.
+	 * @param settings a {@link com.jayway.awaitility.core.ConditionSettings} object.
+	 */
 	public AbstractHamcrestCondition(final Callable<T> supplier, final Matcher<? super T> matcher, ConditionSettings settings) {
 		if (supplier == null) {
 			throw new IllegalArgumentException("You must specify a supplier (was null).");
@@ -46,6 +53,11 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
 		};
 	}
 
+	/**
+	 * <p>await.</p>
+	 *
+	 * @return a T object.
+	 */
 	public T await() {
 		conditionAwaiter.await();
 		return lastResult;

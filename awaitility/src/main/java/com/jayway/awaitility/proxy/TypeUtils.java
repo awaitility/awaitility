@@ -17,12 +17,15 @@ package com.jayway.awaitility.proxy;
 
 /**
  * Utilities for types.
+ *
+ * @author johan
+ * @version $Id: $Id
  */
 public class TypeUtils {
 
 	/**
 	 * Get the default value for a type.
-	 * 
+	 *
 	 * @param type
 	 *            The type whose default value to get.
 	 * @return The default return type of <code>type</code>.
@@ -33,7 +36,7 @@ public class TypeUtils {
 
 	/**
 	 * Get the default value of a type with based on its fully-qualified name.
-	 * 
+	 *
 	 * @param fullyQualifiedTypeName
 	 *            The name of the type whose default value to get.
 	 * @return The default value of <code>fullyQualifiedTypeName</code>.

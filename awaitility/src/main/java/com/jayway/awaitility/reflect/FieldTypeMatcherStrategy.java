@@ -23,6 +23,11 @@ class FieldTypeMatcherStrategy extends FieldMatcherStrategy {
 
     final Class<?> expectedFieldType;
 
+    /**
+     * <p>Constructor for FieldTypeMatcherStrategy.</p>
+     *
+     * @param fieldType a {@link java.lang.Class} object.
+     */
     public FieldTypeMatcherStrategy(Class<?> fieldType) {
         if (fieldType == null) {
             throw new IllegalArgumentException("field type cannot be null.");
@@ -30,11 +35,13 @@ class FieldTypeMatcherStrategy extends FieldMatcherStrategy {
         this.expectedFieldType = fieldType;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean matches(Field field) {
         return expectedFieldType.equals(field.getType());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void notFound(Class<?> type, boolean isInstanceField) throws FieldNotFoundException {
         throw new FieldNotFoundException(String.format(
@@ -42,6 +49,7 @@ class FieldTypeMatcherStrategy extends FieldMatcherStrategy {
                         : "static", expectedFieldType.getName(), type.getName()));
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return "type " + expectedFieldType.getName();

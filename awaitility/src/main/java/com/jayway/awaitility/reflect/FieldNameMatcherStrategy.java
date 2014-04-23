@@ -23,6 +23,11 @@ class FieldNameMatcherStrategy extends FieldMatcherStrategy {
 
     private final String fieldName;
 
+    /**
+     * <p>Constructor for FieldNameMatcherStrategy.</p>
+     *
+     * @param fieldName a {@link java.lang.String} object.
+     */
     public FieldNameMatcherStrategy(String fieldName) {
         if (fieldName == null || fieldName.equals("") || fieldName.startsWith(" ")) {
             throw new IllegalArgumentException("field name cannot be null.");
@@ -30,11 +35,13 @@ class FieldNameMatcherStrategy extends FieldMatcherStrategy {
         this.fieldName = fieldName;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean matches(Field field) {
         return fieldName.equals(field.getName());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void notFound(Class<?> type, boolean isInstanceField) throws FieldNotFoundException {
         throw new FieldNotFoundException(String.format(
@@ -42,6 +49,11 @@ class FieldNameMatcherStrategy extends FieldMatcherStrategy {
                         : "static", fieldName, type.getName()));
     }
 
+    /**
+     * <p>toString.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String toString() {
         return "fieldName " + fieldName;
     }

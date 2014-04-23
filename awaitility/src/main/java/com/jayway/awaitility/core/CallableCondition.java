@@ -26,6 +26,12 @@ class CallableCondition implements Condition<Void> {
 
     private final ConditionAwaiter conditionAwaiter;
 
+    /**
+     * <p>Constructor for CallableCondition.</p>
+     *
+     * @param matcher a {@link java.util.concurrent.Callable} object.
+     * @param settings a {@link com.jayway.awaitility.core.ConditionSettings} object.
+     */
     public CallableCondition(final Callable<Boolean> matcher, ConditionSettings settings) {
         conditionAwaiter = new ConditionAwaiter(matcher, settings) {
             @SuppressWarnings("rawtypes")
@@ -58,6 +64,11 @@ class CallableCondition implements Condition<Void> {
         };
     }
 
+    /**
+     * <p>await.</p>
+     *
+     * @return a {@link java.lang.Void} object.
+     */
     public Void await() {
         conditionAwaiter.await();
         return null;

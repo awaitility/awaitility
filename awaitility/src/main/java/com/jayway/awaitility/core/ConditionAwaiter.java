@@ -27,6 +27,12 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     private Throwable throwable = null;
     private final ConditionSettings conditionSettings;
 
+    /**
+     * <p>Constructor for ConditionAwaiter.</p>
+     *
+     * @param condition a {@link java.util.concurrent.Callable} object.
+     * @param conditionSettings a {@link com.jayway.awaitility.core.ConditionSettings} object.
+     */
     public ConditionAwaiter(final Callable<Boolean> condition,
                             ConditionSettings conditionSettings) {
         if (condition == null) {
@@ -56,6 +62,9 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 .getPollInterval().getValueInMS(), TimeUnit.MILLISECONDS);
     }
 
+    /**
+     * <p>await.</p>
+     */
     public void await() {
         try {
             try {
@@ -94,8 +103,14 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         }
     }
 
+    /**
+     * <p>getTimeoutMessage.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     protected abstract String getTimeoutMessage();
 
+    /** {@inheritDoc} */
     public void uncaughtException(Thread thread, Throwable throwable) {
         this.throwable = throwable;
         if (latch.getCount() != 0) {

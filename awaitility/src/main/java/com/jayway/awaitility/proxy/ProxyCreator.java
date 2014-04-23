@@ -30,10 +30,23 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * <p>ProxyCreator class.</p>
+ *
+ * @author johan
+ * @version $Id: $Id
+ */
 public final class ProxyCreator {
 	
 	private ProxyCreator() {}
 	
+	/**
+	 * <p>create.</p>
+	 *
+	 * @param targetClass a {@link java.lang.Class} object.
+	 * @param invocationHandler a {@link java.lang.reflect.InvocationHandler} object.
+	 * @return a {@link java.lang.Object} object.
+	 */
 	public static Object create(Class<? extends Object> targetClass, InvocationHandler invocationHandler) {
 		Object proxy = null;
 		if (Modifier.isFinal(targetClass.getModifiers())) {

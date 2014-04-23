@@ -17,6 +17,13 @@ package com.jayway.awaitility.core;
 
 class SafeExceptionRethrower {
 
+    /**
+     * <p>safeRethrow.</p>
+     *
+     * @param t a {@link java.lang.Throwable} object.
+     * @param <T> a T object.
+     * @return a T object.
+     */
     public static <T> T safeRethrow(Throwable t) {
         SafeExceptionRethrower.<RuntimeException> safeRethrow0(t);
         return null;

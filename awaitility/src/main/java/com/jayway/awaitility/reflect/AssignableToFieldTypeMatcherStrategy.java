@@ -19,10 +19,16 @@ import java.lang.reflect.Field;
 
 class AssignableToFieldTypeMatcherStrategy extends FieldTypeMatcherStrategy {
 
+    /**
+     * <p>Constructor for AssignableToFieldTypeMatcherStrategy.</p>
+     *
+     * @param fieldType a {@link java.lang.Class} object.
+     */
     public AssignableToFieldTypeMatcherStrategy(Class<?> fieldType) {
         super(fieldType);
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean matches(Field field) {
         return expectedFieldType.isAssignableFrom((Class<?>) field.getType());

@@ -26,6 +26,15 @@ class ConditionSettings {
 	private final Duration pollDelay;
 	private final boolean catchUncaughtExceptions;
 
+	/**
+	 * <p>Constructor for ConditionSettings.</p>
+	 *
+	 * @param alias a {@link java.lang.String} object.
+	 * @param catchUncaughtExceptions a boolean.
+	 * @param maxWaitTime a {@link com.jayway.awaitility.Duration} object.
+	 * @param pollInterval a {@link com.jayway.awaitility.Duration} object.
+	 * @param pollDelay a {@link com.jayway.awaitility.Duration} object.
+	 */
 	public ConditionSettings(String alias, boolean catchUncaughtExceptions, Duration maxWaitTime,
 			Duration pollInterval, Duration pollDelay) {
 		if (maxWaitTime == null) {
@@ -44,26 +53,56 @@ class ConditionSettings {
 		this.catchUncaughtExceptions = catchUncaughtExceptions;
 	}
 
+	/**
+	 * <p>Getter for the field <code>alias</code>.</p>
+	 *
+	 * @return a {@link java.lang.String} object.
+	 */
 	public String getAlias() {
 		return alias;
 	}
 
+	/**
+	 * <p>Getter for the field <code>maxWaitTime</code>.</p>
+	 *
+	 * @return a {@link com.jayway.awaitility.Duration} object.
+	 */
 	public Duration getMaxWaitTime() {
 		return maxWaitTime;
 	}
 
+	/**
+	 * <p>Getter for the field <code>pollInterval</code>.</p>
+	 *
+	 * @return a {@link com.jayway.awaitility.Duration} object.
+	 */
 	public Duration getPollInterval() {
 		return pollInterval;
 	}
 
+	/**
+	 * <p>Getter for the field <code>pollDelay</code>.</p>
+	 *
+	 * @return a {@link com.jayway.awaitility.Duration} object.
+	 */
 	public Duration getPollDelay() {
 		return pollDelay;
 	}
 
+	/**
+	 * <p>hasAlias.</p>
+	 *
+	 * @return a boolean.
+	 */
 	public boolean hasAlias() {
 		return alias != null;
 	}
 
+	/**
+	 * <p>shouldCatchUncaughtExceptions.</p>
+	 *
+	 * @return a boolean.
+	 */
 	public boolean shouldCatchUncaughtExceptions() {
 		return catchUncaughtExceptions;
 	}

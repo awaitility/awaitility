@@ -22,6 +22,13 @@ import java.util.concurrent.Callable;
 
 class ProxyHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
 
+	/**
+	 * <p>Constructor for ProxyHamcrestCondition.</p>
+	 *
+	 * @param supplier a {@link com.jayway.awaitility.core.ConditionFactory.MethodCaller} object.
+	 * @param matcher a {@link org.hamcrest.Matcher} object.
+	 * @param settings a {@link com.jayway.awaitility.core.ConditionSettings} object.
+	 */
 	public ProxyHamcrestCondition(final MethodCaller<T> supplier, final Matcher<? super T> matcher, ConditionSettings settings) {
 		super(supplier, matcher, settings);
 	}

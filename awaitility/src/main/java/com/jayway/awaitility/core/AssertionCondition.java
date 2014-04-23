@@ -18,10 +18,9 @@ package com.jayway.awaitility.core;
 import java.util.concurrent.Callable;
 
 /**
- * Condition implementation which takes an executable assertion which should throw {@link AssertionError} on assertion failure.
+ * Condition implementation which takes an executable assertion which should throw {@link java.lang.AssertionError} on assertion failure.
  *
  * @since 1.6.0
- *
  * @author Marcin Zajączkowski, 2014-03-28
  */
 public class AssertionCondition implements Condition<Void> {
@@ -30,6 +29,12 @@ public class AssertionCondition implements Condition<Void> {
 
     private String lastExceptionMessage;
 
+    /**
+     * <p>Constructor for AssertionCondition.</p>
+     *
+     * @param supplier a {@link java.lang.Runnable} object.
+     * @param settings a {@link com.jayway.awaitility.core.ConditionSettings} object.
+     */
     public AssertionCondition(final Runnable supplier, ConditionSettings settings) {
         if (supplier == null) {
             throw new IllegalArgumentException("You must specify a supplier (was null).");
@@ -53,6 +58,11 @@ public class AssertionCondition implements Condition<Void> {
         };
     }
 
+    /**
+     * <p>await.</p>
+     *
+     * @return a {@link java.lang.Void} object.
+     */
     public Void await() {
         conditionAwaiter.await();
         return null;

@@ -29,12 +29,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * A factory for creating {@link Condition} objects. It's not recommended to
+ * A factory for creating {@link com.jayway.awaitility.core.Condition} objects. It's not recommended to
  * instantiate this class directly.
  */
 public class ConditionFactory {
 
-    private static final String GROOVY_LANG_CLOSURE = "groovy.lang.Closure";
     /**
      * The timeout.
      */
@@ -148,7 +147,7 @@ public class ConditionFactory {
      * Note that the poll delay will be automatically set as to the same value
      * as the interval unless it's specified explicitly using
      * {@link #pollDelay(Duration)}, {@link #pollDelay(long, TimeUnit)} or
-     * {@link ConditionFactory#pollDelay(com.jayway.awaitility.Duration)}, or
+     * {@link com.jayway.awaitility.core.ConditionFactory#pollDelay(com.jayway.awaitility.Duration)}, or
      * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
      * </p>
      *
@@ -213,14 +212,12 @@ public class ConditionFactory {
      * Specify the polling interval Awaitility will use for this await
      * statement. This means the frequency in which the condition is checked for
      * completion.
-     * <p/>
-     * <p>
+     * <p>&nbsp;</p>
      * Note that the poll delay will be automatically set as to the same value
      * as the interval unless it's specified explicitly using
      * {@link #pollDelay(Duration)}, {@link #pollDelay(long, TimeUnit)} or
-     * {@link ConditionFactory#pollDelay(com.jayway.awaitility.Duration)} , or
+     * {@link com.jayway.awaitility.core.ConditionFactory#pollDelay(com.jayway.awaitility.Duration)} , or
      * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
-     * </p>
      *
      * @param pollInterval the poll interval
      * @param unit         the unit
@@ -245,7 +242,7 @@ public class ConditionFactory {
 
     /**
      * Await for an asynchronous operation. This method returns the same
-     * {@link ConditionFactory} instance and is used only to get a more
+     * {@link com.jayway.awaitility.core.ConditionFactory} instance and is used only to get a more
      * fluent-like syntax.
      *
      * @return the condition factory
@@ -320,7 +317,7 @@ public class ConditionFactory {
     /**
      * Specify the condition that must be met when waiting for a method call.
      * E.g.
-     * <p/>
+     * <p>&nbsp;</p>
      * <pre>
      * await().untilCall(to(orderService).size(), is(greaterThan(2)));
      * </pre>
@@ -328,6 +325,7 @@ public class ConditionFactory {
      * @param <T>     the generic type
      * @param ignore  the return value of the method call
      * @param matcher The condition that must be met when
+     * @return a T object.
      * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public <T> T untilCall(T ignore, final Matcher<? super T> matcher) {
@@ -339,15 +337,15 @@ public class ConditionFactory {
     }
 
     /**
-     * Await until a {@link Callable} supplies a value matching the specified
-     * {@link Matcher}. E.g.
-     * <p/>
+     * Await until a {@link java.util.concurrent.Callable} supplies a value matching the specified
+     * {@link org.hamcrest.Matcher}. E.g.
+     * <p>&nbsp;</p>
      * <pre>
      * await().until(numberOfPersons(), is(greaterThan(2)));
      * </pre>
-     * <p/>
-     * where "numberOfPersons()" returns a standard {@link Callable}:
-     * <p/>
+     * <p>&nbsp;</p>
+     * where "numberOfPersons()" returns a standard {@link java.util.concurrent.Callable}:
+     * <p>&nbsp;</p>
      * <pre>
      * private Callable&lt;Integer&gt; numberOfPersons() {
      * 	return new Callable&lt;Integer&gt;() {
@@ -357,12 +355,12 @@ public class ConditionFactory {
      *    };
      * }
      * </pre>
-     * <p/>
-     * Using a generic {@link Callable} as done by using this version of "until"
+     * <p>&nbsp;</p>
+     * Using a generic {@link java.util.concurrent.Callable} as done by using this version of "until"
      * allows you to reuse the "numberOfPersons()" definition in multiple await
      * statements. I.e. you can easily create another await statement (perhaps
      * in a different test case) using e.g.
-     * <p/>
+     * <p>&nbsp;</p>
      * <pre>
      * await().until(numberOfPersons(), is(equalTo(6)));
      * </pre>
@@ -372,6 +370,7 @@ public class ConditionFactory {
      *                 should be matched.
      * @param matcher  the matcher The hamcrest matcher that checks whether the
      *                 condition is fulfilled.
+     * @return a T object.
      * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public <T> T until(final Callable<T> supplier, final Matcher<? super T> matcher) {
@@ -379,28 +378,27 @@ public class ConditionFactory {
     }
 
     /**
-     * Await until a {@link Runnable} supplier execution passes (ends without throwing an exception). E.g. with Java 8:
-     * </p>
+     * Await until a {@link java.lang.Runnable} supplier execution passes (ends without throwing an exception). E.g. with Java 8:
+     * <p>&nbsp;</p>
      * <pre>
-     * await().until(() -> Assertions.assertThat(personRepository.size()).isEqualTo(6));
+     * await().until(() -&gt; Assertions.assertThat(personRepository.size()).isEqualTo(6));
      * </pre>
      * or
      * <pre>
-     * await().until(() -> assertEquals(6, personRepository.size()));
+     * await().until(() -&gt; assertEquals(6, personRepository.size()));
      * </pre>
-     * <p/>
+     * <p>&nbsp;</p>
      * This method is intended to benefit from lambda expressions introduced in Java 8. It allows to use standard AssertJ/FEST Assert assertions
      * (by the way also standard JUnit/TestNG assertions) to test asynchronous calls and systems.
-     * <p/>
-     * {@link AssertionError} instances thrown by the supplier are treated as an assertion failure and proper error message is propagated on timeout.
+     * <p>&nbsp;</p>
+     * {@link java.lang.AssertionError} instances thrown by the supplier are treated as an assertion failure and proper error message is propagated on timeout.
      * Other exceptions are rethrown immediately as an execution errors.
-     * <p/>
+     * <p>&nbsp;</p>
      * Why technically it is completely valid to use plain Runnable class in Java 7 code, the resulting expression is very verbose and can decrease
      * the readability of the test case, e.g.
-     * </p>
+     * <p>&nbsp;</p>
      * <pre>
      * await().untilPass(new Runnable() {
-     *     <verbatim>@Override</verbatim>
      *     public void run() {
      *         Assertions.assertThat(personRepository.size()).isEqualTo(6);
      *     }
@@ -408,7 +406,7 @@ public class ConditionFactory {
      * </pre>
      *
      * @param supplier the supplier that is responsible for executing the assertion and throwing AssertionError on failure.
-     * @throws ConditionTimeoutException If condition was not fulfilled within the given time period.
+     * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      * @since 1.6.0
      */
     public void until(final Runnable supplier) {
@@ -417,8 +415,8 @@ public class ConditionFactory {
 
     /**
      * Await until a Atomic variable has a value matching the specified
-     * {@link Matcher}. E.g.
-     * <p/>
+     * {@link org.hamcrest.Matcher}. E.g.
+     * <p>&nbsp;</p>
      * <pre>
      * await().untilAtomic(myAtomic, is(greaterThan(2)));
      * </pre>
@@ -426,6 +424,7 @@ public class ConditionFactory {
      * @param atomic  the atomic variable
      * @param matcher the matcher The hamcrest matcher that checks whether the
      *                condition is fulfilled.
+     * @return a {@link java.lang.Integer} object.
      * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public Integer untilAtomic(final AtomicInteger atomic, final Matcher<? super Integer> matcher) {
@@ -438,8 +437,8 @@ public class ConditionFactory {
 
     /**
      * Await until a Atomic variable has a value matching the specified
-     * {@link Matcher}. E.g.
-     * <p/>
+     * {@link org.hamcrest.Matcher}. E.g.
+     * <p>&nbsp;</p>
      * <pre>
      * await().untilAtomic(myAtomic, is(greaterThan(2)));
      * </pre>
@@ -447,6 +446,7 @@ public class ConditionFactory {
      * @param atomic  the atomic variable
      * @param matcher the matcher The hamcrest matcher that checks whether the
      *                condition is fulfilled.
+     * @return a {@link java.lang.Long} object.
      * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public Long untilAtomic(final AtomicLong atomic, final Matcher<? super Long> matcher) {
@@ -459,8 +459,8 @@ public class ConditionFactory {
 
     /**
      * Await until a Atomic variable has a value matching the specified
-     * {@link Matcher}. E.g.
-     * <p/>
+     * {@link org.hamcrest.Matcher}. E.g.
+     * <p>&nbsp;</p>
      * <pre>
      * await().untilAtomic(myAtomic, is(greaterThan(2)));
      * </pre>
@@ -500,8 +500,8 @@ public class ConditionFactory {
 
     /**
      * Await until a Atomic variable has a value matching the specified
-     * {@link Matcher}. E.g.
-     * <p/>
+     * {@link org.hamcrest.Matcher}. E.g.
+     * <p>&nbsp;</p>
      * <pre>
      * await().untilAtomic(myAtomic, is(greaterThan(2)));
      * </pre>
@@ -509,6 +509,8 @@ public class ConditionFactory {
      * @param atomic  the atomic variable
      * @param matcher the matcher The hamcrest matcher that checks whether the
      *                condition is fulfilled.
+     * @param <V>     a V object.
+     * @return a V object.
      * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public <V> V untilAtomic(final AtomicReference<V> atomic, final Matcher<? super V> matcher) {
@@ -520,17 +522,17 @@ public class ConditionFactory {
     }
 
     /**
-     * Await until a {@link Callable} returns <code>true</code>. This is method
+     * Await until a {@link java.util.concurrent.Callable} returns <code>true</code>. This is method
      * is not as generic as the other variants of "until" but it allows for a
      * more precise and in some cases even more english-like syntax. E.g.
-     * <p/>
+     * <p>&nbsp;</p>
      * <pre>
      * await().until(numberOfPersonsIsEqualToThree());
      * </pre>
-     * <p/>
+     * <p>&nbsp;</p>
      * where "numberOfPersonsIsEqualToThree()" returns a standard
-     * {@link Callable} of type {@link Boolean}:
-     * <p/>
+     * {@link java.util.concurrent.Callable} of type {@link java.lang.Boolean}:
+     * <p>&nbsp;</p>
      * <pre>
      * private Callable&lt;Boolean&gt; numberOfPersons() {
      * 	return new Callable&lt;Boolean&gt;() {
@@ -539,6 +541,7 @@ public class ConditionFactory {
      *        }
      *    };
      * }
+     * </pre>
      *
      * @param <T>                the generic type
      * @param conditionEvaluator the condition evaluator

@@ -29,6 +29,13 @@ import static com.jayway.awaitility.core.LambdaErrorMessageGenerator.isLambdaCla
 class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
 
 
+    /**
+     * <p>Constructor for CallableHamcrestCondition.</p>
+     *
+     * @param supplier a {@link java.util.concurrent.Callable} object.
+     * @param matcher a {@link org.hamcrest.Matcher} object.
+     * @param settings a {@link com.jayway.awaitility.core.ConditionSettings} object.
+     */
     public CallableHamcrestCondition(final Callable<T> supplier, final Matcher<? super T> matcher, ConditionSettings settings) {
         super(supplier, matcher, settings);
     }

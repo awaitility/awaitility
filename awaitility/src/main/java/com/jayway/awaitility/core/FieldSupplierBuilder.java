@@ -32,6 +32,11 @@ public class FieldSupplierBuilder {
     private Class<?> expectedFieldType;
     private Class<? extends Annotation> expectedAnnotation;
 
+    /**
+     * <p>Constructor for FieldSupplierBuilder.</p>
+     *
+     * @param object a {@link java.lang.Object} object.
+     */
     public FieldSupplierBuilder(Object object) {
         assertNotNullParameter(object, "Object passed to fieldIn");
         this.object = object;
@@ -39,25 +44,25 @@ public class FieldSupplierBuilder {
 
     /**
      * Find a field based on a type. E.g.
-     *
+     * <p>&nbsp;</p>
      * <code>
      * await().until(fieldIn(object).ofType(int.class), equalTo(2));
      * </code>
-     *
+     * <p>&nbsp;</p>
      * You can also specify the field more accurately by continuing the statement:
      * E.g.
      * <code>
      * await().until(fieldIn(object).ofType(int.class).andWithName("fieldName"), equalTo(2));
      * </code>
-     *
+     * <p>&nbsp;</p>
      * or
-     *
+     * <p>&nbsp;</p>
      * <code>
      * await().until(fieldIn(object).ofType(int.class).andAnnotatedWith(MyAnnotation.class).andWithName("fieldName"), equalTo(2));
      * </code>
      *
      * @param fieldType The type of the field.
-     * @param <T> The type of the field
+     * @param <T>       The type of the field
      * @return The field supplier
      */
     public <T> NameAndAnnotationFieldSupplier<T> ofType(Class<T> fieldType) {
@@ -74,13 +79,14 @@ public class FieldSupplierBuilder {
                 throw new FieldNotFoundException(String.format(
                         "Couldn't find a field of type %s annotated with %s in %s.", expectedFieldType.getClass()
                                 .getName(), expectedAnnotation.getClass().getName(), WhiteboxImpl.getType(object)
-                                .getName()));
+                                .getName()
+                ));
             }
         }
 
         /**
          * Find a field based on the type and name. E.g.
-         *
+         * <p>&nbsp;</p>
          * <code>
          * await().until(fieldIn(object).ofType(int.class).andWithName("fieldName"), equalTo(2));
          * </code>
@@ -107,7 +113,7 @@ public class FieldSupplierBuilder {
     public class NameAndAnnotationFieldSupplier<T> implements Callable<T> {
         /**
          * Find a field based on the type and name. E.g.
-         *
+         * <p>&nbsp;</p>
          * <code>
          * await().until(fieldIn(object).ofType(int.class).andWithName("fieldName"), equalTo(2));
          * </code>
@@ -123,7 +129,7 @@ public class FieldSupplierBuilder {
 
         /**
          * Find a field based on the type and an annotation. E.g.
-         *
+         * <p>&nbsp;</p>
          * <code>
          * await().until(fieldIn(object).ofType(int.class).andAnnotatedWith(MyAnnotation.class), equalTo(2));
          * </code>
@@ -148,7 +154,7 @@ public class FieldSupplierBuilder {
 
         /**
          * Find a field based on a name, type and annotation. E.g.
-         *
+         * <p>&nbsp;</p>
          * <code>
          * await().until(fieldIn(object).ofType(int.class).andWithName("fieldName").andAnnotatedWith(MyAnnotation.class), equalTo(2));
          * </code>
@@ -176,7 +182,7 @@ public class FieldSupplierBuilder {
     public class NameAndTypeFieldSupplier<T> implements Callable<T> {
         /**
          * Find a field based on the annotation and field name. E.g.
-         *
+         * <p>&nbsp;</p>
          * <code>
          * await().until(fieldIn(object).annotatedWith(MyAnnotation.class).andWithName("fieldName"), equalTo(someObject));
          * </code>
@@ -192,12 +198,13 @@ public class FieldSupplierBuilder {
 
         /**
          * Find a field based on the annotation and field type. E.g.
-         *
+         * <p>&nbsp;</p>
          * <code>
          * await().until(fieldIn(object).annotatedWith(MyAnnotation.class).andOfType(int.class), equalTo(2));
          * </code>
          *
-         * @param type The type of the field
+         * @param type The class representing the type of the field
+         * @param <S>  The type of the field
          * @return The supplier
          */
         public <S> NameAndAnnotationFieldSupplier<S> andOfType(Class<S> type) {
@@ -213,7 +220,7 @@ public class FieldSupplierBuilder {
     }
 
     private void assertNotNullParameter(Object parameterValue, String name) {
-        if(parameterValue == null) {
+        if (parameterValue == null) {
             throw new IllegalArgumentException(name + " cannot be null");
         }
     }

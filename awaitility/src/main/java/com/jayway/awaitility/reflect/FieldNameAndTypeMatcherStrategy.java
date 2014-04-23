@@ -24,6 +24,12 @@ class FieldNameAndTypeMatcherStrategy extends FieldMatcherStrategy {
     private final String fieldName;
     private final Class<?> fieldType;
 
+    /**
+     * <p>Constructor for FieldNameAndTypeMatcherStrategy.</p>
+     *
+     * @param fieldName a {@link java.lang.String} object.
+     * @param type a {@link java.lang.Class} object.
+     */
     public FieldNameAndTypeMatcherStrategy(String fieldName, Class<?> type) {
         if (fieldName == null || fieldName.equals("") || fieldName.startsWith(" ")) {
             throw new IllegalArgumentException("field name cannot be null.");
@@ -34,11 +40,13 @@ class FieldNameAndTypeMatcherStrategy extends FieldMatcherStrategy {
         this.fieldType = type;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean matches(Field field) {
         return fieldName.equals(field.getName()) && fieldType.equals(field.getType());
     }
 
+    /** {@inheritDoc} */
     @Override
     public void notFound(Class<?> type, boolean isInstanceField) throws FieldNotFoundException {
         throw new FieldNotFoundException(String.format(
@@ -46,6 +54,11 @@ class FieldNameAndTypeMatcherStrategy extends FieldMatcherStrategy {
                 isInstanceField ? "instance" : "static", fieldName, fieldType.getName(), type.getName()));
     }
 
+    /**
+     * <p>toString.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String toString() {
         return "fieldName " + fieldName + ", fieldType = " + fieldType.getName();
     }
