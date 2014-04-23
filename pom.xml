@@ -1,5 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>9</version>
+    </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.jayway.awaitility</groupId>
     <artifactId>awaitility-parent</artifactId>
@@ -107,32 +112,6 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <!-- We want to sign the artifact, the POM, and all attached artifacts -->
-                    <plugin>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
-                        <configuration>
-                            <useAgent>false</useAgent>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <!-- We want to deploy the artifact to a staging location for perusal -->
-                    <plugin>
-                        <inherited>true</inherited>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <version>2.8.1</version>
-                        <configuration>
-                            <updateReleaseInfo>true</updateReleaseInfo>
-                        </configuration>
-                    </plugin>
                     <plugin>
                         <artifactId>maven-source-plugin</artifactId>
                         <version>2.2.1</version>
@@ -166,18 +145,6 @@
         </profile>
     </profiles>
 
-    <distributionManagement>
-        <repository>
-            <id>oss.sonatype.org-jayway-staging</id>
-            <name>OpenSource Release Staging on Sonatype.org</name>
-            <url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-        <snapshotRepository>
-            <id>oss.sonatype.org-jayway-snapshots</id>
-            <name>Jayway OpenSource SNAPSHOTs on Sonatype.org</name>
-            <url>http://oss.sonatype.org/content/repositories/jayway-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
     <modules>
         <module>awaitility</module>
         <module>awaitility-scala</module>
