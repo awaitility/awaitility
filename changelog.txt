@@ -1,5 +1,5 @@
-Changelog next version
-----------------------
+Changelog 1.6.0 (2014-04-23)
+----------------------------
 * Support for using Fest Assert and AssertJ: await().until(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
 * Better Java 8 support
 * Updated Groovy module to use Groovy 2.2.2
