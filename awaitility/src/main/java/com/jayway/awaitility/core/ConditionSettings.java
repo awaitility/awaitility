@@ -25,6 +25,7 @@ class ConditionSettings {
 	private final Duration pollInterval;
 	private final Duration pollDelay;
 	private final boolean catchUncaughtExceptions;
+    private final IntermediaryResultHandler intermediaryResultHandler;
 
 	/**
 	 * <p>Constructor for ConditionSettings.</p>
@@ -34,9 +35,10 @@ class ConditionSettings {
 	 * @param maxWaitTime a {@link com.jayway.awaitility.Duration} object.
 	 * @param pollInterval a {@link com.jayway.awaitility.Duration} object.
 	 * @param pollDelay a {@link com.jayway.awaitility.Duration} object.
-	 */
+     * @param intermediaryResultHandler a {@link IntermediaryResultHandler} object.
+     */
 	public ConditionSettings(String alias, boolean catchUncaughtExceptions, Duration maxWaitTime,
-			Duration pollInterval, Duration pollDelay) {
+                             Duration pollInterval, Duration pollDelay, IntermediaryResultHandler intermediaryResultHandler) {
 		if (maxWaitTime == null) {
 			throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
 		}
@@ -51,6 +53,7 @@ class ConditionSettings {
 		this.pollInterval = pollInterval;
 		this.pollDelay = pollDelay == SAME_AS_POLL_INTERVAL ? pollInterval : pollDelay;
 		this.catchUncaughtExceptions = catchUncaughtExceptions;
+        this.intermediaryResultHandler = intermediaryResultHandler;
 	}
 
 	/**
@@ -63,7 +66,7 @@ class ConditionSettings {
 	}
 
 	/**
-	 * <p>Getter for the field <code>maxWaitTime</code>.</p>
+	 * <p>Getter for the field <code>maxWaitTimeInMS</code>.</p>
 	 *
 	 * @return a {@link com.jayway.awaitility.Duration} object.
 	 */
@@ -106,4 +109,14 @@ class ConditionSettings {
 	public boolean shouldCatchUncaughtExceptions() {
 		return catchUncaughtExceptions;
 	}
+
+    /**
+     * <p>Getter for the field <code>intermediaryResultLogger</code></p>
+     *
+     * @return {@link IntermediaryResultHandler} object.
+     */
+    public IntermediaryResultHandler getIntermediaryResultHandler() {
+        return intermediaryResultHandler;
+    }
+
 }
