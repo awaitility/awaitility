@@ -66,7 +66,7 @@ class ConditionSettings {
 	}
 
 	/**
-	 * <p>Getter for the field <code>maxWaitTime</code>.</p>
+	 * <p>Getter for the field <code>maxWaitTimeInMS</code>.</p>
 	 *
 	 * @return a {@link com.jayway.awaitility.Duration} object.
 	 */
