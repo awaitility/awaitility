@@ -66,8 +66,8 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         IntermediaryResultHandler handler = settings.getIntermediaryResultHandler();
         if (handler != null) {
             long elapsedTimeInMS = watch.getElapsedTimeInMS();
-            Long remainingTimeInMS = settings.getMaxWaitTime().equals(Duration.FOREVER) ?
-                    null : settings.getMaxWaitTime().getValueInMS() - elapsedTimeInMS;
+            long remainingTimeInMS = settings.getMaxWaitTime().equals(Duration.FOREVER) ?
+                    Long.MAX_VALUE : settings.getMaxWaitTime().getValueInMS() - elapsedTimeInMS;
             handler.handle(
                     getMessage(supplier, matcher),
                     elapsedTimeInMS,

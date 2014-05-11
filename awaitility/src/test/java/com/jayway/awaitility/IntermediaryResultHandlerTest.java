@@ -30,20 +30,20 @@ public class IntermediaryResultHandlerTest {
         with()
                 .catchUncaughtExceptions()
                 .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS) {
+                    public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                         throw new RuntimeException();
                     }
                 })
                 .until(new CountDown(10), is(equalTo(0)));
     }
 
-    @Test
+    @Test (timeout = 2000)
     public void settingDefaultHandlerWillImpactAllAwaitStatements() {
 
         final CountDown globalCountDown = new CountDown(20);
 
         IntermediaryResultHandler defaultIntermediaryResultHandler = new IntermediaryResultHandler() {
-            public void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS) {
+            public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                 try {
                     globalCountDown.call();
                 } catch (Exception e) {
@@ -59,13 +59,13 @@ public class IntermediaryResultHandlerTest {
         assertThat(globalCountDown.get(), is(equalTo(10)));
     }
 
-    @Test
+    @Test(timeout = 2000)
     public void defaultHandlerCanBeDisabledPerAwaitStatement() {
 
         final CountDown globalCountDown = new CountDown(20);
 
         IntermediaryResultHandler defaultIntermediaryResultHandler = new IntermediaryResultHandler() {
-            public void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS) {
+            public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                 try {
                     globalCountDown.call();
                 } catch (Exception e) {
@@ -86,12 +86,12 @@ public class IntermediaryResultHandlerTest {
         assertThat(globalCountDown.get(), is(equalTo(10)));
     }
 
-    @Test
+    @Test(timeout = 2000)
     public void afterAwaitilityResetNoDefaultHandlerIsSet() {
         final CountDown globalCountDown = new CountDown(20);
 
         IntermediaryResultHandler defaultIntermediaryResultHandler = new IntermediaryResultHandler() {
-            public void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS) {
+            public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                 try {
                     globalCountDown.call();
                 } catch (Exception e) {
@@ -110,11 +110,11 @@ public class IntermediaryResultHandlerTest {
         assertThat(globalCountDown.get(), is(equalTo(15)));
     }
 
-    @Test
-    public void intermediaryResultsCanBeLoggedOnAWay() {
+    @Test(timeout = 10000)
+    public void intermediaryResultsCanBeLoggedToSystemOut() {
         with()
                 .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS) {
+                    public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                         System.out.printf("%s (elapsed time %ds, remaining time %ds)\n", mismatchMessage, elapsedTimeInMS / 1000, remainingTimeInMS / 1000);
                     }
                 })
@@ -123,12 +123,12 @@ public class IntermediaryResultHandlerTest {
                 .until(new CountDown(5), is(equalTo(0)));
     }
 
-    @Test
+    @Test(timeout = 2000)
     public void intermediaryResultsCanBeBuffered() {
         final List<String> buffer = new ArrayList<String>();
         with()
                 .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS) {
+                    public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                         String msg = String.format("%s (elapsed time %ds, remaining time %ds)\n", mismatchMessage, elapsedTimeInMS / 1000, remainingTimeInMS / 1000);
                         buffer.add(msg);
                     }
@@ -138,12 +138,12 @@ public class IntermediaryResultHandlerTest {
         assertThat(buffer.size(), is(equalTo(5)));
     }
 
-    @Test
+    @Test(timeout = 2000)
     public void expectedMismatchMessage() {
         final ValueHolder<String> lastMismatchMessage = new ValueHolder<String>();
         with()
                 .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS) {
+                    public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                         lastMismatchMessage.value = mismatchMessage;
                     }
                 })
@@ -154,13 +154,13 @@ public class IntermediaryResultHandlerTest {
 
     }
 
-    @Test
-    public void awaitingForeverShouldReturnNullRemainingTime() {
+    @Test(timeout = 2000)
+    public void awaitingForeverReturnsLongMaxValueAsRemainingTime() {
         final Set<Long> remainingTimes = new HashSet<Long>();
         final Set<Long> elapsedTimes = new HashSet<Long>();
         with()
                 .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS) {
+                    public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                         remainingTimes.add(remainingTimeInMS);
                         elapsedTimes.add(elapsedTimeInMS);
                     }
@@ -168,8 +168,8 @@ public class IntermediaryResultHandlerTest {
                 .forever()
                 .until(new CountDown(10), is(equalTo(5)));
 
-        assertThat(remainingTimes, everyItem(is(equalTo((Long) null))));
-        assertThat(elapsedTimes, everyItem(is(not(equalTo((Long) null)))));
+        assertThat(remainingTimes, everyItem(is(Long.MAX_VALUE)));
+        assertThat(elapsedTimes, everyItem(is(not(Long.MAX_VALUE))));
     }
 
     private static class CountDown implements Callable<Integer> {

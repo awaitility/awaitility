@@ -23,7 +23,7 @@ public interface IntermediaryResultHandler {
     /**
      * @param mismatchMessage   message returned when Hamcrest matcher fails.
      * @param elapsedTimeInMS   elapsed time in milliseconds.
-     * @param remainingTimeInMS remaining time to wait in milliseconds; <code>null</code>, if no timeout defined, i.e., running forever.
+     * @param remainingTimeInMS remaining time to wait in milliseconds; <code>Long.MAX_VALUE</code>, if no timeout defined, i.e., running forever.
      */
-    void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS);
+    void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS);
 }
