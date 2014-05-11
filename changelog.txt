@@ -17,7 +17,7 @@ Changelog next version
     com.jayway.awaitility.AwaitilityJava8Test$CountDown expected <0> but was <3> (elapsed time 3s, remaining time 6s)
     com.jayway.awaitility.AwaitilityJava8Test$CountDown expected <0> but was <2> (elapsed time 4s, remaining time 5s)
     com.jayway.awaitility.AwaitilityJava8Test$CountDown expected <0> but was <1> (elapsed time 5s, remaining time 4s)
-  Big thanks to Dzieciou for the pull request!
+  Big thanks to Maciej Gawinecki for the pull request!
 
 Changelog 1.6.0 (2014-04-23)
 ----------------------------
