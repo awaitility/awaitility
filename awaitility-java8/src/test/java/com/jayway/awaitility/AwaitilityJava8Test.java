@@ -10,9 +10,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.concurrent.Callable;
+
 import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.awaitility.Awaitility.with;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
 
@@ -107,7 +110,9 @@ public class AwaitilityJava8Test {
         exception.expect(ConditionTimeoutException.class);
         exception.expectMessage("Lambda expression in com.jayway.awaitility.AwaitilityJava8Test: expected <1> but was <0> within 120 milliseconds.");
 
-        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(() -> {return fakeRepository.getValue();}, equalTo(1));
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(() -> {
+            return fakeRepository.getValue();
+        }, equalTo(1));
     }
 
     @Test(timeout = 2000)
@@ -116,5 +121,33 @@ public class AwaitilityJava8Test {
         exception.expectMessage("Condition with lambda expression in com.jayway.awaitility.AwaitilityJava8Test was not fulfilled within 200 milliseconds.");
 
         await().atMost(200, MILLISECONDS).until(() -> fakeRepository.getValue() == 2);
+    }
+
+    @Test(timeout = 10000)
+    public void intermediaryResultsCanBeLoggedToSystemOut() {
+        with()
+                .intermediaryResultHandler((mismatchMessage, elapsedTimeInMS, remainingTimeInMS) -> {
+                    System.out.printf("%s (elapsed time %ds, remaining time %ds)\n", mismatchMessage, elapsedTimeInMS / 1000, remainingTimeInMS / 1000);
+                })
+                .pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
+                .atMost(Duration.TWO_SECONDS)
+                .until(new CountDown(5), is(equalTo(0)));
+    }
+
+    private static class CountDown implements Callable<Integer> {
+
+        private int countDown;
+
+        private CountDown(int countDown) {
+            this.countDown = countDown;
+        }
+
+        public Integer call() throws Exception {
+            return countDown--;
+        }
+
+        public Integer get() {
+            return countDown;
+        }
     }
 }
