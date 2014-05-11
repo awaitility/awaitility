@@ -17,6 +17,7 @@ package com.jayway.awaitility;
 
 import com.jayway.awaitility.core.ConditionFactory;
 import com.jayway.awaitility.core.FieldSupplierBuilder;
+import com.jayway.awaitility.core.IntermediaryResultHandler;
 import com.jayway.awaitility.core.MethodCallRecorder;
 
 import java.util.concurrent.TimeUnit;
@@ -103,17 +104,30 @@ import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
  */
 public class Awaitility {
 
-    /** The default poll interval (100 ms). */
+    /**
+     * The default poll interval (100 ms).
+     */
     private static volatile Duration defaultPollInterval = Duration.ONE_HUNDRED_MILLISECONDS;
 
-    /** The default timeout (10 seconds). */
+    /**
+     * The default timeout (10 seconds).
+     */
     private static volatile Duration defaultTimeout = Duration.TEN_SECONDS;
 
-    /** The default poll delay (same as {@link #defaultPollInterval}). */
+    /**
+     * The default poll delay (same as {@link #defaultPollInterval}).
+     */
     private static volatile Duration defaultPollDelay = SAME_AS_POLL_INTERVAL;
 
-    /** Catch all uncaught exceptions by default?. */
+    /**
+     * Catch all uncaught exceptions by default?.
+     */
     private static volatile boolean defaultCatchUncaughtExceptions = true;
+
+    /**
+     * Default logger of intermediary results.
+     */
+    private static volatile IntermediaryResultHandler defaultIntermediaryResultHandler = null;
 
     /**
      * Instruct Awaitility to catch uncaught exceptions from other threads by
@@ -142,6 +156,7 @@ public class Awaitility {
      * <li>poll interval - 100 milliseconds</li>
      * <li>poll delay - 100 milliseconds</li>
      * <li>Catch all uncaught exceptions - true</li>
+     * <li>Don't handle intermediary results</li>
      * </ul>
      */
     public static void reset() {
@@ -149,6 +164,7 @@ public class Awaitility {
         defaultPollDelay = SAME_AS_POLL_INTERVAL;
         defaultTimeout = Duration.TEN_SECONDS;
         defaultCatchUncaughtExceptions = true;
+        defaultIntermediaryResultHandler = null;
         Thread.setDefaultUncaughtExceptionHandler(null);
         MethodCallRecorder.reset();
     }
@@ -168,13 +184,12 @@ public class Awaitility {
      * named await timeout's the <code>alias</code> will be displayed indicating
      * which await statement that failed.
      *
-     * @param alias
-     *            the alias that will be shown if the await timeouts.
+     * @param alias the alias that will be shown if the await timeouts.
      * @return the condition factory
      */
     public static ConditionFactory await(String alias) {
         return new ConditionFactory(alias, defaultTimeout, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions);
+                defaultCatchUncaughtExceptions, defaultIntermediaryResultHandler);
     }
 
     /**
@@ -209,7 +224,7 @@ public class Awaitility {
      */
     public static ConditionFactory with() {
         return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions);
+                defaultCatchUncaughtExceptions, defaultIntermediaryResultHandler);
     }
 
     /**
@@ -230,8 +245,7 @@ public class Awaitility {
      * An alternative to using {@link #await()} if you want to specify a timeout
      * directly.
      *
-     * @param timeout
-     *            the timeout
+     * @param timeout the timeout
      * @return the condition factory
      */
     public static ConditionFactory waitAtMost(Duration timeout) {
@@ -242,10 +256,8 @@ public class Awaitility {
      * An alternative to using {@link #await()} if you want to specify a timeout
      * directly.
      *
-     * @param value
-     *            the value
-     * @param unit
-     *            the unit
+     * @param value the value
+     * @param unit  the unit
      * @return the condition factory
      */
     public static ConditionFactory waitAtMost(long value, TimeUnit unit) {
@@ -256,10 +268,8 @@ public class Awaitility {
     /**
      * Sets the default poll interval that all await statements will use.
      *
-     * @param pollInterval
-     *            the poll interval
-     * @param unit
-     *            the unit
+     * @param pollInterval the poll interval
+     * @param unit         the unit
      */
     public static void setDefaultPollInterval(long pollInterval, TimeUnit unit) {
         defaultPollInterval = new Duration(pollInterval, unit);
@@ -268,10 +278,8 @@ public class Awaitility {
     /**
      * Sets the default poll delay all await statements will use.
      *
-     * @param pollDelay
-     *            the poll delay
-     * @param unit
-     *            the unit
+     * @param pollDelay the poll delay
+     * @param unit      the unit
      */
     public static void setDefaultPollDelay(long pollDelay, TimeUnit unit) {
         defaultPollDelay = new Duration(pollDelay, unit);
@@ -280,10 +288,8 @@ public class Awaitility {
     /**
      * Sets the default timeout all await statements will use.
      *
-     * @param timeout
-     *            the timeout
-     * @param unit
-     *            the unit
+     * @param timeout the timeout
+     * @param unit    the unit
      */
     public static void setDefaultTimeout(long timeout, TimeUnit unit) {
         defaultTimeout = new Duration(timeout, unit);
@@ -292,8 +298,7 @@ public class Awaitility {
     /**
      * Sets the default poll interval that all await statements will use.
      *
-     * @param pollInterval
-     *            the new default poll interval
+     * @param pollInterval the new default poll interval
      */
     public static void setDefaultPollInterval(Duration pollInterval) {
         if (pollInterval == null) {
@@ -305,8 +310,7 @@ public class Awaitility {
     /**
      * Sets the default poll delay that all await statements will use.
      *
-     * @param pollDelay
-     *            the new default poll delay
+     * @param pollDelay the new default poll delay
      */
     public static void setDefaultPollDelay(Duration pollDelay) {
         if (pollDelay == null) {
@@ -318,14 +322,22 @@ public class Awaitility {
     /**
      * Sets the default timeout that all await statements will use.
      *
-     * @param defaultTimeout
-     *            the new default timeout
+     * @param defaultTimeout the new default timeout
      */
     public static void setDefaultTimeout(Duration defaultTimeout) {
         if (defaultTimeout == null) {
             throw new IllegalArgumentException("You must specify a default timeout (was null).");
         }
         Awaitility.defaultTimeout = defaultTimeout;
+    }
+
+    /**
+     * Sets the default intermediary result handler that all await statements will use.
+     *
+     * @param defaultIntermediaryResultHandler handles intermediary result each time evaluation of a condition fails. Works only with Hamcrest matcher-based conditions.
+     */
+    public static void handleIntermediaryResultsWith(IntermediaryResultHandler defaultIntermediaryResultHandler) {
+        Awaitility.defaultIntermediaryResultHandler = defaultIntermediaryResultHandler;
     }
 
     /**
@@ -338,10 +350,8 @@ public class Awaitility {
      * Here we tell Awaitility to wait until the <code>service.getCount()</code>
      * method returns a value that is greater than 2.
      *
-     * @param <S>
-     *            The type of the service.
-     * @param object
-     *            the object that contains the method of interest.
+     * @param <S>    The type of the service.
+     * @param object the object that contains the method of interest.
      * @return A proxy of the service
      */
     @SuppressWarnings("unchecked")

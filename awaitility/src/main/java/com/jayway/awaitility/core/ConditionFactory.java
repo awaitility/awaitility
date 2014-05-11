@@ -60,6 +60,12 @@ public class ConditionFactory {
     private final Duration pollDelay;
 
     /**
+     *
+     */
+    private final IntermediaryResultHandler intermediaryResultHandler;
+
+
+    /**
      * Instantiates a new condition factory.
      *
      * @param alias                   the alias
@@ -69,7 +75,7 @@ public class ConditionFactory {
      * @param catchUncaughtExceptions the catch uncaught exceptions
      */
     public ConditionFactory(String alias, Duration timeout, Duration pollInterval, Duration pollDelay,
-                            boolean catchUncaughtExceptions) {
+                            boolean catchUncaughtExceptions, IntermediaryResultHandler intermediaryResultHandler) {
         if (pollInterval == null) {
             throw new IllegalArgumentException("pollInterval cannot be null");
         }
@@ -94,6 +100,7 @@ public class ConditionFactory {
         this.pollInterval = pollInterval;
         this.catchUncaughtExceptions = catchUncaughtExceptions;
         this.pollDelay = pollDelay;
+        this.intermediaryResultHandler = intermediaryResultHandler;
     }
 
     /**
@@ -105,7 +112,29 @@ public class ConditionFactory {
      * @param catchUncaughtExceptions the catch uncaught exceptions
      */
     public ConditionFactory(Duration timeout, Duration pollInterval, Duration pollDelay, boolean catchUncaughtExceptions) {
-        this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions);
+        this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions, null);
+    }
+
+    /**
+     * Instantiates a new condition factory.
+     *
+     * @param timeout                 the timeout
+     * @param pollInterval            the poll interval
+     * @param pollDelay               The delay before the polling starts
+     * @param catchUncaughtExceptions the catch uncaught exceptions
+     */
+    public ConditionFactory(Duration timeout, Duration pollInterval, Duration pollDelay, boolean catchUncaughtExceptions, IntermediaryResultHandler intermediaryResultHandler) {
+        this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions, intermediaryResultHandler);
+    }
+
+    /**
+     * Handle intermediary result each time evaluation of a condition fails. Works only with a Hamcrest matcher-based condition.
+     *
+     * @param intermediaryResultHandler the logger of intermediary result
+     * @return the condition factory
+     */
+    public ConditionFactory handleIntermediaryResultsWith(IntermediaryResultHandler intermediaryResultHandler) {
+        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions, intermediaryResultHandler);
     }
 
     /**
@@ -115,7 +144,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory timeout(Duration timeout) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
+        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions, intermediaryResultHandler);
     }
 
     /**
@@ -125,7 +154,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory atMost(Duration timeout) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
+        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions, intermediaryResultHandler);
     }
 
     /**
@@ -136,7 +165,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory forever() {
-        return new ConditionFactory(alias, Duration.FOREVER, pollInterval, pollInterval, catchUncaughtExceptions);
+        return new ConditionFactory(alias, Duration.FOREVER, pollInterval, pollInterval, catchUncaughtExceptions, intermediaryResultHandler);
     }
 
     /**
@@ -155,7 +184,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory pollInterval(Duration pollInterval) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
+        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions, intermediaryResultHandler);
     }
 
     /**
@@ -167,7 +196,7 @@ public class ConditionFactory {
      */
     public ConditionFactory timeout(long timeout, TimeUnit unit) {
         return new ConditionFactory(alias, new Duration(timeout, unit), pollInterval, pollInterval,
-                catchUncaughtExceptions);
+                catchUncaughtExceptions, intermediaryResultHandler);
     }
 
     /**
@@ -181,7 +210,7 @@ public class ConditionFactory {
      */
     public ConditionFactory pollDelay(long delay, TimeUnit unit) {
         return new ConditionFactory(alias, this.timeout, pollInterval, new Duration(delay, unit),
-                catchUncaughtExceptions);
+                catchUncaughtExceptions, intermediaryResultHandler);
     }
 
     /**
@@ -193,7 +222,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory pollDelay(Duration pollDelay) {
-        return new ConditionFactory(alias, this.timeout, pollInterval, pollDelay, catchUncaughtExceptions);
+        return new ConditionFactory(alias, this.timeout, pollInterval, pollDelay, catchUncaughtExceptions, intermediaryResultHandler);
     }
 
     /**
@@ -205,7 +234,7 @@ public class ConditionFactory {
      */
     public ConditionFactory atMost(long timeout, TimeUnit unit) {
         return new ConditionFactory(alias, new Duration(timeout, unit), pollInterval, pollDelay,
-                catchUncaughtExceptions);
+                catchUncaughtExceptions, intermediaryResultHandler);
     }
 
     /**
@@ -225,7 +254,7 @@ public class ConditionFactory {
      */
     public ConditionFactory pollInterval(long pollInterval, TimeUnit unit) {
         return new ConditionFactory(alias, timeout, new Duration(pollInterval, unit), pollDelay,
-                catchUncaughtExceptions);
+                catchUncaughtExceptions, intermediaryResultHandler);
     }
 
     /**
@@ -237,7 +266,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory catchUncaughtExceptions() {
-        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, true);
+        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, true, intermediaryResultHandler);
     }
 
     /**
@@ -261,7 +290,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory await(String alias) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions);
+        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions, intermediaryResultHandler);
     }
 
     /**
@@ -552,7 +581,7 @@ public class ConditionFactory {
     }
 
     private ConditionSettings generateConditionSettings() {
-        return new ConditionSettings(alias, catchUncaughtExceptions, timeout, pollInterval, pollDelay);
+        return new ConditionSettings(alias, catchUncaughtExceptions, timeout, pollInterval, pollDelay, intermediaryResultHandler);
     }
 
     private <T> T until(Condition<T> condition) {

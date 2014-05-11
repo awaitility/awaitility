@@ -15,53 +15,92 @@
  */
 package com.jayway.awaitility.core;
 
+import com.jayway.awaitility.Duration;
 import org.hamcrest.Matcher;
 
 import java.util.concurrent.Callable;
 
 abstract class AbstractHamcrestCondition<T> implements Condition<T> {
 
-	private ConditionAwaiter conditionAwaiter;
+    private ConditionAwaiter conditionAwaiter;
 
-	private T lastResult;
+    private T lastResult;
+    private final StopWatch watch;
 
-	/**
-	 * <p>Constructor for AbstractHamcrestCondition.</p>
-	 *
-	 * @param supplier a {@link java.util.concurrent.Callable} object.
-	 * @param matcher a {@link org.hamcrest.Matcher} object.
-	 * @param settings a {@link com.jayway.awaitility.core.ConditionSettings} object.
-	 */
-	public AbstractHamcrestCondition(final Callable<T> supplier, final Matcher<? super T> matcher, ConditionSettings settings) {
-		if (supplier == null) {
-			throw new IllegalArgumentException("You must specify a supplier (was null).");
-		}
-		if (matcher == null) {
-			throw new IllegalArgumentException("You must specify a matcher (was null).");
-		}
-		Callable<Boolean> callable = new Callable<Boolean>() {
-			public Boolean call() throws Exception {
-				lastResult = supplier.call();
-				return matcher.matches(lastResult);
-			}
-		};
-		conditionAwaiter = new ConditionAwaiter(callable, settings) {
-			@Override
-			protected String getTimeoutMessage() {
-				return String.format("%s expected %s but was <%s>", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher), lastResult);
-			}
-		};
-	}
+    /**
+     * <p>Constructor for AbstractHamcrestCondition.</p>
+     *
+     * @param supplier a {@link java.util.concurrent.Callable} object.
+     * @param matcher  a {@link org.hamcrest.Matcher} object.
+     * @param settings a {@link com.jayway.awaitility.core.ConditionSettings} object.
+     */
+    public AbstractHamcrestCondition(final Callable<T> supplier, final Matcher<? super T> matcher, final ConditionSettings settings) {
+        if (supplier == null) {
+            throw new IllegalArgumentException("You must specify a supplier (was null).");
+        }
+        if (matcher == null) {
+            throw new IllegalArgumentException("You must specify a matcher (was null).");
+        }
 
-	/**
-	 * <p>await.</p>
-	 *
-	 * @return a T object.
-	 */
-	public T await() {
-		conditionAwaiter.await();
-		return lastResult;
-	}
+        watch = new StopWatch();
+        Callable<Boolean> callable = new Callable<Boolean>() {
+            public Boolean call() throws Exception {
+                lastResult = supplier.call();
+                boolean matches = matcher.matches(lastResult);
+                if (!matches) {
+                    handleIntermediaryResult(supplier, matcher, settings, watch);
+                }
+                return matches;
 
-	abstract String getCallableDescription(final Callable<T> supplier);
+            }
+        };
+        conditionAwaiter = new ConditionAwaiter(callable, settings) {
+            @Override
+            protected String getTimeoutMessage() {
+                return getMessage(supplier, matcher);
+            }
+        };
+    }
+
+    private void handleIntermediaryResult(Callable<T> supplier, Matcher<? super T> matcher, ConditionSettings settings, StopWatch watch) {
+        IntermediaryResultHandler handler = settings.getIntermediaryResultHandler();
+        if (handler != null) {
+            long elapsedTimeInMS = watch.getElapsedTimeInMS();
+            Long remainingTimeInMS = settings.getMaxWaitTime().equals(Duration.FOREVER) ?
+                    null : settings.getMaxWaitTime().getValueInMS() - elapsedTimeInMS;
+            handler.handle(
+                    getMessage(supplier, matcher),
+                    elapsedTimeInMS,
+                    remainingTimeInMS);
+        }
+    }
+
+    private String getMessage(Callable<T> supplier, Matcher<? super T> matcher) {
+        return String.format("%s expected %s but was <%s>", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher), lastResult);
+    }
+
+    private static class StopWatch {
+        private long startTime;
+
+        public void start() {
+            this.startTime = System.currentTimeMillis();
+        }
+
+        public long getElapsedTimeInMS() {
+            return System.currentTimeMillis() - startTime;
+        }
+    }
+
+    /**
+     * <p>await.</p>
+     *
+     * @return a T object.
+     */
+    public T await() {
+        watch.start();
+        conditionAwaiter.await();
+        return lastResult;
+    }
+
+    abstract String getCallableDescription(final Callable<T> supplier);
 }
