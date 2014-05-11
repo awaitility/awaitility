@@ -17,7 +17,6 @@ package com.jayway.awaitility.core;
 
 import com.jayway.awaitility.Duration;
 import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -27,6 +26,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.is;
 
 /**
  * A factory for creating {@link com.jayway.awaitility.core.Condition} objects. It's not recommended to
@@ -514,7 +516,7 @@ public class ConditionFactory {
      * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilTrue(final AtomicBoolean atomic) {
-        untilAtomic(atomic, Matchers.is(Boolean.TRUE));
+        untilAtomic(atomic, anyOf(is(Boolean.TRUE), is(true)));
     }
 
     /**
@@ -524,7 +526,7 @@ public class ConditionFactory {
      * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilFalse(final AtomicBoolean atomic) {
-        untilAtomic(atomic, Matchers.is(Boolean.FALSE));
+        untilAtomic(atomic, anyOf(is(Boolean.FALSE), is(false)));
     }
 
     /**

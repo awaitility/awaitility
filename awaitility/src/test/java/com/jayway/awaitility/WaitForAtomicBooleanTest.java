@@ -11,12 +11,21 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 public class WaitForAtomicBooleanTest {
     private AtomicBoolean wasAdded = new AtomicBoolean(false);
+    private AtomicBoolean wasAddedWithDefaultValue = new AtomicBoolean();
+
 
     @Test(timeout = 2000L)
     public void atomicBooleanExample() throws Exception {
         new WasAddedModifier().start();
 
         await().atMost(FIVE_SECONDS).until(wasAdded(), equalTo(true));
+    }
+
+    @Test(timeout = 2000L)
+    public void atomicBooleanWithUntilTrueWhenBooleanUsesDefaultValue() throws Exception {
+        new WasAddedWithDefaultValue().start();
+
+        await().atMost(FIVE_SECONDS).untilTrue(wasAddedWithDefaultValue);
     }
 
     @Test(timeout = 2000L)
@@ -51,6 +60,18 @@ public class WaitForAtomicBooleanTest {
                 throw new RuntimeException(e);
             }
             wasAdded.set(!wasAdded.get());
+        }
+    }
+
+    private class WasAddedWithDefaultValue extends Thread {
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(500L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            wasAddedWithDefaultValue.set(true);
         }
     }
 }
