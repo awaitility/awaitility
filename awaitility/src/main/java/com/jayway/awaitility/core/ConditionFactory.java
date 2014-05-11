@@ -133,7 +133,7 @@ public class ConditionFactory {
      * @param intermediaryResultHandler the logger of intermediary result
      * @return the condition factory
      */
-    public ConditionFactory handleIntermediaryResultsWith(IntermediaryResultHandler intermediaryResultHandler) {
+    public ConditionFactory intermediaryResultHandler(IntermediaryResultHandler intermediaryResultHandler) {
         return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions, intermediaryResultHandler);
     }
 

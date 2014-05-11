@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-import static com.jayway.awaitility.Awaitility.handleIntermediaryResultsWith;
+import static com.jayway.awaitility.Awaitility.setDefaultIntermediaryResultHandler;
 import static com.jayway.awaitility.Awaitility.with;
 import static org.hamcrest.CoreMatchers.everyItem;
 import static org.hamcrest.CoreMatchers.is;
@@ -29,7 +29,7 @@ public class IntermediaryResultHandlerTest {
     public void handlerExceptionsAreNotCaught() {
         with()
                 .catchUncaughtExceptions()
-                .handleIntermediaryResultsWith(new IntermediaryResultHandler() {
+                .intermediaryResultHandler(new IntermediaryResultHandler() {
                     public void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS) {
                         throw new RuntimeException();
                     }
@@ -50,7 +50,7 @@ public class IntermediaryResultHandlerTest {
                 }
             }
         };
-        Awaitility.handleIntermediaryResultsWith(defaultIntermediaryResultHandler);
+        Awaitility.setDefaultIntermediaryResultHandler(defaultIntermediaryResultHandler);
 
         with().until(new CountDown(5), is(equalTo(0)));
         assertThat(globalCountDown.get(), is(equalTo(15)));
@@ -72,13 +72,13 @@ public class IntermediaryResultHandlerTest {
                 }
             }
         };
-        handleIntermediaryResultsWith(defaultIntermediaryResultHandler);
+        setDefaultIntermediaryResultHandler(defaultIntermediaryResultHandler);
 
         with().until(new CountDown(5), is(equalTo(0)));
         assertThat(globalCountDown.get(), is(equalTo(15)));
 
         with()
-                .handleIntermediaryResultsWith(null)
+                .intermediaryResultHandler(null)
                 .until(new CountDown(5), is(equalTo(0)));
         assertThat(globalCountDown.get(), is(equalTo(15)));
 
@@ -98,7 +98,7 @@ public class IntermediaryResultHandlerTest {
                 }
             }
         };
-        handleIntermediaryResultsWith(defaultIntermediaryResultHandler);
+        setDefaultIntermediaryResultHandler(defaultIntermediaryResultHandler);
 
         with().until(new CountDown(5), is(equalTo(0)));
         assertThat(globalCountDown.get(), is(equalTo(15)));
@@ -113,7 +113,7 @@ public class IntermediaryResultHandlerTest {
     @Test
     public void intermediaryResultsCanBeLoggedOnAWay() {
         with()
-                .handleIntermediaryResultsWith(new IntermediaryResultHandler() {
+                .intermediaryResultHandler(new IntermediaryResultHandler() {
                     public void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS) {
                         System.out.printf("%s (elapsed time %ds, remaining time %ds)\n", mismatchMessage, elapsedTimeInMS / 1000, remainingTimeInMS / 1000);
                     }
@@ -127,7 +127,7 @@ public class IntermediaryResultHandlerTest {
     public void intermediaryResultsCanBeBuffered() {
         final List<String> buffer = new ArrayList<String>();
         with()
-                .handleIntermediaryResultsWith(new IntermediaryResultHandler() {
+                .intermediaryResultHandler(new IntermediaryResultHandler() {
                     public void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS) {
                         String msg = String.format("%s (elapsed time %ds, remaining time %ds)\n", mismatchMessage, elapsedTimeInMS / 1000, remainingTimeInMS / 1000);
                         buffer.add(msg);
@@ -142,7 +142,7 @@ public class IntermediaryResultHandlerTest {
     public void expectedMismatchMessage() {
         final ValueHolder<String> lastMismatchMessage = new ValueHolder<String>();
         with()
-                .handleIntermediaryResultsWith(new IntermediaryResultHandler() {
+                .intermediaryResultHandler(new IntermediaryResultHandler() {
                     public void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS) {
                         lastMismatchMessage.value = mismatchMessage;
                     }
@@ -159,7 +159,7 @@ public class IntermediaryResultHandlerTest {
         final Set<Long> remainingTimes = new HashSet<Long>();
         final Set<Long> elapsedTimes = new HashSet<Long>();
         with()
-                .handleIntermediaryResultsWith(new IntermediaryResultHandler() {
+                .intermediaryResultHandler(new IntermediaryResultHandler() {
                     public void handle(String mismatchMessage, long elapsedTimeInMS, Long remainingTimeInMS) {
                         remainingTimes.add(remainingTimeInMS);
                         elapsedTimes.add(elapsedTimeInMS);

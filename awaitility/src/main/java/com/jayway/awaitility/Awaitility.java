@@ -336,7 +336,7 @@ public class Awaitility {
      *
      * @param defaultIntermediaryResultHandler handles intermediary result each time evaluation of a condition fails. Works only with Hamcrest matcher-based conditions.
      */
-    public static void handleIntermediaryResultsWith(IntermediaryResultHandler defaultIntermediaryResultHandler) {
+    public static void setDefaultIntermediaryResultHandler(IntermediaryResultHandler defaultIntermediaryResultHandler) {
         Awaitility.defaultIntermediaryResultHandler = defaultIntermediaryResultHandler;
     }
 
