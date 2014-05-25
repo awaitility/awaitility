@@ -70,7 +70,7 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         IntermediaryResultHandler handler = settings.getIntermediaryResultHandler();
         if (handler != null) {
             long elapsedTimeInMS = watch.getElapsedTimeInMS();
-            long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings);
+            long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
             handler.handleMatch(
                     getMatchMessage(supplier, matcher),
                     elapsedTimeInMS,
@@ -78,9 +78,9 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         }
     }
 
-    private long getRemainingTimeInMS(long elapsedTimeInMS, ConditionSettings settings) {
-        return settings.getMaxWaitTime().equals(Duration.FOREVER) ?
-                Long.MAX_VALUE : settings.getMaxWaitTime().getValueInMS() - elapsedTimeInMS;
+    private long getRemainingTimeInMS(long elapsedTimeInMS, Duration maxWaitTime) {
+        return maxWaitTime.equals(Duration.FOREVER) ?
+                Long.MAX_VALUE : maxWaitTime.getValueInMS() - elapsedTimeInMS;
     }
 
     private String getMatchMessage(Callable<T> supplier, Matcher<? super T> matcher) {
@@ -91,7 +91,7 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         IntermediaryResultHandler handler = settings.getIntermediaryResultHandler();
         if (handler != null) {
             long elapsedTimeInMS = watch.getElapsedTimeInMS();
-            long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings);
+            long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
             handler.handleMismatch(
                     getMismatchMessage(supplier, matcher),
                     elapsedTimeInMS,
