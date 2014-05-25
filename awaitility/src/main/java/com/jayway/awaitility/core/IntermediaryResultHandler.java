@@ -16,14 +16,25 @@
 package com.jayway.awaitility.core;
 
 /**
- * Handle intermediary result each time evaluation of a condition fails.
+ * Handles each intermediary mismatch and a final match (if any) of Hamcrest-based condition.
  */
 public interface IntermediaryResultHandler {
 
     /**
+     * Handles an intermediary mismatch of a Hamcrest matcher.
+     *
      * @param mismatchMessage   message returned when Hamcrest matcher fails.
      * @param elapsedTimeInMS   elapsed time in milliseconds.
      * @param remainingTimeInMS remaining time to wait in milliseconds; <code>Long.MAX_VALUE</code>, if no timeout defined, i.e., running forever.
      */
-    void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS);
+    void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS);
+
+    /**
+     * Handles a final match of a Hamcrest matcher.
+     *
+     * @param matchMessage   message returned when Hamcrest matcher succeeds.
+     * @param elapsedTimeInMS   elapsed time in milliseconds.
+     * @param remainingTimeInMS remaining time to wait in milliseconds; <code>Long.MAX_VALUE</code>, if no timeout defined, i.e., running forever.
+     */
+    void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS);
 }
