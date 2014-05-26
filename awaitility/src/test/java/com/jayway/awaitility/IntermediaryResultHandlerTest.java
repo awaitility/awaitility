@@ -17,6 +17,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.samePropertyValuesAs;
 
 public class IntermediaryResultHandlerTest {
 
@@ -30,7 +31,10 @@ public class IntermediaryResultHandlerTest {
         with()
                 .catchUncaughtExceptions()
                 .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                        throw new RuntimeException();
+                    }
+                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                         throw new RuntimeException();
                     }
                 })
@@ -43,12 +47,14 @@ public class IntermediaryResultHandlerTest {
         final CountDown globalCountDown = new CountDown(20);
 
         IntermediaryResultHandler defaultIntermediaryResultHandler = new IntermediaryResultHandler() {
-            public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+            public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                 try {
                     globalCountDown.call();
                 } catch (Exception e) {
                 }
             }
+
+            public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) { }
         };
         Awaitility.setDefaultIntermediaryResultHandler(defaultIntermediaryResultHandler);
 
@@ -65,12 +71,14 @@ public class IntermediaryResultHandlerTest {
         final CountDown globalCountDown = new CountDown(20);
 
         IntermediaryResultHandler defaultIntermediaryResultHandler = new IntermediaryResultHandler() {
-            public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+            public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                 try {
                     globalCountDown.call();
                 } catch (Exception e) {
                 }
             }
+
+            public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) { }
         };
         setDefaultIntermediaryResultHandler(defaultIntermediaryResultHandler);
 
@@ -91,12 +99,14 @@ public class IntermediaryResultHandlerTest {
         final CountDown globalCountDown = new CountDown(20);
 
         IntermediaryResultHandler defaultIntermediaryResultHandler = new IntermediaryResultHandler() {
-            public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+            public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                 try {
                     globalCountDown.call();
                 } catch (Exception e) {
                 }
             }
+
+            public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) { }
         };
         setDefaultIntermediaryResultHandler(defaultIntermediaryResultHandler);
 
@@ -114,8 +124,12 @@ public class IntermediaryResultHandlerTest {
     public void intermediaryResultsCanBeLoggedToSystemOut() {
         with()
                 .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                         System.out.printf("%s (elapsed time %ds, remaining time %ds)\n", mismatchMessage, elapsedTimeInMS / 1000, remainingTimeInMS / 1000);
+                    }
+
+                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                        System.out.printf("%s (in %ds)\n", matchMessage, elapsedTimeInMS / 1000);
                     }
                 })
                 .pollInterval(Duration.ONE_SECOND)
@@ -128,14 +142,39 @@ public class IntermediaryResultHandlerTest {
         final List<String> buffer = new ArrayList<String>();
         with()
                 .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                         String msg = String.format("%s (elapsed time %ds, remaining time %ds)\n", mismatchMessage, elapsedTimeInMS / 1000, remainingTimeInMS / 1000);
+                        buffer.add(msg);
+                    }
+
+                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                        String msg = String.format("%s (in %ds)\n", matchMessage, elapsedTimeInMS / 1000);
                         buffer.add(msg);
                     }
                 })
                 .until(new CountDown(5), is(equalTo(0)));
 
-        assertThat(buffer.size(), is(equalTo(5)));
+        assertThat(buffer.size(), is(equalTo(5+1)));
+    }
+
+
+    @Test(timeout = 2000)
+    public void expectedMismatchMessageForComplexMatchers() {
+        final ValueHolder<String> lastMismatchMessage = new ValueHolder<String>();
+        with()
+                .intermediaryResultHandler(new IntermediaryResultHandler() {
+                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                        lastMismatchMessage.value = mismatchMessage;
+                    }
+
+                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                    }
+                })
+                .until(new CountDownProvider(new CountDownBean(10, 20)), samePropertyValuesAs(new CountDownBean(10, 10)));
+
+        String expectedMismatchMessage = String.format("%s expected same property values as CountDownBean [countDown: <10>, secondCountDown: <10>] but secondCountDown was <11>", CountDownProvider.class.getName());
+        assertThat(lastMismatchMessage.value, is(equalTo(expectedMismatchMessage)));
+
     }
 
     @Test(timeout = 2000)
@@ -143,8 +182,11 @@ public class IntermediaryResultHandlerTest {
         final ValueHolder<String> lastMismatchMessage = new ValueHolder<String>();
         with()
                 .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                         lastMismatchMessage.value = mismatchMessage;
+                    }
+
+                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                     }
                 })
                 .until(new CountDown(10), is(equalTo(5)));
@@ -155,12 +197,37 @@ public class IntermediaryResultHandlerTest {
     }
 
     @Test(timeout = 2000)
+    public void expectedMatchMessage() {
+        final ValueHolder<String> lastMatchMessage = new ValueHolder<String>();
+        with()
+                .intermediaryResultHandler(new IntermediaryResultHandler() {
+                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                        lastMatchMessage.value = mismatchMessage;
+                    }
+
+                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                        lastMatchMessage.value = matchMessage;
+                    }
+                })
+                .until(new CountDown(10), is(equalTo(5)));
+
+        String expectedMatchMessage = String.format("%s's condition that <5> has been satisfied", CountDown.class.getName());
+        assertThat(lastMatchMessage.value, is(equalTo(expectedMatchMessage)));
+
+    }
+
+    @Test(timeout = 2000)
     public void awaitingForeverReturnsLongMaxValueAsRemainingTime() {
         final Set<Long> remainingTimes = new HashSet<Long>();
         final Set<Long> elapsedTimes = new HashSet<Long>();
         with()
                 .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handle(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                        remainingTimes.add(remainingTimeInMS);
+                        elapsedTimes.add(elapsedTimeInMS);
+                    }
+
+                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
                         remainingTimes.add(remainingTimeInMS);
                         elapsedTimes.add(elapsedTimeInMS);
                     }
@@ -188,6 +255,54 @@ public class IntermediaryResultHandlerTest {
             return countDown;
         }
     }
+
+    public static class CountDownBean {
+
+        private int countDown;
+        private int secondCountDown;
+
+        private CountDownBean(int countDown, int secondCountDown) {
+            this.countDown = countDown; this.secondCountDown = secondCountDown;
+        }
+
+        public int getCountDown() {
+            return countDown;
+        }
+
+        public void setCountDown(int countDown) {
+            this.countDown = countDown;
+        }
+
+        public int getSecondCountDown() {
+            return secondCountDown;
+        }
+
+        public void setSecondCountDown(int secondCountDown) {
+            this.secondCountDown = secondCountDown;
+        }
+    }
+
+    private static class CountDownProvider implements Callable<CountDownBean> {
+
+
+        private final CountDownBean countDown;
+
+
+        private CountDownProvider(CountDownBean countDown) {
+            this.countDown = countDown;
+        }
+
+
+        public CountDownBean call() throws Exception {
+            countDown.setSecondCountDown(countDown.getSecondCountDown()-1);
+            return get();
+        }
+
+        public CountDownBean get() {
+            return countDown;
+        }
+    }
+
 
     private static class ValueHolder<T> {
         T value;

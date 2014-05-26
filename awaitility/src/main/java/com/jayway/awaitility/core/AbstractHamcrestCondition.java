@@ -16,7 +16,9 @@
 package com.jayway.awaitility.core;
 
 import com.jayway.awaitility.Duration;
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.StringDescription;
 
 import java.util.concurrent.Callable;
 
@@ -48,7 +50,9 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
                 lastResult = supplier.call();
                 boolean matches = matcher.matches(lastResult);
                 if (!matches) {
-                    handleIntermediaryResult(supplier, matcher, settings, watch);
+                    handleIntermediaryMismatch(supplier, matcher, settings, watch);
+                } else {
+                    handleFinalMatch(supplier, matcher, settings, watch);
                 }
                 return matches;
 
@@ -57,26 +61,48 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         conditionAwaiter = new ConditionAwaiter(callable, settings) {
             @Override
             protected String getTimeoutMessage() {
-                return getMessage(supplier, matcher);
+                return String.format("%s expected %s but was <%s>", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher), lastResult);
             }
         };
     }
 
-    private void handleIntermediaryResult(Callable<T> supplier, Matcher<? super T> matcher, ConditionSettings settings, StopWatch watch) {
+    private void handleFinalMatch(Callable<T> supplier, Matcher<? super T> matcher, ConditionSettings settings, StopWatch watch) {
         IntermediaryResultHandler handler = settings.getIntermediaryResultHandler();
         if (handler != null) {
             long elapsedTimeInMS = watch.getElapsedTimeInMS();
-            long remainingTimeInMS = settings.getMaxWaitTime().equals(Duration.FOREVER) ?
-                    Long.MAX_VALUE : settings.getMaxWaitTime().getValueInMS() - elapsedTimeInMS;
-            handler.handle(
-                    getMessage(supplier, matcher),
+            long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
+            handler.handleMatch(
+                    getMatchMessage(supplier, matcher),
                     elapsedTimeInMS,
                     remainingTimeInMS);
         }
     }
 
-    private String getMessage(Callable<T> supplier, Matcher<? super T> matcher) {
-        return String.format("%s expected %s but was <%s>", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher), lastResult);
+    private long getRemainingTimeInMS(long elapsedTimeInMS, Duration maxWaitTime) {
+        return maxWaitTime.equals(Duration.FOREVER) ?
+                Long.MAX_VALUE : maxWaitTime.getValueInMS() - elapsedTimeInMS;
+    }
+
+    private String getMatchMessage(Callable<T> supplier, Matcher<? super T> matcher) {
+        return String.format("%s's condition that %s has been satisfied", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher));
+    }
+
+    private void handleIntermediaryMismatch(Callable<T> supplier, Matcher<? super T> matcher, ConditionSettings settings, StopWatch watch) {
+        IntermediaryResultHandler handler = settings.getIntermediaryResultHandler();
+        if (handler != null) {
+            long elapsedTimeInMS = watch.getElapsedTimeInMS();
+            long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
+            handler.handleMismatch(
+                    getMismatchMessage(supplier, matcher),
+                    elapsedTimeInMS,
+                    remainingTimeInMS);
+        }
+    }
+
+    private String getMismatchMessage(Callable<T> supplier, Matcher<? super T> matcher) {
+        Description mismatchDescription = new StringDescription();
+        matcher.describeMismatch(lastResult, mismatchDescription);
+        return String.format("%s expected %s but %s", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher), mismatchDescription);
     }
 
     private static class StopWatch {
