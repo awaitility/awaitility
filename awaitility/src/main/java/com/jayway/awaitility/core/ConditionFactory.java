@@ -655,12 +655,4 @@ public class ConditionFactory {
     private static Class<?> loadClass(String className) throws ClassNotFoundException {
         return Class.forName(className, false, Thread.currentThread().getContextClassLoader());
     }
-
-    private static Class<?> loadClassAndThrowRuntimeExceptionIfNotFound(String className) {
-        try {
-            return loadClass(className);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
