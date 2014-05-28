@@ -16,6 +16,7 @@
 package com.jayway.awaitility.resulthandler;
 
 import com.jayway.awaitility.core.IntermediaryResultHandler;
+import org.hamcrest.Matcher;
 
 import java.util.concurrent.TimeUnit;
 
@@ -41,12 +42,12 @@ public class LoggingIntermediaryResultHandler implements IntermediaryResultHandl
     }
 
 
-    public void handleMismatch(String mismatchMessage, Object currentValue, long elapsedTimeInMS, long remainingTimeInMS) {
+    public void handleMismatch(String mismatchMessage, Matcher<? super Object> matcher, Object currentValue, long elapsedTimeInMS, long remainingTimeInMS) {
         System.out.printf("%s (elapsed time %d %s, remaining time %d %s)\n", mismatchMessage, timeUnit.convert(elapsedTimeInMS, MILLISECONDS),
                 timeUnitAsString(), timeUnit.convert(remainingTimeInMS, MILLISECONDS), timeUnitAsString());
     }
 
-    public void handleMatch(String matchMessage, Object conditionEndValue, long elapsedTimeInMS, long remainingTimeInMS) {
+    public void handleMatch(String matchMessage, Matcher<? super Object> matcher, Object conditionEndValue, long elapsedTimeInMS, long remainingTimeInMS) {
         System.out.printf("%s after %d %s (remaining time %d %s)\n",
                 matchMessage, timeUnit.convert(elapsedTimeInMS, MILLISECONDS), timeUnitAsString(), timeUnit.convert(remainingTimeInMS, MILLISECONDS),
                 timeUnitAsString());

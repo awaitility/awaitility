@@ -7,6 +7,7 @@ import com.jayway.awaitility.core.ConditionTimeoutException;
 import com.jayway.awaitility.core.IntermediaryResultHandler;
 import com.jayway.awaitility.resulthandler.LoggingIntermediaryResultHandler;
 import org.assertj.core.api.Assertions;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -132,12 +133,12 @@ public class AwaitilityJava8Test {
         with()
                 .intermediaryResultHandler(new IntermediaryResultHandler<Integer>() {
                     @Override
-                    public void handleMismatch(String mismatchMessage, Integer result, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMismatch(String mismatchMessage, Matcher<? super Integer> matcher, Integer result, long elapsedTimeInMS, long remainingTimeInMS) {
                         System.out.printf("%s (elapsed time %dms, remaining time %dms)\n", mismatchMessage, elapsedTimeInMS, remainingTimeInMS);
                     }
 
                     @Override
-                    public void handleMatch(String matchMessage, Integer result, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMatch(String matchMessage, Matcher<? super Integer> matcher, Integer result, long elapsedTimeInMS, long remainingTimeInMS) {
                         System.out.printf("Matching value found: %d (elapsed time %dms, remaining time %dms)\n", result, elapsedTimeInMS, remainingTimeInMS);
                     }
                 })

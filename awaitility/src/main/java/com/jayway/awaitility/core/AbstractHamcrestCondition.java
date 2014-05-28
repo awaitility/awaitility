@@ -74,11 +74,7 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
             long elapsedTimeInMS = watch.getElapsedTimeInMS();
             long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
             try {
-                handler.handleMatch(
-                        getMatchMessage(supplier, matcher),
-                        lastResult,
-                        elapsedTimeInMS,
-                        remainingTimeInMS);
+                handler.handleMatch(getMatchMessage(supplier, matcher), matcher, lastResult, elapsedTimeInMS, remainingTimeInMS);
             } catch (ClassCastException e) {
                 throwClassCastExceptionBecauseIntermediaryResultHandlerCouldntBeApplied(e, handler);
             }
@@ -101,11 +97,7 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
             long elapsedTimeInMS = watch.getElapsedTimeInMS();
             long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
             try {
-                handler.handleMismatch(
-                        getMismatchMessage(supplier, matcher),
-                        lastResult,
-                        elapsedTimeInMS,
-                        remainingTimeInMS);
+                handler.handleMismatch(getMismatchMessage(supplier, matcher), matcher, lastResult, elapsedTimeInMS, remainingTimeInMS);
             } catch (ClassCastException e) {
                 throwClassCastExceptionBecauseIntermediaryResultHandlerCouldntBeApplied(e, handler);
             }

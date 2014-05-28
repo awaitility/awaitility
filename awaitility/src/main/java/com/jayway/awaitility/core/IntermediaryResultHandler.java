@@ -15,6 +15,8 @@
  */
 package com.jayway.awaitility.core;
 
+import org.hamcrest.Matcher;
+
 /**
  * Handles each intermediary mismatch and a final match (if any) of Hamcrest-based condition.
  *
@@ -25,20 +27,22 @@ public interface IntermediaryResultHandler<T> {
     /**
      * Handles an intermediary mismatch of a Hamcrest matcher.
      *
-     * @param mismatchMessage       message returned when Hamcrest matcher fails.
-     * @param elapsedTimeInMS       elapsed time in milliseconds.
+     * @param mismatchMessage       Descriptive message returned when Hamcrest matcher fails.
+     * @param matcher               The Hamcrest matcher used in the condition
      * @param currentConditionValue The current value of the condition.
+     * @param elapsedTimeInMS       elapsed time in milliseconds.
      * @param remainingTimeInMS     remaining time to wait in milliseconds; <code>Long.MAX_VALUE</code>, if no timeout defined, i.e., running forever.
      */
-    void handleMismatch(String mismatchMessage, T currentConditionValue, long elapsedTimeInMS, long remainingTimeInMS);
+    void handleMismatch(String mismatchMessage, Matcher<? super T> matcher, T currentConditionValue, long elapsedTimeInMS, long remainingTimeInMS);
 
     /**
      * Handles a final match of a Hamcrest matcher.
      *
-     * @param matchMessage      message returned when Hamcrest matcher succeeds.
+     * @param matchMessage      Descriptive message returned when Hamcrest matcher succeeds.
+     * @param matcher           The Hamcrest matcher used in the condition
      * @param conditionEndValue The value returned by the condition when it matched.
      * @param elapsedTimeInMS   elapsed time in milliseconds.
      * @param remainingTimeInMS remaining time to wait in milliseconds; <code>Long.MAX_VALUE</code>, if no timeout defined, i.e., running forever.
      */
-    void handleMatch(String matchMessage, T conditionEndValue, long elapsedTimeInMS, long remainingTimeInMS);
+    void handleMatch(String matchMessage, Matcher<? super T> matcher, T conditionEndValue, long elapsedTimeInMS, long remainingTimeInMS);
 }
