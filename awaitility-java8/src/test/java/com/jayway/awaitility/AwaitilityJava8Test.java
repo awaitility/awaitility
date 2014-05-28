@@ -4,6 +4,8 @@ import com.jayway.awaitility.classes.Asynch;
 import com.jayway.awaitility.classes.FakeRepository;
 import com.jayway.awaitility.classes.FakeRepositoryImpl;
 import com.jayway.awaitility.core.ConditionTimeoutException;
+import com.jayway.awaitility.core.IntermediaryResultHandler;
+import com.jayway.awaitility.resulthandler.LoggingIntermediaryResultHandler;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,6 +17,8 @@ import java.util.concurrent.Callable;
 import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.awaitility.Awaitility.with;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.CoreMatchers.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
@@ -126,9 +130,27 @@ public class AwaitilityJava8Test {
     @Test(timeout = 10000)
     public void intermediaryResultsCanBeLoggedToSystemOut() {
         with()
-                .intermediaryResultHandler((mismatchMessage, elapsedTimeInMS, remainingTimeInMS) -> {
-                    System.out.printf("%s (elapsed time %ds, remaining time %ds)\n", mismatchMessage, elapsedTimeInMS / 1000, remainingTimeInMS / 1000);
+                .intermediaryResultHandler(new IntermediaryResultHandler<Integer>() {
+                    @Override
+                    public void handleMismatch(String mismatchMessage, Integer result, long elapsedTimeInMS, long remainingTimeInMS) {
+                        System.out.printf("%s (elapsed time %dms, remaining time %dms)\n", mismatchMessage, elapsedTimeInMS, remainingTimeInMS);
+                    }
+
+                    @Override
+                    public void handleMatch(String matchMessage, Integer result, long elapsedTimeInMS, long remainingTimeInMS) {
+                        System.out.printf("Matching value found: %d (elapsed time %dms, remaining time %dms)\n", result, elapsedTimeInMS, remainingTimeInMS);
+                    }
                 })
+
+                .pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
+                .atMost(Duration.TWO_SECONDS)
+                .until(new CountDown(5), anyOf(is(0), lessThan(0)));
+    }
+
+    @Test(timeout = 10000)
+    public void loggingIntermediaryHandlerLogsToSystemOut() {
+        with()
+                .intermediaryResultHandler(new LoggingIntermediaryResultHandler(SECONDS))
                 .pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
                 .atMost(Duration.TWO_SECONDS)
                 .until(new CountDown(5), is(equalTo(0)));

@@ -2,7 +2,9 @@ package com.jayway.awaitility;
 
 import com.jayway.awaitility.core.IntermediaryResultHandler;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,14 +14,13 @@ import java.util.concurrent.Callable;
 
 import static com.jayway.awaitility.Awaitility.setDefaultIntermediaryResultHandler;
 import static com.jayway.awaitility.Awaitility.with;
-import static org.hamcrest.CoreMatchers.everyItem;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.samePropertyValuesAs;
+import static org.hamcrest.Matchers.*;
 
 public class IntermediaryResultHandlerTest {
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
 
     @Before
     public void setUp() {
@@ -30,11 +31,11 @@ public class IntermediaryResultHandlerTest {
     public void handlerExceptionsAreNotCaught() {
         with()
                 .catchUncaughtExceptions()
-                .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                .intermediaryResultHandler(new IntermediaryResultHandler<Integer>() {
+                    public void handleMismatch(String mismatchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                         throw new RuntimeException();
                     }
-                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMatch(String matchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                         throw new RuntimeException();
                     }
                 })
@@ -46,15 +47,15 @@ public class IntermediaryResultHandlerTest {
 
         final CountDown globalCountDown = new CountDown(20);
 
-        IntermediaryResultHandler defaultIntermediaryResultHandler = new IntermediaryResultHandler() {
-            public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+        IntermediaryResultHandler defaultIntermediaryResultHandler = new IntermediaryResultHandler<Integer>() {
+            public void handleMismatch(String mismatchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                 try {
                     globalCountDown.call();
                 } catch (Exception e) {
                 }
             }
 
-            public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) { }
+            public void handleMatch(String matchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) { }
         };
         Awaitility.setDefaultIntermediaryResultHandler(defaultIntermediaryResultHandler);
 
@@ -70,15 +71,15 @@ public class IntermediaryResultHandlerTest {
 
         final CountDown globalCountDown = new CountDown(20);
 
-        IntermediaryResultHandler defaultIntermediaryResultHandler = new IntermediaryResultHandler() {
-            public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+        IntermediaryResultHandler defaultIntermediaryResultHandler = new IntermediaryResultHandler<Integer>() {
+            public void handleMismatch(String mismatchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                 try {
                     globalCountDown.call();
                 } catch (Exception e) {
                 }
             }
 
-            public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) { }
+            public void handleMatch(String matchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) { }
         };
         setDefaultIntermediaryResultHandler(defaultIntermediaryResultHandler);
 
@@ -98,15 +99,15 @@ public class IntermediaryResultHandlerTest {
     public void afterAwaitilityResetNoDefaultHandlerIsSet() {
         final CountDown globalCountDown = new CountDown(20);
 
-        IntermediaryResultHandler defaultIntermediaryResultHandler = new IntermediaryResultHandler() {
-            public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+        IntermediaryResultHandler defaultIntermediaryResultHandler = new IntermediaryResultHandler<Integer>() {
+            public void handleMismatch(String mismatchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                 try {
                     globalCountDown.call();
                 } catch (Exception e) {
                 }
             }
 
-            public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) { }
+            public void handleMatch(String matchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) { }
         };
         setDefaultIntermediaryResultHandler(defaultIntermediaryResultHandler);
 
@@ -123,12 +124,12 @@ public class IntermediaryResultHandlerTest {
     @Test(timeout = 10000)
     public void intermediaryResultsCanBeLoggedToSystemOut() {
         with()
-                .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                .intermediaryResultHandler(new IntermediaryResultHandler<Integer>() {
+                    public void handleMismatch(String mismatchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                         System.out.printf("%s (elapsed time %ds, remaining time %ds)\n", mismatchMessage, elapsedTimeInMS / 1000, remainingTimeInMS / 1000);
                     }
 
-                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMatch(String matchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                         System.out.printf("%s (in %ds)\n", matchMessage, elapsedTimeInMS / 1000);
                     }
                 })
@@ -141,13 +142,13 @@ public class IntermediaryResultHandlerTest {
     public void intermediaryResultsCanBeBuffered() {
         final List<String> buffer = new ArrayList<String>();
         with()
-                .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                .intermediaryResultHandler(new IntermediaryResultHandler<Integer>() {
+                    public void handleMismatch(String mismatchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                         String msg = String.format("%s (elapsed time %ds, remaining time %ds)\n", mismatchMessage, elapsedTimeInMS / 1000, remainingTimeInMS / 1000);
                         buffer.add(msg);
                     }
 
-                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMatch(String matchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                         String msg = String.format("%s (in %ds)\n", matchMessage, elapsedTimeInMS / 1000);
                         buffer.add(msg);
                     }
@@ -162,12 +163,12 @@ public class IntermediaryResultHandlerTest {
     public void expectedMismatchMessageForComplexMatchers() {
         final ValueHolder<String> lastMismatchMessage = new ValueHolder<String>();
         with()
-                .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                .intermediaryResultHandler(new IntermediaryResultHandler<CountDownBean>() {
+                    public void handleMismatch(String mismatchMessage, CountDownBean value, long elapsedTimeInMS, long remainingTimeInMS) {
                         lastMismatchMessage.value = mismatchMessage;
                     }
 
-                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMatch(String matchMessage, CountDownBean value, long elapsedTimeInMS, long remainingTimeInMS) {
                     }
                 })
                 .until(new CountDownProvider(new CountDownBean(10, 20)), samePropertyValuesAs(new CountDownBean(10, 10)));
@@ -181,12 +182,12 @@ public class IntermediaryResultHandlerTest {
     public void expectedMismatchMessage() {
         final ValueHolder<String> lastMismatchMessage = new ValueHolder<String>();
         with()
-                .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                .intermediaryResultHandler(new IntermediaryResultHandler<Integer>() {
+                    public void handleMismatch(String mismatchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                         lastMismatchMessage.value = mismatchMessage;
                     }
 
-                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMatch(String matchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                     }
                 })
                 .until(new CountDown(10), is(equalTo(5)));
@@ -200,20 +201,50 @@ public class IntermediaryResultHandlerTest {
     public void expectedMatchMessage() {
         final ValueHolder<String> lastMatchMessage = new ValueHolder<String>();
         with()
-                .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                .intermediaryResultHandler(new IntermediaryResultHandler<Integer>() {
+                    public void handleMismatch(String mismatchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                         lastMatchMessage.value = mismatchMessage;
                     }
 
-                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMatch(String matchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                         lastMatchMessage.value = matchMessage;
                     }
                 })
                 .until(new CountDown(10), is(equalTo(5)));
 
-        String expectedMatchMessage = String.format("%s's condition that <5> has been satisfied", CountDown.class.getName());
+        String expectedMatchMessage = String.format("%s reached its end value of <5>", CountDown.class.getName());
         assertThat(lastMatchMessage.value, is(equalTo(expectedMatchMessage)));
 
+    }
+
+    @Test(timeout = 2000)
+    public void throwsClassCastExceptionWhenIntermediaryResultHandlerTypeIsInvalid() {
+        exception.expect(ClassCastException.class);
+        exception.expectMessage(allOf(startsWith("Cannot apply intermediary result handler com.jayway.awaitility.IntermediaryResultHandlerTest"),
+                    endsWith(" because java.lang.Integer cannot be cast to java.lang.String")));
+        with().intermediaryResultHandler(new IntermediaryResultHandler<String>() {
+                    public void handleMismatch(String mismatchMessage, String value, long elapsedTimeInMS, long remainingTimeInMS) {
+                    }
+
+                    public void handleMatch(String matchMessage, String value, long elapsedTimeInMS, long remainingTimeInMS) {
+                    }
+                })
+                .until(new CountDown(10), is(equalTo(5)));
+    }
+
+    @Test(timeout = 2000)
+    public void throwsClassCastExceptionWhenIntermediaryResultHandlerTypeIsInvalidAndResultMatches() {
+        exception.expect(ClassCastException.class);
+        exception.expectMessage(allOf(startsWith("Cannot apply intermediary result handler com.jayway.awaitility.IntermediaryResultHandlerTest"),
+                    endsWith(" because java.lang.Integer cannot be cast to java.lang.String")));
+        with().intermediaryResultHandler(new IntermediaryResultHandler<String>() {
+                    public void handleMismatch(String mismatchMessage, String value, long elapsedTimeInMS, long remainingTimeInMS) {
+                    }
+
+                    public void handleMatch(String matchMessage, String value, long elapsedTimeInMS, long remainingTimeInMS) {
+                    }
+                })
+                .until(new CountDown(5), is(equalTo(5)));
     }
 
     @Test(timeout = 2000)
@@ -221,13 +252,13 @@ public class IntermediaryResultHandlerTest {
         final Set<Long> remainingTimes = new HashSet<Long>();
         final Set<Long> elapsedTimes = new HashSet<Long>();
         with()
-                .intermediaryResultHandler(new IntermediaryResultHandler() {
-                    public void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                .intermediaryResultHandler(new IntermediaryResultHandler<Integer>() {
+                    public void handleMismatch(String mismatchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                         remainingTimes.add(remainingTimeInMS);
                         elapsedTimes.add(elapsedTimeInMS);
                     }
 
-                    public void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS) {
+                    public void handleMatch(String matchMessage, Integer value, long elapsedTimeInMS, long remainingTimeInMS) {
                         remainingTimes.add(remainingTimeInMS);
                         elapsedTimes.add(elapsedTimeInMS);
                     }

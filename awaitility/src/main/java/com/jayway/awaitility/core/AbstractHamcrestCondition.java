@@ -45,14 +45,14 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         }
 
         watch = new StopWatch();
-        Callable<Boolean> callable = new Callable<Boolean>() {
+        final Callable<Boolean> callable = new Callable<Boolean>() {
             public Boolean call() throws Exception {
                 lastResult = supplier.call();
                 boolean matches = matcher.matches(lastResult);
                 if (!matches) {
-                    handleIntermediaryMismatch(supplier, matcher, settings, watch);
+                    handleIntermediaryMismatch(supplier, matcher, settings, watch, lastResult);
                 } else {
-                    handleFinalMatch(supplier, matcher, settings, watch);
+                    handleFinalMatch(supplier, matcher, settings, watch, lastResult);
                 }
                 return matches;
 
@@ -61,20 +61,27 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         conditionAwaiter = new ConditionAwaiter(callable, settings) {
             @Override
             protected String getTimeoutMessage() {
+                //                return getMismatchMessage(supplier, matcher);
                 return String.format("%s expected %s but was <%s>", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher), lastResult);
             }
         };
     }
 
-    private void handleFinalMatch(Callable<T> supplier, Matcher<? super T> matcher, ConditionSettings settings, StopWatch watch) {
-        IntermediaryResultHandler handler = settings.getIntermediaryResultHandler();
+    @SuppressWarnings("unchecked")
+    private void handleFinalMatch(Callable<T> supplier, Matcher<? super T> matcher, ConditionSettings settings, StopWatch watch, T lastResult) {
+        IntermediaryResultHandler<T> handler = settings.getIntermediaryResultHandler();
         if (handler != null) {
             long elapsedTimeInMS = watch.getElapsedTimeInMS();
             long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
-            handler.handleMatch(
-                    getMatchMessage(supplier, matcher),
-                    elapsedTimeInMS,
-                    remainingTimeInMS);
+            try {
+                handler.handleMatch(
+                        getMatchMessage(supplier, matcher),
+                        lastResult,
+                        elapsedTimeInMS,
+                        remainingTimeInMS);
+            } catch (ClassCastException e) {
+                throwClassCastExceptionBecauseIntermediaryResultHandlerCouldntBeApplied(e, handler);
+            }
         }
     }
 
@@ -84,19 +91,29 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
     }
 
     private String getMatchMessage(Callable<T> supplier, Matcher<? super T> matcher) {
-        return String.format("%s's condition that %s has been satisfied", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher));
+        return String.format("%s reached its end value of %s", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher));
     }
 
-    private void handleIntermediaryMismatch(Callable<T> supplier, Matcher<? super T> matcher, ConditionSettings settings, StopWatch watch) {
-        IntermediaryResultHandler handler = settings.getIntermediaryResultHandler();
+    @SuppressWarnings("unchecked")
+    private void handleIntermediaryMismatch(Callable<T> supplier, Matcher<? super T> matcher, ConditionSettings settings, StopWatch watch, T lastResult) {
+        IntermediaryResultHandler<T> handler = settings.getIntermediaryResultHandler();
         if (handler != null) {
             long elapsedTimeInMS = watch.getElapsedTimeInMS();
             long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
-            handler.handleMismatch(
-                    getMismatchMessage(supplier, matcher),
-                    elapsedTimeInMS,
-                    remainingTimeInMS);
+            try {
+                handler.handleMismatch(
+                        getMismatchMessage(supplier, matcher),
+                        lastResult,
+                        elapsedTimeInMS,
+                        remainingTimeInMS);
+            } catch (ClassCastException e) {
+                throwClassCastExceptionBecauseIntermediaryResultHandlerCouldntBeApplied(e, handler);
+            }
         }
+    }
+
+    private void throwClassCastExceptionBecauseIntermediaryResultHandlerCouldntBeApplied(ClassCastException e, IntermediaryResultHandler handler) {
+        throw new ClassCastException("Cannot apply intermediary result handler " + handler.getClass().getName() + " because " + e.getMessage());
     }
 
     private String getMismatchMessage(Callable<T> supplier, Matcher<? super T> matcher) {

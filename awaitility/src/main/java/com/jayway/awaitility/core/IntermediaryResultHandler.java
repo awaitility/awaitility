@@ -17,24 +17,28 @@ package com.jayway.awaitility.core;
 
 /**
  * Handles each intermediary mismatch and a final match (if any) of Hamcrest-based condition.
+ *
+ * @param <T> The expected return type of the condition
  */
-public interface IntermediaryResultHandler {
+public interface IntermediaryResultHandler<T> {
 
     /**
      * Handles an intermediary mismatch of a Hamcrest matcher.
      *
-     * @param mismatchMessage   message returned when Hamcrest matcher fails.
-     * @param elapsedTimeInMS   elapsed time in milliseconds.
-     * @param remainingTimeInMS remaining time to wait in milliseconds; <code>Long.MAX_VALUE</code>, if no timeout defined, i.e., running forever.
+     * @param mismatchMessage       message returned when Hamcrest matcher fails.
+     * @param elapsedTimeInMS       elapsed time in milliseconds.
+     * @param currentConditionValue The current value of the condition.
+     * @param remainingTimeInMS     remaining time to wait in milliseconds; <code>Long.MAX_VALUE</code>, if no timeout defined, i.e., running forever.
      */
-    void handleMismatch(String mismatchMessage, long elapsedTimeInMS, long remainingTimeInMS);
+    void handleMismatch(String mismatchMessage, T currentConditionValue, long elapsedTimeInMS, long remainingTimeInMS);
 
     /**
      * Handles a final match of a Hamcrest matcher.
      *
-     * @param matchMessage   message returned when Hamcrest matcher succeeds.
+     * @param matchMessage      message returned when Hamcrest matcher succeeds.
+     * @param conditionEndValue The value returned by the condition when it matched.
      * @param elapsedTimeInMS   elapsed time in milliseconds.
      * @param remainingTimeInMS remaining time to wait in milliseconds; <code>Long.MAX_VALUE</code>, if no timeout defined, i.e., running forever.
      */
-    void handleMatch(String matchMessage, long elapsedTimeInMS, long remainingTimeInMS);
+    void handleMatch(String matchMessage, T conditionEndValue, long elapsedTimeInMS, long remainingTimeInMS);
 }
