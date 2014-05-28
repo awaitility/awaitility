@@ -30,10 +30,18 @@ public class LoggingIntermediaryResultHandler implements IntermediaryResultHandl
 
     private final TimeUnit timeUnit;
 
+    /**
+     * Uses {@link java.util.concurrent.TimeUnit#MILLISECONDS} as unit for elapsed and remaining time.
+     */
     public LoggingIntermediaryResultHandler() {
         this(MILLISECONDS);
     }
 
+    /**
+     * Specifies the {@link java.util.concurrent.TimeUnit} to use as unit for elapsed and remaining time.
+     *
+     * @param timeUnit The time unit to use.
+     */
     public LoggingIntermediaryResultHandler(TimeUnit timeUnit) {
         if (timeUnit == null) {
             throw new IllegalArgumentException("TimeUnit cannot be null");
