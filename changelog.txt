@@ -1,10 +1,9 @@
 Changelog next version
 ----------------------
 * Added support for condition evaluation listeners. A listener is called each time a Hamcrest-based condition has been evaluated by Awaitility. For example:
-    with()
-           .conditionEvaluationListener(condition -> System.out.printf("%s (elapsed time %dms, remaining time %dms)\n", condition.getDescription(), condition.getElapsedTimeInMS(), condition.getRemainingTimeInMS()))
-           .atMost(Duration.TEN_SECONDS)
-           .until(new CountDown(5), is(equalTo(0)));
+    with().
+            conditionEvaluationListener(condition -> System.out.printf("%s (elapsed time %dms, remaining time %dms)\n", condition.getDescription(), condition.getElapsedTimeInMS(), condition.getRemainingTimeInMS())).
+            await().atMost(Duration.TEN_SECONDS).until(new CountDown(5), is(equalTo(0)));
   will print the following to the console:
     com.jayway.awaitility.AwaitilityJava8Test$CountDown expected (<0> or a value less than <0>) but was <5> (elapsed time 101ms, remaining time 1899ms)
     com.jayway.awaitility.AwaitilityJava8Test$CountDown expected (<0> or a value less than <0>) but was <4> (elapsed time 204ms, remaining time 1796ms)
