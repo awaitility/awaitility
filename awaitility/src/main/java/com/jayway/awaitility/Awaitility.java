@@ -16,8 +16,8 @@
 package com.jayway.awaitility;
 
 import com.jayway.awaitility.core.ConditionFactory;
+import com.jayway.awaitility.core.ConditionEvaluationListener;
 import com.jayway.awaitility.core.FieldSupplierBuilder;
-import com.jayway.awaitility.core.IntermediaryResultHandler;
 import com.jayway.awaitility.core.MethodCallRecorder;
 
 import java.util.concurrent.TimeUnit;
@@ -125,9 +125,9 @@ public class Awaitility {
     private static volatile boolean defaultCatchUncaughtExceptions = true;
 
     /**
-     * Default logger of intermediary results.
+     * Default listener of condition evaluation results.
      */
-    private static volatile IntermediaryResultHandler defaultIntermediaryResultHandler = null;
+    private static volatile ConditionEvaluationListener defaultConditionEvaluationListener = null;
 
     /**
      * Instruct Awaitility to catch uncaught exceptions from other threads by
@@ -156,7 +156,7 @@ public class Awaitility {
      * <li>poll interval - 100 milliseconds</li>
      * <li>poll delay - 100 milliseconds</li>
      * <li>Catch all uncaught exceptions - true</li>
-     * <li>Don't handle intermediary results</li>
+     * <li>Don't handle condition evaluation results</li>
      * </ul>
      */
     public static void reset() {
@@ -164,7 +164,7 @@ public class Awaitility {
         defaultPollDelay = SAME_AS_POLL_INTERVAL;
         defaultTimeout = Duration.TEN_SECONDS;
         defaultCatchUncaughtExceptions = true;
-        defaultIntermediaryResultHandler = null;
+        defaultConditionEvaluationListener = null;
         Thread.setDefaultUncaughtExceptionHandler(null);
         MethodCallRecorder.reset();
     }
@@ -189,7 +189,7 @@ public class Awaitility {
      */
     public static ConditionFactory await(String alias) {
         return new ConditionFactory(alias, defaultTimeout, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultIntermediaryResultHandler);
+                defaultCatchUncaughtExceptions, defaultConditionEvaluationListener);
     }
 
     /**
@@ -224,7 +224,7 @@ public class Awaitility {
      */
     public static ConditionFactory with() {
         return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultIntermediaryResultHandler);
+                defaultCatchUncaughtExceptions, defaultConditionEvaluationListener);
     }
 
     /**
@@ -332,12 +332,12 @@ public class Awaitility {
     }
 
     /**
-     * Sets the default intermediary result handler that all await statements will use.
+     * Sets the default condition evaluation listener that all await statements will use.
      *
-     * @param defaultIntermediaryResultHandler handles intermediary result each time evaluation of a condition fails. Works only with Hamcrest matcher-based conditions.
+     * @param defaultConditionEvaluationListener handles condition evaluation each time evaluation of a condition occurs. Works only with Hamcrest matcher-based conditions.
      */
-    public static void setDefaultIntermediaryResultHandler(IntermediaryResultHandler defaultIntermediaryResultHandler) {
-        Awaitility.defaultIntermediaryResultHandler = defaultIntermediaryResultHandler;
+    public static void setDefaultConditionEvaluationListener(ConditionEvaluationListener defaultConditionEvaluationListener) {
+        Awaitility.defaultConditionEvaluationListener = defaultConditionEvaluationListener;
     }
 
     /**

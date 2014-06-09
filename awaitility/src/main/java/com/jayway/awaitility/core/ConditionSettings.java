@@ -25,7 +25,7 @@ class ConditionSettings {
 	private final Duration pollInterval;
 	private final Duration pollDelay;
 	private final boolean catchUncaughtExceptions;
-    private final IntermediaryResultHandler intermediaryResultHandler;
+    private final ConditionEvaluationListener conditionEvaluationListener;
 
 	/**
 	 * <p>Constructor for ConditionSettings.</p>
@@ -35,10 +35,10 @@ class ConditionSettings {
 	 * @param maxWaitTime a {@link com.jayway.awaitility.Duration} object.
 	 * @param pollInterval a {@link com.jayway.awaitility.Duration} object.
 	 * @param pollDelay a {@link com.jayway.awaitility.Duration} object.
-     * @param intermediaryResultHandler a {@link IntermediaryResultHandler} object.
+     * @param conditionEvaluationListener a {@link ConditionEvaluationListener} object.
      */
 	public ConditionSettings(String alias, boolean catchUncaughtExceptions, Duration maxWaitTime,
-                             Duration pollInterval, Duration pollDelay, IntermediaryResultHandler intermediaryResultHandler) {
+                             Duration pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener) {
 		if (maxWaitTime == null) {
 			throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
 		}
@@ -53,7 +53,7 @@ class ConditionSettings {
 		this.pollInterval = pollInterval;
 		this.pollDelay = pollDelay == SAME_AS_POLL_INTERVAL ? pollInterval : pollDelay;
 		this.catchUncaughtExceptions = catchUncaughtExceptions;
-        this.intermediaryResultHandler = intermediaryResultHandler;
+        this.conditionEvaluationListener = conditionEvaluationListener;
 	}
 
 	/**
@@ -111,12 +111,12 @@ class ConditionSettings {
 	}
 
     /**
-     * <p>Getter for the field <code>intermediaryResultLogger</code></p>
+     * <p>Getter for the field <code>conditionResultLogger</code></p>
      *
-     * @return {@link IntermediaryResultHandler} object.
+     * @return {@link ConditionEvaluationListener} object.
      */
-    public IntermediaryResultHandler getIntermediaryResultHandler() {
-        return intermediaryResultHandler;
+    public ConditionEvaluationListener getConditionEvaluationListener() {
+        return conditionEvaluationListener;
     }
 
 }

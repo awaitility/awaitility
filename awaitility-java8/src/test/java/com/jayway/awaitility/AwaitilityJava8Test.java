@@ -3,11 +3,9 @@ package com.jayway.awaitility;
 import com.jayway.awaitility.classes.Asynch;
 import com.jayway.awaitility.classes.FakeRepository;
 import com.jayway.awaitility.classes.FakeRepositoryImpl;
+import com.jayway.awaitility.core.ConditionEvaluationLogger;
 import com.jayway.awaitility.core.ConditionTimeoutException;
-import com.jayway.awaitility.core.IntermediaryResultHandler;
-import com.jayway.awaitility.resulthandler.LoggingIntermediaryResultHandler;
 import org.assertj.core.api.Assertions;
-import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -129,20 +127,9 @@ public class AwaitilityJava8Test {
     }
 
     @Test(timeout = 10000)
-    public void intermediaryResultsCanBeLoggedToSystemOut() {
+    public void conditionResultsCanBeLoggedToSystemOut() {
         with()
-                .intermediaryResultHandler(new IntermediaryResultHandler<Integer>() {
-                    @Override
-                    public void handleMismatch(String mismatchMessage, Matcher<? super Integer> matcher, Integer result, long elapsedTimeInMS, long remainingTimeInMS) {
-                        System.out.printf("%s (elapsed time %dms, remaining time %dms)\n", mismatchMessage, elapsedTimeInMS, remainingTimeInMS);
-                    }
-
-                    @Override
-                    public void handleMatch(String matchMessage, Matcher<? super Integer> matcher, Integer result, long elapsedTimeInMS, long remainingTimeInMS) {
-                        System.out.printf("Matching value found: %d (elapsed time %dms, remaining time %dms)\n", result, elapsedTimeInMS, remainingTimeInMS);
-                    }
-                })
-
+                .conditionEvaluationListener(condition -> System.out.printf("%s (elapsed time %dms, remaining time %dms)\n", condition.getDescription(), condition.getElapsedTimeInMS(), condition.getRemainingTimeInMS()))
                 .pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
                 .atMost(Duration.TWO_SECONDS)
                 .until(new CountDown(5), anyOf(is(0), lessThan(0)));
@@ -151,7 +138,7 @@ public class AwaitilityJava8Test {
     @Test(timeout = 10000)
     public void loggingIntermediaryHandlerLogsToSystemOut() {
         with()
-                .intermediaryResultHandler(new LoggingIntermediaryResultHandler(SECONDS))
+                .conditionEvaluationListener(new ConditionEvaluationLogger(SECONDS))
                 .pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
                 .atMost(Duration.TWO_SECONDS)
                 .until(new CountDown(5), is(equalTo(0)));
