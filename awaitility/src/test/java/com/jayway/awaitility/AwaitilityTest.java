@@ -108,13 +108,6 @@ public class AwaitilityTest {
         assertEquals(1, fakeRepository.getValue());
     }
 
-    @Test(expected = ConditionTimeoutException.class)
-    public void awaitOperationSupportsDefaultPollDelay() throws Exception {
-        Awaitility.setDefaultPollDelay(3000, TimeUnit.MILLISECONDS);
-        await().atMost(ONE_SECOND).until(value(), greaterThan(0));
-        assertEquals(1, fakeRepository.getValue());
-    }
-
     @Test(timeout = 2000)
     public void foreverConditionSpecificationUsingUntilWithDirectBlock() throws Exception {
         new Asynch(fakeRepository).perform();
