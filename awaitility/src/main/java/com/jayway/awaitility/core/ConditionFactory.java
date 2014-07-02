@@ -136,7 +136,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory conditionEvaluationListener(ConditionEvaluationListener conditionEvaluationListener) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions, conditionEvaluationListener);
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, conditionEvaluationListener);
     }
 
     /**
@@ -146,7 +146,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory timeout(Duration timeout) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions, conditionEvaluationListener);
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, conditionEvaluationListener);
     }
 
     /**
@@ -156,7 +156,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory atMost(Duration timeout) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions, conditionEvaluationListener);
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, conditionEvaluationListener);
     }
 
     /**
@@ -167,7 +167,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory forever() {
-        return new ConditionFactory(alias, Duration.FOREVER, pollInterval, pollInterval, catchUncaughtExceptions, conditionEvaluationListener);
+        return new ConditionFactory(alias, Duration.FOREVER, pollInterval, pollDelay, catchUncaughtExceptions, conditionEvaluationListener);
     }
 
     /**
@@ -186,7 +186,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory pollInterval(Duration pollInterval) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions, conditionEvaluationListener);
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, conditionEvaluationListener);
     }
 
     /**
@@ -197,7 +197,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory timeout(long timeout, TimeUnit unit) {
-        return new ConditionFactory(alias, new Duration(timeout, unit), pollInterval, pollInterval,
+        return new ConditionFactory(alias, new Duration(timeout, unit), pollInterval, pollDelay,
                 catchUncaughtExceptions, conditionEvaluationListener);
     }
 
@@ -268,7 +268,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory catchUncaughtExceptions() {
-        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, true, conditionEvaluationListener);
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, true, conditionEvaluationListener);
     }
 
     /**
@@ -292,7 +292,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory await(String alias) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollInterval, catchUncaughtExceptions, conditionEvaluationListener);
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, conditionEvaluationListener);
     }
 
     /**
