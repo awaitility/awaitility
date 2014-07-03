@@ -2,6 +2,7 @@ package com.jayway.awaitility;
 
 import com.jayway.awaitility.core.EvaluatedCondition;
 import com.jayway.awaitility.core.ConditionEvaluationListener;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -22,9 +23,8 @@ public class ConditionEvaluationListenerTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-
-    @Before
-    public void setUp() {
+    @After
+    public void tearDown() {
         Awaitility.reset();
     }
 
