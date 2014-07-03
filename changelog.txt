@@ -1,5 +1,5 @@
-Changelog next version
-----------------------
+Changelog 1.6.1 (2014-07-03)
+----------------------------
 * Added support for condition evaluation listeners. A listener is called each time a Hamcrest-based condition has been evaluated by Awaitility. For example:
     with().
             conditionEvaluationListener(condition -> System.out.printf("%s (elapsed time %dms, remaining time %dms)\n", condition.getDescription(), condition.getElapsedTimeInMS(), condition.getRemainingTimeInMS())).
