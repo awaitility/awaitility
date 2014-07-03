@@ -16,7 +16,8 @@ public class EvaluatedCondition<T> {
     private final boolean conditionIsFulfilled;
 
     /**
-     * @param description           Descriptive message of the Hamcrest matcher.
+     * @param description           A descriptive match message or mismatch message of the matcher. If <code>isConditionSatisfied</code> is <code>true</code> then it
+     *                              describes a match message, if <code>false</code> then it describes a mismatch message.
      * @param matcher               The Hamcrest matcher used in the condition
      * @param currentConditionValue The current value of the condition.
      * @param elapsedTimeInMS       elapsed time in milliseconds.
