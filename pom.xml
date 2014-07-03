@@ -8,7 +8,7 @@
     <groupId>com.jayway.awaitility</groupId>
     <artifactId>awaitility-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.6.1</version>
+    <version>1.6.2-SNAPSHOT</version>
     <url>http://github.com/jayway/awaitility</url>
     <name>Awaitility Parent POM</name>
     <description>A Java DSL for synchronizing asynchronous operations</description>
@@ -54,7 +54,7 @@
         <url>http://github.com/jayway/awaitility/tree/${scm.branch}</url>
         <connection>scm:git:git://github.com/jayway/awaitility.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/jayway/awaitility.git</developerConnection>
-      <tag>awaitility-1.6.1</tag>
+      <tag>HEAD</tag>
   </scm>
     <mailingLists>
         <mailingList>
