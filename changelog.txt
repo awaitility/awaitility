@@ -13,7 +13,7 @@ Changelog next version
     com.jayway.awaitility.AwaitilityJava8Test$CountDown reached its end value of (<0> or a value less than <0>) (elapsed time 610ms, remaining time 1390ms)
   Big thanks to Maciej Gawinecki for the help.
 * Added primitive values to matching check when doing await().untilTrue(..) and await().untilFalse(..) (issue 26)
-* Fixed issue that caused poll interval to be used as poll delay
+* Fixed issue that caused poll interval to be used as poll delay (issue 29).
 
 Changelog 1.6.0 (2014-04-23)
 ----------------------------
