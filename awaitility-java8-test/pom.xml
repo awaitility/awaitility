@@ -7,8 +7,8 @@
         <version>1.6.2-SNAPSHOT</version>
     </parent>
     <artifactId>awaitility-java8</artifactId>
-    <name>Awaitility support for Java 8</name>
-    <description>Simplifies Awaitility usage with Java 8</description>
+    <name>Awaitility tests for Java 8</name>
+    <description>Tests Awaitility with Java 8</description>
     <packaging>jar</packaging>
 
     <build>

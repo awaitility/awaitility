@@ -1,3 +1,7 @@
+Changelog next version
+----------------------
+* awaitility-java8 project was renamed to awaitility-java8-test to better describe its purpose.
+
 Changelog 1.6.1 (2014-07-03)
 ----------------------------
 * Added support for condition evaluation listeners. A listener is called each time a Hamcrest-based condition has been evaluated by Awaitility. For example:
