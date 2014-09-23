@@ -2,6 +2,11 @@
 Usage
 ===============================================================================
 
+* For Scala documentation click [here](scala.md).
+
+
+__Table of contents__
+
 * [Static imports](#static-imports)
 * [Usage examples](#usage-examples)
     - [Example 1 - Simple](#example-1---simple)
