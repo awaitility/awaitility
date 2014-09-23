@@ -3,6 +3,7 @@ Usage
 ===============================================================================
 
 * For Scala documentation click [here](scala.md).
+* For Groovy documentation click [here](groovy.md).
 
 
 __Table of contents__
