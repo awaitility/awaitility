@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * awaitility-java8 project was renamed to awaitility-java8-test to better describe its purpose.
+* Support for automatic deadlock detection. The awaitility stracktrace will now include deadlock information if a deadlock was found (thanks to Tobias Bieniek for pull request).
 
 Changelog 1.6.1 (2014-07-03)
 ----------------------------
