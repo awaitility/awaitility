@@ -48,14 +48,20 @@ public class DeadlockDetectionTest {
             }
         };
 
+        // start both threads more or less at the same time to create the deadlock
         t1.start();
         t2.start();
 
         try {
+            // wait for something that will never happen
+            // i.e. something that will throw the expected ConditionTimeoutException
             await().atMost(Duration.ONE_SECOND).untilTrue(locked);
+
+            // ... and fail if the exception is not thrown
             fail("ConditionTimeoutException expected.");
 
         } catch (ConditionTimeoutException e) {
+            // check that the thrown exception has a DeadlockException attached to it
             DeadlockException cause = (DeadlockException) e.getCause();
             assertTrue(cause instanceof DeadlockException);
             assertEquals(2, cause.getThreadInfos().length);
