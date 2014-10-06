@@ -1,5 +1,6 @@
 package com.jayway.awaitility;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.concurrent.Callable;
@@ -10,9 +11,14 @@ import static com.jayway.awaitility.Duration.FIVE_SECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class WaitForAtomicBooleanTest {
-    private AtomicBoolean wasAdded = new AtomicBoolean(false);
-    private AtomicBoolean wasAddedWithDefaultValue = new AtomicBoolean();
+    private AtomicBoolean wasAdded;
+    private AtomicBoolean wasAddedWithDefaultValue;
 
+    @Before
+    public void setup() {
+        wasAdded = new AtomicBoolean(false);
+        wasAddedWithDefaultValue = new AtomicBoolean();
+    }
 
     @Test(timeout = 2000L)
     public void atomicBooleanExample() throws Exception {
