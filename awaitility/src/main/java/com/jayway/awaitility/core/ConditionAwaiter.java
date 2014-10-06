@@ -19,6 +19,8 @@ import com.jayway.awaitility.Duration;
 
 import java.beans.Introspector;
 import java.lang.Thread.UncaughtExceptionHandler;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.util.concurrent.*;
 
 abstract class ConditionAwaiter implements UncaughtExceptionHandler {
@@ -90,7 +92,15 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                     } else {
                         message = String.format("%s within %s %s.", getTimeoutMessage(), timeout, maxWaitTimeLowerCase);
                     }
-                    throw new ConditionTimeoutException(message);
+
+                    ConditionTimeoutException e = new ConditionTimeoutException(message);
+
+                    ThreadMXBean bean = ManagementFactory.getThreadMXBean();
+                    long[] threadIds = bean.findDeadlockedThreads();
+                    if (threadIds != null)
+                        e.initCause(new DeadlockException(threadIds));
+
+                    throw e;
                 }
             } finally {
                 executor.shutdown();
