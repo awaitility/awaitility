@@ -56,7 +56,7 @@ import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
  *
  * <pre>
  * with().pollInterval(ONE_HUNDERED_MILLISECONDS).and().with().pollDelay(20, MILLISECONDS).await("customer registration")
- *         .until(costumerStatus(), equalTo(REGISTERED));
+ *         .until(customerStatus(), equalTo(REGISTERED));
  * </pre>
  *
  * You can also specify a default timeout, poll interval and poll delay using:
