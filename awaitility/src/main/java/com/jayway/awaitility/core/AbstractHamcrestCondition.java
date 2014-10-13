@@ -15,7 +15,6 @@
  */
 package com.jayway.awaitility.core;
 
-import com.jayway.awaitility.Duration;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
@@ -27,7 +26,7 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
     private ConditionAwaiter conditionAwaiter;
 
     private T lastResult;
-    private final StopWatch watch;
+    private final ConditionEvaluationHandler<T> conditionEvaluationHandler;
 
     /**
      * <p>Constructor for AbstractHamcrestCondition.</p>
@@ -44,15 +43,15 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
             throw new IllegalArgumentException("You must specify a matcher (was null).");
         }
 
-        watch = new StopWatch();
+        conditionEvaluationHandler = new ConditionEvaluationHandler<T>(matcher, settings);
         final Callable<Boolean> callable = new Callable<Boolean>() {
             public Boolean call() throws Exception {
                 lastResult = supplier.call();
                 boolean matches = matcher.matches(lastResult);
-                if (!matches) {
-                    handleConditionResultMismatch(supplier, matcher, settings, watch, lastResult);
+                if (matches) {
+                    conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier, matcher), lastResult);
                 } else {
-                    handleConditionResultMatch(supplier, matcher, settings, watch, lastResult);
+                    conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, matcher), lastResult);
                 }
                 return matches;
 
@@ -67,45 +66,9 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         };
     }
 
-    @SuppressWarnings("unchecked")
-    private void handleConditionResultMatch(Callable<T> supplier, Matcher<? super T> matcher, ConditionSettings settings, StopWatch watch, T lastResult) {
-        ConditionEvaluationListener<T> listener = settings.getConditionEvaluationListener();
-        if (listener != null) {
-            long elapsedTimeInMS = watch.getElapsedTimeInMS();
-            long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
-            try {
-                listener.conditionEvaluated(new EvaluatedCondition<T>(getMatchMessage(supplier, matcher), matcher, lastResult, elapsedTimeInMS, remainingTimeInMS, true));
-            } catch (ClassCastException e) {
-                throwClassCastExceptionBecauseIntermediaryResultHandlerCouldntBeApplied(e, listener);
-            }
-        }
-    }
-
-    private long getRemainingTimeInMS(long elapsedTimeInMS, Duration maxWaitTime) {
-        return maxWaitTime.equals(Duration.FOREVER) ?
-                Long.MAX_VALUE : maxWaitTime.getValueInMS() - elapsedTimeInMS;
-    }
 
     private String getMatchMessage(Callable<T> supplier, Matcher<? super T> matcher) {
         return String.format("%s reached its end value of %s", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher));
-    }
-
-    @SuppressWarnings("unchecked")
-    private void handleConditionResultMismatch(Callable<T> supplier, Matcher<? super T> matcher, ConditionSettings settings, StopWatch watch, T lastResult) {
-        ConditionEvaluationListener<T> listener = settings.getConditionEvaluationListener();
-        if (listener != null) {
-            long elapsedTimeInMS = watch.getElapsedTimeInMS();
-            long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
-            try {
-                listener.conditionEvaluated(new EvaluatedCondition<T>(getMismatchMessage(supplier, matcher), matcher, lastResult, elapsedTimeInMS, remainingTimeInMS, false));
-            } catch (ClassCastException e) {
-                throwClassCastExceptionBecauseIntermediaryResultHandlerCouldntBeApplied(e, listener);
-            }
-        }
-    }
-
-    private void throwClassCastExceptionBecauseIntermediaryResultHandlerCouldntBeApplied(ClassCastException e, ConditionEvaluationListener listener) {
-        throw new ClassCastException("Cannot apply condition evaluation listener " + listener.getClass().getName() + " because " + e.getMessage());
     }
 
     private String getMismatchMessage(Callable<T> supplier, Matcher<? super T> matcher) {
@@ -114,25 +77,13 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         return String.format("%s expected %s but %s", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher), mismatchDescription);
     }
 
-    private static class StopWatch {
-        private long startTime;
-
-        public void start() {
-            this.startTime = System.currentTimeMillis();
-        }
-
-        public long getElapsedTimeInMS() {
-            return System.currentTimeMillis() - startTime;
-        }
-    }
-
     /**
      * <p>await.</p>
      *
      * @return a T object.
      */
     public T await() {
-        watch.start();
+        conditionEvaluationHandler.start();
         conditionAwaiter.await();
         return lastResult;
     }

@@ -65,6 +65,7 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
         final String expectedFieldName = fieldSupplier.getExpectedFieldName();
         final Class<?> expectedFieldType = fieldSupplier.getExpectedFieldType();
         final Object object = fieldSupplier.getObject();
+        final Class<?> objectClass = object instanceof Class ? (Class<?>) object : object.getClass();
 
         StringBuilder builder = new StringBuilder();
         if (expectedFieldName == null) {
@@ -80,7 +81,7 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
         } else {
 
             try {
-                final Field declaredField = object.getClass().getDeclaredField(expectedFieldName);
+                final Field declaredField = objectClass.getDeclaredField(expectedFieldName);
                 builder.append("Field ");
                 builder.append(declaredField);
             } catch (Exception e) {
