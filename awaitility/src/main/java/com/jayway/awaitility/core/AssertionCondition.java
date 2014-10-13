@@ -28,7 +28,7 @@ public class AssertionCondition implements Condition<Void> {
     private final ConditionAwaiter conditionAwaiter;
 
     private String lastExceptionMessage;
-    private final ConditionEvaluationHandler<String> conditionEvaluationHandler;
+    private final ConditionEvaluationHandler<Object> conditionEvaluationHandler;
 
     /**
      * <p>Constructor for AssertionCondition.</p>
@@ -41,7 +41,7 @@ public class AssertionCondition implements Condition<Void> {
             throw new IllegalArgumentException("You must specify a supplier (was null).");
         }
 
-        conditionEvaluationHandler = new ConditionEvaluationHandler<String>(null, settings);
+        conditionEvaluationHandler = new ConditionEvaluationHandler<Object>(null, settings);
 
         final Callable<Boolean> callable = new Callable<Boolean>() {
             public Boolean call() throws Exception {
