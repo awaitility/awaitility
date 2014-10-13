@@ -28,6 +28,7 @@ public class AssertionCondition implements Condition<Void> {
     private final ConditionAwaiter conditionAwaiter;
 
     private String lastExceptionMessage;
+    private final ConditionEvaluationHandler<String> conditionEvaluationHandler;
 
     /**
      * <p>Constructor for AssertionCondition.</p>
@@ -35,17 +36,22 @@ public class AssertionCondition implements Condition<Void> {
      * @param supplier a {@link java.lang.Runnable} object.
      * @param settings a {@link com.jayway.awaitility.core.ConditionSettings} object.
      */
-    public AssertionCondition(final Runnable supplier, ConditionSettings settings) {
+    public AssertionCondition(final Runnable supplier, final ConditionSettings settings) {
         if (supplier == null) {
             throw new IllegalArgumentException("You must specify a supplier (was null).");
         }
-        Callable<Boolean> callable = new Callable<Boolean>() {
+
+        conditionEvaluationHandler = new ConditionEvaluationHandler<String>(null, settings);
+
+        final Callable<Boolean> callable = new Callable<Boolean>() {
             public Boolean call() throws Exception {
                 try {
                     supplier.run();
+                    conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier), lastExceptionMessage);
                     return true;
                 } catch (AssertionError e) {
                     lastExceptionMessage = e.getMessage();
+                    conditionEvaluationHandler.handleConditionResultMatch(getMismatchMessage(supplier), lastExceptionMessage);
                     return false;
                 }
             }
@@ -58,12 +64,22 @@ public class AssertionCondition implements Condition<Void> {
         };
     }
 
+
+    private String getMatchMessage(Runnable supplier) {
+        return supplier.getClass().getName() + " passed";
+    }
+
+    private String getMismatchMessage(Runnable supplier) {
+        return supplier.getClass().getName() + " " + lastExceptionMessage;
+    }
+
     /**
      * <p>await.</p>
      *
      * @return a {@link java.lang.Void} object.
      */
     public Void await() {
+        conditionEvaluationHandler.start();
         conditionAwaiter.await();
         return null;
     }
