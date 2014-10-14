@@ -15,13 +15,17 @@
  */
 package com.jayway.awaitility.core;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
+
+import static com.jayway.awaitility.core.LambdaErrorMessageGenerator.generateLambdaErrorMessagePrefix;
+import static com.jayway.awaitility.core.LambdaErrorMessageGenerator.isLambdaClass;
 
 /**
  * Condition implementation which takes an executable assertion which should throw {@link java.lang.AssertionError} on assertion failure.
  *
- * @since 1.6.0
  * @author Marcin Zajączkowski, 2014-03-28
+ * @since 1.6.0
  */
 public class AssertionCondition implements Condition<Void> {
 
@@ -47,11 +51,11 @@ public class AssertionCondition implements Condition<Void> {
             public Boolean call() throws Exception {
                 try {
                     supplier.run();
-                    conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier), lastExceptionMessage);
+                    conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier, settings.getAlias()), null);
                     return true;
                 } catch (AssertionError e) {
                     lastExceptionMessage = e.getMessage();
-                    conditionEvaluationHandler.handleConditionResultMatch(getMismatchMessage(supplier), lastExceptionMessage);
+                    conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, lastExceptionMessage, settings.getAlias()), null);
                     return false;
                 }
             }
@@ -59,18 +63,42 @@ public class AssertionCondition implements Condition<Void> {
         conditionAwaiter = new ConditionAwaiter(callable, settings) {
             @Override
             protected String getTimeoutMessage() {
-                return supplier.getClass().getName() + " " + lastExceptionMessage;
+                return getMismatchMessage(supplier, lastExceptionMessage, settings.getAlias());
             }
         };
     }
 
 
-    private String getMatchMessage(Runnable supplier) {
-        return supplier.getClass().getName() + " passed";
+    private String getMatchMessage(Runnable supplier, String conditionAlias) {
+        return generateDescriptionPrefix(supplier, conditionAlias) + " reached its end value";
     }
 
-    private String getMismatchMessage(Runnable supplier) {
-        return supplier.getClass().getName() + " " + lastExceptionMessage;
+    private String getMismatchMessage(Runnable supplier, String exceptionMessage, String conditionAlias) {
+        return generateDescriptionPrefix(supplier, conditionAlias) + " " + exceptionMessage;
+    }
+
+    private String generateDescriptionPrefix(Runnable supplier, String conditionAlias) {
+        String methodDescription = generateMethodDescription(supplier);
+        boolean hasAlias = conditionAlias != null;
+        if (isLambdaClass(supplier.getClass())) {
+            final String prefix;
+            if (hasAlias) {
+                prefix = "Condition with alias " + conditionAlias + " that uses ";
+            } else {
+                prefix = "Condition that uses ";
+            }
+            return prefix + generateLambdaErrorMessagePrefix(supplier.getClass(), false) + methodDescription;
+        }
+        return "Runnable condition" + (hasAlias ? " with alias " + conditionAlias : "") + methodDescription;
+    }
+
+    private String generateMethodDescription(Runnable supplier) {
+        String methodDescription = "";
+        Method enclosingMethod = supplier.getClass().getEnclosingMethod();
+        if (enclosingMethod != null) {
+            methodDescription = " defined in " + enclosingMethod.toString();
+        }
+        return methodDescription;
     }
 
     /**

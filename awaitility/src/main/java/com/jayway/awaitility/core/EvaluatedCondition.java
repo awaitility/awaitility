@@ -14,6 +14,7 @@ public class EvaluatedCondition<T> {
     private final long elapsedTimeInMS;
     private final long remainingTimeInMS;
     private final boolean conditionIsFulfilled;
+    private final String alias;
 
     /**
      * @param description           A descriptive match message or mismatch message of the matcher. If <code>isConditionSatisfied</code> is <code>true</code> then it
@@ -25,13 +26,14 @@ public class EvaluatedCondition<T> {
      * @param isConditionSatisfied  <code>true</code> if the condition is satisfied (i.e. hamcrest matcher matches the value), <code>false</code> otherwise (i.e. an intermediate value).
      */
     EvaluatedCondition(String description, Matcher<? super T> matcher, T currentConditionValue, long elapsedTimeInMS, long remainingTimeInMS,
-                       boolean isConditionSatisfied) {
+                       boolean isConditionSatisfied, String alias) {
         this.description = description;
         this.matcher = matcher;
         this.currentConditionValue = currentConditionValue;
         this.elapsedTimeInMS = elapsedTimeInMS;
         this.remainingTimeInMS = remainingTimeInMS;
         this.conditionIsFulfilled = isConditionSatisfied;
+        this.alias = alias;
     }
 
     /**
@@ -42,7 +44,15 @@ public class EvaluatedCondition<T> {
     }
 
     /**
-     * @return The Hamcrest matcher used in the condition
+     * @return <code>true</code> if the condition has a matcher (i.e. it's a Hamcrest Based condition) which means that {@link #getMatcher()} will return a non-null value.
+     */
+    public boolean isHamcrestCondition() {
+        return matcher != null;
+    }
+
+    /**
+     * @return The Hamcrest matcher used in the condition if this condition is a Hamcrest condition
+     * @see #isHamcrestCondition()
      */
     public Matcher<? super T> getMatcher() {
         return matcher;
@@ -81,5 +91,21 @@ public class EvaluatedCondition<T> {
      */
     public boolean isSatisfied() {
         return conditionIsFulfilled;
+    }
+
+    /**
+     * @return The Awaitility alias for the condition (if any).
+     * @see #hasAlias()
+     */
+    public String getAlias() {
+        return alias;
+    }
+
+    /**
+     * @return <code>true</code> if this condition defined an alias.
+     * @see #getAlias()
+     */
+    public boolean hasAlias() {
+        return alias != null;
     }
 }
