@@ -51,7 +51,7 @@ public class AssertionCondition implements Condition<Void> {
                     return true;
                 } catch (AssertionError e) {
                     lastExceptionMessage = e.getMessage();
-                    conditionEvaluationHandler.handleConditionResultMatch(getMismatchMessage(supplier), lastExceptionMessage);
+                    conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier), lastExceptionMessage);
                     return false;
                 }
             }
