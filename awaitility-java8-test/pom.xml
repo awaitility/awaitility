@@ -6,7 +6,7 @@
         <groupId>com.jayway.awaitility</groupId>
         <version>1.6.2-SNAPSHOT</version>
     </parent>
-    <artifactId>awaitility-java8</artifactId>
+    <artifactId>awaitility-java8-test</artifactId>
     <name>Awaitility tests for Java 8</name>
     <description>Tests Awaitility with Java 8</description>
     <packaging>jar</packaging>
