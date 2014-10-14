@@ -22,7 +22,7 @@ import org.hamcrest.Matcher;
  * Handler for {@link Condition} implementations that calls {@link ConditionEvaluationListener} with condition evaluation result and message.
  * It also serves as stop watch for elapsed time.
  */
-public class ConditionEvaluationHandler<T> {
+class ConditionEvaluationHandler<T> {
 
     private final Matcher<? super T> matcher;
     private final ConditionSettings settings;
@@ -46,7 +46,7 @@ public class ConditionEvaluationHandler<T> {
         try {
             listener.conditionEvaluated(new EvaluatedCondition<T>(mismatchMessage, matcher, currentConditionValue, elapsedTimeInMS, remainingTimeInMS, false, settings.getAlias()));
         } catch (ClassCastException e) {
-            throwClassCastExceptionBecauseIntermediaryResultHandlerCouldntBeApplied(e, listener);
+            throwClassCastExceptionBecauseConditionEvaluationListenerCouldntBeApplied(e, listener);
         }
     }
 
@@ -61,7 +61,7 @@ public class ConditionEvaluationHandler<T> {
         try {
             listener.conditionEvaluated(new EvaluatedCondition<T>(matchMessage, matcher, currentConditionValue, elapsedTimeInMS, remainingTimeInMS, true, settings.getAlias()));
         } catch (ClassCastException e) {
-            throwClassCastExceptionBecauseIntermediaryResultHandlerCouldntBeApplied(e, listener);
+            throwClassCastExceptionBecauseConditionEvaluationListenerCouldntBeApplied(e, listener);
         }
     }
 
@@ -70,7 +70,7 @@ public class ConditionEvaluationHandler<T> {
                 Long.MAX_VALUE : maxWaitTime.getValueInMS() - elapsedTimeInMS;
     }
 
-    private void throwClassCastExceptionBecauseIntermediaryResultHandlerCouldntBeApplied(ClassCastException e, ConditionEvaluationListener listener) {
+    private void throwClassCastExceptionBecauseConditionEvaluationListenerCouldntBeApplied(ClassCastException e, ConditionEvaluationListener listener) {
         throw new ClassCastException("Cannot apply condition evaluation listener " + listener.getClass().getName() + " because " + e.getMessage());
     }
 

@@ -25,6 +25,7 @@ import static com.jayway.awaitility.core.LambdaErrorMessageGenerator.isLambdaCla
  * Condition implementation which takes an executable assertion which should throw {@link java.lang.AssertionError} on assertion failure.
  *
  * @author Marcin Zajączkowski, 2014-03-28
+ * @author Johan Haleby
  * @since 1.6.0
  */
 public class AssertionCondition implements Condition<Void> {
@@ -83,9 +84,9 @@ public class AssertionCondition implements Condition<Void> {
         if (isLambdaClass(supplier.getClass())) {
             final String prefix;
             if (hasAlias) {
-                prefix = "Condition with alias " + conditionAlias + " that uses ";
+                prefix = "Condition with alias " + conditionAlias + " defined as a ";
             } else {
-                prefix = "Condition that uses ";
+                prefix = "Condition defined as a ";
             }
             return prefix + generateLambdaErrorMessagePrefix(supplier.getClass(), false) + methodDescription;
         }

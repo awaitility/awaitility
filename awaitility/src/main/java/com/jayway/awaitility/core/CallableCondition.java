@@ -26,14 +26,18 @@ class CallableCondition implements Condition<Void> {
 
     private final ConditionAwaiter conditionAwaiter;
 
+    private final ConditionEvaluationHandler<Object> conditionEvaluationHandler;
+
     /**
      * <p>Constructor for CallableCondition.</p>
      *
-     * @param matcher a {@link java.util.concurrent.Callable} object.
+     * @param matcher  a {@link java.util.concurrent.Callable} object.
      * @param settings a {@link com.jayway.awaitility.core.ConditionSettings} object.
      */
     public CallableCondition(final Callable<Boolean> matcher, ConditionSettings settings) {
-        conditionAwaiter = new ConditionAwaiter(matcher, settings) {
+        conditionEvaluationHandler = new ConditionEvaluationHandler<Object>(null, settings);
+        ConditionEvaluationWrapper conditionEvaluationWrapper = new ConditionEvaluationWrapper(matcher, settings, conditionEvaluationHandler);
+        conditionAwaiter = new ConditionAwaiter(conditionEvaluationWrapper, settings) {
             @SuppressWarnings("rawtypes")
             @Override
             protected String getTimeoutMessage() {
@@ -65,12 +69,74 @@ class CallableCondition implements Condition<Void> {
     }
 
     /**
-     * <p>await.</p>
+     * <p>await</p>
      *
      * @return a {@link java.lang.Void} object.
      */
     public Void await() {
+        conditionEvaluationHandler.start();
         conditionAwaiter.await();
         return null;
+    }
+
+    /**
+     * Wraps and delegates to another callable and invokes the {@link com.jayway.awaitility.core.ConditionEvaluationHandler}.
+     */
+    private static class ConditionEvaluationWrapper implements Callable<Boolean> {
+
+        private final Callable<Boolean> matcher;
+        private final ConditionSettings settings;
+        private final ConditionEvaluationHandler<Object> conditionEvaluationHandler;
+
+        ConditionEvaluationWrapper(Callable<Boolean> matcher, ConditionSettings settings, ConditionEvaluationHandler<Object> conditionEvaluationHandler) {
+
+            this.matcher = matcher;
+            this.settings = settings;
+            this.conditionEvaluationHandler = conditionEvaluationHandler;
+        }
+
+        @Override
+        public Boolean call() throws Exception {
+            boolean conditionFulfilled = matcher.call();
+            if (conditionFulfilled) {
+                conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(matcher, settings.getAlias()), true);
+            } else {
+                conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(matcher, settings.getAlias()), false);
+
+            }
+            return conditionFulfilled;
+        }
+
+        private String getMatchMessage(Callable<Boolean> matcher, String conditionAlias) {
+            return generateDescriptionPrefix(matcher, conditionAlias) + " returned true";
+        }
+
+        private String getMismatchMessage(Callable<Boolean> matcher, String conditionAlias) {
+            return generateDescriptionPrefix(matcher, conditionAlias) + " returned false";
+        }
+
+        private String generateDescriptionPrefix(Callable<Boolean> matcher, String conditionAlias) {
+            String methodDescription = generateMethodDescription(matcher);
+            boolean hasAlias = conditionAlias != null;
+            if (isLambdaClass(matcher.getClass())) {
+                final String prefix;
+                if (hasAlias) {
+                    prefix = "Condition with alias " + conditionAlias + " defined as a ";
+                } else {
+                    prefix = "Condition defined as a ";
+                }
+                return prefix + generateLambdaErrorMessagePrefix(matcher.getClass(), false) + methodDescription;
+            }
+            return "Callable condition" + (hasAlias ? " with alias " + conditionAlias : "") + methodDescription;
+        }
+
+        private String generateMethodDescription(Callable<Boolean> matcher) {
+            String methodDescription = "";
+            Method enclosingMethod = matcher.getClass().getEnclosingMethod();
+            if (enclosingMethod != null) {
+                methodDescription = " defined in " + enclosingMethod.toString();
+            }
+            return methodDescription;
+        }
     }
 }

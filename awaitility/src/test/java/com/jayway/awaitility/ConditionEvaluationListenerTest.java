@@ -1,8 +1,10 @@
 package com.jayway.awaitility;
 
-import com.jayway.awaitility.core.EvaluatedCondition;
 import com.jayway.awaitility.core.ConditionEvaluationListener;
-import org.junit.*;
+import com.jayway.awaitility.core.EvaluatedCondition;
+import org.junit.After;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
@@ -215,26 +217,6 @@ public class ConditionEvaluationListenerTest {
 
         assertThat(remainingTimes, everyItem(is(Long.MAX_VALUE)));
         assertThat(elapsedTimes, everyItem(is(not(Long.MAX_VALUE))));
-    }
-
-    @Ignore @Test(timeout = 2000)
-    public void expectedMatchMessageForCallableConditions() {
-        final ValueHolder<String> lastMatchMessage = new ValueHolder<String>();
-        with()
-                .conditionEvaluationListener(new ConditionEvaluationListener<Integer>() {
-                    public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
-                        lastMatchMessage.value = condition.getDescription();
-                    }
-                })
-                .until(new Callable<Boolean>() {
-                    @Override
-                    public Boolean call() throws Exception {
-                        return new CountDown(10).get() == 5;
-                    }
-                });
-
-        String expectedMatchMessage = String.format("%s reached its end value of <5>", CountDown.class.getName());
-        assertThat(lastMatchMessage.value, is(equalTo(expectedMatchMessage)));
     }
 
     private static class CountDown implements Callable<Integer> {
