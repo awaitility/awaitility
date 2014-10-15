@@ -95,7 +95,12 @@ public class AssertionCondition implements Condition<Void> {
 
     private String generateMethodDescription(Runnable supplier) {
         String methodDescription = "";
-        Method enclosingMethod = supplier.getClass().getEnclosingMethod();
+        Method enclosingMethod = null;
+        try {
+            enclosingMethod = supplier.getClass().getEnclosingMethod();
+        } catch (Error ignored) {
+            // A java.lang.InternalError could be thrown when using the Groovy extension using Groovy 2.3.7 for some reason. Bug in Groovy?!
+        }
         if (enclosingMethod != null) {
             methodDescription = " defined in " + enclosingMethod.toString();
         }

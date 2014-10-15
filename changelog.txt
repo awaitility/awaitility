@@ -5,6 +5,8 @@ Changelog next version
 * Condition evaluation listeners now supports non Hamcrest based conditions (thanks to Tomasz Kalkosiński for the help).
 * Condition evaluation listeners now expose condition alias
 * Improved error messages for lambda- and Runnable conditions
+* Upgraded Scala dependency to version 2.11.3.
+* Upgraded Groovy dependency to version 2.3.7.
 
 Changelog 1.6.1 (2014-07-03)
 ----------------------------

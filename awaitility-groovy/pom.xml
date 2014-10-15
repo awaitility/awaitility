@@ -9,15 +9,13 @@
     <name>Awaitility support for Groovy</name>
     <description>Simplifies Awaitility usage from Groovy</description>
     <properties>
-        <groovy.version>2.2.2</groovy.version>
+        <groovy.version>2.3.7</groovy.version>
         <gmaven.version>1.4</gmaven.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.spockframework</groupId>
