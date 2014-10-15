@@ -7,6 +7,7 @@ Changelog next version
 * Improved error messages for lambda- and Runnable conditions
 * Upgraded Scala dependency to version 2.11.3.
 * Upgraded Groovy dependency to version 2.3.7.
+* Support for Groovy Traits. Implement com.jayway.awaitility.groovy.AwaitilityTrait instead of using the com.jayway.awaitility.groovy.AwaitilitySupport mixin.
 
 Changelog 1.6.1 (2014-07-03)
 ----------------------------

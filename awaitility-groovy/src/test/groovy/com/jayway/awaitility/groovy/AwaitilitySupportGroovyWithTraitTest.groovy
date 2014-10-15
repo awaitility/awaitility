@@ -19,12 +19,12 @@ import com.jayway.awaitility.core.ConditionTimeoutException
 import com.jayway.awaitility.groovy.classes.Asynch
 import spock.lang.Specification
 
+import static com.jayway.awaitility.Awaitility.await
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 import static org.hamcrest.Matchers.equalTo
 import static org.junit.Assert.assertThat
 
-@Mixin(AwaitilitySupport)
-class AwaitilitySupportGroovyTest extends Specification {
+class AwaitilitySupportGroovyWithTraitTest extends Specification implements AwaitilityTrait {
 
   def asynch = new Asynch()
 
