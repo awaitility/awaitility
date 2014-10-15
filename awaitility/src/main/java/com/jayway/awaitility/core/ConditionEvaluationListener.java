@@ -16,14 +16,14 @@
 package com.jayway.awaitility.core;
 
 /**
- * A ConditionEvaluationListener is called each time a Hamcrest-based condition has been evaluated by Awaitility.
+ * A ConditionEvaluationListener is called each time a condition has been evaluated by Awaitility.
  *
  * @param <T> The expected return type of the condition
  */
 public interface ConditionEvaluationListener<T> {
 
     /**
-     * Handle an evaluated condition of a Hamcrest matcher.
+     * Handle an evaluated condition of a matcher.
      *
      * @param condition The condition evaluation result containing various properties of the result of evaluated condition
      */
