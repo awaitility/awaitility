@@ -15,33 +15,12 @@
 */
 package com.jayway.awaitility.groovy
 
-import com.jayway.awaitility.core.ConditionFactory
-
-import java.util.concurrent.Callable
-
-import static com.jayway.awaitility.spi.Timeout.timeout_message
-
 trait AwaitilityTrait {
   private Initializer initializer = new Initializer()
 
   static class Initializer {
     Initializer() {
-      timeout_message = "Condition was not fulfilled"
-
-      def originalMethod = ConditionFactory.metaClass.getMetaMethod("until", Runnable.class)
-      ConditionFactory.metaClass.until { Runnable runnable ->
-        if (runnable instanceof Closure) {
-          delegate.until(new Callable<Boolean>() {
-            Boolean call() {
-              return (runnable as Closure).call();
-            }
-          });
-        } else {
-          originalMethod.invoke(delegate, runnable)
-        }
-        // Return true to signal that everything went OK (for spock tests)
-        true
-      }
+      AwaitilityGroovyBridge.initializeAwaitilityGroovySupport()
     }
   }
 }
