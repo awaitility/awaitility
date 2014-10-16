@@ -17,18 +17,13 @@ public void updatesCustomerStatus() throws Exception {
 
 ## News
 
-* 2014-07-03: [Awaitility 1.6.1](http://awaitility.googlecode.com/files/awaitility-1.6.1.zip) is released with support for [Condition Evaluation Listeners](https://code.google.com/p/awaitility/wiki/Usage#Condition_Evaluation_Listener) as well as various bug fixes. See [change log](changelog.txt) for more details.
-
-* 2014-04-23: [Awaitility 1.6.0](http://awaitility.googlecode.com/files/awaitility-1.6.0.zip) is released with [support](https://code.google.com/p/awaitility/wiki/Usage#Example_8_-_Using_AssertJ_or_Fest_Assert) for [AssertJ](http://joel-costigliola.github.io/assertj/) and [Fest Assert](https://code.google.com/p/fest/) assertions as well as better support for [Java 8](https://code.google.com/p/awaitility/wiki/Usage#Example_7_-_Java_8). See [this blog](http://www.jayway.com/2014/04/23/java-8-and-assertj-support-in-awaitility-1-6-0/) for some examples and have a look at the [change log](changelog.txt) for more details.
-
-* 2014-01-27: [Awaitility 1.5.0](http://dl.bintray.com/johanhaleby/generic/awaitility-1.5.0.zip) is released. See [change log](changelog.txt) for details. 
-
+See <a href="https://code.google.com/p/awaitility/">homepage</>.
 
 ## Documentation
 
 * [Getting started](https://code.google.com/p/awaitility/wiki/Getting_started)
 * [User Guide](https://code.google.com/p/awaitility/wiki/Usage)
-* [Awaitility Javadoc](http://awaitility.googlecode.com/svn/tags/1.6.1/apidocs/com/jayway/awaitility/Awaitility.html)
+* [Awaitility Javadoc](http://awaitility.googlecode.com/svn/tags/1.6.2/apidocs/com/jayway/awaitility/Awaitility.html)
 
 
 ## Founded by:
