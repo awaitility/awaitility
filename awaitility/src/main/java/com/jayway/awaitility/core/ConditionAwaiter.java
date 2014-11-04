@@ -96,9 +96,15 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                     ConditionTimeoutException e = new ConditionTimeoutException(message);
 
                     ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-                    long[] threadIds = bean.findDeadlockedThreads();
-                    if (threadIds != null)
-                        e.initCause(new DeadlockException(threadIds));
+                    try {
+                        long[] threadIds = bean.findDeadlockedThreads();
+                        if (threadIds != null)
+                            e.initCause(new DeadlockException(threadIds));
+                    }
+                    catch (UnsupportedOperationException ignored) {
+                        // findDeadLockedThreads() not supported on this VM,
+                        // don't init cause and move on.
+                    }
 
                     throw e;
                 }
