@@ -17,7 +17,7 @@ public void updatesCustomerStatus() throws Exception {
 
 ## News
 
-See <a href="https://code.google.com/p/awaitility/">homepage</>.
+See <a href="https://code.google.com/p/awaitility/">homepage</a>.
 
 ## Documentation
 
