@@ -29,3 +29,5 @@ See <a href="https://code.google.com/p/awaitility/">homepage</a>.
 ## Founded by:
 
 [![jayway](http://www.arctiquator.com/oppenkallkod/assets/images/jayway_logo.png)](http://www.jayway.com)
+
+[![Analytics](https://ga-beacon.appspot.com/UA-17489061-2/jayway/awaitility)](https://github.com/jayway/awaitility)
