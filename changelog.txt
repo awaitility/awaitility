@@ -1,7 +1,6 @@
 Changelog next version
 ----------------------
 * Awaitility now gracefully handles cases when findDeadLockedThreads() is not supported on certain JVM:s (thanks to Jeremie Jost for pull request).
-* Upgraded cglib version from 3.1 to 3.2
 
 Changelog 1.6.2 (2014-10-15)
 ----------------------------
