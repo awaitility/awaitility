@@ -1,5 +1,5 @@
-Changelog next version
-----------------------
+Changelog 1.6.3 (2014-11-28)
+----------------------------
 * Awaitility now gracefully handles cases when findDeadLockedThreads() is not supported on certain JVM:s (thanks to Jeremie Jost for pull request).
 
 Changelog 1.6.2 (2014-10-15)
