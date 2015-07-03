@@ -125,6 +125,11 @@ public class Awaitility {
     private static volatile boolean defaultCatchUncaughtExceptions = true;
 
     /**
+     * Ignore caught exceptions by default?
+     */
+    private static boolean defaultIgnoreExceptions;
+
+    /**
      * Default listener of condition evaluation results.
      */
     private static volatile ConditionEvaluationListener defaultConditionEvaluationListener = null;
@@ -148,6 +153,13 @@ public class Awaitility {
     }
 
     /**
+     * Instruct Awaitility to ignore caught or uncaught exceptions during condition evaluation.
+     * Exceptions will be treated as evaluating to <code>false</code>. Your test will not fail
+     * upon an exception, unless it times out.
+     */
+    public static void ignoreExceptionsByDefault() { defaultIgnoreExceptions = true; }
+
+    /**
      * Reset the timeout, poll interval, poll delay, uncaught exception handling
      * to their default values:
      * <p>&nbsp;</p>
@@ -156,6 +168,7 @@ public class Awaitility {
      * <li>poll interval - 100 milliseconds</li>
      * <li>poll delay - 100 milliseconds</li>
      * <li>Catch all uncaught exceptions - true</li>
+     * <li>Do not ignore caught exceptions</li>
      * <li>Don't handle condition evaluation results</li>
      * </ul>
      */
@@ -165,6 +178,7 @@ public class Awaitility {
         defaultTimeout = Duration.TEN_SECONDS;
         defaultCatchUncaughtExceptions = true;
         defaultConditionEvaluationListener = null;
+        defaultIgnoreExceptions = false;
         Thread.setDefaultUncaughtExceptionHandler(null);
         MethodCallRecorder.reset();
     }
@@ -189,7 +203,7 @@ public class Awaitility {
      */
     public static ConditionFactory await(String alias) {
         return new ConditionFactory(alias, defaultTimeout, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultConditionEvaluationListener);
+                defaultCatchUncaughtExceptions, defaultIgnoreExceptions, defaultConditionEvaluationListener);
     }
 
     /**
@@ -200,7 +214,7 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory catchUncaughtExceptions() {
-        return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay, true);
+        return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay, true, defaultIgnoreExceptions);
     }
 
     /**
@@ -210,7 +224,7 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory dontCatchUncaughtExceptions() {
-        return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay, false);
+        return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay, false, defaultIgnoreExceptions);
     }
 
     /**
@@ -224,7 +238,7 @@ public class Awaitility {
      */
     public static ConditionFactory with() {
         return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultConditionEvaluationListener);
+                defaultCatchUncaughtExceptions, defaultIgnoreExceptions, defaultConditionEvaluationListener);
     }
 
     /**
@@ -238,7 +252,7 @@ public class Awaitility {
      */
     public static ConditionFactory given() {
         return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions);
+                defaultCatchUncaughtExceptions, defaultIgnoreExceptions);
     }
 
     /**
@@ -249,7 +263,8 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory waitAtMost(Duration timeout) {
-        return new ConditionFactory(timeout, defaultPollInterval, defaultPollDelay, defaultCatchUncaughtExceptions);
+        return new ConditionFactory(timeout, defaultPollInterval, defaultPollDelay, defaultCatchUncaughtExceptions,
+                defaultIgnoreExceptions);
     }
 
     /**
@@ -262,7 +277,7 @@ public class Awaitility {
      */
     public static ConditionFactory waitAtMost(long value, TimeUnit unit) {
         return new ConditionFactory(new Duration(value, unit), defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions);
+                defaultCatchUncaughtExceptions, defaultIgnoreExceptions);
     }
 
     /**
