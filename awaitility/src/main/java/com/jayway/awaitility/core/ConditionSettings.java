@@ -25,6 +25,7 @@ class ConditionSettings {
     private final Duration pollInterval;
     private final Duration pollDelay;
     private final boolean catchUncaughtExceptions;
+    private final boolean ignoreExceptions;
     private final ConditionEvaluationListener conditionEvaluationListener;
 
     /**
@@ -36,9 +37,11 @@ class ConditionSettings {
      * @param pollInterval                a {@link com.jayway.awaitility.Duration} object.
      * @param pollDelay                   a {@link com.jayway.awaitility.Duration} object.
      * @param conditionEvaluationListener a {@link ConditionEvaluationListener} object.
+     * @param ignoreExceptions            a boolean.
      */
     public ConditionSettings(String alias, boolean catchUncaughtExceptions, Duration maxWaitTime,
-                             Duration pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener) {
+                             Duration pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
+                             boolean ignoreExceptions) {
         if (maxWaitTime == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
@@ -54,6 +57,7 @@ class ConditionSettings {
         this.pollDelay = pollDelay == SAME_AS_POLL_INTERVAL ? pollInterval : pollDelay;
         this.catchUncaughtExceptions = catchUncaughtExceptions;
         this.conditionEvaluationListener = conditionEvaluationListener;
+        this.ignoreExceptions = ignoreExceptions;
     }
 
     /**
@@ -119,4 +123,12 @@ class ConditionSettings {
         return conditionEvaluationListener;
     }
 
+    /**
+     * <p>Getter for the field <code>ignoreExceptions</code></p>
+     *
+     * @return a boolean.
+     */
+    public boolean shouldExceptionsBeIgnored() {
+        return ignoreExceptions;
+    }
 }
