@@ -403,6 +403,24 @@ public class AwaitilityTest {
                 errorCount.get() == 0);
     }
 
+    @Test(timeout = 2000)
+    public void exceptionsDuringEvaluationAreReportedByDefault() {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(is("Repository value is not 1"));
+
+        new Asynch(fakeRepository).perform();
+        await().atMost(1000, MILLISECONDS).with().until(conditionsThatIsThrowingAnExceptionForATime());
+    }
+
+    @Test(timeout = 2000)
+    public void exceptionsDuringEvaluationAreIgnoredWhenDeclaredNonFatal() {
+        new Asynch(fakeRepository).perform();
+        await().atMost(1000, MILLISECONDS).with().ignoreExceptions().until(conditionsThatIsThrowingAnExceptionForATime());
+    }
+
+    private Callable<Boolean> conditionsThatIsThrowingAnExceptionForATime() {
+        return new ThrowExceptionUnlessFakeRepositoryEqualsOne(fakeRepository);
+    }
 
     private Callable<Boolean> fakeRepositoryValueEqualsOne() {
         return new FakeRepositoryEqualsOne(fakeRepository);

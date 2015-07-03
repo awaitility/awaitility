@@ -52,6 +52,11 @@ public class ConditionFactory {
     private final boolean catchUncaughtExceptions;
 
     /**
+     * The ignore exceptions.
+     */
+    private final boolean ignoreExceptions;
+
+    /**
      * The alias.
      */
     private final String alias;
@@ -78,6 +83,21 @@ public class ConditionFactory {
      */
     public ConditionFactory(String alias, Duration timeout, Duration pollInterval, Duration pollDelay,
                             boolean catchUncaughtExceptions, ConditionEvaluationListener conditionEvaluationListener) {
+        this(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, conditionEvaluationListener, false);
+    }
+
+    /**
+     * Instantiates a new condition factory.
+     *
+     * @param alias                   the alias
+     * @param timeout                 the timeout
+     * @param pollInterval            the poll interval
+     * @param pollDelay               The poll delay
+     * @param catchUncaughtExceptions the catch uncaught exceptions
+     * @param ignoreExceptions        the ignore exceptions
+     */
+    public ConditionFactory(String alias, Duration timeout, Duration pollInterval, Duration pollDelay,
+                            boolean catchUncaughtExceptions, ConditionEvaluationListener conditionEvaluationListener, boolean ignoreExceptions) {
         if (pollInterval == null) {
             throw new IllegalArgumentException("pollInterval cannot be null");
         }
@@ -103,6 +123,7 @@ public class ConditionFactory {
         this.catchUncaughtExceptions = catchUncaughtExceptions;
         this.pollDelay = pollDelay;
         this.conditionEvaluationListener = conditionEvaluationListener;
+        this.ignoreExceptions = ignoreExceptions;
     }
 
     /**
@@ -269,6 +290,19 @@ public class ConditionFactory {
      */
     public ConditionFactory catchUncaughtExceptions() {
         return new ConditionFactory(alias, timeout, pollInterval, pollDelay, true, conditionEvaluationListener);
+    }
+
+    /**
+     * Instruct Awaitility to ignore exceptions, both caught and uncaught, that
+     * occur during evaluation. This is useful in situations where the evaluated
+     * conditions may temporarily throw exceptions.
+     * <p>
+     * <em>This effectively rules out the effect of {@link #catchUncaughtExceptions}.</em>
+     *
+     * @return the condition factory.
+     */
+    public ConditionFactory ignoreExceptions() {
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, true, conditionEvaluationListener, true);
     }
 
     /**
@@ -583,7 +617,8 @@ public class ConditionFactory {
     }
 
     private ConditionSettings generateConditionSettings() {
-        return new ConditionSettings(alias, catchUncaughtExceptions, timeout, pollInterval, pollDelay, conditionEvaluationListener);
+        return new ConditionSettings(alias, catchUncaughtExceptions, timeout, pollInterval, pollDelay, conditionEvaluationListener,
+                ignoreExceptions);
     }
 
     private <T> T until(Condition<T> condition) {
