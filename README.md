@@ -1,4 +1,4 @@
-# ![Awaitility](resources/Awaitility_logo_red_small.png) 
+![Awaitility](resources/Awaitility_logo_red_small.png) 
 [![Build Status](https://travis-ci.org/jayway/awaitility.svg)](https://travis-ci.org/jayway/awaitility)
 
 Testing asynchronous systems is hard. Not only does it require handling threads, timeouts and concurrency issues, but the intent of the test code can be obscured by all these details. Awaitility is a DSL that allows you to express expectations of an asynchronous system in a concise and easy to read manner. For example:
@@ -21,9 +21,9 @@ See <a href="https://code.google.com/p/awaitility/">homepage</a>.
 
 ## Documentation
 
-* [Getting started](https://code.google.com/p/awaitility/wiki/Getting_started)
-* [User Guide](https://code.google.com/p/awaitility/wiki/Usage)
-* [Awaitility Javadoc](http://awaitility.googlecode.com/svn/tags/1.6.2/apidocs/com/jayway/awaitility/Awaitility.html)
+* [Getting started](Getting_started)
+* [User Guide](Usage)
+* [Awaitility Javadoc](http://www.javadoc.io/doc/com.jayway.awaitility/awaitility/1.6.3)
 
 
 ## Founded by:
