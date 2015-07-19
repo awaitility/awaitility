@@ -23,7 +23,7 @@ public void updatesCustomerStatus() throws Exception {
  * improved support for [Condition Evaluation Listeners](https://github.com/jayway/awaitility/wiki/Usage#condition-evaluation-listener), [Groovy 2.3 Trait support](https://github.com/jayway/awaitility/wiki/Groovy#groovy-23-and-above) and [deadlock detection](https://github.com/jayway/awaitility/wiki/Usage#deadlock-detection). See [change log](http://github.com/jayway/awaitility/raw/master/changelog.txt) for more details.
  * 2014-07-03: [Awaitility 1.6.1](http://dl.bintray.com/johanhaleby/generic/awaitility-1.6.1.zip) is released with support for [Condition Evaluation Listeners](https://github.com/jayway/awaitility/wiki/Usage#condition-evaluation-listener) as well as various bug fixes. See [change log](http://github.com/jayway/awaitility/raw/master/changelog.txt) for more details.
 
-[Older news](OldNews)
+[Older news](https://github.com/jayway/awaitility/wiki/OldNews)
 
 ## Documentation
 
