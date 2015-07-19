@@ -15,9 +15,6 @@ public void updatesCustomerStatus() throws Exception {
 }
 ```
 
-
-[[Link Text|Title of the Wiki Page]]
-
 ## News
  * 2014-11-28: [Awaitility 1.6.3](http://dl.bintray.com/johanhaleby/generic/awaitility-1.6.3.zip) is released. See [change log](http://github.com/jayway/awaitility/raw/master/changelog.txt) for details. 
  * 2014-10-15: [Awaitility 1.6.2](http://dl.bintray.com/johanhaleby/generic/awaitility-1.6.2.zip) is released with
