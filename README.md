@@ -21,8 +21,8 @@ See <a href="https://code.google.com/p/awaitility/">homepage</a>.
 
 ## Documentation
 
-* [Getting started](Getting_started)
-* [User Guide](Usage)
+* [Getting started](https://github.com/jayway/awaitility/wiki/Getting_started)
+* [User Guide](https://github.com/jayway/awaitility/wiki/Usage)
 * [Awaitility Javadoc](http://www.javadoc.io/doc/com.jayway.awaitility/awaitility/1.6.3)
 
 
