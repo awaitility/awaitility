@@ -22,7 +22,7 @@ See <a href="https://code.google.com/p/awaitility/">homepage</a>.
 ## Documentation
 
 * [Getting started](https://github.com/jayway/awaitility/wiki/Getting_started)
-* [User Guide](wiki/Usage)
+* [User Guide](https://github.com/jayway/awaitility/wiki/Usage)
 * [Awaitility Javadoc](http://www.javadoc.io/doc/com.jayway.awaitility/awaitility/1.6.3)
 
 
