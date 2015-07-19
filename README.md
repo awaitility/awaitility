@@ -15,9 +15,15 @@ public void updatesCustomerStatus() throws Exception {
 ```
 
 
-## News
+[[Link Text|Title of the Wiki Page]]
 
-See <a href="https://code.google.com/p/awaitility/">homepage</a>.
+## News
+ * 2014-11-28: [Awaitility 1.6.3](http://dl.bintray.com/johanhaleby/generic/awaitility-1.6.3.zip) is released. See [change log](http://github.com/jayway/awaitility/raw/master/changelog.txt) for details. 
+ * 2014-10-15: [Awaitility 1.6.2](http://dl.bintray.com/johanhaleby/generic/awaitility-1.6.2.zip) is released with
+ * improved support for [Condition Evaluation Listeners](Usage#Condition_Evaluation_Listener), [Groovy 2.3 Trait support](Groovy#Groovy_2.3_and_above) and [Usage#Deadlock_detection deadlock detection]. See [change log](http://github.com/jayway/awaitility/raw/master/changelog.txt) for more details.
+ * 2014-07-03: [Awaitility 1.6.1](http://dl.bintray.com/johanhaleby/generic/awaitility-1.6.1.zip) is released with support for [Condition Evaluation Listeners](Usage#Condition_Evaluation_Listener) as well as various bug fixes. See [change log](http://github.com/jayway/awaitility/raw/master/changelog.txt) for more details.
+
+[Older news](OldNews)
 
 ## Documentation
 
@@ -25,6 +31,9 @@ See <a href="https://code.google.com/p/awaitility/">homepage</a>.
 * [User Guide](https://github.com/jayway/awaitility/wiki/Usage)
 * [Awaitility Javadoc](http://www.javadoc.io/doc/com.jayway.awaitility/awaitility/1.6.3)
 
+## Links
+* [Change log](https://github.com/jayway/awaitility/raw/master/changelog.txt)
+* Awaitility on [Ohloh](https://www.ohloh.net/p/awaitility)
 
 ## Founded by:
 
