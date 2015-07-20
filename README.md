@@ -27,7 +27,7 @@ public void updatesCustomerStatus() throws Exception {
 
 * [Getting started](https://github.com/jayway/awaitility/wiki/Getting_started)
 * [User Guide](https://github.com/jayway/awaitility/wiki/Usage)
-* [Download](Downloads)
+* [Downloads](https://github.com/jayway/awaitility/wiki/Downloads)
 * [Awaitility Javadoc](http://www.javadoc.io/doc/com.jayway.awaitility/awaitility/1.6.3)
 
 ## Links
