@@ -1,6 +1,6 @@
 ![Awaitility](resources/Awaitility_logo_red_small.png) 
 
-[![Build Status](https://travis-ci.org/jayway/awaitility.svg)](https://travis-ci.org/jayway/awaitility)[![Analytics](https://ga-beacon.appspot.com/UA-17489061-2/jayway/awaitility)](https://github.com/jayway/awaitility)
+[![Build Status](https://travis-ci.org/jayway/awaitility.svg)](https://travis-ci.org/jayway/awaitility)
 
 Testing asynchronous systems is hard. Not only does it require handling threads, timeouts and concurrency issues, but the intent of the test code can be obscured by all these details. Awaitility is a DSL that allows you to express expectations of an asynchronous system in a concise and easy to read manner. For example:
 
