@@ -16,6 +16,7 @@
 package com.jayway.awaitility.scala
 
 import java.util.concurrent.Callable
+
 import com.jayway.awaitility.spi.Timeout._
 
 trait AwaitilitySupport {

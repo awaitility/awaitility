@@ -1,6 +1,5 @@
 package com.jayway.awaitility.core;
 
-import java.lang.Throwable;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;

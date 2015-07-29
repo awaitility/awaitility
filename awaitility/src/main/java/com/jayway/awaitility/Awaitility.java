@@ -15,8 +15,8 @@
  */
 package com.jayway.awaitility;
 
-import com.jayway.awaitility.core.ConditionFactory;
 import com.jayway.awaitility.core.ConditionEvaluationListener;
+import com.jayway.awaitility.core.ConditionFactory;
 import com.jayway.awaitility.core.FieldSupplierBuilder;
 import com.jayway.awaitility.core.MethodCallRecorder;
 
