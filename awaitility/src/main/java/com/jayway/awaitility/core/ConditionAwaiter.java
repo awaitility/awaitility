@@ -36,7 +36,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
      * @param conditionSettings a {@link com.jayway.awaitility.core.ConditionSettings} object.
      */
     public ConditionAwaiter(final Callable<Boolean> condition,
-                            ConditionSettings conditionSettings) {
+                            final ConditionSettings conditionSettings) {
         if (condition == null) {
             throw new IllegalArgumentException("You must specify a condition (was null).");
         }
@@ -55,8 +55,10 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                         latch.countDown();
                     }
                 } catch (Exception e) {
-                    throwable = e;
-                    latch.countDown();
+                    if (!conditionSettings.shouldExceptionsBeIgnored()) {
+                        throwable = e;
+                        latch.countDown();
+                    }
                 }
             }
         };
