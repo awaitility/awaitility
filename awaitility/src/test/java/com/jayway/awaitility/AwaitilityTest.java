@@ -30,7 +30,9 @@ import java.io.PrintStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.jayway.awaitility.Awaitility.*;
 import static com.jayway.awaitility.Duration.ONE_SECOND;
@@ -374,6 +376,33 @@ public class AwaitilityTest {
             assertEquals(0, fakeRepository.getValue());
         }
     }
+
+    @Test(timeout = 5000)
+    public void awaitUsingCallToMultipleThreads_githubIssue28() throws Exception {
+        final AtomicInteger errorCount = new AtomicInteger(0);
+
+        int threadsCount = 16;
+        final CountDownLatch allThreadsDone = new CountDownLatch(threadsCount);
+        for (int i = 0; i < threadsCount; i++) {
+            new Thread() {
+                public void run() {
+                    try {
+                        await().untilCall(to(fakeRepository).getValue(), equalTo(0));
+                    } catch (IllegalStateException ex) {
+                        if (ex.getMessage().contains("No method call has been recorded. Perhaps the method was final?")) {
+                            errorCount.incrementAndGet();
+                        }
+                    } finally {
+                        allThreadsDone.countDown();
+                    }
+                }
+            }.start();
+        }
+        allThreadsDone.await();
+        assertTrue("Racy method recording got mixed up: " + errorCount.get() + " errors",
+                errorCount.get() == 0);
+    }
+
 
     private Callable<Boolean> fakeRepositoryValueEqualsOne() {
         return new FakeRepositoryEqualsOne(fakeRepository);
