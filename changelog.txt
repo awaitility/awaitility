@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * Updated to JUnit 4.12
+* Allow parallel test execution with MethodCallRecorder (thanks to Tom Bujok for pull request)
 
 Changelog 1.6.3 (2014-11-28)
 ----------------------------
