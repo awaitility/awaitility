@@ -27,15 +27,15 @@ import java.lang.reflect.Method;
 public class MethodCallRecorder {
 
     private static final String NO_METHOD_CALL_RECORDED_MESSAGE = "No method call has been recorded. Perhaps the method was final?";
-    private static Object lastTarget;
-    private static Method lastMethod;
-    private static Object[] lastArgs;
-    
+    private static ThreadLocal<Object> lastTarget = new ThreadLocal<Object>();
+    private static ThreadLocal<Method> lastMethod = new ThreadLocal<Method>();
+    private static ThreadLocal<Object[]> lastArgs = new ThreadLocal<Object[]>();
+
     private static InvocationHandler invocationHandler = new InvocationHandler() {
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 			if (shouldBeRecorded(method)) {
-				lastMethod = method;
-				lastArgs = args;
+				lastMethod.set(method);
+				lastArgs.set(args);
 			}
 			return TypeUtils.getDefaultValue(method.getReturnType());
 		}
@@ -54,7 +54,7 @@ public class MethodCallRecorder {
 	 */
 	public static Object createProxy(Object target) {
 		Object proxy = ProxyCreator.create(target.getClass(), invocationHandler);
-		lastTarget = target;
+		lastTarget.set(target);
 		return proxy;
 	}
 
@@ -64,10 +64,11 @@ public class MethodCallRecorder {
 	 * @return a {@link java.lang.Object} object.
 	 */
 	public static Object getLastTarget() {
-		if (lastTarget == null) {
+        Object target = lastTarget.get();
+		if (target == null) {
 			throw new IllegalStateException(NO_METHOD_CALL_RECORDED_MESSAGE);
 		}
-		return lastTarget;
+		return target;
 	}
 
 	/**
@@ -76,10 +77,11 @@ public class MethodCallRecorder {
 	 * @return a {@link java.lang.reflect.Method} object.
 	 */
 	public static Method getLastMethod() {
-		if (lastMethod == null) {
+        Method method = lastMethod.get();
+		if (method == null) {
 			throw new IllegalStateException(NO_METHOD_CALL_RECORDED_MESSAGE);
 		}
-		return lastMethod;
+		return method;
 	}
 	
 	/**
@@ -88,19 +90,20 @@ public class MethodCallRecorder {
 	 * @return an array of {@link java.lang.Object} objects.
 	 */
 	public static Object[] getLastArgs() {
-		if (lastTarget == null) {
+        Object target = lastTarget.get();
+        if (target == null) {
 			throw new IllegalStateException(NO_METHOD_CALL_RECORDED_MESSAGE);
 		}
-		return lastArgs;
+		return lastArgs.get();
 	}
 
 	/**
 	 * <p>reset.</p>
 	 */
 	public static void reset() {
-		lastTarget = null;
-		lastMethod = null;
-		lastArgs = null;
+		lastTarget.remove();
+		lastMethod.remove();
+		lastArgs.remove();
 	}
 	
 }
