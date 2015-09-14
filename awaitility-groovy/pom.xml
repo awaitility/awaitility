@@ -3,7 +3,7 @@
     <parent>
         <groupId>com.jayway.awaitility</groupId>
         <artifactId>awaitility-parent</artifactId>
-        <version>1.6.4</version>
+        <version>1.6.5-SNAPSHOT</version>
     </parent>
     <artifactId>awaitility-groovy</artifactId>
     <name>Awaitility support for Groovy</name>

@@ -4,7 +4,7 @@
     <parent>
         <artifactId>awaitility-parent</artifactId>
         <groupId>com.jayway.awaitility</groupId>
-        <version>1.6.4</version>
+        <version>1.6.5-SNAPSHOT</version>
     </parent>
     <artifactId>awaitility-java8-test</artifactId>
     <name>Awaitility tests for Java 8</name>
