@@ -95,7 +95,6 @@ class CallableCondition implements Condition<Void> {
             this.conditionEvaluationHandler = conditionEvaluationHandler;
         }
 
-        @Override
         public Boolean call() throws Exception {
             boolean conditionFulfilled = matcher.call();
             if (conditionFulfilled) {
