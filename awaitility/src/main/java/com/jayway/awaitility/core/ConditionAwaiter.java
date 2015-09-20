@@ -32,7 +32,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     /**
      * <p>Constructor for ConditionAwaiter.</p>
      *
-     * @param condition a {@link java.util.concurrent.Callable} object.
+     * @param condition         a {@link java.util.concurrent.Callable} object.
      * @param conditionSettings a {@link com.jayway.awaitility.core.ConditionSettings} object.
      */
     public ConditionAwaiter(final Callable<Boolean> condition,
@@ -55,7 +55,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                         latch.countDown();
                     }
                 } catch (Exception e) {
-                    if (!conditionSettings.shouldExceptionsBeIgnored()) {
+                    if (!conditionSettings.shouldExceptionBeIgnored(e)) {
                         throwable = e;
                         latch.countDown();
                     }
@@ -102,8 +102,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                         long[] threadIds = bean.findDeadlockedThreads();
                         if (threadIds != null)
                             e.initCause(new DeadlockException(threadIds));
-                    }
-                    catch (UnsupportedOperationException ignored) {
+                    } catch (UnsupportedOperationException ignored) {
                         // findDeadLockedThreads() not supported on this VM,
                         // don't init cause and move on.
                     }
@@ -128,7 +127,9 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
      */
     protected abstract String getTimeoutMessage();
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     public void uncaughtException(Thread thread, Throwable throwable) {
         this.throwable = throwable;
         if (latch.getCount() != 0) {

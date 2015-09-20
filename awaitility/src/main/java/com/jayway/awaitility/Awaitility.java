@@ -15,10 +15,8 @@
  */
 package com.jayway.awaitility;
 
-import com.jayway.awaitility.core.ConditionEvaluationListener;
-import com.jayway.awaitility.core.ConditionFactory;
-import com.jayway.awaitility.core.FieldSupplierBuilder;
-import com.jayway.awaitility.core.MethodCallRecorder;
+import com.jayway.awaitility.core.*;
+import org.hamcrest.Matcher;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,44 +27,44 @@ import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
  * operations. It makes it easy to test asynchronous code. Examples:
  * <p>&nbsp;</p>
  * Wait at most 5 seconds until customer status has been updated:
- *
+ * <p/>
  * <pre>
  * await().atMost(5, SECONDS).until(customerStatusHasUpdated());
  * </pre>
- *
+ * <p/>
  * Wait forever until the call to <code>orderService.orderCount()</code> is
  * greater than 3.
- *
+ * <p/>
  * <pre>
  * await().forever().untilCall(to(orderService).orderCount(), greaterThan(3));
  * </pre>
- *
+ * <p/>
  * Wait 300 milliseconds until field in object <code>myObject</code> with name
  * <code>fieldName</code> and of type <code>int.class</code> is equal to 4.
- *
+ * <p/>
  * <pre>
  * await().atMost(300, MILLISECONDS).until(fieldIn(orderService).withName("fieldName").andOfType(int.class), equalTo(3));
  * </pre>
- *
+ * <p/>
  * Advanced usage: Use a poll interval of 100 milliseconds with an initial delay
  * of 20 milliseconds until customer status is equal to "REGISTERED". This
  * example also uses a named await by specifying an alias
  * ("customer registration"). This makes it easy to find out which await
  * statement that failed if you have multiple awaits in the same test.
- *
+ * <p/>
  * <pre>
  * with().pollInterval(ONE_HUNDERED_MILLISECONDS).and().with().pollDelay(20, MILLISECONDS).await("customer registration")
  *         .until(customerStatus(), equalTo(REGISTERED));
  * </pre>
- *
+ * <p/>
  * You can also specify a default timeout, poll interval and poll delay using:
- *
+ * <p/>
  * <pre>
  * Awaitility.setDefaultTimeout(..)
  * Awaitility.setDefaultPollInterval(..)
  * Awaitility.setDefaultPollDelay(..)
  * </pre>
- *
+ * <p/>
  * You can also reset to the default values using {@link com.jayway.awaitility.Awaitility#reset()}.
  * In order to use Awaitility effectively it's recommended to statically import
  * the following methods from the Awaitility framework:
@@ -127,7 +125,11 @@ public class Awaitility {
     /**
      * Ignore caught exceptions by default?
      */
-    private static boolean defaultIgnoreExceptions;
+    private static volatile ExceptionIgnorer defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Exception>() {
+        public boolean matches(Exception e) {
+            return false;
+        }
+    });
 
     /**
      * Default listener of condition evaluation results.
@@ -157,7 +159,44 @@ public class Awaitility {
      * Exceptions will be treated as evaluating to <code>false</code>. Your test will not fail
      * upon an exception, unless it times out.
      */
-    public static void ignoreExceptionsByDefault() { defaultIgnoreExceptions = true; }
+    public static void ignoreExceptionsByDefault() {
+        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Exception>() {
+            public boolean matches(Exception e) {
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Instruct Awaitility to ignore caught exception of the given type during condition evaluation.
+     * Exceptions will be treated as evaluating to <code>false</code>. Your test will not fail
+     * upon an exception matching the supplied exception type, unless it times out.
+     */
+    public static void ignoreExceptionByDefault(final Class<? extends Exception> exceptionType) {
+        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Exception>() {
+            public boolean matches(Exception e) {
+                return e.getClass().equals(exceptionType);
+            }
+        });
+    }
+
+    /**
+     * Instruct Awaitility to ignore caught exceptions matching the given <code>predicate</code> during condition evaluation.
+     * Exceptions will be treated as evaluating to <code>false</code>. Your test will not fail
+     * upon an exception matching the supplied predicate, unless it times out.
+     */
+    public static void ignoreExceptionsByDefaultMatching(Predicate<Exception> predicate) {
+        defaultExceptionIgnorer = new PredicateExceptionIgnorer(predicate);
+    }
+
+    /**
+     * Instruct Awaitility to ignore caught exceptions matching the supplied <code>matcher</code> during condition evaluation.
+     * Exceptions will be treated as evaluating to <code>false</code>. Your test will not fail
+     * upon an exception matching the supplied exception type, unless it times out.
+     */
+    public static void ignoreExceptionsByDefaultMatching(Matcher<? super Exception> matcher) {
+        defaultExceptionIgnorer = new HamcrestExceptionIgnorer(matcher);
+    }
 
     /**
      * Reset the timeout, poll interval, poll delay, uncaught exception handling
@@ -178,7 +217,11 @@ public class Awaitility {
         defaultTimeout = Duration.TEN_SECONDS;
         defaultCatchUncaughtExceptions = true;
         defaultConditionEvaluationListener = null;
-        defaultIgnoreExceptions = false;
+        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Exception>() {
+            public boolean matches(Exception e) {
+                return false;
+            }
+        });
         Thread.setDefaultUncaughtExceptionHandler(null);
         MethodCallRecorder.reset();
     }
@@ -203,7 +246,7 @@ public class Awaitility {
      */
     public static ConditionFactory await(String alias) {
         return new ConditionFactory(alias, defaultTimeout, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultIgnoreExceptions, defaultConditionEvaluationListener);
+                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener);
     }
 
     /**
@@ -214,7 +257,7 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory catchUncaughtExceptions() {
-        return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay, true, defaultIgnoreExceptions);
+        return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay, true, defaultExceptionIgnorer);
     }
 
     /**
@@ -224,12 +267,12 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory dontCatchUncaughtExceptions() {
-        return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay, false, defaultIgnoreExceptions);
+        return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay, false, defaultExceptionIgnorer);
     }
 
     /**
      * Start constructing an await statement with some settings. E.g.
-     *
+     * <p/>
      * <pre>
      * with().pollInterval(20, MILLISECONDS).await().until(somethingHappens());
      * </pre>
@@ -238,12 +281,12 @@ public class Awaitility {
      */
     public static ConditionFactory with() {
         return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultIgnoreExceptions, defaultConditionEvaluationListener);
+                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener);
     }
 
     /**
      * Start constructing an await statement given some settings. E.g.
-     *
+     * <p/>
      * <pre>
      * given().pollInterval(20, MILLISECONDS).then().await().until(somethingHappens());
      * </pre>
@@ -252,7 +295,7 @@ public class Awaitility {
      */
     public static ConditionFactory given() {
         return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultIgnoreExceptions);
+                defaultCatchUncaughtExceptions, defaultExceptionIgnorer);
     }
 
     /**
@@ -264,7 +307,7 @@ public class Awaitility {
      */
     public static ConditionFactory waitAtMost(Duration timeout) {
         return new ConditionFactory(timeout, defaultPollInterval, defaultPollDelay, defaultCatchUncaughtExceptions,
-                defaultIgnoreExceptions);
+                defaultExceptionIgnorer);
     }
 
     /**
@@ -277,7 +320,7 @@ public class Awaitility {
      */
     public static ConditionFactory waitAtMost(long value, TimeUnit unit) {
         return new ConditionFactory(new Duration(value, unit), defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultIgnoreExceptions);
+                defaultCatchUncaughtExceptions, defaultExceptionIgnorer);
     }
 
     /**
@@ -357,11 +400,11 @@ public class Awaitility {
 
     /**
      * Await until a specific method invocation returns something. E.g.
-     *
+     * <p/>
      * <pre>
      * await().untilCall(to(service).getCount(), greaterThan(2));
      * </pre>
-     *
+     * <p/>
      * Here we tell Awaitility to wait until the <code>service.getCount()</code>
      * method returns a value that is greater than 2.
      *
@@ -377,14 +420,14 @@ public class Awaitility {
 
     /**
      * Await until an instance field matches something. E.g.
-     *
+     * <p/>
      * <pre>
      * await().until(fieldIn(service).ofType(int.class).andWithName("fieldName"), greaterThan(2));
      * </pre>
-     *
+     * <p/>
      * Here Awaitility waits until a field with name <code>fieldName</code> and of the <code>int.class</code>
      * in object <code>service</code> is greater than 2.
-     *
+     * <p/>
      * Note that the field must be thread-safe in order to guarantee correct behavior.
      *
      * @param object The object that contains the field.
@@ -396,14 +439,14 @@ public class Awaitility {
 
     /**
      * Await until a static field matches something. E.g.
-     *
+     * <p/>
      * <pre>
      * await().until(fieldIn(Service.class).ofType(int.class).andWithName("fieldName"), greaterThan(2));
      * </pre>
-     *
+     * <p/>
      * Here Awaitility waits until a static field with name <code>fieldName</code> and of the
      * <code>int.class</code> in object <code>service</code> is greater than 2.
-     *
+     * <p/>
      * Note that the field must be thread-safe in order to guarantee correct behavior.
      *
      * @param clazz The class that contains the static field.

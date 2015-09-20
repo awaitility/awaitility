@@ -1,3 +1,21 @@
+Changelog next version
+----------------------
+* Added ability to ignore exceptions while evaluating a condition. This is useful if you're waiting for something that throws exceptions
+  as an intermediate value before the final state is reached. As an example take Spring's SocketUtils class that allows you to find an
+  available TCP port in a given range. It will throw an exception if no port is available in the given range. So let's say we know that the ports
+  in the given range are currently not available but we want to wait for them to be available. In that case we need to ignore the exceptions thrown
+  by SocketUtils.
+  For example:
+    given().ignoreExceptions().await().until(() -> SocketUtils.findAvailableTcpPort(x,y));
+ This instruct Awaitility to ignore all caught exceptions during condition evaluation. Exceptions will be treated as evaluating to false.
+ The test will not fail upon an exception matching the supplied exception type, unless it times out. You can also ignore specific exceptions:
+   given().ignoreException(IllegalStateException.class).await().until(() -> SocketUtils.findAvailableTcpPort(x,y));
+ or use Hamcrest matcher:
+   given().ignoreExceptionMatching(instanceOf(RuntimeException.class)).await().until(() -> SocketUtils.findAvailableTcpPort(x,y));
+ or a predicate:
+   given().ignoreExceptionMatching(e -> e.getMessage().startsWith("Could not find an available")).await().until(something());
+
+
 Changelog 1.6.4 (2015-09-14)
 ---------------------------
 * Updated to JUnit 4.12

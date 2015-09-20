@@ -28,7 +28,7 @@ public class ThrowExceptionUnlessFakeRepositoryEqualsOne implements Callable<Boo
 
     public Boolean call() {
         if (repository.getValue() != 1) {
-            throw new RuntimeException("Repository value is not 1");
+            throw new IllegalArgumentException("Repository value is not 1");
         }
         return true;
     }

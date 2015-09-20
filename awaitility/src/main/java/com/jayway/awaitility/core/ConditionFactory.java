@@ -54,7 +54,7 @@ public class ConditionFactory {
     /**
      * The ignore exceptions.
      */
-    private final boolean ignoreExceptions;
+    private final ExceptionIgnorer exceptionsIgnorer;
 
     /**
      * The alias.
@@ -79,12 +79,12 @@ public class ConditionFactory {
      * @param timeout                 the timeout
      * @param pollInterval            the poll interval
      * @param pollDelay               The poll delay
-     * @param ignoreExceptions        the ignore exceptions
+     * @param exceptionsIgnorer       the ignore exceptions
      * @param catchUncaughtExceptions the catch uncaught exceptions
      */
     public ConditionFactory(String alias, Duration timeout, Duration pollInterval, Duration pollDelay,
-            boolean catchUncaughtExceptions, boolean ignoreExceptions,
-            ConditionEvaluationListener conditionEvaluationListener) {
+                            boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
+                            ConditionEvaluationListener conditionEvaluationListener) {
         if (pollInterval == null) {
             throw new IllegalArgumentException("pollInterval cannot be null");
         }
@@ -110,7 +110,7 @@ public class ConditionFactory {
         this.catchUncaughtExceptions = catchUncaughtExceptions;
         this.pollDelay = pollDelay;
         this.conditionEvaluationListener = conditionEvaluationListener;
-        this.ignoreExceptions = ignoreExceptions;
+        this.exceptionsIgnorer = exceptionsIgnorer;
     }
 
     /**
@@ -119,12 +119,12 @@ public class ConditionFactory {
      * @param timeout                 the timeout
      * @param pollInterval            the poll interval
      * @param pollDelay               The delay before the polling starts
-     * @param ignoreExceptions        the ignore exceptions
+     * @param exceptionsIgnorer       the ignore exceptions
      * @param catchUncaughtExceptions the catch uncaught exceptions
      */
     public ConditionFactory(Duration timeout, Duration pollInterval, Duration pollDelay, boolean catchUncaughtExceptions,
-                            boolean ignoreExceptions) {
-        this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions, ignoreExceptions, null);
+                            ExceptionIgnorer exceptionsIgnorer) {
+        this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer, null);
     }
 
     /**
@@ -133,13 +133,13 @@ public class ConditionFactory {
      * @param timeout                 the timeout
      * @param pollInterval            the poll interval
      * @param pollDelay               The delay before the polling starts
-     * @param ignoreExceptions        the ignore exceptions
+     * @param exceptionsIgnorer       the ignore exceptions
      * @param catchUncaughtExceptions the catch uncaught exceptions
      */
     public ConditionFactory(Duration timeout, Duration pollInterval, Duration pollDelay,
-                            boolean catchUncaughtExceptions, boolean ignoreExceptions,
+                            boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
                             ConditionEvaluationListener conditionEvaluationListener) {
-        this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions, ignoreExceptions,
+        this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
                 conditionEvaluationListener);
     }
 
@@ -150,7 +150,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory conditionEvaluationListener(ConditionEvaluationListener conditionEvaluationListener) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, ignoreExceptions,
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
                 conditionEvaluationListener);
     }
 
@@ -161,7 +161,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory timeout(Duration timeout) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, ignoreExceptions,
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
                 conditionEvaluationListener);
     }
 
@@ -172,7 +172,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory atMost(Duration timeout) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, ignoreExceptions,
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
                 conditionEvaluationListener);
     }
 
@@ -184,7 +184,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory forever() {
-        return new ConditionFactory(alias, Duration.FOREVER, pollInterval, pollDelay, catchUncaughtExceptions, ignoreExceptions,
+        return new ConditionFactory(alias, Duration.FOREVER, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
                 conditionEvaluationListener);
     }
 
@@ -204,7 +204,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory pollInterval(Duration pollInterval) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, ignoreExceptions,
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
                 conditionEvaluationListener);
     }
 
@@ -217,7 +217,7 @@ public class ConditionFactory {
      */
     public ConditionFactory timeout(long timeout, TimeUnit unit) {
         return new ConditionFactory(alias, new Duration(timeout, unit), pollInterval, pollDelay,
-                catchUncaughtExceptions, ignoreExceptions, conditionEvaluationListener);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
     }
 
     /**
@@ -231,7 +231,7 @@ public class ConditionFactory {
      */
     public ConditionFactory pollDelay(long delay, TimeUnit unit) {
         return new ConditionFactory(alias, this.timeout, pollInterval, new Duration(delay, unit),
-                catchUncaughtExceptions, ignoreExceptions, conditionEvaluationListener);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
     }
 
     /**
@@ -243,7 +243,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory pollDelay(Duration pollDelay) {
-        return new ConditionFactory(alias, this.timeout, pollInterval, pollDelay, catchUncaughtExceptions, ignoreExceptions,
+        return new ConditionFactory(alias, this.timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
                 conditionEvaluationListener);
     }
 
@@ -256,7 +256,7 @@ public class ConditionFactory {
      */
     public ConditionFactory atMost(long timeout, TimeUnit unit) {
         return new ConditionFactory(alias, new Duration(timeout, unit), pollInterval, pollDelay,
-                catchUncaughtExceptions, ignoreExceptions,  conditionEvaluationListener);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
     }
 
     /**
@@ -276,7 +276,7 @@ public class ConditionFactory {
      */
     public ConditionFactory pollInterval(long pollInterval, TimeUnit unit) {
         return new ConditionFactory(alias, timeout, new Duration(pollInterval, unit), pollDelay,
-                catchUncaughtExceptions, ignoreExceptions, conditionEvaluationListener);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
     }
 
     /**
@@ -288,21 +288,108 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory catchUncaughtExceptions() {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, true, ignoreExceptions,
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, true, exceptionsIgnorer,
                 conditionEvaluationListener);
     }
 
     /**
-     * Instruct Awaitility to ignore exceptions, both caught and uncaught, that
-     * occur during evaluation. Exceptions will be treated as evaluating to
+     * Instruct Awaitility to ignore exceptions instance of the supplied exceptionType type.
+     * Exceptions will be treated as evaluating to <code>false</code>.
+     * This is useful in situations where the evaluated conditions may temporarily throw exceptions.
+     * <p/>
+     * <p>If you want to ignore a specific exceptionType then use {@link #ignoreException(Class)}</p>
+     *
+     * @param exceptionType The exception type (hierarchy) to ignore
+     * @return the condition factory
+     */
+    public ConditionFactory ignoreExceptionsInstanceOf(final Class<? extends Exception> exceptionType) {
+        if (exceptionType == null) {
+            throw new IllegalArgumentException("exceptionType cannot be null");
+        }
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions,
+                new PredicateExceptionIgnorer(new Predicate<Exception>() {
+                    public boolean matches(Exception e) {
+                        return exceptionType.isAssignableFrom(e.getClass());
+                    }
+                }),
+                conditionEvaluationListener);
+    }
+
+    /**
+     * Instruct Awaitility to ignore a specific exception and <i>no</i> subclasses of this exception.
+     * Exceptions will be treated as evaluating to <code>false</code>.
+     * This is useful in situations where the evaluated conditions may temporarily throw exceptions.
+     * <p>If you want to ignore a subtypes of this exception then use {@link #ignoreExceptionsInstanceOf(Class)}} </p>
+     *
+     * @param exceptionType The exception type to ignore
+     * @return the condition factory
+     */
+    public ConditionFactory ignoreException(final Class<? extends Exception> exceptionType) {
+        if (exceptionType == null) {
+            throw new IllegalArgumentException("exception cannot be null");
+        }
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions,
+                new PredicateExceptionIgnorer(new Predicate<Exception>() {
+                    public boolean matches(Exception e) {
+                        return e.getClass().equals(exceptionType);
+                    }
+                }),
+                conditionEvaluationListener);
+    }
+
+    /**
+     * Instruct Awaitility to ignore <i>all</i> exceptions that occur during evaluation.
+     * Exceptions will be treated as evaluating to
      * <code>false</code>. This is useful in situations where the evaluated
      * conditions may temporarily throw exceptions.
      *
      * @return the condition factory.
      */
     public ConditionFactory ignoreExceptions() {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, true,
-                conditionEvaluationListener);
+        return ignoreExceptionsMatching(new Predicate<Exception>() {
+            public boolean matches(Exception e) {
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Instruct Awaitility to not ignore any exceptions that occur during evaluation.
+     * This is only useful if Awaitility is configured to ignore exceptions by default but you want to
+     * have a different behavior for a single test case.
+     *
+     * @return the condition factory.
+     */
+    public ConditionFactory ignoreNoExceptions() {
+        return ignoreExceptionsMatching(new Predicate<Exception>() {
+            public boolean matches(Exception e) {
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Instruct Awaitility to ignore exceptions that occur during evaluation and matches the supplied Hamcrest matcher.
+     * Exceptions will be treated as evaluating to
+     * <code>false</code>. This is useful in situations where the evaluated conditions may temporarily throw exceptions.
+     *
+     * @return the condition factory.
+     */
+    public ConditionFactory ignoreExceptionsMatching(Matcher<? super Exception> matcher) {
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions,
+                new HamcrestExceptionIgnorer(matcher), conditionEvaluationListener);
+    }
+
+    /**
+     * Instruct Awaitility to ignore exceptions that occur during evaluation and matches the supplied <code>predicate</code>.
+     * Exceptions will be treated as evaluating to
+     * <code>false</code>. This is useful in situations where the evaluated conditions may temporarily throw exceptions.
+     *
+     * @return the condition factory.
+     */
+    public ConditionFactory ignoreExceptionsMatching(Predicate<Exception> predicate) {
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions,
+                new PredicateExceptionIgnorer(predicate), conditionEvaluationListener);
     }
 
     /**
@@ -326,7 +413,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory await(String alias) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, ignoreExceptions,
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
                 conditionEvaluationListener);
     }
 
@@ -377,7 +464,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory dontCatchUncaughtExceptions() {
-        return new ConditionFactory(timeout, pollInterval, pollDelay, false, ignoreExceptions);
+        return new ConditionFactory(timeout, pollInterval, pollDelay, false, exceptionsIgnorer);
     }
 
     /**
@@ -619,7 +706,7 @@ public class ConditionFactory {
 
     private ConditionSettings generateConditionSettings() {
         return new ConditionSettings(alias, catchUncaughtExceptions, timeout, pollInterval, pollDelay, conditionEvaluationListener,
-                ignoreExceptions);
+                exceptionsIgnorer);
     }
 
     private <T> T until(Condition<T> condition) {

@@ -25,7 +25,7 @@ class ConditionSettings {
     private final Duration pollInterval;
     private final Duration pollDelay;
     private final boolean catchUncaughtExceptions;
-    private final boolean ignoreExceptions;
+    private final ExceptionIgnorer ignoreExceptions;
     private final ConditionEvaluationListener conditionEvaluationListener;
 
     /**
@@ -41,7 +41,7 @@ class ConditionSettings {
      */
     public ConditionSettings(String alias, boolean catchUncaughtExceptions, Duration maxWaitTime,
                              Duration pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
-                             boolean ignoreExceptions) {
+                             ExceptionIgnorer ignoreExceptions) {
         if (maxWaitTime == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
@@ -124,11 +124,9 @@ class ConditionSettings {
     }
 
     /**
-     * <p>Getter for the field <code>ignoreExceptions</code></p>
-     *
-     * @return a boolean.
+     * @return true if a particular exception should be ignored
      */
-    public boolean shouldExceptionsBeIgnored() {
-        return ignoreExceptions;
+    public boolean shouldExceptionBeIgnored(Exception e) {
+        return ignoreExceptions.shouldIgnoreException(e);
     }
 }
