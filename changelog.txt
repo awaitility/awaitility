@@ -15,7 +15,7 @@ Changelog next version
  or a predicate:
    given().ignoreExceptionsMatching(e -> e.getMessage().startsWith("Could not find an available")).await().until(something());
 * Updated the Groovy version to 2.4.4 from 2.3.7 in the Groovy extension.
-
+* Updated the Scala version to 2.11.3 from 2.11.7 in the Scala extension.
 
 Changelog 1.6.4 (2015-09-14)
 ---------------------------
