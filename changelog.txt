@@ -14,6 +14,7 @@ Changelog next version
    given().ignoreExceptionsMatching(instanceOf(RuntimeException.class)).await().until(() -> SocketUtils.findAvailableTcpPort(x,y));
  or a predicate:
    given().ignoreExceptionsMatching(e -> e.getMessage().startsWith("Could not find an available")).await().until(something());
+* Updated the Groovy version to 2.4.4 from 2.3.7 in the Groovy extension.
 
 
 Changelog 1.6.4 (2015-09-14)
