@@ -1,5 +1,5 @@
-Changelog next version
-----------------------
+Changelog 1.6.5 (2015-09-27)
+----------------------------
 * Added ability to ignore exceptions while evaluating a condition. This is useful if you're waiting for something that throws exceptions
   as an intermediate value before the final state is reached. As an example take Spring's SocketUtils class that allows you to find an
   available TCP port in a given range. It will throw an exception if no port is available in the given range. So let's say we know that the ports
