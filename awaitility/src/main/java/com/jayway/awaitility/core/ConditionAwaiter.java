@@ -19,9 +19,9 @@ import com.jayway.awaitility.Duration;
 
 import java.beans.Introspector;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadMXBean;
 import java.util.concurrent.*;
+
+import static com.jayway.awaitility.classpath.ClassPathResolver.existInCP;
 
 abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
@@ -97,14 +97,16 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
 
                     ConditionTimeoutException e = new ConditionTimeoutException(message);
 
-                    ThreadMXBean bean = ManagementFactory.getThreadMXBean();
-                    try {
-                        long[] threadIds = bean.findDeadlockedThreads();
-                        if (threadIds != null)
-                            e.initCause(new DeadlockException(threadIds));
-                    } catch (UnsupportedOperationException ignored) {
-                        // findDeadLockedThreads() not supported on this VM,
-                        // don't init cause and move on.
+                    if (existInCP("java.lang.management.ThreadMXBean") && existInCP("java.lang.management.ManagementFactory")) {
+                        java.lang.management.ThreadMXBean bean = java.lang.management.ManagementFactory.getThreadMXBean();
+                        try {
+                            long[] threadIds = bean.findDeadlockedThreads();
+                            if (threadIds != null)
+                                e.initCause(new DeadlockException(threadIds));
+                        } catch (UnsupportedOperationException ignored) {
+                            // findDeadLockedThreads() not supported on this VM,
+                            // don't init cause and move on.
+                        }
                     }
 
                     throw e;
