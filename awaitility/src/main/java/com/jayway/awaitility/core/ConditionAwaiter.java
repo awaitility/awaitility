@@ -97,6 +97,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
 
                     ConditionTimeoutException e = new ConditionTimeoutException(message);
 
+                    // Not all systems support deadlock detection so ignore if ThreadMXBean & ManagementFactory is not in classpath
                     if (existInCP("java.lang.management.ThreadMXBean") && existInCP("java.lang.management.ManagementFactory")) {
                         java.lang.management.ThreadMXBean bean = java.lang.management.ManagementFactory.getThreadMXBean();
                         try {
