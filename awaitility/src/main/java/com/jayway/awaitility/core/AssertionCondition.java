@@ -42,62 +42,81 @@ public class AssertionCondition implements Condition<Void> {
      * @param settings a {@link com.jayway.awaitility.core.ConditionSettings} object.
      */
     public AssertionCondition(final Runnable supplier, final ConditionSettings settings) {
-        if (supplier == null) {
-            throw new IllegalArgumentException("You must specify a supplier (was null).");
+        this(new ThrowingRunnableAdapter(supplier), settings);
+    }
+
+    /**
+     * <p>Constructor for AssertionCondition.</p>
+     *
+     * @param throwingSupplier a {@link ThrowingRunnable} object.
+     * @param settings         a {@link com.jayway.awaitility.core.ConditionSettings} object.
+     */
+    public AssertionCondition(final ThrowingRunnable throwingSupplier, final ConditionSettings settings) {
+        if (throwingSupplier == null) {
+            throw new IllegalArgumentException("You must specify a throwingSupplier (was null).");
         }
 
+        final Class<?> supplierClass = getUserClass(throwingSupplier);
         conditionEvaluationHandler = new ConditionEvaluationHandler<Object>(null, settings);
 
         final Callable<Boolean> callable = new Callable<Boolean>() {
             public Boolean call() throws Exception {
                 try {
-                    supplier.run();
-                    conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier, settings.getAlias()), null);
+                    throwingSupplier.run();
+                    conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplierClass, settings.getAlias()), null);
                     return true;
                 } catch (AssertionError e) {
                     lastExceptionMessage = e.getMessage();
-                    conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, lastExceptionMessage, settings.getAlias()), null);
+                    conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplierClass, lastExceptionMessage, settings.getAlias()), null);
                     return false;
                 }
             }
         };
+
         conditionAwaiter = new ConditionAwaiter(callable, settings) {
             @Override
             protected String getTimeoutMessage() {
-                return getMismatchMessage(supplier, lastExceptionMessage, settings.getAlias());
+                return getMismatchMessage(supplierClass, lastExceptionMessage, settings.getAlias());
             }
         };
     }
 
+    private Class<?> getUserClass(ThrowingRunnable throwingSupplier) {
+        if (throwingSupplier instanceof ThrowingRunnableAdapter) {
+            return ((ThrowingRunnableAdapter) throwingSupplier).getOriginalClass();
+        }
 
-    private String getMatchMessage(Runnable supplier, String conditionAlias) {
-        return generateDescriptionPrefix(supplier, conditionAlias) + " reached its end value";
+        return throwingSupplier.getClass();
     }
 
-    private String getMismatchMessage(Runnable supplier, String exceptionMessage, String conditionAlias) {
-        return generateDescriptionPrefix(supplier, conditionAlias) + " " + exceptionMessage;
+    private String getMatchMessage(Class<?> supplierClass, String conditionAlias) {
+        return generateDescriptionPrefix(supplierClass, conditionAlias) + " reached its end value";
     }
 
-    private String generateDescriptionPrefix(Runnable supplier, String conditionAlias) {
-        String methodDescription = generateMethodDescription(supplier);
+    private String getMismatchMessage(Class<?> supplierClass, String exceptionMessage, String conditionAlias) {
+        return generateDescriptionPrefix(supplierClass, conditionAlias) + " " + exceptionMessage;
+    }
+
+    private String generateDescriptionPrefix(Class<?> supplierClass, String conditionAlias) {
+        String methodDescription = generateMethodDescription(supplierClass);
         boolean hasAlias = conditionAlias != null;
-        if (isLambdaClass(supplier.getClass())) {
+        if (isLambdaClass(supplierClass)) {
             final String prefix;
             if (hasAlias) {
                 prefix = "Condition with alias " + conditionAlias + " defined as a ";
             } else {
                 prefix = "Condition defined as a ";
             }
-            return prefix + generateLambdaErrorMessagePrefix(supplier.getClass(), false) + methodDescription;
+            return prefix + generateLambdaErrorMessagePrefix(supplierClass, false) + methodDescription;
         }
         return "Runnable condition" + (hasAlias ? " with alias " + conditionAlias : "") + methodDescription;
     }
 
-    private String generateMethodDescription(Runnable supplier) {
+    private String generateMethodDescription(Class<?> supplierClass) {
         String methodDescription = "";
         Method enclosingMethod = null;
         try {
-            enclosingMethod = supplier.getClass().getEnclosingMethod();
+            enclosingMethod = supplierClass.getEnclosingMethod();
         } catch (Error ignored) {
             // A java.lang.InternalError could be thrown when using the Groovy extension using Groovy 2.3.7 for some reason. Bug in Groovy?!
         }
@@ -116,5 +135,23 @@ public class AssertionCondition implements Condition<Void> {
         conditionEvaluationHandler.start();
         conditionAwaiter.await();
         return null;
+    }
+}
+
+class ThrowingRunnableAdapter implements ThrowingRunnable {
+
+    private final Runnable supplier;
+
+    public ThrowingRunnableAdapter(Runnable supplier) {
+        this.supplier = supplier;
+    }
+
+    @Override
+    public void run() throws Exception {
+        supplier.run();
+    }
+
+    Class<?> getOriginalClass() {
+        return supplier.getClass();
     }
 }

@@ -17,6 +17,7 @@
 package com.jayway.awaitility;
 
 import com.jayway.awaitility.core.ConditionTimeoutException;
+import com.jayway.awaitility.core.ThrowingRunnable;
 import com.jayway.awaitility.support.CountDown;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,6 +61,25 @@ public class ConditionEvaluationListenerJava8Test {
     }
 
     @Test(timeout = 2000)
+    public void expectedMatchMessageForAssertionConditionsWhenUsingLambdasWithoutAlias_ThrowingLambda() {
+        final AtomicReference<String> lastMatchMessage = new AtomicReference<>();
+        CountDown countDown = new CountDown(10);
+        with()
+                .conditionEvaluationListener(condition -> {
+                    try {
+                        countDown.call();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    lastMatchMessage.set(condition.getDescription());
+                })
+                .until2(() -> assertEquals(5, (int) countDown.get()));
+
+        String expectedMatchMessage = String.format("%s reached its end value", CountDown.class.getName());
+        assertThat(lastMatchMessage.get(), allOf(startsWith("Condition defined as a lambda expression"), endsWith(expectedMatchMessage)));
+    }
+
+    @Test(timeout = 2000)
     public void expectedMatchMessageForAssertionConditionsWhenUsingLambdasWithAlias() {
         final AtomicReference<String> lastMatchMessage = new AtomicReference<>();
         CountDown countDown = new CountDown(10);
@@ -73,6 +93,25 @@ public class ConditionEvaluationListenerJava8Test {
                     lastMatchMessage.set(condition.getDescription());
                 }).await("my alias")
                 .until(() -> assertEquals(5, (int) countDown.get()));
+
+        String expectedMatchMessage = String.format("%s reached its end value", CountDown.class.getName());
+        assertThat(lastMatchMessage.get(), allOf(startsWith("Condition with alias my alias defined as a lambda expression"), endsWith(expectedMatchMessage)));
+    }
+
+    @Test(timeout = 2000)
+    public void expectedMatchMessageForAssertionConditionsWhenUsingLambdasWithAlias_ThrowingLambda() {
+        final AtomicReference<String> lastMatchMessage = new AtomicReference<>();
+        CountDown countDown = new CountDown(10);
+        with()
+                .conditionEvaluationListener(condition -> {
+                    try {
+                        countDown.call();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    lastMatchMessage.set(condition.getDescription());
+                }).await("my alias")
+                .until2(() -> assertEquals(5, (int) countDown.get()));
 
         String expectedMatchMessage = String.format("%s reached its end value", CountDown.class.getName());
         assertThat(lastMatchMessage.get(), allOf(startsWith("Condition with alias my alias defined as a lambda expression"), endsWith(expectedMatchMessage)));
@@ -99,6 +138,26 @@ public class ConditionEvaluationListenerJava8Test {
     }
 
     @Test(timeout = 2000)
+    public void expectedMismatchMessageForAssertionConditionsWhenUsingLambdasWithoutAlias_ThrowingLambda() {
+        final AtomicReference<String> lastMatchMessage = new AtomicReference<>();
+        CountDown countDown = new CountDown(10);
+        try {
+            with()
+                    .conditionEvaluationListener(condition -> {
+                        try {
+                            countDown.call();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                        lastMatchMessage.set(condition.getDescription());
+                    }).await().atMost(150, MILLISECONDS).until2(() -> assertEquals(-1, (int) countDown.get()));
+            fail("Test should fail");
+        } catch (ConditionTimeoutException e) {
+            assertThat(lastMatchMessage.get(), allOf(startsWith("Condition defined as a lambda expression in"), containsString("expected:<-1> but was:<")));
+        }
+    }
+
+    @Test(timeout = 2000)
     public void expectedMismatchMessageForAssertionConditionsWhenUsingLambdasWithAlias() {
         final AtomicReference<String> lastMatchMessage = new AtomicReference<>();
         CountDown countDown = new CountDown(10);
@@ -111,6 +170,25 @@ public class ConditionEvaluationListenerJava8Test {
                 }
                 lastMatchMessage.set(condition.getDescription());
             }).await("my alias").atMost(150, MILLISECONDS).until(() -> assertEquals(-1, (int) countDown.get()));
+            fail("Test should fail");
+        } catch (ConditionTimeoutException e) {
+            assertThat(lastMatchMessage.get(), startsWith("Condition with alias my alias defined as a lambda expression"));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void expectedMismatchMessageForAssertionConditionsWhenUsingLambdasWithAlias_ThrowingLambda() {
+        final AtomicReference<String> lastMatchMessage = new AtomicReference<>();
+        CountDown countDown = new CountDown(10);
+        try {
+            with().conditionEvaluationListener(condition -> {
+                try {
+                    countDown.call();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                lastMatchMessage.set(condition.getDescription());
+            }).await("my alias").atMost(150, MILLISECONDS).until2(() -> assertEquals(-1, (int) countDown.get()));
             fail("Test should fail");
         } catch (ConditionTimeoutException e) {
             assertThat(lastMatchMessage.get(), startsWith("Condition with alias my alias defined as a lambda expression"));
@@ -143,6 +221,30 @@ public class ConditionEvaluationListenerJava8Test {
 
     @SuppressWarnings("Convert2Lambda")
     @Test(timeout = 2000)
+    public void expectedMatchMessageForAssertionConditionsWhenNotUsingLambdasWithoutAlias_ThrowingRunnable() {
+        final AtomicReference<String> lastMatchMessage = new AtomicReference<>();
+        CountDown countDown = new CountDown(10);
+        with()
+                .conditionEvaluationListener(condition -> {
+                    try {
+                        countDown.call();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    lastMatchMessage.set(condition.getDescription());
+                })
+                .until2(new ThrowingRunnable() {
+                    @Override
+                    public void run() {
+                        assertEquals(5, (int) countDown.get());
+                    }
+                });
+
+        assertThat(lastMatchMessage.get(), allOf(startsWith("Runnable condition defined in"), containsString(testName.getMethodName()), endsWith("reached its end value")));
+    }
+
+    @SuppressWarnings("Convert2Lambda")
+    @Test(timeout = 2000)
     public void expectedMatchMessageForAssertionConditionsWhenNotUsingLambdasWithAlias() {
         final AtomicReference<String> lastMatchMessage = new AtomicReference<>();
         CountDown countDown = new CountDown(10);
@@ -156,6 +258,30 @@ public class ConditionEvaluationListenerJava8Test {
                     lastMatchMessage.set(condition.getDescription());
                 }).await("my alias")
                 .until(new Runnable() {
+                    @Override
+                    public void run() {
+                        assertEquals(5, (int) countDown.get());
+                    }
+                });
+
+        assertThat(lastMatchMessage.get(), allOf(startsWith("Runnable condition with alias my alias defined in"), containsString(testName.getMethodName()), endsWith("reached its end value")));
+    }
+
+    @SuppressWarnings("Convert2Lambda")
+    @Test(timeout = 2000)
+    public void expectedMatchMessageForAssertionConditionsWhenNotUsingLambdasWithAlias_ThrowingRunnable() {
+        final AtomicReference<String> lastMatchMessage = new AtomicReference<>();
+        CountDown countDown = new CountDown(10);
+        with()
+                .conditionEvaluationListener(condition -> {
+                    try {
+                        countDown.call();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    lastMatchMessage.set(condition.getDescription());
+                }).await("my alias")
+                .until2(new ThrowingRunnable() {
                     @Override
                     public void run() {
                         assertEquals(5, (int) countDown.get());
@@ -193,6 +319,32 @@ public class ConditionEvaluationListenerJava8Test {
 
     @SuppressWarnings("Convert2Lambda")
     @Test(timeout = 2000)
+    public void expectedMismatchMessageForAssertionConditionsWhenNotUsingLambdasWithoutAlias_ThrowingRunnable() {
+        final AtomicReference<String> lastMatchMessage = new AtomicReference<>();
+        CountDown countDown = new CountDown(10);
+        try {
+            with()
+                    .conditionEvaluationListener(condition -> {
+                        lastMatchMessage.set(condition.getDescription());
+                        try {
+                            countDown.call();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).await().atMost(150, MILLISECONDS).until2(new ThrowingRunnable() {
+                @Override
+                public void run() {
+                    assertEquals(-1, (int) countDown.get());
+                }
+            });
+            fail("Expected to fail");
+        } catch (ConditionTimeoutException e) {
+            assertThat(lastMatchMessage.get(), allOf(startsWith("Runnable condition defined in"), containsString(testName.getMethodName()), containsString("expected:")));
+        }
+    }
+
+    @SuppressWarnings("Convert2Lambda")
+    @Test(timeout = 2000)
     public void expectedMismatchMessageForAssertionConditionsWhenNotUsingLambdasWithAlias() {
         final AtomicReference<String> lastMatchMessage = new AtomicReference<>();
         CountDown countDown = new CountDown(10);
@@ -207,6 +359,33 @@ public class ConditionEvaluationListenerJava8Test {
                         }
                     }).await("my alias").atMost(150, MILLISECONDS)
                     .until(new Runnable() {
+                        @Override
+                        public void run() {
+                            assertEquals(5, (int) countDown.get());
+                        }
+                    });
+            fail("Expected to fail");
+        } catch (ConditionTimeoutException e) {
+            assertThat(lastMatchMessage.get(), allOf(startsWith("Runnable condition with alias my alias defined in"), containsString(testName.getMethodName()), containsString("expected:")));
+        }
+    }
+
+    @SuppressWarnings("Convert2Lambda")
+    @Test(timeout = 2000)
+    public void expectedMismatchMessageForAssertionConditionsWhenNotUsingLambdasWithAlias_ThrowingRunnable() {
+        final AtomicReference<String> lastMatchMessage = new AtomicReference<>();
+        CountDown countDown = new CountDown(10);
+        try {
+            with()
+                    .conditionEvaluationListener(condition -> {
+                        lastMatchMessage.set(condition.getDescription());
+                        try {
+                            countDown.call();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).await("my alias").atMost(150, MILLISECONDS)
+                    .until2(new ThrowingRunnable() {
                         @Override
                         public void run() {
                             assertEquals(5, (int) countDown.get());
