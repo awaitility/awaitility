@@ -24,6 +24,7 @@ import com.jayway.awaitility.core.ConditionTimeoutException;
 import com.jayway.awaitility.core.ThrowingRunnable;
 import com.jayway.awaitility.support.CountDown;
 import org.assertj.core.api.Assertions;
+import org.hamcrest.core.IsEqual;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,8 +34,10 @@ import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.awaitility.Awaitility.with;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for await().until(Runnable) using AssertionCondition.
@@ -59,6 +62,22 @@ public class AwaitilityJava8Test {
     public void awaitAssertJAssertionAsLambda() {
         new Asynch(fakeRepository).perform();
         await().until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+    }
+
+    @Test(timeout = 2000)
+    public void shouldNotAcceptNull() {
+        try {
+            await().untilPass(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), IsEqual.equalTo("You must specify a throwingSupplier (was null)."));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void shouldAcceptEmptyLambda() {
+        await().untilPass(() -> {
+        });
     }
 
     @Test(timeout = 2000)

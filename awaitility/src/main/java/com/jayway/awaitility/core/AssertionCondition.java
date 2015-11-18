@@ -143,6 +143,10 @@ class ThrowingRunnableAdapter implements ThrowingRunnable {
     private final Runnable supplier;
 
     public ThrowingRunnableAdapter(Runnable supplier) {
+        if (supplier == null) {
+            throw new IllegalArgumentException("You must specify a supplier (was null).");
+        }
+
         this.supplier = supplier;
     }
 
