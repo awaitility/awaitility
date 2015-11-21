@@ -16,13 +16,14 @@
 package com.jayway.awaitility.core;
 
 import com.jayway.awaitility.Duration;
+import com.jayway.awaitility.pollinterval.PollInterval;
 
 import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
 
 class ConditionSettings {
     private final String alias;
     private final Duration maxWaitTime;
-    private final Duration pollInterval;
+    private final PollInterval pollInterval;
     private final Duration pollDelay;
     private final boolean catchUncaughtExceptions;
     private final ExceptionIgnorer ignoreExceptions;
@@ -40,7 +41,7 @@ class ConditionSettings {
      * @param ignoreExceptions            a boolean.
      */
     public ConditionSettings(String alias, boolean catchUncaughtExceptions, Duration maxWaitTime,
-                             Duration pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
+                             PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
                              ExceptionIgnorer ignoreExceptions) {
         if (maxWaitTime == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
@@ -54,7 +55,7 @@ class ConditionSettings {
         this.alias = alias;
         this.maxWaitTime = maxWaitTime;
         this.pollInterval = pollInterval;
-        this.pollDelay = pollDelay == SAME_AS_POLL_INTERVAL ? pollInterval : pollDelay;
+        this.pollDelay = pollDelay == SAME_AS_POLL_INTERVAL ? pollInterval.next(1, pollDelay) : pollDelay;
         this.catchUncaughtExceptions = catchUncaughtExceptions;
         this.conditionEvaluationListener = conditionEvaluationListener;
         this.ignoreExceptions = ignoreExceptions;
@@ -83,7 +84,7 @@ class ConditionSettings {
      *
      * @return a {@link com.jayway.awaitility.Duration} object.
      */
-    public Duration getPollInterval() {
+    public PollInterval getPollInterval() {
         return pollInterval;
     }
 

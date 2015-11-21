@@ -83,8 +83,7 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
      * @return a T object.
      */
     public T await() {
-        conditionEvaluationHandler.start();
-        conditionAwaiter.await();
+        conditionAwaiter.await(conditionEvaluationHandler);
         return lastResult;
     }
 

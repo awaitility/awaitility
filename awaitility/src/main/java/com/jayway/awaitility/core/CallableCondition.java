@@ -74,8 +74,7 @@ class CallableCondition implements Condition<Void> {
      * @return a {@link java.lang.Void} object.
      */
     public Void await() {
-        conditionEvaluationHandler.start();
-        conditionAwaiter.await();
+        conditionAwaiter.await(conditionEvaluationHandler);
         return null;
     }
 

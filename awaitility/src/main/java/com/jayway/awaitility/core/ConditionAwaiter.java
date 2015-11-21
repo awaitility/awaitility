@@ -26,6 +26,7 @@ import static com.jayway.awaitility.classpath.ClassPathResolver.existInCP;
 abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     private final CountDownLatch latch;
+    private final Callable<Boolean> condition;
     private Throwable throwable = null;
     private final ConditionSettings conditionSettings;
 
@@ -48,7 +49,20 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         }
         this.conditionSettings = conditionSettings;
         this.latch = new CountDownLatch(1);
-        Runnable poller = new Runnable() {
+        this.condition = condition;
+    }
+
+    private boolean conditionCompleted() {
+        return latch.getCount() == 0;
+    }
+
+    /**
+     * <p>await.</p>
+     *
+     * @param conditionEvaluationHandler The conditionEvaluationHandler
+     */
+    public <T> void await(ConditionEvaluationHandler<T> conditionEvaluationHandler) {
+        final Runnable poller = new Runnable() {
             public void run() {
                 try {
                     if (condition.call()) {
@@ -62,14 +76,30 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 }
             }
         };
-        executor.scheduleWithFixedDelay(poller, conditionSettings.getPollDelay().getValueInMS(), conditionSettings
-                .getPollInterval().getValueInMS(), TimeUnit.MILLISECONDS);
-    }
+        final Duration pollDelay = conditionSettings.getPollDelay();
+        conditionEvaluationHandler.start();
+        final ScheduledFuture<?>[] future = {executor.schedule(poller, pollDelay.getValue(), pollDelay.getTimeUnit())};
+        Thread pollSchedulingThread = new Thread(new Runnable() {
+            public void run() {
+                int pollCount = 0;
+                try {
+                    Duration pollInterval = pollDelay;
+                    while (!executor.isShutdown()) {
+                        future[0].get();
+                        if (conditionCompleted()) {
+                            break;
+                        }
+                        pollCount = pollCount + 1;
+                        pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
+                        future[0] = executor.schedule(poller, pollInterval.getValue(), pollInterval.getTimeUnit());
+                    }
+                } catch (Exception e) {
+                    throwable = e;
+                }
+            }
+        });
+        pollSchedulingThread.start();
 
-    /**
-     * <p>await.</p>
-     */
-    public void await() {
         try {
             try {
                 final Duration maxWaitTime = conditionSettings.getMaxWaitTime();

@@ -16,6 +16,8 @@
 package com.jayway.awaitility.core;
 
 import com.jayway.awaitility.Duration;
+import com.jayway.awaitility.pollinterval.ConstantPollInterval;
+import com.jayway.awaitility.pollinterval.PollInterval;
 import org.hamcrest.Matcher;
 
 import java.lang.reflect.InvocationTargetException;
@@ -44,7 +46,7 @@ public class ConditionFactory {
     /**
      * The poll interval.
      */
-    private final Duration pollInterval;
+    private final PollInterval pollInterval;
 
     /**
      * The catch uncaught exceptions.
@@ -85,6 +87,12 @@ public class ConditionFactory {
     public ConditionFactory(String alias, Duration timeout, Duration pollInterval, Duration pollDelay,
                             boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
                             ConditionEvaluationListener conditionEvaluationListener) {
+        this(alias, timeout, new ConstantPollInterval(pollInterval), pollDelay, catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
+    }
+
+    public ConditionFactory(String alias, Duration timeout, PollInterval pollInterval, Duration pollDelay,
+                            boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
+                            ConditionEvaluationListener conditionEvaluationListener) {
         if (pollInterval == null) {
             throw new IllegalArgumentException("pollInterval cannot be null");
         }
@@ -96,9 +104,10 @@ public class ConditionFactory {
         }
 
         final long timeoutInMS = timeout.getValueInMS();
-        if (!timeout.isForever() && timeoutInMS <= pollInterval.getValueInMS()) {
+        Duration firstDuration = Duration.SAME_AS_POLL_INTERVAL == pollDelay ?  pollInterval.next(1, Duration.ZERO) : pollInterval.next(1, pollDelay);
+        if (!timeout.isForever() && timeoutInMS <= firstDuration.getValueInMS()) {
             throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll interval (%s %s).",
-                    timeout.getValue(), timeout.getTimeUnitAsString(), pollInterval.getValue(), pollInterval.getTimeUnitAsString()));
+                    timeout.getValue(), timeout.getTimeUnitAsString(), firstDuration.getValue(), firstDuration.getTimeUnitAsString()));
         } else if ((!pollDelay.isForever() && !timeout.isForever()) && timeoutInMS <= pollDelay.getValueInMS()) {
             throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll delay (%s %s).",
                     timeout.getValue(), timeout.getTimeUnitAsString(), pollDelay.getValue(), pollDelay.getTimeUnitAsString()));
@@ -123,6 +132,20 @@ public class ConditionFactory {
      * @param catchUncaughtExceptions the catch uncaught exceptions
      */
     public ConditionFactory(Duration timeout, Duration pollInterval, Duration pollDelay, boolean catchUncaughtExceptions,
+                            ExceptionIgnorer exceptionsIgnorer) {
+        this(null, timeout, new ConstantPollInterval(pollInterval), pollDelay, catchUncaughtExceptions, exceptionsIgnorer, null);
+    }
+
+    /**
+     * Instantiates a new condition factory.
+     *
+     * @param timeout                 the timeout
+     * @param pollInterval            the poll interval
+     * @param pollDelay               The delay before the polling starts
+     * @param exceptionsIgnorer       the ignore exceptions
+     * @param catchUncaughtExceptions the catch uncaught exceptions
+     */
+    public ConditionFactory(Duration timeout, PollInterval pollInterval, Duration pollDelay, boolean catchUncaughtExceptions,
                             ExceptionIgnorer exceptionsIgnorer) {
         this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer, null);
     }
@@ -277,6 +300,11 @@ public class ConditionFactory {
     public ConditionFactory pollInterval(long pollInterval, TimeUnit unit) {
         return new ConditionFactory(alias, timeout, new Duration(pollInterval, unit), pollDelay,
                 catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
+    }
+
+    public ConditionFactory pollInterval(PollInterval pollInterval) {
+        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions,
+                exceptionsIgnorer, conditionEvaluationListener);
     }
 
     /**
