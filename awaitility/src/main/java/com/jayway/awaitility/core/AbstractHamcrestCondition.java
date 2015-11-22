@@ -15,6 +15,7 @@
  */
 package com.jayway.awaitility.core;
 
+import com.jayway.awaitility.Duration;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
@@ -44,14 +45,14 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         }
 
         conditionEvaluationHandler = new ConditionEvaluationHandler<T>(matcher, settings);
-        final Callable<Boolean> callable = new Callable<Boolean>() {
-            public Boolean call() throws Exception {
+        final ConditionEvaluator callable = new ConditionEvaluator() {
+            public boolean eval(Duration pollInterval) throws Exception{
                 lastResult = supplier.call();
                 boolean matches = matcher.matches(lastResult);
                 if (matches) {
-                    conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier, matcher), lastResult);
+                    conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier, matcher), lastResult, pollInterval);
                 } else {
-                    conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, matcher), lastResult);
+                    conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, matcher), lastResult, pollInterval);
                 }
                 return matches;
 

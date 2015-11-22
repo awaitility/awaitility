@@ -35,7 +35,7 @@ class ConditionEvaluationHandler<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public void handleConditionResultMismatch(String mismatchMessage, T currentConditionValue) {
+    public void handleConditionResultMismatch(String mismatchMessage, T currentConditionValue, Duration pollInterval) {
         ConditionEvaluationListener<T> listener = settings.getConditionEvaluationListener();
         if (listener == null) {
             return;
@@ -44,14 +44,15 @@ class ConditionEvaluationHandler<T> {
         long elapsedTimeInMS = watch.getElapsedTimeInMS();
         long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
         try {
-            listener.conditionEvaluated(new EvaluatedCondition<T>(mismatchMessage, matcher, currentConditionValue, elapsedTimeInMS, remainingTimeInMS, false, settings.getAlias()));
+            listener.conditionEvaluated(new EvaluatedCondition<T>(mismatchMessage, matcher, currentConditionValue, elapsedTimeInMS,
+                    remainingTimeInMS, false, settings.getAlias(), pollInterval));
         } catch (ClassCastException e) {
             throwClassCastExceptionBecauseConditionEvaluationListenerCouldntBeApplied(e, listener);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public void handleConditionResultMatch(String matchMessage, T currentConditionValue) {
+    public void handleConditionResultMatch(String matchMessage, T currentConditionValue, Duration pollInterval) {
         ConditionEvaluationListener<T> listener = settings.getConditionEvaluationListener();
         if (listener == null) {
             return;
@@ -59,7 +60,8 @@ class ConditionEvaluationHandler<T> {
         long elapsedTimeInMS = watch.getElapsedTimeInMS();
         long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
         try {
-            listener.conditionEvaluated(new EvaluatedCondition<T>(matchMessage, matcher, currentConditionValue, elapsedTimeInMS, remainingTimeInMS, true, settings.getAlias()));
+            listener.conditionEvaluated(new EvaluatedCondition<T>(matchMessage, matcher, currentConditionValue, elapsedTimeInMS,
+                    remainingTimeInMS, true, settings.getAlias(), pollInterval));
         } catch (ClassCastException e) {
             throwClassCastExceptionBecauseConditionEvaluationListenerCouldntBeApplied(e, listener);
         }

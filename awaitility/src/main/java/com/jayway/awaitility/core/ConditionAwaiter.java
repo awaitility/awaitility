@@ -19,14 +19,17 @@ import com.jayway.awaitility.Duration;
 
 import java.beans.Introspector;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static com.jayway.awaitility.classpath.ClassPathResolver.existInCP;
 
 abstract class ConditionAwaiter implements UncaughtExceptionHandler {
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private final ExecutorService executor = Executors.newFixedThreadPool(1);
     private final CountDownLatch latch;
-    private final Callable<Boolean> condition;
+    private final ConditionEvaluator condition;
     private Throwable throwable = null;
     private final ConditionSettings conditionSettings;
 
@@ -36,7 +39,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
      * @param condition         a {@link java.util.concurrent.Callable} object.
      * @param conditionSettings a {@link com.jayway.awaitility.core.ConditionSettings} object.
      */
-    public ConditionAwaiter(final Callable<Boolean> condition,
+    public ConditionAwaiter(final ConditionEvaluator condition,
                             final ConditionSettings conditionSettings) {
         if (condition == null) {
             throw new IllegalArgumentException("You must specify a condition (was null).");
@@ -62,36 +65,25 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
      * @param conditionEvaluationHandler The conditionEvaluationHandler
      */
     public <T> void await(ConditionEvaluationHandler<T> conditionEvaluationHandler) {
-        final Runnable poller = new Runnable() {
-            public void run() {
-                try {
-                    if (condition.call()) {
-                        latch.countDown();
-                    }
-                } catch (Exception e) {
-                    if (!conditionSettings.shouldExceptionBeIgnored(e)) {
-                        throwable = e;
-                        latch.countDown();
-                    }
-                }
-            }
-        };
         final Duration pollDelay = conditionSettings.getPollDelay();
         conditionEvaluationHandler.start();
-        final ScheduledFuture<?>[] future = {executor.schedule(poller, pollDelay.getValue(), pollDelay.getTimeUnit())};
         Thread pollSchedulingThread = new Thread(new Runnable() {
             public void run() {
                 int pollCount = 0;
                 try {
+                    if (!pollDelay.isZero()) {
+                        Thread.sleep(pollDelay.getValueInMS());
+                    }
                     Duration pollInterval = pollDelay;
                     while (!executor.isShutdown()) {
-                        future[0].get();
                         if (conditionCompleted()) {
                             break;
                         }
                         pollCount = pollCount + 1;
                         pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
-                        future[0] = executor.schedule(poller, pollInterval.getValue(), pollInterval.getTimeUnit());
+                        Duration maxWaitTime = conditionSettings.getMaxWaitTime();
+                        executor.submit(new ConditionPoller(pollInterval)).get(maxWaitTime.getValue(), maxWaitTime.getTimeUnit());
+                        Thread.sleep(pollInterval.getValueInMS());
                     }
                 } catch (Exception e) {
                     throwable = e;
@@ -167,6 +159,30 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         this.throwable = throwable;
         if (latch.getCount() != 0) {
             latch.countDown();
+        }
+    }
+
+    private class ConditionPoller implements Runnable {
+        private final Duration delayed;
+
+        /**
+         * @param delayed The duration of the poll interval
+         */
+        public ConditionPoller(Duration delayed) {
+            this.delayed = delayed;
+        }
+
+        public void run() {
+            try {
+                if (condition.eval(delayed)) {
+                    latch.countDown();
+                }
+            } catch (Exception e) {
+                if (!conditionSettings.shouldExceptionBeIgnored(e)) {
+                    throwable = e;
+                    latch.countDown();
+                }
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 Changelog next version
 ----------------------
 * Deadlock detection is no longer applied on platform that doesn't support it such as Android (issue 30)
-
+* ConditionEvaluationLogger now logs the poll interval of the evaluated condition
 
 Changelog 1.6.5 (2015-09-27)
 ----------------------------

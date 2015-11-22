@@ -138,6 +138,15 @@ public class Duration {
     }
 
     /**
+     * <p>isZero</p>
+     *
+     * @return a boolean.
+     */
+    public boolean isZero() {
+        return this.equals(ZERO);
+    }
+
+    /**
      * <p>Getter for the field <code>value</code>.</p>
      *
      * @return a long.

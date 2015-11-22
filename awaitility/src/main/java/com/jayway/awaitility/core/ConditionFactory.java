@@ -16,7 +16,7 @@
 package com.jayway.awaitility.core;
 
 import com.jayway.awaitility.Duration;
-import com.jayway.awaitility.pollinterval.ConstantPollInterval;
+import com.jayway.awaitility.pollinterval.FixedPollInterval;
 import com.jayway.awaitility.pollinterval.PollInterval;
 import org.hamcrest.Matcher;
 
@@ -87,7 +87,7 @@ public class ConditionFactory {
     public ConditionFactory(String alias, Duration timeout, Duration pollInterval, Duration pollDelay,
                             boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
                             ConditionEvaluationListener conditionEvaluationListener) {
-        this(alias, timeout, new ConstantPollInterval(pollInterval), pollDelay, catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
+        this(alias, timeout, new FixedPollInterval(pollInterval), pollDelay, catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
     }
 
     public ConditionFactory(String alias, Duration timeout, PollInterval pollInterval, Duration pollDelay,
@@ -133,7 +133,7 @@ public class ConditionFactory {
      */
     public ConditionFactory(Duration timeout, Duration pollInterval, Duration pollDelay, boolean catchUncaughtExceptions,
                             ExceptionIgnorer exceptionsIgnorer) {
-        this(null, timeout, new ConstantPollInterval(pollInterval), pollDelay, catchUncaughtExceptions, exceptionsIgnorer, null);
+        this(null, timeout, new FixedPollInterval(pollInterval), pollDelay, catchUncaughtExceptions, exceptionsIgnorer, null);
     }
 
     /**

@@ -13,26 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package com.jayway.awaitility.pollinterval;
+package com.jayway.awaitility.core;
 
 import com.jayway.awaitility.Duration;
 
-import java.util.concurrent.TimeUnit;
+interface ConditionEvaluator {
 
-public class ConstantPollInterval implements PollInterval {
-
-    private final Duration duration;
-
-    public ConstantPollInterval(Duration duration) {
-        this.duration = duration;
-    }
-
-    public ConstantPollInterval(long pollInterval, TimeUnit unit) {
-        this(new Duration(pollInterval, unit));
-    }
-
-    public Duration next(int pollCount, Duration previousDuration) {
-        return duration;
-    }
+    /**
+     * @param pollInterval The poll interval for the for this evaluation round
+     */
+    boolean eval(Duration pollInterval) throws Exception;
 }

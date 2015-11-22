@@ -15,6 +15,8 @@
  */
 package com.jayway.awaitility.core;
 
+import com.jayway.awaitility.Duration;
+
 import java.lang.reflect.Method;
 import java.util.concurrent.Callable;
 
@@ -81,7 +83,7 @@ class CallableCondition implements Condition<Void> {
     /**
      * Wraps and delegates to another callable and invokes the {@link com.jayway.awaitility.core.ConditionEvaluationHandler}.
      */
-    private static class ConditionEvaluationWrapper implements Callable<Boolean> {
+    private static class ConditionEvaluationWrapper implements ConditionEvaluator {
 
         private final Callable<Boolean> matcher;
         private final ConditionSettings settings;
@@ -94,12 +96,12 @@ class CallableCondition implements Condition<Void> {
             this.conditionEvaluationHandler = conditionEvaluationHandler;
         }
 
-        public Boolean call() throws Exception {
+        public boolean eval(Duration pollInterval) throws Exception {
             boolean conditionFulfilled = matcher.call();
             if (conditionFulfilled) {
-                conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(matcher, settings.getAlias()), true);
+                conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(matcher, settings.getAlias()), true, pollInterval);
             } else {
-                conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(matcher, settings.getAlias()), false);
+                conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(matcher, settings.getAlias()), false, pollInterval);
 
             }
             return conditionFulfilled;
