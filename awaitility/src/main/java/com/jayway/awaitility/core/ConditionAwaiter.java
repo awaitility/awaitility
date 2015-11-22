@@ -29,19 +29,19 @@ import static com.jayway.awaitility.classpath.ClassPathResolver.existInCP;
 abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     private final ExecutorService executor = Executors.newFixedThreadPool(1);
     private final CountDownLatch latch;
-    private final ConditionEvaluator condition;
+    private final ConditionEvaluator conditionEvaluator;
     private Throwable throwable = null;
     private final ConditionSettings conditionSettings;
 
     /**
      * <p>Constructor for ConditionAwaiter.</p>
      *
-     * @param condition         a {@link java.util.concurrent.Callable} object.
-     * @param conditionSettings a {@link com.jayway.awaitility.core.ConditionSettings} object.
+     * @param conditionEvaluator a {@link ConditionEvaluator} object.
+     * @param conditionSettings  a {@link com.jayway.awaitility.core.ConditionSettings} object.
      */
-    public ConditionAwaiter(final ConditionEvaluator condition,
+    public ConditionAwaiter(final ConditionEvaluator conditionEvaluator,
                             final ConditionSettings conditionSettings) {
-        if (condition == null) {
+        if (conditionEvaluator == null) {
             throw new IllegalArgumentException("You must specify a condition (was null).");
         }
         if (conditionSettings == null) {
@@ -52,7 +52,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         }
         this.conditionSettings = conditionSettings;
         this.latch = new CountDownLatch(1);
-        this.condition = condition;
+        this.conditionEvaluator = conditionEvaluator;
     }
 
     private boolean conditionCompleted() {
@@ -174,7 +174,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
 
         public void run() {
             try {
-                if (condition.eval(delayed)) {
+                if (conditionEvaluator.eval(delayed)) {
                     latch.countDown();
                 }
             } catch (Exception e) {
