@@ -64,13 +64,13 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
      *
      * @param conditionEvaluationHandler The conditionEvaluationHandler
      */
-    public <T> void await(ConditionEvaluationHandler<T> conditionEvaluationHandler) {
+    public <T> void await(final ConditionEvaluationHandler<T> conditionEvaluationHandler) {
         final Duration pollDelay = conditionSettings.getPollDelay();
-        conditionEvaluationHandler.start();
         Thread pollSchedulingThread = new Thread(new Runnable() {
             public void run() {
                 int pollCount = 0;
                 try {
+                    conditionEvaluationHandler.start();
                     if (!pollDelay.isZero()) {
                         Thread.sleep(pollDelay.getValueInMS());
                     }
