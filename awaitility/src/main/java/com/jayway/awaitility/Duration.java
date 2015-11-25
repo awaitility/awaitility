@@ -181,7 +181,13 @@ public class Duration {
         return new Duration(value + duration, unit);
     }
 
-    public Duration times(long duration) {
+    /**
+     * Multiply this duration with the given duration
+     *
+     * @param duration The duration
+     * @return A new duration
+     */
+    public Duration multiply(long duration) {
         if (SAME_AS_POLL_INTERVAL == this) {
             // TODO Fix this
             return new Duration(duration, MILLISECONDS);

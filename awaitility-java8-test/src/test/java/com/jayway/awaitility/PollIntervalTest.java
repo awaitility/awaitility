@@ -62,14 +62,14 @@ public class PollIntervalTest {
     public void inlinePollInterval() {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
-                pollInterval((__, previous) -> previous.times(2)).until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+                pollInterval((__, previous) -> previous.multiply(2)).until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
     @Test(timeout = 2000)
     public void iterativePollInterval() {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
-                pollInterval(iterative(duration -> duration.times(2), FIVE_HUNDRED_MILLISECONDS)).
+                pollInterval(iterative(duration -> duration.multiply(2), FIVE_HUNDRED_MILLISECONDS)).
                 until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
