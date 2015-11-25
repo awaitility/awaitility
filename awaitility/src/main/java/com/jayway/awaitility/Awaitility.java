@@ -16,11 +16,11 @@
 package com.jayway.awaitility;
 
 import com.jayway.awaitility.core.*;
+import com.jayway.awaitility.pollinterval.FixedPollInterval;
+import com.jayway.awaitility.pollinterval.PollInterval;
 import org.hamcrest.Matcher;
 
 import java.util.concurrent.TimeUnit;
-
-import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
 
 /**
  * Awaitility is a small Java DSL for synchronizing (waiting for) asynchronous
@@ -102,10 +102,12 @@ import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
  */
 public class Awaitility {
 
+    private static final Duration DEFAULT_DURATION = Duration.ONE_HUNDRED_MILLISECONDS;
+
     /**
-     * The default poll interval (100 ms).
+     * The default poll interval (fixed 100 ms).
      */
-    private static volatile Duration defaultPollInterval = Duration.ONE_HUNDRED_MILLISECONDS;
+    private static volatile PollInterval defaultPollInterval = new FixedPollInterval(DEFAULT_DURATION);
 
     /**
      * The default timeout (10 seconds).
@@ -113,12 +115,12 @@ public class Awaitility {
     private static volatile Duration defaultTimeout = Duration.TEN_SECONDS;
 
     /**
-     * The default poll delay (same as {@link #defaultPollInterval}).
+     * The default poll delay ({@link Duration#ONE_HUNDRED_MILLISECONDS})
      */
-    private static volatile Duration defaultPollDelay = SAME_AS_POLL_INTERVAL;
+    private static volatile Duration defaultPollDelay = DEFAULT_DURATION;
 
     /**
-     * Catch all uncaught exceptions by default?.
+     * Catch all uncaught exceptions by default?
      */
     private static volatile boolean defaultCatchUncaughtExceptions = true;
 
@@ -212,8 +214,8 @@ public class Awaitility {
      * </ul>
      */
     public static void reset() {
-        defaultPollInterval = Duration.ONE_HUNDRED_MILLISECONDS;
-        defaultPollDelay = SAME_AS_POLL_INTERVAL;
+        defaultPollInterval = new FixedPollInterval(DEFAULT_DURATION);
+        defaultPollDelay = DEFAULT_DURATION;
         defaultTimeout = Duration.TEN_SECONDS;
         defaultCatchUncaughtExceptions = true;
         defaultConditionEvaluationListener = null;
@@ -330,7 +332,7 @@ public class Awaitility {
      * @param unit         the unit
      */
     public static void setDefaultPollInterval(long pollInterval, TimeUnit unit) {
-        defaultPollInterval = new Duration(pollInterval, unit);
+        defaultPollInterval = new FixedPollInterval(new Duration(pollInterval, unit));
     }
 
     /**
@@ -359,6 +361,18 @@ public class Awaitility {
      * @param pollInterval the new default poll interval
      */
     public static void setDefaultPollInterval(Duration pollInterval) {
+        if (pollInterval == null) {
+            throw new IllegalArgumentException("You must specify a poll interval (was null).");
+        }
+        defaultPollInterval = new FixedPollInterval(pollInterval);
+    }
+
+    /**
+     * Sets the default poll interval that all await statements will use.
+     *
+     * @param pollInterval the new default poll interval
+     */
+    public static void setDefaultPollInterval(PollInterval pollInterval) {
         if (pollInterval == null) {
             throw new IllegalArgumentException("You must specify a poll interval (was null).");
         }

@@ -28,7 +28,7 @@ public interface PollInterval {
 
     /**
      * @param pollCount        The number of times the condition has been polled (evaluated)
-     * @param previousDuration The duration of the previously returned poll interval
+     * @param previousDuration The duration of the previously returned poll interval or {@link Duration#ZERO} when determining initial poll delay (if not explicitly defined).
      * @return The duration of the next poll interval
      */
     Duration next(int pollCount, Duration previousDuration);

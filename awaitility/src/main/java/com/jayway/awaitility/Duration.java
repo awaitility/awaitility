@@ -23,6 +23,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 /**
  * <p>Duration class.</p>
  */
+@SuppressWarnings("Duplicates")
 public class Duration {
 
     /**
@@ -81,7 +82,10 @@ public class Duration {
     public static final Duration TEN_MINUTES = new Duration(600, SECONDS);
     /**
      * Constant <code>SAME_AS_POLL_INTERVAL</code>
+     *
+     * @deprecated This doesn't do anything. The initial delay is now always the same as poll interval if nothing else is specified.
      */
+    @Deprecated
     public static final Duration SAME_AS_POLL_INTERVAL = new Duration();
     private static final int NONE = -1;
 
@@ -168,78 +172,122 @@ public class Duration {
     }
 
     /**
-     * Add a duration (with the same time unit as the current duration)
+     * Add a amount (with the same time unit as the current duration)
      *
-     * @param duration The duration to add
-     * @return A new duration
+     * @param amount The amount to add
+     * @return A new amount
      */
-    public Duration plus(long duration) {
-        if (SAME_AS_POLL_INTERVAL == this) {
-            // TODO Fix this
-            return new Duration(duration, MILLISECONDS);
-        }
-        return new Duration(value + duration, unit);
+    public Duration plus(long amount) {
+        return new Plus().apply(this, unit == null ? FOREVER : new Duration(amount, unit));
     }
 
     /**
-     * Multiply this duration with the given duration
-     *
-     * @param duration The duration
-     * @return A new duration
-     */
-    public Duration multiply(long duration) {
-        if (SAME_AS_POLL_INTERVAL == this) {
-            // TODO Fix this
-            return new Duration(duration, MILLISECONDS);
-        }
-        return new Duration((value == 0 ? 1 : value) * duration, unit);
-    }
-
-    /**
-     * Add a duration with the given time unit. For example:
+     * Add a amount with the given time unit. For example:
      * <pre>
      * new Duration(2, SECONDS).plus(4, MILLISECONDS)
      * </pre>
-     * this will return a Duration with 2004 {@link TimeUnit#MILLISECONDS}.
+     * will return a Duration of 2004 {@link TimeUnit#MILLISECONDS}.
+     * <p/>
+     * <pre>
+     * new Duration(2, SECONDS).plus(1, MINUTES)
+     * </pre>
+     * will return a Duration of 62 {@link TimeUnit#SECONDS}.
      *
-     * @param duration The duration to add
+     * @param amount   The amount to add
      * @param timeUnit The time unit to add
-     * @return A new duration
+     * @return A new amount
      */
-    public Duration plus(long duration, TimeUnit timeUnit) {
-        // TODO Fix NPE
-        int min = Math.min(timeUnit.ordinal(), unit.ordinal());
-        int max = Math.max(timeUnit.ordinal(), unit.ordinal());
-        TimeUnit[] timeUnits = TimeUnit.values();
-        TimeUnit sourceUnit = timeUnits[min];
-        TimeUnit targetUnit = timeUnits[max];
-        return new Duration(duration + targetUnit.convert(value, sourceUnit), targetUnit);
-    }
+    public Duration plus(long amount, TimeUnit timeUnit) {
+        if (timeUnit == null) {
+            throw new IllegalArgumentException("Time unit cannot be null");
+        }
 
-    /**
-     * Add a duration (with the same time unit as the current duration)
-     *
-     * @param duration The duration to add
-     * @return A new duration
-     */
-    public Duration minus(long duration) {
-        return new Duration(value - duration, unit);
+        return new Plus().apply(this, new Duration(amount, timeUnit));
     }
 
     /**
      * Add a duration with the given time unit. For example:
      * <pre>
-     * new Duration(2, SECONDS).add(4, MILLISECONDS)
+     * new Duration(2, SECONDS).plus(Duration.FIVE_HUNDRED_MILLISECONDS)
      * </pre>
-     * this will return a Duration with 2004 {@link TimeUnit#MILLISECONDS}.
+     * will return a Duration of 2500 {@link TimeUnit#MILLISECONDS}.
+     * <p/>
      *
      * @param duration The duration to add
-     * @param timeUnit The time unit to add
      * @return A new duration
      */
-    public Duration minus(long duration, TimeUnit timeUnit) {
-        // TODO Fixme
-        return null;
+    public Duration plus(Duration duration) {
+        return new Plus().apply(this, duration);
+    }
+
+    /**
+     * Multiply this amount with the given amount
+     *
+     * @param amount The amount
+     * @return A new amount
+     */
+    public Duration multiply(long amount) {
+        return new Multiply().apply(this, unit == null ? FOREVER : new Duration(amount, unit));
+    }
+
+
+    /**
+     * Divide this duration amount with the given amount
+     *
+     * @param amount The amount
+     * @return A new amount
+     */
+    public Duration divide(long amount) {
+        return new Divide().apply(this, unit == null ? FOREVER : new Duration(amount, unit));
+    }
+
+    /**
+     * Subtract an amount (with the same time unit as the current amount)
+     *
+     * @param amount The amount to add
+     * @return A new amount
+     */
+    public Duration minus(long amount) {
+        return new Minus().apply(this, unit == null ? FOREVER : new Duration(amount, unit));
+    }
+
+    /**
+     * Subtract an amount with the given time unit. For example:
+     * <pre>
+     * new Duration(2, SECONDS).minus(4, MILLISECONDS)
+     * </pre>
+     * will return a Duration of 1996 {@link TimeUnit#MILLISECONDS}.
+     * <p/>
+     * <pre>
+     * new Duration(2, MINUTES).minus(1, SECONDS)
+     * </pre>
+     * will return a Duration of 119 {@link TimeUnit#SECONDS}.
+     *
+     * @param amount   The amount to add
+     * @param timeUnit The time unit to add
+     * @return A new amount
+     */
+    public Duration minus(long amount, TimeUnit timeUnit) {
+        if (timeUnit == null) {
+            throw new IllegalArgumentException("Time unit cannot be null");
+        }
+
+        return new Minus().apply(this, new Duration(amount, timeUnit));
+    }
+
+    /**
+     * Add a duration with the given time unit. For example:
+     * <pre>
+     * new Duration(2, SECONDS).plus(Duration.FIVE_HUNDRED_MILLISECONDS)
+     * </pre>
+     * will return a Duration of 2500 {@link TimeUnit#MILLISECONDS}.
+     * <p/>
+     *
+     * @param duration The duration to add
+     * @return A new duration
+     */
+    public Duration minus(Duration duration) {
+        return new Minus().apply(this, duration);
     }
 
     /**
@@ -263,5 +311,118 @@ public class Duration {
         int result = (int) (value ^ (value >>> 32));
         result = 31 * result + (unit != null ? unit.hashCode() : 0);
         return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "Duration{" +
+                "unit=" + unit +
+                ", value=" + value +
+                '}';
+    }
+
+    private static abstract class BiFunction {
+        public final Duration apply(Duration lhs, Duration rhs) {
+            if (lhs == null || rhs == null) {
+                throw new IllegalArgumentException("Duration cannot be null");
+            } else if (lhs == SAME_AS_POLL_INTERVAL || rhs == SAME_AS_POLL_INTERVAL) {
+                throw new IllegalStateException("Cannot perform operation on this kind of duration (SAME_AS_POLL_INTERVAL). Please don't use this Duration since it's deprecated");
+            }
+
+            Duration specialDuration = handleSpecialCases(lhs, rhs);
+            if (specialDuration != null) {
+                return specialDuration;
+            }
+
+            final Duration newDuration;
+            if (lhs.getTimeUnit().ordinal() > rhs.getTimeUnit().ordinal()) {
+                long lhsConverted = rhs.getTimeUnit().convert(lhs.getValue(), lhs.getTimeUnit());
+                newDuration = new Duration(apply(lhsConverted, rhs.getValue()), rhs.getTimeUnit());
+            } else if (lhs.getTimeUnit().ordinal() < rhs.getTimeUnit().ordinal()) {
+                long rhsConverted = lhs.getTimeUnit().convert(rhs.getValue(), rhs.getTimeUnit());
+                newDuration = new Duration(apply(lhs.getValue(), rhsConverted), lhs.getTimeUnit());
+            } else {
+                // Same time unit
+                newDuration = new Duration(apply(lhs.getValue(), rhs.getValue()), lhs.getTimeUnit());
+            }
+
+            return newDuration;
+        }
+
+        protected abstract Duration handleSpecialCases(Duration lhs, Duration rhs);
+
+        abstract long apply(long operand1, long operand2);
+    }
+
+    private static class Plus extends BiFunction {
+        protected Duration handleSpecialCases(Duration lhs, Duration rhs) {
+            if (ZERO.equals(rhs)) {
+                return lhs;
+            } else if (ZERO.equals(lhs)) {
+                return rhs;
+            } else if (lhs == FOREVER || rhs == FOREVER) {
+                return FOREVER;
+            }
+            return null;
+        }
+
+        long apply(long operand1, long operand2) {
+            return operand1 + operand2;
+        }
+    }
+
+    private static class Minus extends BiFunction {
+        protected Duration handleSpecialCases(Duration lhs, Duration rhs) {
+            if (!lhs.isZero() && rhs.isZero()) {
+                return lhs;
+            } else if (lhs == FOREVER) {
+                return FOREVER;
+            } else if (rhs == FOREVER) {
+                return ZERO;
+            } else if (FOREVER.equals(rhs)) {
+                return ZERO;
+            }
+            return null;
+        }
+
+        long apply(long operand1, long operand2) {
+            return operand1 - operand2;
+        }
+    }
+
+    private static class Multiply extends BiFunction {
+        @Override
+        protected Duration handleSpecialCases(Duration lhs, Duration rhs) {
+            if (lhs.isZero() || rhs.isZero()) {
+                return ZERO;
+            } else if (lhs == FOREVER || rhs == FOREVER) {
+                return FOREVER;
+            }
+            return null;
+        }
+
+        long apply(long operand1, long operand2) {
+            return operand1 * operand2;
+        }
+    }
+
+    private static class Divide extends BiFunction {
+        protected Duration handleSpecialCases(Duration lhs, Duration rhs) {
+            if (lhs == FOREVER) {
+                return FOREVER;
+            } else if (rhs == FOREVER) {
+                throw new IllegalArgumentException("Cannot divide by infinity");
+            } else if (ZERO.equals(lhs)) {
+                return ZERO;
+            }
+            return null;
+        }
+
+        long apply(long operand1, long operand2) {
+            return operand1 / operand2;
+        }
     }
 }

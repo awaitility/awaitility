@@ -2,6 +2,12 @@ Changelog next version
 ----------------------
 * Deadlock detection is no longer applied on platform that doesn't support it such as Android (issue 30)
 * ConditionEvaluationLogger now logs the poll interval of the evaluated condition
+* Non-backwards compatible change: Poll delay _may_ no longer the same as the poll interval if you've explicitly specified a poll interval to be something else than 100 ms.
+                                   This means that if you've set poll interval to 200 ms and not explicitly set the poll delay it will still be 100 ms (by default).
+                                   Before the poll delay would be 200 ms as well. The reason for this that with new (non-linear) poll intervals it doesn't make
+                                   sense derive an initial poll delay from these poll intervals. To ease both code and reasoning it was decided to not leave these
+                                   two concepts as separate things.
+* Deprecations: Duration.SAME_AS_POLL_INTERVAL is deprecated since it's no longer used. It'll be removed in a future release.
 
 Changelog 1.6.5 (2015-09-27)
 ----------------------------

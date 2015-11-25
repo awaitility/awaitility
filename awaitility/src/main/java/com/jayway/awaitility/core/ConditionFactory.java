@@ -104,10 +104,9 @@ public class ConditionFactory {
         }
 
         final long timeoutInMS = timeout.getValueInMS();
-        Duration firstDuration = Duration.SAME_AS_POLL_INTERVAL == pollDelay ? pollInterval.next(1, Duration.ZERO) : pollInterval.next(1, pollDelay);
-        if (!timeout.isForever() && timeoutInMS <= firstDuration.getValueInMS()) {
-            throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll interval (%s %s).",
-                    timeout.getValue(), timeout.getTimeUnitAsString(), firstDuration.getValue(), firstDuration.getTimeUnitAsString()));
+        if (!timeout.isForever() && timeoutInMS <= pollDelay.getValueInMS()) {
+            throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll delay (%s %s).",
+                    timeout.getValue(), timeout.getTimeUnitAsString(), pollDelay.getValue(), pollDelay.getTimeUnitAsString()));
         } else if ((!pollDelay.isForever() && !timeout.isForever()) && timeoutInMS <= pollDelay.getValueInMS()) {
             throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll delay (%s %s).",
                     timeout.getValue(), timeout.getTimeUnitAsString(), pollDelay.getValue(), pollDelay.getTimeUnitAsString()));
@@ -160,6 +159,22 @@ public class ConditionFactory {
      * @param catchUncaughtExceptions the catch uncaught exceptions
      */
     public ConditionFactory(Duration timeout, Duration pollInterval, Duration pollDelay,
+                            boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
+                            ConditionEvaluationListener conditionEvaluationListener) {
+        this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
+                conditionEvaluationListener);
+    }
+
+    /**
+     * Instantiates a new condition factory.
+     *
+     * @param timeout                 the timeout
+     * @param pollInterval            the poll interval
+     * @param pollDelay               The delay before the polling starts
+     * @param exceptionsIgnorer       the ignore exceptions
+     * @param catchUncaughtExceptions the catch uncaught exceptions
+     */
+    public ConditionFactory(Duration timeout, PollInterval pollInterval, Duration pollDelay,
                             boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
                             ConditionEvaluationListener conditionEvaluationListener) {
         this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
@@ -266,6 +281,9 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory pollDelay(Duration pollDelay) {
+        if (pollDelay == null) {
+            throw new IllegalArgumentException("pollDelay cannot be null");
+        }
         return new ConditionFactory(alias, this.timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
                 conditionEvaluationListener);
     }
@@ -734,8 +752,8 @@ public class ConditionFactory {
     }
 
     private ConditionSettings generateConditionSettings() {
-        return new ConditionSettings(alias, catchUncaughtExceptions, timeout, pollInterval, pollDelay, conditionEvaluationListener,
-                exceptionsIgnorer);
+        return new ConditionSettings(alias, catchUncaughtExceptions, timeout, pollInterval, pollDelay,
+                conditionEvaluationListener, exceptionsIgnorer);
     }
 
     private <T> T until(Condition<T> condition) {
@@ -793,18 +811,5 @@ public class ConditionFactory {
                 return SafeExceptionRethrower.safeRethrow(e.getCause());
             }
         }
-    }
-
-    private static boolean isInstanceOf(Object object, String className) {
-        try {
-            object.getClass().isAssignableFrom(loadClass(className));
-            return true;
-        } catch (Throwable e) {
-            return false;
-        }
-    }
-
-    private static Class<?> loadClass(String className) throws ClassNotFoundException {
-        return Class.forName(className, false, Thread.currentThread().getContextClassLoader());
     }
 }
