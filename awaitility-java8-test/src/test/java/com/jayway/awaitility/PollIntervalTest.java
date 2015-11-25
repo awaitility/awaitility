@@ -30,8 +30,10 @@ import org.junit.rules.ExpectedException;
 import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.awaitility.Duration.FIVE_HUNDRED_MILLISECONDS;
 import static com.jayway.awaitility.Duration.TWO_HUNDRED_MILLISECONDS;
+import static com.jayway.awaitility.pollinterval.FibonacciPollInterval.fibonacci;
 import static com.jayway.awaitility.pollinterval.FixedPollInterval.fixed;
 import static com.jayway.awaitility.pollinterval.IterativePollInterval.iterative;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * Tests for await().until(Runnable) using AssertionCondition.
@@ -56,6 +58,14 @@ public class PollIntervalTest {
     public void fibonacciPollInterval() {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).pollInterval(new FibonacciPollInterval()).until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+    }
+
+    @Test(timeout = 2000)
+    public void fibonacciPollIntervalStaticallyImported() {
+        new Asynch(fakeRepository).perform();
+        await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
+                pollInterval(fibonacci().with().offset(10).and().timeUnit(MILLISECONDS)).
+                until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
     @Test(timeout = 2000)
