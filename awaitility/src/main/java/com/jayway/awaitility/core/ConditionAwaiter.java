@@ -19,10 +19,7 @@ import com.jayway.awaitility.Duration;
 
 import java.beans.Introspector;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static com.jayway.awaitility.classpath.ClassPathResolver.existInCP;
 
@@ -82,7 +79,12 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                         pollCount = pollCount + 1;
                         pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
                         Duration maxWaitTime = conditionSettings.getMaxWaitTime();
-                        executor.submit(new ConditionPoller(pollInterval)).get(maxWaitTime.getValue(), maxWaitTime.getTimeUnit());
+                        Future<?> future = executor.submit(new ConditionPoller(pollInterval));
+                        if (maxWaitTime == Duration.FOREVER) {
+                            future.get();
+                        } else {
+                            future.get(maxWaitTime.getValue(), maxWaitTime.getTimeUnit());
+                        }
                         Thread.sleep(pollInterval.getValueInMS());
                     }
                 } catch (Exception e) {
