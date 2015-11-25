@@ -28,6 +28,10 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static com.jayway.awaitility.Awaitility.await;
+import static com.jayway.awaitility.Duration.FIVE_HUNDRED_MILLISECONDS;
+import static com.jayway.awaitility.Duration.TWO_HUNDRED_MILLISECONDS;
+import static com.jayway.awaitility.pollinterval.FixedPollInterval.fixed;
+import static com.jayway.awaitility.pollinterval.IterativePollInterval.iterative;
 
 /**
  * Tests for await().until(Runnable) using AssertionCondition.
@@ -55,9 +59,25 @@ public class PollIntervalTest {
     }
 
     @Test(timeout = 2000)
-    public void iteratePollInterval() {
+    public void inlinePollInterval() {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
                 pollInterval((__, previous) -> previous.times(2)).until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+    }
+
+    @Test(timeout = 2000)
+    public void iterativePollInterval() {
+        new Asynch(fakeRepository).perform();
+        await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
+                pollInterval(iterative(duration -> duration.times(2), FIVE_HUNDRED_MILLISECONDS)).
+                until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+    }
+
+    @Test(timeout = 2000)
+    public void fixedPollInterval() {
+        new Asynch(fakeRepository).perform();
+        await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
+                pollInterval(fixed(TWO_HUNDRED_MILLISECONDS)).
+                until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 }

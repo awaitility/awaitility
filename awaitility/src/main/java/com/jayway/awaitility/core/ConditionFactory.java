@@ -104,7 +104,7 @@ public class ConditionFactory {
         }
 
         final long timeoutInMS = timeout.getValueInMS();
-        Duration firstDuration = Duration.SAME_AS_POLL_INTERVAL == pollDelay ?  pollInterval.next(1, Duration.ZERO) : pollInterval.next(1, pollDelay);
+        Duration firstDuration = Duration.SAME_AS_POLL_INTERVAL == pollDelay ? pollInterval.next(1, Duration.ZERO) : pollInterval.next(1, pollDelay);
         if (!timeout.isForever() && timeoutInMS <= firstDuration.getValueInMS()) {
             throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll interval (%s %s).",
                     timeout.getValue(), timeout.getTimeUnitAsString(), firstDuration.getValue(), firstDuration.getTimeUnitAsString()));
@@ -291,11 +291,12 @@ public class ConditionFactory {
      * as the interval unless it's specified explicitly using
      * {@link #pollDelay(Duration)}, {@link #pollDelay(long, TimeUnit)} or
      * {@link com.jayway.awaitility.core.ConditionFactory#pollDelay(com.jayway.awaitility.Duration)} , or
-     * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
+     * ConditionFactory#andWithPollDelay(long, TimeUnit)}. This is the same as creating a {@link FixedPollInterval}.
      *
      * @param pollInterval the poll interval
      * @param unit         the unit
      * @return the condition factory
+     * @see FixedPollInterval
      */
     public ConditionFactory pollInterval(long pollInterval, TimeUnit unit) {
         return new ConditionFactory(alias, timeout, new Duration(pollInterval, unit), pollDelay,

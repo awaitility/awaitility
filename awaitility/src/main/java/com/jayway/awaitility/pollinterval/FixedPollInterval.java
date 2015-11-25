@@ -20,19 +20,57 @@ import com.jayway.awaitility.Duration;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Generates a fixed (linear) poll interval based on the supplied duration
+ */
 public class FixedPollInterval implements PollInterval {
 
     private final Duration duration;
 
+    /**
+     * Create a new instance of the {@link FixedPollInterval}.
+     *
+     * @param duration The duration of the poll interval
+     */
     public FixedPollInterval(Duration duration) {
+        if (duration == null) {
+            throw new IllegalArgumentException("Duration cannot be null");
+        }
         this.duration = duration;
     }
 
+    /**
+     * Create a new instance of the {@link FixedPollInterval}.
+     *
+     * @param pollInterval The poll interval amount
+     * @param unit         The time unit
+     */
     public FixedPollInterval(long pollInterval, TimeUnit unit) {
         this(new Duration(pollInterval, unit));
     }
 
     public Duration next(int pollCount, Duration previousDuration) {
         return duration;
+    }
+
+    /**
+     * Syntactic sugar for create a new instance of {@link FixedPollInterval}.
+     *
+     * @param duration The duration of the poll interval
+     * @return A new instance of {@link FixedPollInterval}
+     */
+    public static FixedPollInterval fixed(Duration duration) {
+        return new FixedPollInterval(duration);
+    }
+
+    /**
+     * Syntactic sugar for create a new instance of {@link FixedPollInterval}.
+     *
+     * @param pollInterval The poll interval amount
+     * @param unit         The time unit
+     * @return A new instance of {@link FixedPollInterval}
+     */
+    public static FixedPollInterval fixed(long pollInterval, TimeUnit unit) {
+        return new FixedPollInterval(pollInterval, unit);
     }
 }
