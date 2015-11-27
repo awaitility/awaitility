@@ -97,6 +97,20 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
+    public void awaitOperationSupportsSpecifyingZeroAsPollDelay() throws Exception {
+        new Asynch(fakeRepository).perform();
+        with().pollDelay(Duration.ZERO).pollInterval(Duration.ONE_HUNDRED_MILLISECONDS).then().await().until(fakeRepositoryValueEqualsOne());
+        assertEquals(1, fakeRepository.getValue());
+    }
+
+    @Test(timeout = 2000)
+    public void awaitOperationSupportsSpecifyingZeroAsPollInterval() throws Exception {
+        new Asynch(fakeRepository).perform();
+        with().pollDelay(Duration.TWO_HUNDRED_MILLISECONDS).pollInterval(Duration.ZERO).then().await().until(fakeRepositoryValueEqualsOne());
+        assertEquals(1, fakeRepository.getValue());
+    }
+
+    @Test(timeout = 2000)
     public void awaitOperationSupportsSpecifyingPollDelay() throws Exception {
         new Asynch(fakeRepository).perform();
         with().pollDelay(Duration.ONE_HUNDRED_MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());

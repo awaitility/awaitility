@@ -77,14 +77,14 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                             break;
                         }
                         pollCount = pollCount + 1;
-                        pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
-                        Duration maxWaitTime = conditionSettings.getMaxWaitTime();
                         Future<?> future = executor.submit(new ConditionPoller(pollInterval));
+                        Duration maxWaitTime = conditionSettings.getMaxWaitTime();
                         if (maxWaitTime == Duration.FOREVER) {
                             future.get();
                         } else {
                             future.get(maxWaitTime.getValue(), maxWaitTime.getTimeUnit());
                         }
+                        pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
                         Thread.sleep(pollInterval.getValueInMS());
                     }
                 } catch (Exception e) {

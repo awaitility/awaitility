@@ -72,7 +72,7 @@ public class PollIntervalTest {
     public void inlinePollInterval() {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
-                pollInterval((__, previous) -> previous.multiply(2)).
+                pollInterval((__, previous) -> previous.multiply(2).plus(1)).
                 until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
