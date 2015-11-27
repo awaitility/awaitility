@@ -37,6 +37,13 @@ public class Duration {
     public static final Duration ZERO = new Duration(0, MILLISECONDS);
 
     /**
+     * Constant <code>ONE_MILLISECOND</code>
+     *
+     * @since 1.7.0
+     */
+    public static final Duration ONE_MILLISECOND = new Duration(1, MILLISECONDS);
+
+    /**
      * Constant <code>ONE_HUNDRED_MILLISECONDS</code>
      */
     public static final Duration ONE_HUNDRED_MILLISECONDS = new Duration(100, MILLISECONDS);

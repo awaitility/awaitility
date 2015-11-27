@@ -25,6 +25,8 @@ import com.jayway.awaitility.Duration;
  * await().with().pollInterval(iterative(duration -> duration.multiply(2)), Duration.FIVE_HUNDRED_MILLISECONDS).until(..);
  * </pre>
  * This generates a poll interval sequence that looks like this (ms): 500, 1000, 2000, 4000, 8000, 16000, ...
+ * <p/>
+ * Note that if the user specifies a poll delay this delay will take place <i>before</i> the first call to {@link #next(int, Duration)}.
  */
 public class IterativePollInterval implements PollInterval {
 
@@ -32,35 +34,59 @@ public class IterativePollInterval implements PollInterval {
     private final Duration startDuration;
 
     /**
-     * Generate an iterative poll interval based on the supplied function and a start duration of 100 milliseconds.
+     * Generate an iterative poll interval based on the supplied function.
      *
      * @param function The function to use.
      */
     public IterativePollInterval(Function function) {
-        this(function, Duration.ONE_HUNDRED_MILLISECONDS);
+        this(function, null, false);
     }
 
     /**
-     * Generate an iterative poll interval based on the supplied function and start duration.
+     * Generate a iterative poll interval based on the supplied function and start duration.
      *
      * @param function      The function to use.
      * @param startDuration The start duration (initial function value)
      */
     public IterativePollInterval(Function function, Duration startDuration) {
+        this(function, startDuration, true);
+    }
+
+    /**
+     * Generate a iterative poll interval based on the supplied function and start duration.
+     *
+     * @param function      The function to use.
+     * @param startDuration The start duration (initial function value)
+     */
+    private IterativePollInterval(Function function, Duration startDuration, boolean startDurationExplicitlyDefined) {
         if (function == null) {
             throw new IllegalArgumentException("Function cannot be null");
         }
-        if (startDuration == null) {
+        if (startDurationExplicitlyDefined && startDuration == null) {
             throw new IllegalArgumentException("Start duration cannot be null");
-        } else if (startDuration.isForever()) {
+        } else if (startDurationExplicitlyDefined && startDuration.isForever()) {
             throw new IllegalArgumentException("Cannot use a poll interval of length 'forever'");
         }
         this.function = function;
         this.startDuration = startDuration;
     }
 
+    /**
+     * Generate the next Duration based on the supplied function. If you've specified a start duration explicitly then
+     * this start duration will override the value of <code>previousDuration</code> when <code>pollCount</code> is 1 (i.e. the poll delay).
+     *
+     * @param pollCount        The number of times the condition has been polled (evaluated). Always a positive integer.
+     * @param previousDuration The duration of the previously returned poll interval.
+     * @return The duration of the next poll interval
+     */
     public Duration next(int pollCount, Duration previousDuration) {
-        return function.apply(previousDuration == null ? startDuration : previousDuration);
+        final Duration durationToUse;
+        if (pollCount == 1 && startDuration != null) {
+            durationToUse = startDuration;
+        } else {
+            durationToUse = previousDuration;
+        }
+        return function.apply(durationToUse);
     }
 
     /**
@@ -96,6 +122,24 @@ public class IterativePollInterval implements PollInterval {
          * @return The next duration
          */
         Duration apply(Duration previousDuration);
+    }
+
+    /**
+     * Syntactic sugar
+     *
+     * @return The same of instance of {@link IterativePollInterval}
+     */
+    public IterativePollInterval with() {
+        return this;
+    }
+
+    /**
+     * Set the start duration of this poll interval
+     *
+     * @return A new of instance of {@link IterativePollInterval} with the given start duration
+     */
+    public IterativePollInterval startDuration(Duration duration) {
+        return new IterativePollInterval(function, duration);
     }
 
     @Override

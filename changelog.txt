@@ -12,6 +12,7 @@ Changelog next version
   (for fixed poll intervals the poll delay is equal to the duration of the FixedPollInterval for backward compatible reasons). (issue 36)
 * Improvement to Duration (com.jayway.awaitility.Duration). You can invoke make use of the new methods plus, minus, multiply, divide. For example:
     new Duration(5, SECONDS).plus(17, MILLISECONDS); // Will return a new Duration of 5017 milliseconds.
+* Added Duration.ONE_MILLISECOND
 
 Changelog 1.6.5 (2015-09-27)
 ----------------------------
