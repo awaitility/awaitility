@@ -51,12 +51,13 @@ public class FibonacciPollInterval implements PollInterval {
      * Create an instance of the {@link FibonacciPollInterval} with a supplied time unit.
      *
      * @param offset   The fibonacci offset. For example if offset is 5 and poll count is 1 then the returned duration will be 8 (since  <code>fib(6)</code> is equal to 8).
-     *                 Default offset is {@value #DEFAULT_OFFSET}.
+     *                 Default offset is {@value #DEFAULT_OFFSET}. You can set the offset to <tt>-1</tt> if you want the first value to be <code>fib(0)</code> (i.e. pollCount - offset).
+     *                 By default the first value will be <code>fib(1)</code>.
      * @param timeUnit The time unit
      */
     public FibonacciPollInterval(int offset, TimeUnit timeUnit) {
-        if (offset < 0) {
-            throw new IllegalArgumentException("Offset must be positive");
+        if (offset <= -1) {
+            throw new IllegalArgumentException("Offset must be greater than or equal to -1");
         }
         if (timeUnit == null) {
             throw new IllegalArgumentException("Time unit cannot be null");
