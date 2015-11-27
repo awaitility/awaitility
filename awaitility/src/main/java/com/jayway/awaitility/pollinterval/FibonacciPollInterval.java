@@ -106,7 +106,7 @@ public class FibonacciPollInterval implements PollInterval {
      * @return A new instance of {@link FibonacciPollInterval}.
      */
     public static FibonacciPollInterval fibonacci(int offset, TimeUnit timeUnit) {
-        return new FibonacciPollInterval(timeUnit);
+        return new FibonacciPollInterval(offset, timeUnit);
     }
 
     /**
