@@ -567,6 +567,59 @@ public class ConditionFactory {
     }
 
     /**
+     * Await until a {@link ThrowingRunnable} supplier execution passes (ends without throwing an exception). E.g. with Java 8:
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilPass(() -&gt; Assertions.assertThat(personRepository.size()).isEqualTo(6));
+     * </pre>
+     * or
+     * <pre>
+     * await().untilPass(() -&gt; assertEquals(6, personRepository.size()));
+     * </pre>
+     * <p>&nbsp;</p>
+     * This method is intended to benefit from lambda expressions introduced in Java 8. It allows to use standard AssertJ/FEST Assert assertions
+     * (by the way also standard JUnit/TestNG assertions) to test asynchronous calls and systems.
+     * It accepts {@link ThrowingRunnable} interface instead of plain {@link Runnable} to allow passing lambda expressions that throw exceptions
+     * in their bodies, e.g.:
+     * <pre>
+     * await().until(() -> {
+     *      methodThatHasThrowsInItsDeclaration();
+     * });
+     * </pre>
+     * when using {@link Runnable} user would have to write something like:
+     * <pre>
+     * await().until(() -> {
+     *      try {
+     *          methodThatHasThrowsInItsDeclaration();
+     *      } catch(Exception e) {
+     *          throw new RuntimeException(e);
+     *      }
+     * });
+     * </pre>
+     * <p>&nbsp;</p>
+     * {@link java.lang.AssertionError} instances thrown by the supplier are treated as an assertion failure and proper error message is propagated on timeout.
+     * Other exceptions are rethrown immediately as an execution errors.
+     * <p>&nbsp;</p>
+     * Why technically it is completely valid to use plain Runnable class in Java 7 code, the resulting expression is very verbose and can decrease
+     * the readability of the test case, e.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilPass(new Runnable() {
+     *     public void run() {
+     *         Assertions.assertThat(personRepository.size()).isEqualTo(6);
+     *     }
+     * });
+     * </pre>
+     *
+     * @param supplier the supplier that is responsible for executing the assertion and throwing AssertionError on failure.
+     * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     * @since 1.6.6
+     */
+    public void untilPass(final ThrowingRunnable supplier) {
+        until(new AssertionCondition(supplier, generateConditionSettings()));
+    }
+
+    /**
      * Await until a Atomic variable has a value matching the specified
      * {@link org.hamcrest.Matcher}. E.g.
      * <p>&nbsp;</p>

@@ -21,8 +21,10 @@ import com.jayway.awaitility.classes.FakeRepository;
 import com.jayway.awaitility.classes.FakeRepositoryImpl;
 import com.jayway.awaitility.core.ConditionEvaluationLogger;
 import com.jayway.awaitility.core.ConditionTimeoutException;
+import com.jayway.awaitility.core.ThrowingRunnable;
 import com.jayway.awaitility.support.CountDown;
 import org.assertj.core.api.Assertions;
+import org.hamcrest.core.IsEqual;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,8 +34,10 @@ import static com.jayway.awaitility.Awaitility.await;
 import static com.jayway.awaitility.Awaitility.with;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Tests for await().until(Runnable) using AssertionCondition.
@@ -61,6 +65,28 @@ public class AwaitilityJava8Test {
     }
 
     @Test(timeout = 2000)
+    public void shouldNotAcceptNull() {
+        try {
+            await().untilPass(null);
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), IsEqual.equalTo("You must specify a throwingSupplier (was null)."));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void shouldAcceptEmptyLambda() {
+        await().untilPass(() -> {
+        });
+    }
+
+    @Test(timeout = 2000)
+    public void awaitAssertJAssertionAsThrowingLambda() {
+        new Asynch(fakeRepository).perform();
+        await().untilPass(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+    }
+
+    @Test(timeout = 2000)
     public void awaitUsingLambdaVersionOfCallableBoolean() {
         new Asynch(fakeRepository).perform();
         await().until(() -> fakeRepository.getValue() == 1);
@@ -71,6 +97,18 @@ public class AwaitilityJava8Test {
     public void awaitAssertJAssertionAsAnonymousClass() {
         new Asynch(fakeRepository).perform();
         await().until(new Runnable() {
+            @Override
+            public void run() {
+                Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1);
+            }
+        });
+    }
+
+    @SuppressWarnings("Convert2Lambda")
+    @Test(timeout = 2000)
+    public void awaitAssertJAssertionAsAnonymousClassThatMayThrow() {
+        new Asynch(fakeRepository).perform();
+        await().untilPass(new ThrowingRunnable() {
             @Override
             public void run() {
                 Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1);
@@ -90,9 +128,26 @@ public class AwaitilityJava8Test {
     }
 
     @Test(timeout = 2000)
+    public void awaitAssertJAssertionDisplaysOriginalErrorMessageAndTimeoutWhenConditionTimeoutExceptionOccurs_ThrowingLambda() {
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage(startsWith("Condition defined as a lambda expression in " + AwaitilityJava8Test.class.getName()));
+        exception.expectMessage(endsWith("expected:<[1]> but was:<[0]> within 120 milliseconds."));
+
+        new Asynch(fakeRepository).perform();
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).untilPass(
+                () -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+    }
+
+    @Test(timeout = 2000)
     public void awaitJUnitAssertionAsLambda() {
         new Asynch(fakeRepository).perform();
         await().until(() -> assertEquals(1, fakeRepository.getValue()));
+    }
+
+    @Test(timeout = 2000)
+    public void awaitJUnitAssertionAsLambdaThatMayThrow() {
+        new Asynch(fakeRepository).perform();
+        await().untilPass(() -> assertEquals(1, fakeRepository.getValue()));
     }
 
     @Test(timeout = 2000)
@@ -102,6 +157,16 @@ public class AwaitilityJava8Test {
         exception.expectMessage(endsWith("expected:<1> but was:<0> within 120 milliseconds."));
 
         with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(
+                () -> assertEquals(1, fakeRepository.getValue()));
+    }
+
+    @Test(timeout = 2000)
+    public void awaitJUnitAssertionDisplaysOriginalErrorMessageAndTimeoutWhenConditionTimeoutExceptionOccurs_ThrowingLambda() {
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage(startsWith("Condition defined as a lambda expression in " + AwaitilityJava8Test.class.getName()));
+        exception.expectMessage(endsWith("expected:<1> but was:<0> within 120 milliseconds."));
+
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).untilPass(
                 () -> assertEquals(1, fakeRepository.getValue()));
     }
 
