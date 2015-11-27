@@ -85,7 +85,7 @@ public class AwaitilityJava8Test {
         exception.expectMessage(endsWith("expected:<[1]> but was:<[0]> within 120 milliseconds."));
 
         new Asynch(fakeRepository).perform();
-        with().pollDelay(10, MILLISECONDS).pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(
                 () -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 

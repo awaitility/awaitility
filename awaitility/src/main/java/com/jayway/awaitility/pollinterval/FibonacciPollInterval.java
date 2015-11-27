@@ -163,4 +163,29 @@ public class FibonacciPollInterval implements PollInterval {
         }
         return fib(value - 1, current + previous, current);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FibonacciPollInterval)) return false;
+
+        FibonacciPollInterval that = (FibonacciPollInterval) o;
+
+        return offset == that.offset && timeUnit == that.timeUnit;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = timeUnit.hashCode();
+        result = 31 * result + offset;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "FibonacciPollInterval{" +
+                "offset=" + offset +
+                ", timeUnit=" + timeUnit +
+                '}';
+    }
 }

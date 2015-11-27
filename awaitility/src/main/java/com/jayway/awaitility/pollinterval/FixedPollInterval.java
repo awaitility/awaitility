@@ -80,4 +80,27 @@ public class FixedPollInterval implements PollInterval {
     public static FixedPollInterval fixed(long pollInterval, TimeUnit unit) {
         return new FixedPollInterval(pollInterval, unit);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FixedPollInterval)) return false;
+
+        FixedPollInterval that = (FixedPollInterval) o;
+
+        return duration.equals(that.duration);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return duration.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "FixedPollInterval{" +
+                "duration=" + duration +
+                '}';
+    }
 }

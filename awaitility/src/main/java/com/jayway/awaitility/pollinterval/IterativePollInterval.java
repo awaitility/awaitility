@@ -95,4 +95,30 @@ public class IterativePollInterval implements PollInterval {
          */
         Duration apply(Duration previousDuration);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof IterativePollInterval)) return false;
+
+        IterativePollInterval that = (IterativePollInterval) o;
+
+        return function.equals(that.function) && startDuration.equals(that.startDuration);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = function.hashCode();
+        result = 31 * result + startDuration.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "IterativePollInterval{" +
+                "function=" + function +
+                ", startDuration=" + startDuration +
+                '}';
+    }
 }

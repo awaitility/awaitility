@@ -19,16 +19,23 @@ package com.jayway.awaitility.pollinterval;
 import com.jayway.awaitility.Duration;
 
 /**
- * A poll interval represents how often Awaitility will pause before rechecking of the specified (Awaitility) condition evaluates to true.
- * Note that the naming "poll interval" is a bit misleading. It's actually more of a delay between two successive condition evaluations.
- * I.e if the condition evaluation takes 5 ms and a fixed poll interval of 100 ms is used then the next condition evaluation with happen at
- * (approximately) 105 ms.
+ * A poll interval represents how often Awaitility will pause before reevaluating the supplied condition.
+ * <p/>
+ * Note that the name "poll interval" is a bit misleading. It's actually a delay between two successive condition evaluations.
+ * I.e if the condition evaluation takes 5 ms and a fixed poll interval of 100 ms is used then the next condition evaluation will happen at
+ * (approximately) 105 ms. It's called <tt>PollInterval</tt> for historic reasons.
+ *
+ * @since 1.7.0
  */
 public interface PollInterval {
 
     /**
-     * @param pollCount        The number of times the condition has been polled (evaluated)
-     * @param previousDuration The duration of the previously returned poll interval or {@link Duration#ZERO} when determining initial poll delay (if not explicitly defined).
+     * Generate the next poll interval ({@link Duration}) based on the previous {@link Duration} and/or the <code>poll count</code>.
+     * The first time the poll interval is called the poll delay is used as <code>previousDuration</code>. By default the poll delay is
+     * equal to {@link Duration#ZERO}.
+     *
+     * @param pollCount        The number of times the condition has been polled (evaluated). Always a positive integer.
+     * @param previousDuration The duration of the previously returned poll interval.
      * @return The duration of the next poll interval
      */
     Duration next(int pollCount, Duration previousDuration);

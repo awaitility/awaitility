@@ -99,18 +99,6 @@ public class ConditionFactory {
         if (timeout == null) {
             throw new IllegalArgumentException("timeout cannot be null");
         }
-        if (pollDelay == null) {
-            throw new IllegalArgumentException("pollDelay cannot be null");
-        }
-
-        final long timeoutInMS = timeout.getValueInMS();
-        if (!timeout.isForever() && timeoutInMS <= pollDelay.getValueInMS()) {
-            throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll delay (%s %s).",
-                    timeout.getValue(), timeout.getTimeUnitAsString(), pollDelay.getValue(), pollDelay.getTimeUnitAsString()));
-        } else if ((!pollDelay.isForever() && !timeout.isForever()) && timeoutInMS <= pollDelay.getValueInMS()) {
-            throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll delay (%s %s).",
-                    timeout.getValue(), timeout.getTimeUnitAsString(), pollDelay.getValue(), pollDelay.getTimeUnitAsString()));
-        }
 
         this.alias = alias;
         this.timeout = timeout;
@@ -232,10 +220,9 @@ public class ConditionFactory {
      * completion.
      * <p>
      * Note that the poll delay will be automatically set as to the same value
-     * as the interval unless it's specified explicitly using
+     * as the interval (if using a {@link FixedPollInterval}) unless it's specified explicitly using
      * {@link #pollDelay(Duration)}, {@link #pollDelay(long, TimeUnit)} or
-     * {@link com.jayway.awaitility.core.ConditionFactory#pollDelay(com.jayway.awaitility.Duration)}, or
-     * ConditionFactory#andWithPollDelay(long, TimeUnit)}.
+     * {@link com.jayway.awaitility.core.ConditionFactory#pollDelay(com.jayway.awaitility.Duration)}.
      * </p>
      *
      * @param pollInterval the poll interval
@@ -268,7 +255,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory pollDelay(long delay, TimeUnit unit) {
-        return new ConditionFactory(alias, this.timeout, pollInterval, new Duration(delay, unit),
+        return new ConditionFactory(alias, timeout, pollInterval, new Duration(delay, unit),
                 catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
     }
 
@@ -317,12 +304,13 @@ public class ConditionFactory {
      * @see FixedPollInterval
      */
     public ConditionFactory pollInterval(long pollInterval, TimeUnit unit) {
-        return new ConditionFactory(alias, timeout, new Duration(pollInterval, unit), pollDelay,
+        PollInterval fixedPollInterval = new FixedPollInterval(new Duration(pollInterval, unit));
+        return new ConditionFactory(alias, timeout, fixedPollInterval, definePollDelay(pollDelay, fixedPollInterval),
                 catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
     }
 
     public ConditionFactory pollInterval(PollInterval pollInterval) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions,
+        return new ConditionFactory(alias, timeout, pollInterval, definePollDelay(pollDelay, pollInterval), catchUncaughtExceptions,
                 exceptionsIgnorer, conditionEvaluationListener);
     }
 
@@ -752,7 +740,17 @@ public class ConditionFactory {
     }
 
     private ConditionSettings generateConditionSettings() {
-        return new ConditionSettings(alias, catchUncaughtExceptions, timeout, pollInterval, pollDelay,
+        Duration actualPollDelay = definePollDelay(pollDelay, pollInterval);
+
+        final long timeoutInMS = timeout.getValueInMS();
+        if (!timeout.isForever() && timeoutInMS <= actualPollDelay.getValueInMS()) {
+            throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll delay (%s %s).",
+                    timeout.getValue(), timeout.getTimeUnitAsString(), actualPollDelay.getValue(), actualPollDelay.getTimeUnitAsString()));
+        } else if ((!actualPollDelay.isForever() && !timeout.isForever()) && timeoutInMS <= actualPollDelay.getValueInMS()) {
+            throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll delay (%s %s).",
+                    timeout.getValue(), timeout.getTimeUnitAsString(), actualPollDelay.getValue(), actualPollDelay.getTimeUnitAsString()));
+        }
+        return new ConditionSettings(alias, catchUncaughtExceptions, timeout, pollInterval, actualPollDelay,
                 conditionEvaluationListener, exceptionsIgnorer);
     }
 
@@ -811,5 +809,31 @@ public class ConditionFactory {
                 return SafeExceptionRethrower.safeRethrow(e.getCause());
             }
         }
+    }
+
+
+    /**
+     * Ensures backward compatibility (especially that poll delay is the same as poll interval for fixed poll interval).
+     * It also make sure that poll delay is {@link Duration#ZERO} for all other poll intervals if poll delay was not explicitly
+     * defined. If poll delay was explicitly defined the it will just be returned.
+     *
+     * @param pollDelay    The poll delay
+     * @param pollInterval The chosen (or default) poll interval
+     * @return The poll delay to use
+     */
+    Duration definePollDelay(Duration pollDelay, PollInterval pollInterval) {
+        final Duration pollDelayToUse;
+        // If a poll delay is null then a poll delay has not been explicitly defined by the user
+        if (pollDelay == null) {
+            if (pollInterval != null && pollInterval instanceof FixedPollInterval) {
+                pollDelayToUse = pollInterval.next(1, Duration.ZERO); // Will return same poll delay as poll interval
+            } else {
+                pollDelayToUse = Duration.ZERO; // Default poll delay for non-fixed poll intervals
+            }
+        } else {
+            // Poll delay was explicitly defined, use it!
+            pollDelayToUse = pollDelay;
+        }
+        return pollDelayToUse;
     }
 }

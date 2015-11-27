@@ -18,8 +18,6 @@ package com.jayway.awaitility.core;
 import com.jayway.awaitility.Duration;
 import com.jayway.awaitility.pollinterval.PollInterval;
 
-import static com.jayway.awaitility.Duration.SAME_AS_POLL_INTERVAL;
-
 class ConditionSettings {
     private final String alias;
     private final Duration maxWaitTime;
@@ -49,13 +47,10 @@ class ConditionSettings {
         if (pollInterval == null) {
             throw new IllegalArgumentException("You must specify a poll interval (was null).");
         }
-        if (pollDelay == null) {
-            throw new IllegalArgumentException("You must specify a poll delay (was null).");
-        }
         this.alias = alias;
         this.maxWaitTime = maxWaitTime;
         this.pollInterval = pollInterval;
-        this.pollDelay = pollDelay == SAME_AS_POLL_INTERVAL ? pollInterval.next(1, pollDelay) : pollDelay;
+        this.pollDelay = pollDelay;
         this.catchUncaughtExceptions = catchUncaughtExceptions;
         this.conditionEvaluationListener = conditionEvaluationListener;
         this.ignoreExceptions = ignoreExceptions;

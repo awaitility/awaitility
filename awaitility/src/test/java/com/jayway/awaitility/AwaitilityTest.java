@@ -330,7 +330,7 @@ public class AwaitilityTest {
         exception.expectMessage(String.format("%s.getObject() expected <%s> but was <%s> within 50 milliseconds.",
                 FakeObjectRepository.class.getName(), expectedObject.toString(), actualObject.toString()));
 
-        with().pollDelay(10, MILLISECONDS).and().pollInterval(10, MILLISECONDS).and().timeout(50, MILLISECONDS).await()
+        with().pollInterval(10, MILLISECONDS).and().timeout(50, MILLISECONDS).await()
                 .untilCall(to(fakeObjectRepository).getObject(), is(expectedObject));
     }
 

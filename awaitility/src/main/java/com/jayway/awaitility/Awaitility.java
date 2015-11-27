@@ -22,6 +22,8 @@ import org.hamcrest.Matcher;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.jayway.awaitility.Duration.ONE_HUNDRED_MILLISECONDS;
+
 /**
  * Awaitility is a small Java DSL for synchronizing (waiting for) asynchronous
  * operations. It makes it easy to test asynchronous code. Examples:
@@ -102,12 +104,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class Awaitility {
 
-    private static final Duration DEFAULT_DURATION = Duration.ONE_HUNDRED_MILLISECONDS;
+    private static final Duration DEFAULT_POLL_DELAY = null;
+
+    private static final PollInterval DEFAULT_POLL_INTERVAL = new FixedPollInterval(ONE_HUNDRED_MILLISECONDS);
 
     /**
      * The default poll interval (fixed 100 ms).
      */
-    private static volatile PollInterval defaultPollInterval = new FixedPollInterval(DEFAULT_DURATION);
+    private static volatile PollInterval defaultPollInterval = DEFAULT_POLL_INTERVAL;
 
     /**
      * The default timeout (10 seconds).
@@ -115,9 +119,9 @@ public class Awaitility {
     private static volatile Duration defaultTimeout = Duration.TEN_SECONDS;
 
     /**
-     * The default poll delay ({@link Duration#ONE_HUNDRED_MILLISECONDS})
+     * The default poll delay
      */
-    private static volatile Duration defaultPollDelay = DEFAULT_DURATION;
+    private static volatile Duration defaultPollDelay = DEFAULT_POLL_DELAY;
 
     /**
      * Catch all uncaught exceptions by default?
@@ -214,8 +218,8 @@ public class Awaitility {
      * </ul>
      */
     public static void reset() {
-        defaultPollInterval = new FixedPollInterval(DEFAULT_DURATION);
-        defaultPollDelay = DEFAULT_DURATION;
+        defaultPollInterval = DEFAULT_POLL_INTERVAL;
+        defaultPollDelay = DEFAULT_POLL_DELAY;
         defaultTimeout = Duration.TEN_SECONDS;
         defaultCatchUncaughtExceptions = true;
         defaultConditionEvaluationListener = null;
