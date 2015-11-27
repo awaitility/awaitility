@@ -742,6 +742,10 @@ public class ConditionFactory {
     private ConditionSettings generateConditionSettings() {
         Duration actualPollDelay = definePollDelay(pollDelay, pollInterval);
 
+        if (actualPollDelay.isForever()) {
+            throw new IllegalArgumentException("Cannot delay polling forever");
+        }
+
         final long timeoutInMS = timeout.getValueInMS();
         if (!timeout.isForever() && timeoutInMS <= actualPollDelay.getValueInMS()) {
             throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll delay (%s %s).",

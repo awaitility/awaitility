@@ -111,6 +111,26 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
+    public void awaitOperationDoesntSupportSpecifyingForeverAsPollDelay() throws Exception {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Cannot delay polling forever");
+
+        new Asynch(fakeRepository).perform();
+        with().pollDelay(Duration.FOREVER).pollInterval(Duration.ONE_HUNDRED_MILLISECONDS).then().await().until(fakeRepositoryValueEqualsOne());
+        assertEquals(1, fakeRepository.getValue());
+    }
+
+    @Test(timeout = 2000)
+    public void awaitOperationDoesntSupportSpecifyingForeverAsPollInterval() throws Exception {
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Cannot use a fixed poll interval of length 'forever'");
+
+        new Asynch(fakeRepository).perform();
+        with().pollDelay(Duration.ONE_HUNDRED_MILLISECONDS).pollInterval(Duration.FOREVER).then().await().until(fakeRepositoryValueEqualsOne());
+        assertEquals(1, fakeRepository.getValue());
+    }
+
+    @Test(timeout = 2000)
     public void awaitOperationSupportsSpecifyingPollDelay() throws Exception {
         new Asynch(fakeRepository).perform();
         with().pollDelay(Duration.ONE_HUNDRED_MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());

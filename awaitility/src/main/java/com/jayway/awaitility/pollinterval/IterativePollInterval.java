@@ -24,7 +24,7 @@ import com.jayway.awaitility.Duration;
  * <pre>
  * await().with().pollInterval(iterative(duration -> duration.multiply(2)), Duration.FIVE_HUNDRED_MILLISECONDS).until(..);
  * </pre>
- * This generate a poll interval sequence that looks like this (ms): 500, 1000, 2000, 4000, 8000, 16000, ...
+ * This generates a poll interval sequence that looks like this (ms): 500, 1000, 2000, 4000, 8000, 16000, ...
  */
 public class IterativePollInterval implements PollInterval {
 
@@ -52,6 +52,8 @@ public class IterativePollInterval implements PollInterval {
         }
         if (startDuration == null) {
             throw new IllegalArgumentException("Start duration cannot be null");
+        } else if (startDuration.isForever()) {
+            throw new IllegalArgumentException("Cannot use a poll interval of length 'forever'");
         }
         this.function = function;
         this.startDuration = startDuration;

@@ -35,7 +35,10 @@ public class FixedPollInterval implements PollInterval {
     public FixedPollInterval(Duration duration) {
         if (duration == null) {
             throw new IllegalArgumentException("Duration cannot be null");
+        } else if (duration.isForever()) {
+            throw new IllegalArgumentException("Cannot use a fixed poll interval of length 'forever'");
         }
+
         this.duration = duration;
     }
 
