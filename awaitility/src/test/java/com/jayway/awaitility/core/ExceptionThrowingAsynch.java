@@ -31,7 +31,7 @@ public class ExceptionThrowingAsynch {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                SafeExceptionRethrower.safeRethrow(throwable);
+                CheckedExceptionRethrower.safeRethrow(throwable);
             }
         });
 

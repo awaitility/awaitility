@@ -15,17 +15,20 @@
  */
 package com.jayway.awaitility.core;
 
-class SafeExceptionRethrower {
+/**
+ * This is an internal class and should NOT be used outside of Awaitility! Use it at own risk (please don't :)).
+ */
+public class CheckedExceptionRethrower {
 
     /**
      * <p>safeRethrow.</p>
      *
-     * @param t a {@link java.lang.Throwable} object.
+     * @param t   a {@link java.lang.Throwable} object.
      * @param <T> a T object.
      * @return a T object.
      */
     public static <T> T safeRethrow(Throwable t) {
-        SafeExceptionRethrower.<RuntimeException> safeRethrow0(t);
+        CheckedExceptionRethrower.<RuntimeException>safeRethrow0(t);
         return null;
     }
 

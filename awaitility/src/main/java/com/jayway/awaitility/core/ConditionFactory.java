@@ -592,6 +592,8 @@ public class ConditionFactory {
      *     }
      * });
      * </pre>
+     * <p>&nbsp;</p>
+     * If your condition calls a method that throws a checked exception then please wrap it in {@link com.jayway.awaitility.Awaitility#throwing(ThrowingRunnable)}.
      *
      * @param supplier the supplier that is responsible for executing the assertion and throwing AssertionError on failure.
      * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
@@ -808,9 +810,9 @@ public class ConditionFactory {
             try {
                 return (T) method.invoke(target, args);
             } catch (IllegalAccessException e) {
-                return SafeExceptionRethrower.safeRethrow(e);
+                return CheckedExceptionRethrower.safeRethrow(e);
             } catch (InvocationTargetException e) {
-                return SafeExceptionRethrower.safeRethrow(e.getCause());
+                return CheckedExceptionRethrower.safeRethrow(e.getCause());
             }
         }
     }

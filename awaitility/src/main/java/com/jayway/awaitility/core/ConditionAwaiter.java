@@ -143,7 +143,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 }
             }
         } catch (Throwable e) {
-            SafeExceptionRethrower.safeRethrow(e);
+            CheckedExceptionRethrower.safeRethrow(e);
         }
     }
 

@@ -28,8 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static com.jayway.awaitility.Awaitility.await;
-import static com.jayway.awaitility.Awaitility.with;
+import static com.jayway.awaitility.Awaitility.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.Matchers.*;
@@ -156,5 +155,14 @@ public class AwaitilityJava8Test {
                 .pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
                 .atMost(Duration.TWO_SECONDS)
                 .until(new CountDown(5), is(equalTo(0)));
+    }
+
+    @Test public void
+    canMakeUseOfThrowingMethodInAwaitilityToWrapRunnablesThatThrowsExceptions() {
+        await().until(throwing(() -> stringEquals("test", "test")));
+    }
+
+    private void stringEquals(String first, String second) throws Exception {
+        Assertions.assertThat(first).isEqualTo(second);
     }
 }

@@ -435,6 +435,47 @@ public class Awaitility {
         return (S) MethodCallRecorder.createProxy(object);
     }
 
+    /**
+     * Await until a {@link ThrowingRunnable} supplier execution passes (ends without throwing an exception).
+     * <p>&nbsp;</p>
+     * This method is intended to benefit from lambda expressions introduced in Java 8. It allows to use standard AssertJ/FEST Assert assertions
+     * (by the way also standard JUnit/TestNG assertions) to test asynchronous calls and systems.
+     * It accepts {@link ThrowingRunnable} interface instead of plain {@link Runnable} to allow passing lambda expressions that throw exceptions
+     * in their bodies, e.g.:
+     * <pre>
+     * await().until(throwing(() -> {
+     *      methodThatHasThrowsInItsDeclaration();
+     * }));
+     * </pre>
+     * when using {@link Runnable} user would have to write something like:
+     * <pre>
+     * await().until(throwing(() -> {
+     *      try {
+     *          methodThatHasThrowsInItsDeclaration();
+     *      } catch(Exception e) {
+     *          throw new RuntimeException(e);
+     *      }
+     * }));
+     * </pre>
+     * <p>&nbsp;</p>
+     * {@link java.lang.AssertionError} instances thrown by the supplier are treated as an assertion failure and proper error message is propagated on timeout.
+     * Other exceptions are rethrown immediately as an execution errors.
+     *
+     * @param throwingRunnable the supplier that is responsible for executing the assertion and throwing AssertionError on failure.
+     * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     * @since 1.7.0
+     */
+    public static Runnable throwing(final ThrowingRunnable throwingRunnable) {
+        return new Runnable() {
+            public void run() {
+                try {
+                    throwingRunnable.run();
+                } catch (Throwable e) {
+                    CheckedExceptionRethrower.safeRethrow(e);
+                }
+            }
+        };
+    }
 
     /**
      * Await until an instance field matches something. E.g.

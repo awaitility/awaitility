@@ -13,6 +13,14 @@ Changelog next version
 * Improvement to Duration (com.jayway.awaitility.Duration). You can invoke make use of the new methods plus, minus, multiply, divide. For example:
     new Duration(5, SECONDS).plus(17, MILLISECONDS); // Will return a new Duration of 5017 milliseconds.
 * Added Duration.ONE_MILLISECOND
+* Added ability to wait for Runnable (void) conditions that declares check exceptions. For example if we have the following method:
+    public void something() throws Exception { ... }
+  We can't just do:
+    await().until(() -> something());
+  since something might throw a checked exception (and the lambda expression thus can't be treated as a Runnable). To work-around this
+  make use of the "throwing" method declared in com.jayway.awaitility.Awaitility:
+     await().until(throwing(() -> something()));
+  Big thanks to Tomasz Kowalczewski and Marcin Zajączkowski for helping out. (issue )32
 
 Changelog 1.6.5 (2015-09-27)
 ----------------------------
