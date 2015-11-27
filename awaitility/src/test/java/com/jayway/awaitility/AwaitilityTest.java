@@ -387,6 +387,17 @@ public class AwaitilityTest {
                 errorCount.get() == 0);
     }
 
+    @Test(timeout = 2000L, expected = IllegalStateException.class)
+    public void rethrowsExceptionsInCallable() {
+        await().atMost(1, TimeUnit.SECONDS)
+                .until(new Callable<Boolean>() {
+                           public Boolean call() throws Exception {
+                               throw new IllegalStateException("Hello");
+                           }
+                       }
+                );
+    }
+
     private Callable<Boolean> fakeRepositoryValueEqualsOne() {
         return new FakeRepositoryEqualsOne(fakeRepository);
     }
