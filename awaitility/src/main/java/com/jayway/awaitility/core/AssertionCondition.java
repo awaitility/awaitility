@@ -150,7 +150,6 @@ class ThrowingRunnableAdapter implements ThrowingRunnable {
         this.supplier = supplier;
     }
 
-    @Override
     public void run() throws Exception {
         supplier.run();
     }
