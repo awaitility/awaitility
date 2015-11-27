@@ -443,13 +443,13 @@ public class Awaitility {
      * It accepts {@link ThrowingRunnable} interface instead of plain {@link Runnable} to allow passing lambda expressions that throw exceptions
      * in their bodies, e.g.:
      * <pre>
-     * await().until(throwing(() -> {
+     * await().until(matches(() -> {
      *      methodThatHasThrowsInItsDeclaration();
      * }));
      * </pre>
      * when using {@link Runnable} user would have to write something like:
      * <pre>
-     * await().until(throwing(() -> {
+     * await().until(matches(() -> {
      *      try {
      *          methodThatHasThrowsInItsDeclaration();
      *      } catch(Exception e) {
@@ -465,7 +465,7 @@ public class Awaitility {
      * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      * @since 1.7.0
      */
-    public static Runnable throwing(final ThrowingRunnable throwingRunnable) {
+    public static Runnable matches(final ThrowingRunnable throwingRunnable) {
         return new Runnable() {
             public void run() {
                 try {

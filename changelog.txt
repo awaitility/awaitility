@@ -18,8 +18,8 @@ Changelog next version
   We can't just do:
     await().until(() -> something());
   since something might throw a checked exception (and the lambda expression thus can't be treated as a Runnable). To work-around this
-  make use of the "throwing" method declared in com.jayway.awaitility.Awaitility:
-     await().until(throwing(() -> something()));
+  make use of the "matches" method declared in com.jayway.awaitility.Awaitility:
+     await().until(matches(() -> something()));
   Big thanks to Tomasz Kowalczewski and Marcin Zajączkowski for helping out. (issue )32
 
 Changelog 1.6.5 (2015-09-27)

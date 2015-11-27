@@ -159,7 +159,7 @@ public class AwaitilityJava8Test {
 
     @Test public void
     canMakeUseOfThrowingMethodInAwaitilityToWrapRunnablesThatThrowsExceptions() {
-        await().until(throwing(() -> stringEquals("test", "test")));
+        await().until(matches(() -> stringEquals("test", "test")));
     }
 
     private void stringEquals(String first, String second) throws Exception {

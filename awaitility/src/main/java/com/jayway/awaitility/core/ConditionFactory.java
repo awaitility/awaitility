@@ -593,7 +593,7 @@ public class ConditionFactory {
      * });
      * </pre>
      * <p>&nbsp;</p>
-     * If your condition calls a method that throws a checked exception then please wrap it in {@link com.jayway.awaitility.Awaitility#throwing(ThrowingRunnable)}.
+     * If your condition calls a method that throws a checked exception then please wrap it in {@link com.jayway.awaitility.Awaitility#matches(ThrowingRunnable)}.
      *
      * @param supplier the supplier that is responsible for executing the assertion and throwing AssertionError on failure.
      * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
