@@ -15,8 +15,9 @@
  */
 package com.jayway.awaitility.core;
 
+import com.jayway.awaitility.Duration;
+
 import java.lang.reflect.Method;
-import java.util.concurrent.Callable;
 
 import static com.jayway.awaitility.core.LambdaErrorMessageGenerator.generateLambdaErrorMessagePrefix;
 import static com.jayway.awaitility.core.LambdaErrorMessageGenerator.isLambdaClass;
@@ -48,15 +49,15 @@ public class AssertionCondition implements Condition<Void> {
 
         conditionEvaluationHandler = new ConditionEvaluationHandler<Object>(null, settings);
 
-        final Callable<Boolean> callable = new Callable<Boolean>() {
-            public Boolean call() throws Exception {
+        final ConditionEvaluator callable = new ConditionEvaluator() {
+            public boolean eval(Duration pollInterval) throws Exception {
                 try {
                     supplier.run();
-                    conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier, settings.getAlias()), null);
+                    conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier, settings.getAlias()), null, pollInterval);
                     return true;
                 } catch (AssertionError e) {
                     lastExceptionMessage = e.getMessage();
-                    conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, lastExceptionMessage, settings.getAlias()), null);
+                    conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, lastExceptionMessage, settings.getAlias()), null, pollInterval);
                     return false;
                 }
             }
@@ -113,8 +114,7 @@ public class AssertionCondition implements Condition<Void> {
      * @return a {@link java.lang.Void} object.
      */
     public Void await() {
-        conditionEvaluationHandler.start();
-        conditionAwaiter.await();
+        conditionAwaiter.await(conditionEvaluationHandler);
         return null;
     }
 }

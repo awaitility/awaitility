@@ -1,7 +1,17 @@
 Changelog next version
 ----------------------
 * Deadlock detection is no longer applied on platform that doesn't support it such as Android (issue 30)
-
+* ConditionEvaluationLogger now logs the poll interval of the evaluated condition
+* Deprecations: Duration.SAME_AS_POLL_INTERVAL is deprecated since it's no longer used. It'll be removed in a future release.
+* Introducing non-fixed poll intervals. PollInterval is now a first-class concept (represented by a com.jayway.awaitility.pollinterval.PollInterval)
+  and it's non possible use non-fixed poll intervals. By default Awaitility uses the FixedPollInterval (default 100 ms just as in previous version)
+  but you can now change another type of poll interval. Awaitility ships with three different PollInterval implementations:
+  Fixed (default), Fibonacci and Iterative. To use the Fibonacci poll interval you can do like this:
+    with().pollInterval(fibonacci()).await().until(..);
+  this will generate a poll interval of 1, 1, 2, 3, 5, 8, 13, .. . Note that Duration.ZERO is used as start value for all non-fixed poll intervals
+  (for fixed poll intervals the poll delay is equal to the duration of the FixedPollInterval for backward compatible reasons). (issue 36)
+* Improvement to Duration (com.jayway.awaitility.Duration). You can invoke make use of the new methods plus, minus, multiply, divide. For example:
+    new Duration(5, SECONDS).plus(17, MILLISECONDS); // Will return a new Duration of 5017 milliseconds.
 
 Changelog 1.6.5 (2015-09-27)
 ----------------------------

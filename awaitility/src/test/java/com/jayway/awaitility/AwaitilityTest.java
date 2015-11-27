@@ -304,7 +304,7 @@ public class AwaitilityTest {
                 + ".getValue() expected a value greater than <0> but was <0> within 50 milliseconds.");
 
         new Asynch(fakeRepository).perform();
-        with().pollInterval(10, MILLISECONDS).and().timeout(50, MILLISECONDS).await()
+        with().pollDelay(10, MILLISECONDS).and().pollInterval(10, MILLISECONDS).and().timeout(50, MILLISECONDS).await()
                 .untilCall(to(fakeRepository).getValue(), greaterThan(0));
     }
 
@@ -335,22 +335,6 @@ public class AwaitilityTest {
     }
 
     @Test
-    public void awaitilityThrowsIllegalStateExceptionWhenTimeoutIsLessThanPollInterval() throws Exception {
-        exception.expect(IllegalStateException.class);
-        exception.expectMessage(is("Timeout (10 seconds) must be greater than the poll interval (10 minutes)."));
-
-        with().pollInterval(10, MINUTES).await().atMost(10, MILLISECONDS).until(fakeRepositoryValueEqualsOne());
-    }
-
-    @Test
-    public void awaitilityThrowsIllegalStateExceptionWhenTimeoutIsEqualToPollInterval() throws Exception {
-        exception.expect(IllegalStateException.class);
-        exception.expectMessage(is("Timeout (10 milliseconds) must be greater than the poll interval (10 milliseconds)."));
-
-        with().pollInterval(10, MILLISECONDS).await().atMost(10, MILLISECONDS).until(fakeRepositoryValueEqualsOne());
-    }
-
-    @Test
     public void awaitilityThrowsIllegalStateExceptionWhenTimeoutIsLessThanPollDelay() throws Exception {
         exception.expect(IllegalStateException.class);
         exception.expectMessage(is("Timeout (10 seconds) must be greater than the poll delay (10 minutes)."));
@@ -363,7 +347,7 @@ public class AwaitilityTest {
         exception.expect(IllegalStateException.class);
         exception.expectMessage(is("Timeout (200 milliseconds) must be greater than the poll delay (200 milliseconds)."));
 
-        with().pollDelay(200, MILLISECONDS).await().atMost(200, MILLISECONDS).until(fakeRepositoryValueEqualsOne());
+        with().with().pollDelay(20, MILLISECONDS).pollDelay(200, MILLISECONDS).await().atMost(200, MILLISECONDS).until(fakeRepositoryValueEqualsOne());
     }
 
     @Test(timeout = 2000)

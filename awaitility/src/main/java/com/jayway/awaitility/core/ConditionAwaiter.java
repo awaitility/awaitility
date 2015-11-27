@@ -24,20 +24,21 @@ import java.util.concurrent.*;
 import static com.jayway.awaitility.classpath.ClassPathResolver.existInCP;
 
 abstract class ConditionAwaiter implements UncaughtExceptionHandler {
-    private final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    private final ExecutorService executor = Executors.newFixedThreadPool(1);
     private final CountDownLatch latch;
+    private final ConditionEvaluator conditionEvaluator;
     private Throwable throwable = null;
     private final ConditionSettings conditionSettings;
 
     /**
      * <p>Constructor for ConditionAwaiter.</p>
      *
-     * @param condition         a {@link java.util.concurrent.Callable} object.
-     * @param conditionSettings a {@link com.jayway.awaitility.core.ConditionSettings} object.
+     * @param conditionEvaluator a {@link ConditionEvaluator} object.
+     * @param conditionSettings  a {@link com.jayway.awaitility.core.ConditionSettings} object.
      */
-    public ConditionAwaiter(final Callable<Boolean> condition,
+    public ConditionAwaiter(final ConditionEvaluator conditionEvaluator,
                             final ConditionSettings conditionSettings) {
-        if (condition == null) {
+        if (conditionEvaluator == null) {
             throw new IllegalArgumentException("You must specify a condition (was null).");
         }
         if (conditionSettings == null) {
@@ -48,28 +49,51 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         }
         this.conditionSettings = conditionSettings;
         this.latch = new CountDownLatch(1);
-        Runnable poller = new Runnable() {
-            public void run() {
-                try {
-                    if (condition.call()) {
-                        latch.countDown();
-                    }
-                } catch (Exception e) {
-                    if (!conditionSettings.shouldExceptionBeIgnored(e)) {
-                        throwable = e;
-                        latch.countDown();
-                    }
-                }
-            }
-        };
-        executor.scheduleWithFixedDelay(poller, conditionSettings.getPollDelay().getValueInMS(), conditionSettings
-                .getPollInterval().getValueInMS(), TimeUnit.MILLISECONDS);
+        this.conditionEvaluator = conditionEvaluator;
+    }
+
+    private boolean conditionCompleted() {
+        return latch.getCount() == 0;
     }
 
     /**
      * <p>await.</p>
+     *
+     * @param conditionEvaluationHandler The conditionEvaluationHandler
      */
-    public void await() {
+    public <T> void await(final ConditionEvaluationHandler<T> conditionEvaluationHandler) {
+        final Duration pollDelay = conditionSettings.getPollDelay();
+        Thread pollSchedulingThread = new Thread(new Runnable() {
+            public void run() {
+                int pollCount = 0;
+                try {
+                    conditionEvaluationHandler.start();
+                    if (!pollDelay.isZero()) {
+                        Thread.sleep(pollDelay.getValueInMS());
+                    }
+                    Duration pollInterval = pollDelay;
+                    while (!executor.isShutdown()) {
+                        if (conditionCompleted()) {
+                            break;
+                        }
+                        pollCount = pollCount + 1;
+                        pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
+                        Duration maxWaitTime = conditionSettings.getMaxWaitTime();
+                        Future<?> future = executor.submit(new ConditionPoller(pollInterval));
+                        if (maxWaitTime == Duration.FOREVER) {
+                            future.get();
+                        } else {
+                            future.get(maxWaitTime.getValue(), maxWaitTime.getTimeUnit());
+                        }
+                        Thread.sleep(pollInterval.getValueInMS());
+                    }
+                } catch (Exception e) {
+                    throwable = e;
+                }
+            }
+        });
+        pollSchedulingThread.start();
+
         try {
             try {
                 final Duration maxWaitTime = conditionSettings.getMaxWaitTime();
@@ -137,6 +161,30 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         this.throwable = throwable;
         if (latch.getCount() != 0) {
             latch.countDown();
+        }
+    }
+
+    private class ConditionPoller implements Runnable {
+        private final Duration delayed;
+
+        /**
+         * @param delayed The duration of the poll interval
+         */
+        public ConditionPoller(Duration delayed) {
+            this.delayed = delayed;
+        }
+
+        public void run() {
+            try {
+                if (conditionEvaluator.eval(delayed)) {
+                    latch.countDown();
+                }
+            } catch (Exception e) {
+                if (!conditionSettings.shouldExceptionBeIgnored(e)) {
+                    throwable = e;
+                    latch.countDown();
+                }
+            }
         }
     }
 }

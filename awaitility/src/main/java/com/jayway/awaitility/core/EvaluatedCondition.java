@@ -16,6 +16,7 @@
 
 package com.jayway.awaitility.core;
 
+import com.jayway.awaitility.Duration;
 import org.hamcrest.Matcher;
 
 /**
@@ -28,6 +29,7 @@ public class EvaluatedCondition<T> {
     private final Matcher<? super T> matcher;
     private final T currentConditionValue;
     private final long elapsedTimeInMS;
+    private final Duration pollInterval;
     private final long remainingTimeInMS;
     private final boolean conditionIsFulfilled;
     private final String alias;
@@ -42,7 +44,7 @@ public class EvaluatedCondition<T> {
      * @param isConditionSatisfied  <code>true</code> if the condition is satisfied (i.e. hamcrest matcher matches the value), <code>false</code> otherwise (i.e. an intermediate value).
      */
     EvaluatedCondition(String description, Matcher<? super T> matcher, T currentConditionValue, long elapsedTimeInMS, long remainingTimeInMS,
-                       boolean isConditionSatisfied, String alias) {
+                       boolean isConditionSatisfied, String alias, Duration pollInterval) {
         this.description = description;
         this.matcher = matcher;
         this.currentConditionValue = currentConditionValue;
@@ -50,6 +52,7 @@ public class EvaluatedCondition<T> {
         this.remainingTimeInMS = remainingTimeInMS;
         this.conditionIsFulfilled = isConditionSatisfied;
         this.alias = alias;
+        this.pollInterval = pollInterval;
     }
 
     /**
@@ -123,5 +126,12 @@ public class EvaluatedCondition<T> {
      */
     public boolean hasAlias() {
         return alias != null;
+    }
+
+    /**
+     * @return The poll interval for the evaluation round
+     */
+    public Duration getPollInterval() {
+        return pollInterval;
     }
 }

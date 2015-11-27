@@ -52,9 +52,12 @@ public class ConditionEvaluationLogger implements ConditionEvaluationListener<Ob
         long remainingTime = timeUnit.convert(condition.getRemainingTimeInMS(), MILLISECONDS);
         String timeUnitAsString = timeUnit.toString().toLowerCase();
         if (condition.isSatisfied()) {
-            System.out.printf("%s after %d %s (remaining time %d %s)\n", description, elapsedTime, timeUnitAsString, remainingTime, timeUnitAsString);
+            System.out.printf("%s after %d %s (remaining time %d %s, last poll interval was %d %s)\n", description, elapsedTime, timeUnitAsString, remainingTime, timeUnitAsString,
+                    condition.getPollInterval().getValue(), condition.getPollInterval().getTimeUnitAsString());
         } else {
-            System.out.printf("%s (elapsed time %d %s, remaining time %d %s)\n", description, elapsedTime, timeUnitAsString, remainingTime, timeUnitAsString);
+            System.out.printf("%s (elapsed time %d %s, remaining time %d %s (last poll interval was %d %s))\n", description, elapsedTime,
+                    timeUnitAsString, remainingTime, timeUnitAsString, condition.getPollInterval().getValue(),
+                    condition.getPollInterval().getTimeUnitAsString());
         }
     }
 }
