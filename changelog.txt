@@ -1,5 +1,5 @@
-Changelog next version
-----------------------
+Changelog 1.7.0 (2015-11-27)
+----------------------------
 * Deadlock detection is no longer applied on platform that doesn't support it such as Android (issue 30)
 * ConditionEvaluationLogger now logs the poll interval of the evaluated condition
 * Deprecations: Duration.SAME_AS_POLL_INTERVAL is deprecated since it's no longer used. It'll be removed in a future release.
