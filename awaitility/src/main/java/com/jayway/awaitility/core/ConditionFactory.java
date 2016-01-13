@@ -733,11 +733,10 @@ public class ConditionFactory {
      * }
      * </pre>
      *
-     * @param <T>                the generic type
      * @param conditionEvaluator the condition evaluator
      * @throws com.jayway.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
-    public <T> void until(Callable<Boolean> conditionEvaluator) {
+    public void until(Callable<Boolean> conditionEvaluator) {
         until(new CallableCondition(conditionEvaluator, generateConditionSettings()));
     }
 
