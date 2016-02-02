@@ -20,6 +20,8 @@ import com.jayway.awaitility.pollinterval.FixedPollInterval;
 import com.jayway.awaitility.pollinterval.PollInterval;
 import org.hamcrest.Matcher;
 
+import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import static com.jayway.awaitility.Duration.ONE_HUNDRED_MILLISECONDS;
@@ -475,6 +477,10 @@ public class Awaitility {
                 }
             }
         };
+    }
+
+    public static <T> Callable<List<T>> happens(Callable<T> callable, Matcher<T> matcher) {
+        return new AggregatingCallable<T>(callable, matcher);
     }
 
     /**

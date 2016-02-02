@@ -27,6 +27,7 @@ import org.junit.rules.ExpectedException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -430,6 +431,21 @@ public class AwaitilityTest {
                            }
                        }
                 );
+    }
+
+    @Test(timeout = 2000L)
+    public void aggregatesResultsInCallable() {
+        List<String> result = await().atMost(1, TimeUnit.SECONDS)
+                .until(happens(new Callable<String>() {
+                    private final List<String> answers = Arrays.asList("first", "second", "third");
+                    private int index;
+
+                    public String call() throws Exception {
+                        return answers.get(index++);
+                    }
+                }, not(isEmptyString())), hasSize(3));
+        assertThat(result, hasSize(3));
+        assertThat(result, hasItems("first", "second", "third"));
     }
 
     private Callable<Boolean> fakeRepositoryValueEqualsOne() {
