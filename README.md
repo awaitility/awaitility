@@ -1,6 +1,8 @@
 ![Awaitility](resources/Awaitility_logo_red_small.png) 
 
 [![Build Status](https://travis-ci.org/jayway/awaitility.svg)](https://travis-ci.org/jayway/awaitility)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.jayway.awaitility/awaitility/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.jayway.awaitility/awaitility)
+[![Javadoc](https://javadoc-emblem.rhcloud.com/doc/com.jayway.awaitility/awaitility/badge.svg)](http://www.javadoc.io/doc/com.jayway.awaitility/awaitility)
 
 Testing asynchronous systems is hard. Not only does it require handling threads, timeouts and concurrency issues, but the intent of the test code can be obscured by all these details. Awaitility is a DSL that allows you to express expectations of an asynchronous system in a concise and easy to read manner. For example:
 
