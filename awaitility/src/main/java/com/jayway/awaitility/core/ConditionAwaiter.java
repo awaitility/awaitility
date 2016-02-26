@@ -24,7 +24,7 @@ import java.util.concurrent.*;
 import static com.jayway.awaitility.classpath.ClassPathResolver.existInCP;
 
 abstract class ConditionAwaiter implements UncaughtExceptionHandler {
-    private final ExecutorService executor = Executors.newFixedThreadPool(1);
+    private final ExecutorService executor;
     private final CountDownLatch latch;
     private final ConditionEvaluator conditionEvaluator;
     private Throwable throwable = null;
@@ -50,6 +50,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         this.conditionSettings = conditionSettings;
         this.latch = new CountDownLatch(1);
         this.conditionEvaluator = conditionEvaluator;
+        this.executor = initExecutorService();
     }
 
     private boolean conditionCompleted() {
@@ -162,6 +163,20 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         if (latch.getCount() != 0) {
             latch.countDown();
         }
+    }
+
+    private ExecutorService initExecutorService() {
+        return Executors.newSingleThreadExecutor(new ThreadFactory() {
+            public Thread newThread(Runnable r) {
+                Thread thread;
+                if (conditionSettings.hasAlias()) {
+                    thread = new Thread(Thread.currentThread().getThreadGroup(), r, "awaitility[" + conditionSettings.getAlias() + ']');
+                } else {
+                    thread = new Thread(Thread.currentThread().getThreadGroup(), r, "awaitility-thread");
+                }
+                return thread;
+            }
+        });
     }
 
     private class ConditionPoller implements Runnable {
