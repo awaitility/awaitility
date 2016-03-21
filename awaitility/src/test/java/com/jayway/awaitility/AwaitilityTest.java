@@ -165,6 +165,18 @@ public class AwaitilityTest {
         assertEquals(1, fakeRepository.getValue());
     }
 
+    @Test(timeout = 3000, expected = ConditionTimeoutException.class)
+    public void shouldThrowTimeoutExceptionWhenDoneEarlierThanAtLeastConstraint() throws Exception{
+        new Asynch(fakeRepository).perform();
+        await().atLeast(1, SECONDS).and().atMost(2, SECONDS).until(value(), equalTo(1));
+    }
+
+    @Test(timeout = 3000)
+    public void shouldNotThrowTimeoutExceptionWhenDoneLaterThanAtLeastConstraint() throws Exception{
+        new Asynch(fakeRepository).perform();
+        await().atLeast(100, NANOSECONDS).until(value(), equalTo(1));
+    }
+
     @Test(timeout = 2000)
     public void specifyingDefaultPollIntervalImpactsAllSubsequentUndefinedPollIntervalStatements() throws Exception {
         Awaitility.setDefaultPollInterval(20, TimeUnit.MILLISECONDS);

@@ -15,6 +15,8 @@
  */
 package com.jayway.awaitility;
 
+import com.jayway.awaitility.constraint.AtMostWaitConstraint;
+import com.jayway.awaitility.constraint.WaitConstraint;
 import com.jayway.awaitility.core.*;
 import com.jayway.awaitility.pollinterval.FixedPollInterval;
 import com.jayway.awaitility.pollinterval.PollInterval;
@@ -114,9 +116,9 @@ public class Awaitility {
     private static volatile PollInterval defaultPollInterval = DEFAULT_POLL_INTERVAL;
 
     /**
-     * The default timeout (10 seconds).
+     * The default wait constraint (10 seconds).
      */
-    private static volatile Duration defaultTimeout = Duration.TEN_SECONDS;
+    private static volatile WaitConstraint defaultWaitConstraint = AtMostWaitConstraint.TEN_SECONDS;
 
     /**
      * The default poll delay
@@ -220,7 +222,7 @@ public class Awaitility {
     public static void reset() {
         defaultPollInterval = DEFAULT_POLL_INTERVAL;
         defaultPollDelay = DEFAULT_POLL_DELAY;
-        defaultTimeout = Duration.TEN_SECONDS;
+        defaultWaitConstraint = AtMostWaitConstraint.TEN_SECONDS;
         defaultCatchUncaughtExceptions = true;
         defaultConditionEvaluationListener = null;
         defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Exception>() {
@@ -251,7 +253,7 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory await(String alias) {
-        return new ConditionFactory(alias, defaultTimeout, defaultPollInterval, defaultPollDelay,
+        return new ConditionFactory(alias, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener);
     }
 
@@ -263,7 +265,7 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory catchUncaughtExceptions() {
-        return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay, true, defaultExceptionIgnorer);
+        return new ConditionFactory(defaultWaitConstraint, defaultPollInterval, defaultPollDelay, true, defaultExceptionIgnorer);
     }
 
     /**
@@ -273,12 +275,12 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory dontCatchUncaughtExceptions() {
-        return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay, false, defaultExceptionIgnorer);
+        return new ConditionFactory(defaultWaitConstraint, defaultPollInterval, defaultPollDelay, false, defaultExceptionIgnorer);
     }
 
     /**
      * Start constructing an await statement with some settings. E.g.
-     * <p/>
+     * <p>
      * <pre>
      * with().pollInterval(20, MILLISECONDS).await().until(somethingHappens());
      * </pre>
@@ -286,13 +288,13 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory with() {
-        return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay,
+        return new ConditionFactory(defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener);
     }
 
     /**
      * Start constructing an await statement given some settings. E.g.
-     * <p/>
+     * <p>
      * <pre>
      * given().pollInterval(20, MILLISECONDS).then().await().until(somethingHappens());
      * </pre>
@@ -300,7 +302,7 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory given() {
-        return new ConditionFactory(defaultTimeout, defaultPollInterval, defaultPollDelay,
+        return new ConditionFactory(defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer);
     }
 
@@ -312,8 +314,8 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory waitAtMost(Duration timeout) {
-        return new ConditionFactory(timeout, defaultPollInterval, defaultPollDelay, defaultCatchUncaughtExceptions,
-                defaultExceptionIgnorer);
+        return new ConditionFactory(defaultWaitConstraint.withMaxWaitTime(timeout), defaultPollInterval, defaultPollDelay,
+                defaultCatchUncaughtExceptions, defaultExceptionIgnorer);
     }
 
     /**
@@ -325,8 +327,8 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory waitAtMost(long value, TimeUnit unit) {
-        return new ConditionFactory(new Duration(value, unit), defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultExceptionIgnorer);
+        return new ConditionFactory(defaultWaitConstraint.withMaxWaitTime(new Duration(value, unit)), defaultPollInterval,
+                defaultPollDelay, defaultCatchUncaughtExceptions, defaultExceptionIgnorer);
     }
 
     /**
@@ -356,7 +358,7 @@ public class Awaitility {
      * @param unit    the unit
      */
     public static void setDefaultTimeout(long timeout, TimeUnit unit) {
-        defaultTimeout = new Duration(timeout, unit);
+        defaultWaitConstraint = defaultWaitConstraint.withMaxWaitTime(new Duration(timeout, unit));
     }
 
     /**
@@ -404,7 +406,7 @@ public class Awaitility {
         if (defaultTimeout == null) {
             throw new IllegalArgumentException("You must specify a default timeout (was null).");
         }
-        Awaitility.defaultTimeout = defaultTimeout;
+        defaultWaitConstraint = defaultWaitConstraint.withMaxWaitTime(defaultTimeout);
     }
 
     /**
@@ -418,11 +420,11 @@ public class Awaitility {
 
     /**
      * Await until a specific method invocation returns something. E.g.
-     * <p/>
+     * <p>
      * <pre>
      * await().untilCall(to(service).getCount(), greaterThan(2));
      * </pre>
-     * <p/>
+     * <p>
      * Here we tell Awaitility to wait until the <code>service.getCount()</code>
      * method returns a value that is greater than 2.
      *
@@ -479,14 +481,14 @@ public class Awaitility {
 
     /**
      * Await until an instance field matches something. E.g.
-     * <p/>
+     * <p>
      * <pre>
      * await().until(fieldIn(service).ofType(int.class).andWithName("fieldName"), greaterThan(2));
      * </pre>
-     * <p/>
+     * <p>
      * Here Awaitility waits until a field with name <code>fieldName</code> and of the <code>int.class</code>
      * in object <code>service</code> is greater than 2.
-     * <p/>
+     * <p>
      * Note that the field must be thread-safe in order to guarantee correct behavior.
      *
      * @param object The object that contains the field.
@@ -498,14 +500,14 @@ public class Awaitility {
 
     /**
      * Await until a static field matches something. E.g.
-     * <p/>
+     * <p>
      * <pre>
      * await().until(fieldIn(Service.class).ofType(int.class).andWithName("fieldName"), greaterThan(2));
      * </pre>
-     * <p/>
+     * <p>
      * Here Awaitility waits until a static field with name <code>fieldName</code> and of the
      * <code>int.class</code> in object <code>service</code> is greater than 2.
-     * <p/>
+     * <p>
      * Note that the field must be thread-safe in order to guarantee correct behavior.
      *
      * @param clazz The class that contains the static field.

@@ -16,6 +16,8 @@
 package com.jayway.awaitility.core;
 
 import com.jayway.awaitility.Duration;
+import com.jayway.awaitility.constraint.AtMostWaitConstraint;
+import com.jayway.awaitility.constraint.WaitConstraint;
 import com.jayway.awaitility.pollinterval.FixedPollInterval;
 import com.jayway.awaitility.pollinterval.PollInterval;
 import org.hamcrest.Matcher;
@@ -39,9 +41,9 @@ import static org.hamcrest.Matchers.is;
 public class ConditionFactory {
 
     /**
-     * The timeout.
+     * Timing constraint.
      */
-    private final Duration timeout;
+    private final WaitConstraint timeoutConstraint;
 
     /**
      * The poll interval.
@@ -78,30 +80,30 @@ public class ConditionFactory {
      * Instantiates a new condition factory.
      *
      * @param alias                   the alias
-     * @param timeout                 the timeout
+     * @param timeoutConstraint       the timeout constraint
      * @param pollInterval            the poll interval
      * @param pollDelay               The poll delay
      * @param exceptionsIgnorer       the ignore exceptions
      * @param catchUncaughtExceptions the catch uncaught exceptions
      */
-    public ConditionFactory(String alias, Duration timeout, Duration pollInterval, Duration pollDelay,
+    public ConditionFactory(String alias, WaitConstraint timeoutConstraint, Duration pollInterval, Duration pollDelay,
                             boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
                             ConditionEvaluationListener conditionEvaluationListener) {
-        this(alias, timeout, new FixedPollInterval(pollInterval), pollDelay, catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
+        this(alias, timeoutConstraint, new FixedPollInterval(pollInterval), pollDelay, catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
     }
 
-    public ConditionFactory(String alias, Duration timeout, PollInterval pollInterval, Duration pollDelay,
+    public ConditionFactory(String alias, WaitConstraint timeoutConstraint, PollInterval pollInterval, Duration pollDelay,
                             boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
                             ConditionEvaluationListener conditionEvaluationListener) {
         if (pollInterval == null) {
             throw new IllegalArgumentException("pollInterval cannot be null");
         }
-        if (timeout == null) {
+        if (timeoutConstraint == null) {
             throw new IllegalArgumentException("timeout cannot be null");
         }
 
         this.alias = alias;
-        this.timeout = timeout;
+        this.timeoutConstraint = timeoutConstraint;
         this.pollInterval = pollInterval;
         this.catchUncaughtExceptions = catchUncaughtExceptions;
         this.pollDelay = pollDelay;
@@ -112,60 +114,60 @@ public class ConditionFactory {
     /**
      * Instantiates a new condition factory.
      *
-     * @param timeout                 the timeout
+     * @param timeoutConstraint       the timeout
      * @param pollInterval            the poll interval
      * @param pollDelay               The delay before the polling starts
      * @param exceptionsIgnorer       the ignore exceptions
      * @param catchUncaughtExceptions the catch uncaught exceptions
      */
-    public ConditionFactory(Duration timeout, Duration pollInterval, Duration pollDelay, boolean catchUncaughtExceptions,
+    public ConditionFactory(WaitConstraint timeoutConstraint, Duration pollInterval, Duration pollDelay, boolean catchUncaughtExceptions,
                             ExceptionIgnorer exceptionsIgnorer) {
-        this(null, timeout, new FixedPollInterval(pollInterval), pollDelay, catchUncaughtExceptions, exceptionsIgnorer, null);
+        this(null, timeoutConstraint, new FixedPollInterval(pollInterval), pollDelay, catchUncaughtExceptions, exceptionsIgnorer, null);
     }
 
     /**
      * Instantiates a new condition factory.
      *
-     * @param timeout                 the timeout
+     * @param timeoutConstraint       the timeout
      * @param pollInterval            the poll interval
      * @param pollDelay               The delay before the polling starts
      * @param exceptionsIgnorer       the ignore exceptions
      * @param catchUncaughtExceptions the catch uncaught exceptions
      */
-    public ConditionFactory(Duration timeout, PollInterval pollInterval, Duration pollDelay, boolean catchUncaughtExceptions,
+    public ConditionFactory(WaitConstraint timeoutConstraint, PollInterval pollInterval, Duration pollDelay, boolean catchUncaughtExceptions,
                             ExceptionIgnorer exceptionsIgnorer) {
-        this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer, null);
+        this(null, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer, null);
     }
 
     /**
      * Instantiates a new condition factory.
      *
-     * @param timeout                 the timeout
+     * @param timeoutConstraint       the timeout
      * @param pollInterval            the poll interval
      * @param pollDelay               The delay before the polling starts
      * @param exceptionsIgnorer       the ignore exceptions
      * @param catchUncaughtExceptions the catch uncaught exceptions
      */
-    public ConditionFactory(Duration timeout, Duration pollInterval, Duration pollDelay,
+    public ConditionFactory(WaitConstraint timeoutConstraint, Duration pollInterval, Duration pollDelay,
                             boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
                             ConditionEvaluationListener conditionEvaluationListener) {
-        this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
+        this(null, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
                 conditionEvaluationListener);
     }
 
     /**
      * Instantiates a new condition factory.
      *
-     * @param timeout                 the timeout
+     * @param timeoutConstraint       the timeout
      * @param pollInterval            the poll interval
      * @param pollDelay               The delay before the polling starts
      * @param exceptionsIgnorer       the ignore exceptions
      * @param catchUncaughtExceptions the catch uncaught exceptions
      */
-    public ConditionFactory(Duration timeout, PollInterval pollInterval, Duration pollDelay,
+    public ConditionFactory(WaitConstraint timeoutConstraint, PollInterval pollInterval, Duration pollDelay,
                             boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
                             ConditionEvaluationListener conditionEvaluationListener) {
-        this(null, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
+        this(null, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
                 conditionEvaluationListener);
     }
 
@@ -176,8 +178,8 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory conditionEvaluationListener(ConditionEvaluationListener conditionEvaluationListener) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
-                conditionEvaluationListener);
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
+                exceptionsIgnorer, conditionEvaluationListener);
     }
 
     /**
@@ -187,8 +189,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory timeout(Duration timeout) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
-                conditionEvaluationListener);
+        return atMost(timeout);
     }
 
     /**
@@ -198,8 +199,54 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory atMost(Duration timeout) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
-                conditionEvaluationListener);
+        return new ConditionFactory(alias, timeoutConstraint.withMaxWaitTime(timeout), pollInterval, pollDelay,
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
+    }
+
+    /**
+     * Condition has to be evaluated not earlier than <code>timeout</code> before throwing a timeout exception.
+     *
+     * @param timeout the timeout
+     * @return the condition factory
+     */
+    public ConditionFactory atLeast(Duration timeout) {
+        return new ConditionFactory(alias, timeoutConstraint.withMinWaitTime(timeout), pollInterval, pollDelay,
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
+    }
+
+    /**
+     * Condition has to be evaluated not earlier than <code>timeout</code> before throwing a timeout exception.
+     *
+     * @param timeout the timeout
+     * @param unit    the unit
+     * @return the condition factory
+     */
+    public ConditionFactory atLeast(long timeout, TimeUnit unit) {
+        return atLeast(new Duration(timeout, unit));
+    }
+
+    /**
+     * Specifies the duration window which has to be satisfied during operation execution. In case operation is executed
+     * before <code>atLeast</code> or after <code>atMost</code> timeout exception is thrown.
+     *
+     * @param atLeast lower part of execution window
+     * @param atMost  upper part of execution window
+     * @return the condition factory
+     */
+    public ConditionFactory between(Duration atLeast, Duration atMost) {
+        return atLeast(atLeast).and().atMost(atMost);
+    }
+
+    /**
+     * Specifies the duration window which has to be satisfied during operation execution. In case operation is executed
+     * before <code>atLeastDuration</code> or after <code>atMostDuration</code> timeout exception is thrown.
+     *
+     * @param atLeastDuration lower part of execution window
+     * @param atMostDuration  upper part of execution window
+     * @return the condition factory
+     */
+    public ConditionFactory between(long atLeastDuration, TimeUnit atLeastTimeUnit, long atMostDuration, TimeUnit atMostTimeUnit) {
+        return between(new Duration(atLeastDuration, atLeastTimeUnit), new Duration(atMostDuration, atMostTimeUnit));
     }
 
     /**
@@ -210,8 +257,8 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory forever() {
-        return new ConditionFactory(alias, Duration.FOREVER, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
-                conditionEvaluationListener);
+        return new ConditionFactory(alias, AtMostWaitConstraint.FOREVER, pollInterval, pollDelay,
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
     }
 
     /**
@@ -229,8 +276,8 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory pollInterval(Duration pollInterval) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
-                conditionEvaluationListener);
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
+                exceptionsIgnorer, conditionEvaluationListener);
     }
 
     /**
@@ -241,8 +288,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory timeout(long timeout, TimeUnit unit) {
-        return new ConditionFactory(alias, new Duration(timeout, unit), pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
+        return atMost(timeout, unit);
     }
 
     /**
@@ -255,7 +301,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory pollDelay(long delay, TimeUnit unit) {
-        return new ConditionFactory(alias, timeout, pollInterval, new Duration(delay, unit),
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, new Duration(delay, unit),
                 catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
     }
 
@@ -271,8 +317,8 @@ public class ConditionFactory {
         if (pollDelay == null) {
             throw new IllegalArgumentException("pollDelay cannot be null");
         }
-        return new ConditionFactory(alias, this.timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
-                conditionEvaluationListener);
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
+                exceptionsIgnorer, conditionEvaluationListener);
     }
 
     /**
@@ -283,8 +329,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory atMost(long timeout, TimeUnit unit) {
-        return new ConditionFactory(alias, new Duration(timeout, unit), pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
+        return atMost(new Duration(timeout, unit));
     }
 
     /**
@@ -305,12 +350,12 @@ public class ConditionFactory {
      */
     public ConditionFactory pollInterval(long pollInterval, TimeUnit unit) {
         PollInterval fixedPollInterval = new FixedPollInterval(new Duration(pollInterval, unit));
-        return new ConditionFactory(alias, timeout, fixedPollInterval, definePollDelay(pollDelay, fixedPollInterval),
+        return new ConditionFactory(alias, timeoutConstraint, fixedPollInterval, definePollDelay(pollDelay, fixedPollInterval),
                 catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener);
     }
 
     public ConditionFactory pollInterval(PollInterval pollInterval) {
-        return new ConditionFactory(alias, timeout, pollInterval, definePollDelay(pollDelay, pollInterval), catchUncaughtExceptions,
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, definePollDelay(pollDelay, pollInterval), catchUncaughtExceptions,
                 exceptionsIgnorer, conditionEvaluationListener);
     }
 
@@ -323,7 +368,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory catchUncaughtExceptions() {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, true, exceptionsIgnorer,
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, true, exceptionsIgnorer,
                 conditionEvaluationListener);
     }
 
@@ -341,7 +386,7 @@ public class ConditionFactory {
         if (exceptionType == null) {
             throw new IllegalArgumentException("exceptionType cannot be null");
         }
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions,
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
                 new PredicateExceptionIgnorer(new Predicate<Exception>() {
                     public boolean matches(Exception e) {
                         return exceptionType.isAssignableFrom(e.getClass());
@@ -363,7 +408,7 @@ public class ConditionFactory {
         if (exceptionType == null) {
             throw new IllegalArgumentException("exception cannot be null");
         }
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions,
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
                 new PredicateExceptionIgnorer(new Predicate<Exception>() {
                     public boolean matches(Exception e) {
                         return e.getClass().equals(exceptionType);
@@ -411,7 +456,7 @@ public class ConditionFactory {
      * @return the condition factory.
      */
     public ConditionFactory ignoreExceptionsMatching(Matcher<? super Exception> matcher) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions,
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
                 new HamcrestExceptionIgnorer(matcher), conditionEvaluationListener);
     }
 
@@ -423,7 +468,7 @@ public class ConditionFactory {
      * @return the condition factory.
      */
     public ConditionFactory ignoreExceptionsMatching(Predicate<Exception> predicate) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions,
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
                 new PredicateExceptionIgnorer(predicate), conditionEvaluationListener);
     }
 
@@ -448,8 +493,8 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory await(String alias) {
-        return new ConditionFactory(alias, timeout, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
-                conditionEvaluationListener);
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
+                exceptionsIgnorer, conditionEvaluationListener);
     }
 
     /**
@@ -499,7 +544,7 @@ public class ConditionFactory {
      * @return the condition factory
      */
     public ConditionFactory dontCatchUncaughtExceptions() {
-        return new ConditionFactory(timeout, pollInterval, pollDelay, false, exceptionsIgnorer);
+        return new ConditionFactory(timeoutConstraint, pollInterval, pollDelay, false, exceptionsIgnorer);
     }
 
     /**
@@ -747,6 +792,7 @@ public class ConditionFactory {
             throw new IllegalArgumentException("Cannot delay polling forever");
         }
 
+        Duration timeout = timeoutConstraint.getMaxWaitTime();
         final long timeoutInMS = timeout.getValueInMS();
         if (!timeout.isForever() && timeoutInMS <= actualPollDelay.getValueInMS()) {
             throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll delay (%s %s).",
@@ -755,7 +801,7 @@ public class ConditionFactory {
             throw new IllegalStateException(String.format("Timeout (%s %s) must be greater than the poll delay (%s %s).",
                     timeout.getValue(), timeout.getTimeUnitAsString(), actualPollDelay.getValue(), actualPollDelay.getTimeUnitAsString()));
         }
-        return new ConditionSettings(alias, catchUncaughtExceptions, timeout, pollInterval, actualPollDelay,
+        return new ConditionSettings(alias, catchUncaughtExceptions, timeoutConstraint, pollInterval, actualPollDelay,
                 conditionEvaluationListener, exceptionsIgnorer);
     }
 
