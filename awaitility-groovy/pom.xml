@@ -26,6 +26,7 @@
     <description>Simplifies Awaitility usage from Groovy</description>
     <properties>
         <groovy.version>2.4.4</groovy.version>
+        <spock.version>1.0-groovy-2.4</spock.version>
         <gmaven.version>1.5</gmaven.version>
     </properties>
     <dependencies>
@@ -36,7 +37,7 @@
         <dependency>
             <groupId>org.spockframework</groupId>
             <artifactId>spock-core</artifactId>
-            <version>0.7-groovy-2.0</version>
+            <version>${spock.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
