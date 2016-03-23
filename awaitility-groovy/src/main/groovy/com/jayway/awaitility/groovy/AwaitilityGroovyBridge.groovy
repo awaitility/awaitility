@@ -29,11 +29,7 @@ class AwaitilityGroovyBridge {
     def originalMethod = ConditionFactory.metaClass.getMetaMethod("until", Runnable.class)
     ConditionFactory.metaClass.until { Runnable runnable ->
       if (runnable instanceof Closure) {
-        delegate.until(new Callable<Boolean>() {
-          Boolean call() {
-            return (runnable as Closure).call();
-          }
-        });
+        delegate.until(runnable as Callable<Boolean>)
       } else {
         originalMethod.invoke(delegate, runnable)
       }
