@@ -15,6 +15,7 @@
 */
 package com.jayway.awaitility.groovy
 
+@Deprecated
 trait AwaitilityTrait {
   private Initializer initializer = new Initializer()
 

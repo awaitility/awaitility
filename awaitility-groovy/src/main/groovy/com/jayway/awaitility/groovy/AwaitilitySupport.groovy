@@ -17,6 +17,7 @@ package com.jayway.awaitility.groovy
 
 import com.jayway.awaitility.Awaitility
 
+@Deprecated
 class AwaitilitySupport extends Awaitility {
 
   AwaitilitySupport() {
