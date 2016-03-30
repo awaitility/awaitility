@@ -24,12 +24,12 @@ import static java.util.concurrent.TimeUnit.SECONDS;
  * <p>Duration class.</p>
  */
 @SuppressWarnings("Duplicates")
-public class Duration {
+public class Duration implements Comparable<Duration> {
 
     /**
      * Constant <code>FOREVER</code>
      */
-    public static final Duration FOREVER = new Duration();
+    public static final Duration FOREVER = new Duration(); // Isn't it better to represent forever as Long.MAX_VALUE TimeUnit.MILLISEONDS?
 
     /**
      * Constant <code>ZERO</code>
@@ -194,7 +194,7 @@ public class Duration {
      * new Duration(2, SECONDS).plus(4, MILLISECONDS)
      * </pre>
      * will return a Duration of 2004 {@link TimeUnit#MILLISECONDS}.
-     * <p/>
+     * <p>
      * <pre>
      * new Duration(2, SECONDS).plus(1, MINUTES)
      * </pre>
@@ -218,7 +218,7 @@ public class Duration {
      * new Duration(2, SECONDS).plus(Duration.FIVE_HUNDRED_MILLISECONDS)
      * </pre>
      * will return a Duration of 2500 {@link TimeUnit#MILLISECONDS}.
-     * <p/>
+     * <p>
      *
      * @param duration The duration to add
      * @return A new duration
@@ -264,7 +264,7 @@ public class Duration {
      * new Duration(2, SECONDS).minus(4, MILLISECONDS)
      * </pre>
      * will return a Duration of 1996 {@link TimeUnit#MILLISECONDS}.
-     * <p/>
+     * <p>
      * <pre>
      * new Duration(2, MINUTES).minus(1, SECONDS)
      * </pre>
@@ -288,7 +288,7 @@ public class Duration {
      * new Duration(2, SECONDS).plus(Duration.FIVE_HUNDRED_MILLISECONDS)
      * </pre>
      * will return a Duration of 2500 {@link TimeUnit#MILLISECONDS}.
-     * <p/>
+     * <p>
      *
      * @param duration The duration to add
      * @return A new duration
@@ -329,6 +329,11 @@ public class Duration {
                 "unit=" + unit +
                 ", value=" + value +
                 '}';
+    }
+
+    public int compareTo(Duration other) {
+        if (other == null) return 1;
+        return Long.compare(getValueInMS(), other.getValueInMS());
     }
 
     private static abstract class BiFunction {

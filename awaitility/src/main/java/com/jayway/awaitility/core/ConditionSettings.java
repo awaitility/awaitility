@@ -16,11 +16,12 @@
 package com.jayway.awaitility.core;
 
 import com.jayway.awaitility.Duration;
+import com.jayway.awaitility.constraint.WaitConstraint;
 import com.jayway.awaitility.pollinterval.PollInterval;
 
 class ConditionSettings {
     private final String alias;
-    private final Duration maxWaitTime;
+    private final WaitConstraint waitConstraint;
     private final PollInterval pollInterval;
     private final Duration pollDelay;
     private final boolean catchUncaughtExceptions;
@@ -32,23 +33,23 @@ class ConditionSettings {
      *
      * @param alias                       a {@link java.lang.String} object.
      * @param catchUncaughtExceptions     a boolean.
-     * @param maxWaitTime                 a {@link com.jayway.awaitility.Duration} object.
+     * @param waitConstraint              a {@link com.jayway.awaitility.constraint.WaitConstraint} object.
      * @param pollInterval                a {@link com.jayway.awaitility.Duration} object.
      * @param pollDelay                   a {@link com.jayway.awaitility.Duration} object.
      * @param conditionEvaluationListener a {@link ConditionEvaluationListener} object.
      * @param ignoreExceptions            a boolean.
      */
-    public ConditionSettings(String alias, boolean catchUncaughtExceptions, Duration maxWaitTime,
+    public ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
                              PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
                              ExceptionIgnorer ignoreExceptions) {
-        if (maxWaitTime == null) {
+        if (waitConstraint == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
         if (pollInterval == null) {
             throw new IllegalArgumentException("You must specify a poll interval (was null).");
         }
         this.alias = alias;
-        this.maxWaitTime = maxWaitTime;
+        this.waitConstraint = waitConstraint;
         this.pollInterval = pollInterval;
         this.pollDelay = pollDelay;
         this.catchUncaughtExceptions = catchUncaughtExceptions;
@@ -66,12 +67,21 @@ class ConditionSettings {
     }
 
     /**
-     * <p>Getter for the field <code>maxWaitTime</code>.</p>
+     * <p>Returning maximum wait time from field <code>waitConstraint</code>.</p>
      *
      * @return a {@link com.jayway.awaitility.Duration} object.
      */
     public Duration getMaxWaitTime() {
-        return maxWaitTime;
+        return waitConstraint.getMaxWaitTime();
+    }
+
+    /**
+     * <p>Returning minimum wait time from field <code>waitConstraint</code>.</p>
+     *
+     * @return a {@link com.jayway.awaitility.Duration} object.
+     */
+    public Duration getMinWaitTime() {
+        return waitConstraint.getMinWaitTime();
     }
 
     /**

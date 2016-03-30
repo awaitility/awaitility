@@ -64,41 +64,17 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
      */
     public <T> void await(final ConditionEvaluationHandler<T> conditionEvaluationHandler) {
         final Duration pollDelay = conditionSettings.getPollDelay();
-        Thread pollSchedulingThread = new Thread(new Runnable() {
-            public void run() {
-                int pollCount = 0;
-                try {
-                    conditionEvaluationHandler.start();
-                    if (!pollDelay.isZero()) {
-                        Thread.sleep(pollDelay.getValueInMS());
-                    }
-                    Duration pollInterval = pollDelay;
-                    while (!executor.isShutdown()) {
-                        if (conditionCompleted()) {
-                            break;
-                        }
-                        pollCount = pollCount + 1;
-                        Future<?> future = executor.submit(new ConditionPoller(pollInterval));
-                        Duration maxWaitTime = conditionSettings.getMaxWaitTime();
-                        if (maxWaitTime == Duration.FOREVER) {
-                            future.get();
-                        } else {
-                            future.get(maxWaitTime.getValue(), maxWaitTime.getTimeUnit());
-                        }
-                        pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
-                        Thread.sleep(pollInterval.getValueInMS());
-                    }
-                } catch (Exception e) {
-                    throwable = e;
-                }
-            }
-        });
-        pollSchedulingThread.start();
+        final Duration maxWaitTime = conditionSettings.getMaxWaitTime();
+        final Duration minWaitTime = conditionSettings.getMinWaitTime();
+
+        final long maxTimeout = maxWaitTime.getValue();
+        final TimeUnit maxTimeoutUnit = maxWaitTime.getTimeUnit();
+
+        long pollingStarted = System.currentTimeMillis() - pollDelay.getValueInMS();
+        pollSchedulingThread(conditionEvaluationHandler, pollDelay, maxWaitTime).start();
 
         try {
             try {
-                final Duration maxWaitTime = conditionSettings.getMaxWaitTime();
-                final long timeout = maxWaitTime.getValue();
                 final boolean finishedBeforeTimeout;
                 if (maxWaitTime == Duration.FOREVER) {
                     latch.await();
@@ -106,8 +82,13 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 } else if (maxWaitTime == Duration.SAME_AS_POLL_INTERVAL) {
                     throw new IllegalStateException("Cannot use 'SAME_AS_POLL_INTERVAL' as maximum wait time.");
                 } else {
-                    finishedBeforeTimeout = latch.await(timeout, maxWaitTime.getTimeUnit());
+                    finishedBeforeTimeout = latch.await(maxTimeout, maxTimeoutUnit);
                 }
+
+                Duration evaluationDuration =
+                        new Duration(System.currentTimeMillis() - pollingStarted, TimeUnit.MILLISECONDS)
+                                .minus(pollDelay);
+
                 if (throwable != null) {
                     throw throwable;
                 } else if (!finishedBeforeTimeout) {
@@ -115,9 +96,9 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                     final String message;
                     if (conditionSettings.hasAlias()) {
                         message = String.format("Condition with alias '%s' didn't complete within %s %s because %s.",
-                                conditionSettings.getAlias(), timeout, maxWaitTimeLowerCase, Introspector.decapitalize(getTimeoutMessage()));
+                                conditionSettings.getAlias(), maxTimeout, maxWaitTimeLowerCase, Introspector.decapitalize(getTimeoutMessage()));
                     } else {
-                        message = String.format("%s within %s %s.", getTimeoutMessage(), timeout, maxWaitTimeLowerCase);
+                        message = String.format("%s within %s %s.", getTimeoutMessage(), maxTimeout, maxWaitTimeLowerCase);
                     }
 
                     ConditionTimeoutException e = new ConditionTimeoutException(message);
@@ -136,6 +117,11 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                     }
 
                     throw e;
+                } else if (evaluationDuration.compareTo(minWaitTime) < 0) {
+                    String message = String.format("Condition was evaluated in %s %s which is earlier than expected " +
+                                    "minimum timeout %s %s", evaluationDuration.getValue(), evaluationDuration.getTimeUnit(),
+                            minWaitTime.getValue(), minWaitTime.getTimeUnit());
+                    throw new ConditionTimeoutException(message);
                 }
             } finally {
                 executor.shutdown();
@@ -146,6 +132,41 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         } catch (Throwable e) {
             CheckedExceptionRethrower.safeRethrow(e);
         }
+    }
+
+    private <T> Thread pollSchedulingThread(final ConditionEvaluationHandler<T> conditionEvaluationHandler,
+                                            final Duration pollDelay, final Duration maxWaitTime) {
+        final long maxTimeout = maxWaitTime.getValue();
+        final TimeUnit maxTimeoutUnit = maxWaitTime.getTimeUnit();
+
+        return new Thread(new Runnable() {
+            public void run() {
+                int pollCount = 0;
+                try {
+                    conditionEvaluationHandler.start();
+                    if (!pollDelay.isZero()) {
+                        Thread.sleep(pollDelay.getValueInMS());
+                    }
+                    Duration pollInterval = pollDelay;
+                    while (!executor.isShutdown()) {
+                        if (conditionCompleted()) {
+                            break;
+                        }
+                        pollCount = pollCount + 1;
+                        Future<?> future = executor.submit(new ConditionPoller(pollInterval));
+                        if (maxWaitTime == Duration.FOREVER) {
+                            future.get();
+                        } else {
+                            future.get(maxTimeout, maxTimeoutUnit);
+                        }
+                        pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
+                        Thread.sleep(pollInterval.getValueInMS());
+                    }
+                } catch (Exception e) {
+                    throwable = e;
+                }
+            }
+        });
     }
 
     /**
