@@ -2,6 +2,9 @@ Changelog next version
 ----------------------
 * Fixed issue with static fibonacci method that took an offset as argument which was not used
 * Condition awaiter thread does now have a meaningful name based on the await alias (if defined) (thanks to Alex Simkin for pull request)
+* Added atLeast support, for example:
+    await().atLeast(1, SECONDS).and().atMost(2, SECONDS).until(value(), equalTo(1));
+  Big thanks to Oleksii for helping out (issue 38)
 
 Changelog 1.7.0 (2015-11-27)
 ----------------------------
