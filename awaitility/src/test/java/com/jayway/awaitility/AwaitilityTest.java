@@ -166,13 +166,13 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 3000, expected = ConditionTimeoutException.class)
-    public void shouldThrowTimeoutExceptionWhenDoneEarlierThanAtLeastConstraint() throws Exception{
+    public void throwsTimeoutExceptionWhenDoneEarlierThanAtLeastConstraint() throws Exception{
         new Asynch(fakeRepository).perform();
         await().atLeast(1, SECONDS).and().atMost(2, SECONDS).until(value(), equalTo(1));
     }
 
     @Test(timeout = 3000)
-    public void shouldNotThrowTimeoutExceptionWhenDoneLaterThanAtLeastConstraint() throws Exception{
+    public void doesNotThrowTimeoutExceptionWhenDoneLaterThanAtLeastConstraint() throws Exception{
         new Asynch(fakeRepository).perform();
         await().atLeast(100, NANOSECONDS).until(value(), equalTo(1));
     }
