@@ -15,6 +15,7 @@
 */
 package com.jayway.awaitility.groovy
 
+import com.jayway.awaitility.core.AssertionCondition
 import com.jayway.awaitility.core.ConditionFactory
 
 import java.util.concurrent.Callable
@@ -27,9 +28,13 @@ class AwaitilityExtensionModule {
     timeout_message = "Condition was not fulfilled"
   }
 
-  static <T> T until(ConditionFactory self, Closure<T> closure) {
-    self.until(closure as Callable<Boolean>)
-    closure()
+  static def until(ConditionFactory self, Runnable runnable) {
+    if (runnable instanceof Callable)
+      self.until(runnable as Callable)
+    else
+      self.until(new AssertionCondition(runnable, self.generateConditionSettings()))
+    // Return true to signal that everything went OK (for spock tests)
+    return true
   }
 
 }
