@@ -5,6 +5,7 @@ Changelog next version
 * Added atLeast support, for example:
     await().atLeast(1, SECONDS).and().atMost(2, SECONDS).until(value(), equalTo(1));
   Big thanks to Oleksii for helping out (issue 38)
+* Awaitility now requires Java 6 (Java 5 was previously required)
 
 Changelog 1.7.0 (2015-11-27)
 ----------------------------
