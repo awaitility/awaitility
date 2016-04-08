@@ -35,7 +35,3 @@ public void updatesCustomerStatus() throws Exception {
 * [Change log](https://github.com/jayway/awaitility/raw/master/changelog.txt)
 * Awaitility on [Ohloh](https://www.ohloh.net/p/awaitility)
 * [Mailing list](http://groups.google.com/group/awaitility) for questions and support
-
-## Sponsored by:
-
-[![jayway](http://www.arctiquator.com/oppenkallkod/assets/images/jayway_logo.png)](http://www.jayway.com)
