@@ -15,6 +15,13 @@
 */
 package com.jayway.awaitility.groovy
 
+/**
+ * Previously used to enhance Awaitility to allow for Groovy closures.
+ *
+ * @deprecated This implementation has a big flaw. When not used for all test classes, some test cases might or might not fail, depending on execution order.
+ * Since version 1.8.0 it's no longer required to explicitly bootstrap Awaitility in Groovy.
+ * @see AwaitilityExtensionModule
+ */
 @Deprecated
 trait AwaitilityTrait {
   private Initializer initializer = new Initializer()
