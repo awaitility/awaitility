@@ -6,6 +6,12 @@ Changelog next version
     await().atLeast(1, SECONDS).and().atMost(2, SECONDS).until(value(), equalTo(1));
   Big thanks to Oleksii for helping out (issue 38)
 * Awaitility now requires Java 6 (Java 5 was previously required)
+* Updates to the groovy module. com.jayway.awaitility.groovy.AwailitySupport, com.jayway.awaitility.groovy.AwaitilityGroovyBridge
+  and com.jayway.awaitility.groovy.AwaitilityTrait have been deprecated.  The reason is that both AwaitilitySupport and AwaitilityTrait have
+  one big flaws. When not used for one test class, these test cases might or might not fail, depending on execution order. For this
+  reason an AwaitilityExtensionModule has been created which automatically add a new method until(Closure) to the ConditionFactory.
+  So with groovy 2 and above, there is effectively no need any more to use AwaitilitySupport, AwaitilityTrait or AwaitilityGroovyBridge.
+  All you need to do is add awaitility-groovy to your classpath and you are good. Big thanks to Tobias Schulte for pull request.
 
 Changelog 1.7.0 (2015-11-27)
 ----------------------------
