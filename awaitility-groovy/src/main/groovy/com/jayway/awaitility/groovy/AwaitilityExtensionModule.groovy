@@ -1,5 +1,5 @@
 /*
-* Copyright 2014 the original author or authors.
+* Copyright 2016 the original author or authors.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -15,27 +15,26 @@
 */
 package com.jayway.awaitility.groovy
 
+import com.jayway.awaitility.core.AssertionCondition
 import com.jayway.awaitility.core.ConditionFactory
 
 import java.util.concurrent.Callable
 
 import static com.jayway.awaitility.spi.Timeout.timeout_message
 
-@Deprecated
-class AwaitilityGroovyBridge {
+class AwaitilityExtensionModule {
 
-  static void initializeAwaitilityGroovySupport() {
+  static {
     timeout_message = "Condition was not fulfilled"
-
-    def originalMethod = ConditionFactory.metaClass.getMetaMethod("until", Runnable.class)
-    ConditionFactory.metaClass.until { Runnable runnable ->
-      if (runnable instanceof Closure) {
-        delegate.until(runnable as Callable<Boolean>)
-      } else {
-        originalMethod.invoke(delegate, runnable)
-      }
-      // Return true to signal that everything went OK (for spock tests)
-      true
-    }
   }
+
+  static def until(ConditionFactory self, Runnable runnable) {
+    if (runnable instanceof Callable)
+      self.until(runnable as Callable)
+    else
+      self.until(new AssertionCondition(runnable, self.generateConditionSettings()))
+    // Return true to signal that everything went OK (for spock tests)
+    return true
+  }
+
 }
