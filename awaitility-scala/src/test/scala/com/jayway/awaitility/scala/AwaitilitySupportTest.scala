@@ -19,6 +19,8 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 
 import com.jayway.awaitility.Awaitility._
 import com.jayway.awaitility.core.ConditionTimeoutException
+import org.hamcrest.CoreMatchers
+import org.hamcrest.CoreMatchers.is
 import org.junit.Assert._
 import org.junit._
 
@@ -48,6 +50,27 @@ class AwaitilitySupportTest extends AwaitilitySupport {
     } catch {
         case e : ConditionTimeoutException =>
           assertEquals("Condition with alias 'scala' didn't complete within 500 milliseconds because condition was not fulfilled.", e getMessage)
+    }
+  }
+
+  @Test
+  def functionAsSupplierWithMatcher() {
+    val c1 = new Counter()
+    val c2 = new Counter()
+
+    await until (c1.count() + c2.count(),  is(6))
+    await until (isDone(), is(java.lang.Boolean.TRUE))
+    await until (isDone, CoreMatchers is java.lang.Boolean.TRUE )
+  }
+
+  @Test
+  def awaitWithAliasSupplierAndMatcher() = {
+    try {
+      await("scala") atMost(500, MILLISECONDS) until (2 == 1, is(java.lang.Boolean.TRUE))
+      fail("Expected timeout exception")
+    } catch {
+        case e : ConditionTimeoutException =>
+          assertEquals("Condition with alias 'scala' didn't complete within 500 milliseconds because com.jayway.awaitility.scala.AwaitilitySupport$$anon$2 expected <true> but was <false>.", e getMessage)
     }
   }
 

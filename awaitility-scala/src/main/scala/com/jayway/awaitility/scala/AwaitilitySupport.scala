@@ -22,9 +22,15 @@ import com.jayway.awaitility.spi.Timeout._
 trait AwaitilitySupport {
   timeout_message = "Condition was not fulfilled"
 
-  implicit def byNameFunctionToCallable(function : => scala.Boolean) : Callable[java.lang.Boolean] = {
+  implicit def byNameFunctionToCallableOfType[T](function: => T): Callable[T] = {
+    new Callable[T] {
+      def call(): T = function
+    }
+  }
+
+  implicit def byNameFunctionToCallableOfBoolean(function: => scala.Boolean): Callable[java.lang.Boolean] = {
     new Callable[java.lang.Boolean] {
-      def call() : java.lang.Boolean = function
+      def call(): java.lang.Boolean = function
     }
   }
 }
