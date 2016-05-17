@@ -60,10 +60,4 @@ class AwaitilitySupportTest extends AwaitilitySupport {
     }
 
     def isDone() : Boolean = true
-
-    var c = 0
-    def count() = {
-      c = c + 1
-      c
-    }
 }
