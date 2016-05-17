@@ -21,6 +21,7 @@ import com.jayway.awaitility.Awaitility._
 import com.jayway.awaitility.core.ConditionTimeoutException
 import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.is
+import org.hamcrest.Matchers.{containsString, endsWith, startsWith}
 import org.junit.Assert._
 import org.junit._
 
@@ -70,7 +71,31 @@ class AwaitilitySupportTest extends AwaitilitySupport {
       fail("Expected timeout exception")
     } catch {
         case e : ConditionTimeoutException =>
-          assertEquals("Condition with alias 'scala' didn't complete within 500 milliseconds because com.jayway.awaitility.scala.AwaitilitySupport$$anon$2 expected <true> but was <false>.", e getMessage)
+          assertThat(e getMessage, startsWith("Condition with alias 'scala' didn't complete within 500 milliseconds because"))
+          assertThat(e getMessage, endsWith(" expected <true> but was <false>."))
+    }
+  }
+
+  @Test
+  def functionAsRunnable() {
+    val c1 = new Counter()
+    val c2 = new Counter()
+
+    await until { assertThat(c1.count() + c2.count(),  is(6)) }
+    await until { assertThat(isDone(), is(true)) }
+    await until { assertThat(isDone, CoreMatchers is true)  }
+  }
+
+  @Test
+  def awaitWithAliasAndRunnable() = {
+    try {
+      await("scala") atMost(500, MILLISECONDS) until { assertThat(2 == 1, is(true))}
+      fail("Expected timeout exception")
+    } catch {
+        case e : ConditionTimeoutException =>
+          assertThat(e getMessage, startsWith("Condition with alias 'scala' didn't complete within 500 milliseconds because"))
+          assertThat(e getMessage, containsString("Expected: is <true>"))
+          assertThat(e getMessage, endsWith("but: was <false>."))
     }
   }
 

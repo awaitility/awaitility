@@ -33,6 +33,12 @@ trait AwaitilitySupport {
       def call(): java.lang.Boolean = function
     }
   }
+
+  implicit def byNameFunctionToRunnable[T](function: => T): Runnable = {
+    new Runnable {
+      def run(): Unit = function
+    }
+  }
 }
 
 
