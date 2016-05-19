@@ -12,6 +12,9 @@ Changelog next version
   reason an AwaitilityExtensionModule has been created which automatically add a new method until(Closure) to the ConditionFactory.
   So with groovy 2 and above, there is effectively no need any more to use AwaitilitySupport, AwaitilityTrait or AwaitilityGroovyBridge.
   All you need to do is add awaitility-groovy to your classpath and you are good. Big thanks to Tobias Schulte for pull request.
+* Improved Scala support. Previously only boolean expressions could be passed to "until" in Scala but now you can pass any supported type. For example you can now use assertj conditions:
+    await until { assertThat(c1.count() + c2.count(),  is(6)) }
+  (thanks to Grzegorz Ligas for pull request)
 
 Changelog 1.7.0 (2015-11-27)
 ----------------------------
