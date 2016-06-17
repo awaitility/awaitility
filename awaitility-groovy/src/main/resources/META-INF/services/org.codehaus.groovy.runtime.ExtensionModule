@@ -14,4 +14,4 @@
 
 moduleName = Awaitility
 moduleVersion = ${project.version}
-extensionClasses = com.jayway.awaitility.groovy.AwaitilityExtensionModule
+extensionClasses = org.awaitility.groovy.AwaitilityExtensionModule

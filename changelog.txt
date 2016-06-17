@@ -6,8 +6,8 @@ Changelog next version
     await().atLeast(1, SECONDS).and().atMost(2, SECONDS).until(value(), equalTo(1));
   Big thanks to Oleksii for helping out (issue 38)
 * Awaitility now requires Java 6 (Java 5 was previously required)
-* Updates to the groovy module. com.jayway.awaitility.groovy.AwailitySupport, com.jayway.awaitility.groovy.AwaitilityGroovyBridge
-  and com.jayway.awaitility.groovy.AwaitilityTrait have been deprecated.  The reason is that both AwaitilitySupport and AwaitilityTrait have
+* Updates to the groovy module. org.awaitility.groovy.AwailitySupport, org.awaitility.groovy.AwaitilityGroovyBridge
+  and org.awaitility.groovy.AwaitilityTrait have been deprecated.  The reason is that both AwaitilitySupport and AwaitilityTrait have
   one big flaws. When not used for one test class, these test cases might or might not fail, depending on execution order. For this
   reason an AwaitilityExtensionModule has been created which automatically add a new method until(Closure) to the ConditionFactory.
   So with groovy 2 and above, there is effectively no need any more to use AwaitilitySupport, AwaitilityTrait or AwaitilityGroovyBridge.
@@ -15,6 +15,8 @@ Changelog next version
 * Improved Scala support. Previously only boolean expressions could be passed to "until" in Scala but now you can pass any supported type. For example you can now use assertj conditions:
     await until { assertThat(c1.count() + c2.count(),  is(6)) }
   (thanks to Grzegorz Ligas for pull request)
+* Changed package name from "com.jayway.awaitility" to "org.awaitility"
+* Changed groupId from "com.jayway.awaitility" to "org.awaitility"
 
 Changelog 1.7.0 (2015-11-27)
 ----------------------------
@@ -108,7 +110,7 @@ Changelog 1.5.0 (2014-01-27)
 * Updated Objenesis dependency to version 2.1
 * Added support for returning the last polled value from Awaitility when using proxy conditions. For example: int y = await().untilCall(to(x).y(), greaterThan(2)); (issue 13).
 * Updated Groovy dependency to 2.2.1.
-* Non backward-compatible change: Awaitility now throws com.jayway.awaitility.core.ConditionTimeoutException instead of java.concurrent.TimeoutException. The reason is that ConditionTimeoutException is a runtime exception and the latter couldn't be caught since "await" didn't declare the checked exception. (issue 24)
+* Non backward-compatible change: Awaitility now throws org.awaitility.core.ConditionTimeoutException instead of java.concurrent.TimeoutException. The reason is that ConditionTimeoutException is a runtime exception and the latter couldn't be caught since "await" didn't declare the checked exception. (issue 24)
 * Awaitility now catches all uncaught throwables from each thread and propagates them to the main thread (issue 22).
 * Improved error messages when using aliased await conditions (issue 21).
 
