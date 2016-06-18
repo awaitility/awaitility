@@ -1,4 +1,4 @@
-Changelog 2.0.0 (2015-11-27)
+Changelog 2.0.0 (2016-06-17)
 ----------------------------
 * Fixed issue with static fibonacci method that took an offset as argument which was not used
 * Condition awaiter thread does now have a meaningful name based on the await alias (if defined) (thanks to Alex Simkin for pull request)
