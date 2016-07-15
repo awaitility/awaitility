@@ -333,7 +333,9 @@ public class Duration implements Comparable<Duration> {
 
     public int compareTo(Duration other) {
         if (other == null) return 1;
-        return Long.compare(getValueInMS(), other.getValueInMS());
+        long x = getValueInMS();
+        long y = other.getValueInMS();
+        return (x < y) ? -1 : ((x == y) ? 0 : 1);
     }
 
     private static abstract class BiFunction {
