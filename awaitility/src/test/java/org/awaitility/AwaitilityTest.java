@@ -307,6 +307,7 @@ public class AwaitilityTest {
         await(alias).atMost(120, MILLISECONDS).untilCall(to(fakeRepository).getValue(), greaterThan(0));
     }
 
+    @SuppressWarnings("deprecation")
     @Test(timeout = 2000, expected = IllegalStateException.class)
     public void awaitWithSameAsPollIntervalThrowsIllegalStateException() throws Exception {
         await().atMost(SAME_AS_POLL_INTERVAL).until(value(), greaterThan(0));

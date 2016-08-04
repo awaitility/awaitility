@@ -62,6 +62,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
      *
      * @param conditionEvaluationHandler The conditionEvaluationHandler
      */
+    @SuppressWarnings("deprecation")
     public <T> void await(final ConditionEvaluationHandler<T> conditionEvaluationHandler) {
         final Duration pollDelay = conditionSettings.getPollDelay();
         final Duration maxWaitTime = conditionSettings.getMaxWaitTime();
