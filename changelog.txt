@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * Fixed issue in org.awaitility.Duration which made it depend on Java 7 features (issue 50)
+* Shaded CGLib dependency to avoid conflicts with other libraries and upgraded version to 3.2.4 (thanks to Alejandro Iannucci for pull request) (issue 55)
 
 Changelog 2.0.0 (2016-06-17)
 ----------------------------
