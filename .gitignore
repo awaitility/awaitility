@@ -7,3 +7,4 @@ target
 .project
 .settings
 .springBeans
+*/dependency-reduced-pom.xml
