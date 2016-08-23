@@ -87,13 +87,7 @@ public class Duration implements Comparable<Duration> {
      * Constant <code>TEN_MINUTES</code>
      */
     public static final Duration TEN_MINUTES = new Duration(600, SECONDS);
-    /**
-     * Constant <code>SAME_AS_POLL_INTERVAL</code>
-     *
-     * @deprecated This doesn't do anything. The initial delay is now always the same as poll interval if nothing else is specified.
-     */
-    @Deprecated
-    public static final Duration SAME_AS_POLL_INTERVAL = new Duration();
+
     private static final int NONE = -1;
 
     private final long value;
@@ -342,8 +336,6 @@ public class Duration implements Comparable<Duration> {
         public final Duration apply(Duration lhs, Duration rhs) {
             if (lhs == null || rhs == null) {
                 throw new IllegalArgumentException("Duration cannot be null");
-            } else if (lhs == SAME_AS_POLL_INTERVAL || rhs == SAME_AS_POLL_INTERVAL) {
-                throw new IllegalStateException("Cannot perform operation on this kind of duration (SAME_AS_POLL_INTERVAL). Please don't use this Duration since it's deprecated");
             }
 
             Duration specialDuration = handleSpecialCases(lhs, rhs);

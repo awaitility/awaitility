@@ -34,10 +34,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static java.util.concurrent.TimeUnit.*;
 import static org.awaitility.Awaitility.*;
 import static org.awaitility.Duration.ONE_SECOND;
-import static org.awaitility.Duration.SAME_AS_POLL_INTERVAL;
-import static java.util.concurrent.TimeUnit.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -307,11 +306,6 @@ public class AwaitilityTest {
         await(alias).atMost(120, MILLISECONDS).untilCall(to(fakeRepository).getValue(), greaterThan(0));
     }
 
-    @SuppressWarnings("deprecation")
-    @Test(timeout = 2000, expected = IllegalStateException.class)
-    public void awaitWithSameAsPollIntervalThrowsIllegalStateException() throws Exception {
-        await().atMost(SAME_AS_POLL_INTERVAL).until(value(), greaterThan(0));
-    }
 
     @Test(timeout = 2000)
     public void awaitDisplaysSupplierAndMatcherNameWhenConditionTimeoutExceptionOccurs() throws Exception {

@@ -80,8 +80,6 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 if (maxWaitTime == Duration.FOREVER) {
                     latch.await();
                     finishedBeforeTimeout = true;
-                } else if (maxWaitTime == Duration.SAME_AS_POLL_INTERVAL) {
-                    throw new IllegalStateException("Cannot use 'SAME_AS_POLL_INTERVAL' as maximum wait time.");
                 } else {
                     finishedBeforeTimeout = latch.await(maxTimeout, maxTimeoutUnit);
                 }
