@@ -164,7 +164,7 @@ public class AwaitilityJava8Test {
         await().until(matches(() -> stringEquals("test", "test")));
     }
 
-    private void stringEquals(String first, String second) throws Exception {
+    private void stringEquals(String first, String second) {
         Assertions.assertThat(first).isEqualTo(second);
     }
 }

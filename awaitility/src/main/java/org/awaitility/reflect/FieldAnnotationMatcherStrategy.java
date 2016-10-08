@@ -43,10 +43,7 @@ public class FieldAnnotationMatcherStrategy extends FieldMatcherStrategy {
     /** {@inheritDoc} */
     @Override
     public boolean matches(Field field) {
-        if (field.isAnnotationPresent(annotation)) {
-            return true;
-        }
-        return false;
+        return field.isAnnotationPresent(annotation);
     }
 
     /** {@inheritDoc} */

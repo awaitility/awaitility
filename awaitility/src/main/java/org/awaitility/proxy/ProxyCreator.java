@@ -47,8 +47,8 @@ public final class ProxyCreator {
 	 * @param invocationHandler a {@link java.lang.reflect.InvocationHandler} object.
 	 * @return a {@link java.lang.Object} object.
 	 */
-	public static Object create(Class<? extends Object> targetClass, InvocationHandler invocationHandler) {
-		Object proxy = null;
+	public static Object create(Class<?> targetClass, InvocationHandler invocationHandler) {
+		Object proxy;
 		if (Modifier.isFinal(targetClass.getModifiers())) {
 			if (targetClassHasInterfaces(targetClass)) {
 				proxy = createInterfaceProxy(targetClass, invocationHandler);
@@ -65,7 +65,7 @@ public final class ProxyCreator {
 		return proxy;
 	}
 
-	private static Object createCGLibProxy(Class<? extends Object> targetClass, final InvocationHandler invocationHandler) {
+	private static Object createCGLibProxy(Class<?> targetClass, final InvocationHandler invocationHandler) {
 		Object proxy;
 		// Create CGLib Method interceptor
 		MethodInterceptor interceptor = new MethodInterceptor() {
@@ -94,18 +94,18 @@ public final class ProxyCreator {
 				getInterfaceHierarchy(targetClass), invocationHandler);
 	}
 
-	private static boolean targetClassHasInterfaces(Class<? extends Object> targetClass) {
+	private static boolean targetClassHasInterfaces(Class<?> targetClass) {
 		Class<?>[] interfaces = getInterfaceHierarchy(targetClass);
 		return interfaces != null && interfaces.length >= 1;
 	}
 
-	private static Class<?>[] getInterfaceHierarchy(Class<? extends Object> targetClass) {
+	private static Class<?>[] getInterfaceHierarchy(Class<?> targetClass) {
 		if (targetClass == null || targetClass.equals(Object.class)) {
 			return new Class<?>[0];
 		}
 		Set<Class<?>> interfaces = new HashSet<Class<?>>();
-		interfaces.addAll(Arrays.asList(((Class<?>) targetClass).getInterfaces()));
-		interfaces.addAll(Arrays.asList(getInterfaceHierarchy(((Class<?>) targetClass).getSuperclass())));
+		interfaces.addAll(Arrays.asList(targetClass.getInterfaces()));
+		interfaces.addAll(Arrays.asList(getInterfaceHierarchy(targetClass.getSuperclass())));
 		return interfaces.toArray(new Class<?>[interfaces.size()]);
 	}
 }

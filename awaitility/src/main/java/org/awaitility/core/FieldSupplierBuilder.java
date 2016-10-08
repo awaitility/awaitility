@@ -104,7 +104,7 @@ public class FieldSupplierBuilder {
         }
 
         public T call() throws Exception {
-            return (T) ((T) foundField == null ? WhiteboxImpl.getInternalState(object, expectedFieldType) : foundField
+            return (T) (foundField == null ? WhiteboxImpl.getInternalState(object, expectedFieldType) : foundField
                     .get(object));
         }
     }
