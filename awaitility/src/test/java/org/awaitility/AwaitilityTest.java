@@ -216,7 +216,7 @@ public class AwaitilityTest {
     public void whenDontCatchUncaughtExceptionsIsSpecifiedThenExceptionsFromOtherThreadsAreNotCaught() throws Exception {
         new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
             @Override
-            public void testLogic() throws Exception {
+            public void testLogic() {
                 new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
                 dontCatchUncaughtExceptions().and().await().atMost(ONE_SECOND).until(value(), equalTo(1));
             }
@@ -228,7 +228,7 @@ public class AwaitilityTest {
             throws Exception {
         new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
             @Override
-            public void testLogic() throws Exception {
+            public void testLogic() {
                 new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
                 await().and().dontCatchUncaughtExceptions().given().timeout(ONE_SECOND).until(value(), equalTo(1));
             }
@@ -239,7 +239,7 @@ public class AwaitilityTest {
     public void catchUncaughtExceptionsIsReset() throws Exception {
         new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
             @Override
-            public void testLogic() throws Exception {
+            public void testLogic() {
                 new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
                 dontCatchUncaughtExceptions().and().await().atMost(Duration.ONE_SECOND).until(value(), equalTo(1));
             }
@@ -251,7 +251,7 @@ public class AwaitilityTest {
         new AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() {
 
             @Override
-            public void testLogic() throws Exception {
+            public void testLogic() {
                 new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
                 dontCatchUncaughtExceptions().and().given().pollInterval(Duration.ONE_HUNDRED_MILLISECONDS).then().await().atMost(ONE_SECOND)
                         .untilCall(to(fakeRepository).getValue(), equalTo(1));
@@ -488,6 +488,6 @@ public class AwaitilityTest {
             }
         }
 
-        public abstract void testLogic() throws Exception;
+        public abstract void testLogic();
     }
 }
