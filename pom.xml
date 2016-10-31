@@ -184,5 +184,6 @@
         <module>awaitility-scala</module>
         <module>awaitility-groovy</module>
         <module>awaitility-java8-test</module>
+        <module>awaitility-osgi-test</module>
     </modules>
 </project>
