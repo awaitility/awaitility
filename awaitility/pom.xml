@@ -26,31 +26,75 @@
 	</properties>
 	<build>
 		<plugins>
+			<!-- Warning: maven bundle plugin runs before shade so we need to hand tune the manifest -->
 			<plugin>
-				<groupId>biz.aQute.bnd</groupId>
-				<artifactId>bnd-maven-plugin</artifactId>
-				<version>3.3.0</version>
-
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<obrRepository>NONE</obrRepository>
+					<instructions>
+						<_include>-bnd.bnd</_include>
+					</instructions>
+				</configuration>
 				<executions>
 					<execution>
+						<phase>process-classes</phase>
 						<goals>
-							<goal>bnd-process</goal>
+							<goal>manifest</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
 			<plugin>
+				<artifactId>maven-shade-plugin</artifactId>
+				<configuration>
+					<artifactSet>
+						<includes>
+							<include>cglib:cglib-nodep</include>
+						</includes>
+					</artifactSet>
+					<relocations>
+						<relocation>
+							<pattern>net.sf.cglib</pattern>
+							<shadedPattern>org.awaitility.cglib</shadedPattern>
+						</relocation>
+					</relocations>
+					<filters>
+						<filter>
+							<artifact>cglib:cglib-nodep</artifact>
+							<excludes>
+								<exclude>META-INF/</exclude>
+							</excludes>
+						</filter>
+					</filters>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
+
 				<executions>
+					<execution>
+						<id>default-jar</id>
+						<configuration>
+							<archive>
+								<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+							</archive>
+						</configuration>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
 					<execution>
 						<goals>
 							<goal>test-jar</goal>

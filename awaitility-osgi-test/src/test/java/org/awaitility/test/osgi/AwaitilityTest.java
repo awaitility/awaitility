@@ -1,3 +1,4 @@
+package org.awaitility.test.osgi;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -36,8 +37,6 @@ import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 
-import net.sf.cglib.core.CodeGenerationException;
-
 @RunWith(PaxExam.class)
 public class AwaitilityTest {
 
@@ -51,8 +50,9 @@ public class AwaitilityTest {
          systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
          mavenBundle("org.awaitility", "awaitility").versionAsInProject(), 
          mavenBundle("org.objenesis", "objenesis").versionAsInProject(),
+         /*
          mavenBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.cglib")
-             .version("3.2.4_1")
+             .version("3.2.4_1")*/
             // CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
     }
@@ -86,13 +86,7 @@ public class AwaitilityTest {
                 success = true;
             }
         }, 1, SECONDS);
-        try {
         await().atMost(2, TimeUnit.SECONDS).untilCall(to(this).getState(), is(true));
-        } catch (CodeGenerationException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
-
     }
     
     boolean getState() {
