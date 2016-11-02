@@ -1,0 +1,8 @@
+Export-Package: \
+	org.awaitility.cglib.proxy,\
+	org.awaitility.cglib.core,\
+	org.awaitility.cglib.asm,\
+	org.awaitility.*
+Import-Package: \
+	!net.sf.cglib.*,\
+	*
