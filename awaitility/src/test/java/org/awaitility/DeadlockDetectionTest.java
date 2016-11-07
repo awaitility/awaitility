@@ -85,10 +85,9 @@ public class DeadlockDetectionTest {
 
         } catch (ConditionTimeoutException e) {
             // check that the thrown exception has a DeadlockException attached to it
-            DeadlockException cause = (DeadlockException) e.getCause();
+            Throwable cause = e.getCause();
             assertTrue(cause instanceof DeadlockException);
-            assertEquals(2, cause.getThreadInfos().length);
-
+            assertEquals(2, ((DeadlockException) cause).getThreadInfos().length);
         } finally {
             // interrupt both threads to clean up the JVM
             t1.interrupt();

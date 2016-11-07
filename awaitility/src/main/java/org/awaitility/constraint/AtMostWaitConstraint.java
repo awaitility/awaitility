@@ -6,9 +6,9 @@ public class AtMostWaitConstraint implements WaitConstraint {
 
     private final Duration atMostDuration;
 
-    public static AtMostWaitConstraint FOREVER = new AtMostWaitConstraint(Duration.FOREVER);
+    public static final AtMostWaitConstraint FOREVER = new AtMostWaitConstraint(Duration.FOREVER);
 
-    public static AtMostWaitConstraint TEN_SECONDS = new AtMostWaitConstraint(Duration.TEN_SECONDS);
+    public static final AtMostWaitConstraint TEN_SECONDS = new AtMostWaitConstraint(Duration.TEN_SECONDS);
 
     public AtMostWaitConstraint(Duration atMostDuration) {
         this.atMostDuration = atMostDuration;

@@ -475,11 +475,11 @@ public class AwaitilityTest {
     private abstract class AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest {
         public AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() throws Exception {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            System.setErr(new PrintStream(byteArrayOutputStream, true));
+            System.setErr(new PrintStream(byteArrayOutputStream, true, "UTF-8"));
             try {
                 testLogic();
             } finally {
-                String errorMessage = byteArrayOutputStream.toString();
+                String errorMessage = byteArrayOutputStream.toString("UTF-8");
                 try {
                     assertTrue(errorMessage.contains("Illegal state!"));
                 } finally {
