@@ -139,9 +139,9 @@ public class ConditionEvaluationListenerTest {
                 .conditionEvaluationListener(new ConditionEvaluationListener<Integer>() {
                     public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
                         if (condition.isSatisfied()) {
-                            System.out.printf("%s (in %ds)\n", condition.getDescription(), condition.getElapsedTimeInMS() / 1000);
+                            System.out.printf("%s (in %ds)%n", condition.getDescription(), condition.getElapsedTimeInMS() / 1000);
                         } else {
-                            System.out.printf("%s (elapsed time %ds, remaining time %ds)\n", condition.getDescription(), condition.getElapsedTimeInMS() / 1000, condition.getRemainingTimeInMS() / 1000);
+                            System.out.printf("%s (elapsed time %ds, remaining time %ds)%n", condition.getDescription(), condition.getElapsedTimeInMS() / 1000, condition.getRemainingTimeInMS() / 1000);
                         }
                     }
                 })
@@ -156,7 +156,7 @@ public class ConditionEvaluationListenerTest {
         with()
                 .conditionEvaluationListener(new ConditionEvaluationListener<Integer>() {
                     public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
-                        String msg = String.format("%s (elapsed time %ds, remaining time %ds)\n", condition.getDescription(), condition.getElapsedTimeInMS() / 1000, condition.getRemainingTimeInMS() / 1000);
+                        String msg = String.format("%s (elapsed time %ds, remaining time %ds)%n", condition.getDescription(), condition.getElapsedTimeInMS() / 1000, condition.getRemainingTimeInMS() / 1000);
                         buffer.add(msg);
                     }
                 })

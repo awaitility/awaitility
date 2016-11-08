@@ -109,13 +109,14 @@ public class WhiteboxImpl {
             }
             if (foundField != null) {
                 break;
-            } else if (checkHierarchy == false) {
+            } else if (!checkHierarchy) {
                 break;
             }
             startClass = startClass.getSuperclass();
         }
         if (foundField == null) {
             strategy.notFound(originalStartClass, !isClass(object));
+            return null;
         }
         foundField.setAccessible(true);
         return foundField;
@@ -129,8 +130,8 @@ public class WhiteboxImpl {
      * @return true, if successful
      */
     private static boolean hasFieldProperModifier(Object object, Field field) {
-        return ((object instanceof Class<?> && Modifier.isStatic(field.getModifiers())) || ((object instanceof Class<?> == false && Modifier
-                .isStatic(field.getModifiers()) == false)));
+        return ((object instanceof Class<?> && Modifier.isStatic(field.getModifiers())) || !(object instanceof Class<?> || Modifier
+                .isStatic(field.getModifiers())));
     }
 
     /**
@@ -157,7 +158,6 @@ public class WhiteboxImpl {
      * Throw exception if field was not found.
      *
      * @param type      the type
-     * @param fieldName the field name
      * @param fieldName the field name
      * @param field     the field
      */

@@ -51,25 +51,27 @@ class LambdaErrorMessageGenerator {
         if (lambdaMethod != null) {
             Class<?>[] lambdaParams = lambdaMethod.getParameterTypes();
             if (lambdaParams.length > 0) {
-                nameToReturn = (firstLetterUpperCaseAndEndWithColon ? "L" : "l") + "ambda expression in " + nameToReturn;
+                StringBuilder nameToReturnBuilder = new StringBuilder(firstLetterUpperCaseAndEndWithColon ? "L" : "l")
+                        .append("ambda expression in ").append(nameToReturn);
                 if (nameWithoutLambda.equals(lambdaParams[0].getName())) {
                     if (firstLetterUpperCaseAndEndWithColon) {
-                        nameToReturn += ":";
+                        nameToReturnBuilder.append(':');
                     }
                 } else {
-                    nameToReturn += " that uses ";
+                    nameToReturnBuilder.append(" that uses ");
                     for (int i = 0; i < lambdaParams.length; i++) {
                         Class<?> lambdaParam = lambdaParams[i];
-                        nameToReturn += lambdaParam.getName();
+                        nameToReturnBuilder.append(lambdaParam.getName());
                         if (i + 1 == lambdaParams.length) {
                             if (firstLetterUpperCaseAndEndWithColon) {
-                                nameToReturn += ":";
+                                nameToReturnBuilder.append(':');
                             }
                         } else {
-                            nameToReturn += ", " + lambdaParam.getName();
+                            nameToReturnBuilder.append(", ").append(lambdaParam.getName());
                         }
                     }
                 }
+                nameToReturn = nameToReturnBuilder.toString();
             }
         }
         return nameToReturn;
