@@ -143,6 +143,15 @@
     </dependencyManagement>
     <profiles>
         <profile>
+            <id>java8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <modules>
+                <module>awaitility-java8-test</module>
+            </modules>
+        </profile>
+        <profile>
             <id>release</id>
             <build>
                 <plugins>
@@ -183,7 +192,6 @@
         <module>awaitility</module>
         <module>awaitility-scala</module>
         <module>awaitility-groovy</module>
-        <module>awaitility-java8-test</module>
         <module>awaitility-osgi-test</module>
     </modules>
 </project>
