@@ -36,6 +36,7 @@ import java.util.Set;
  * @author johan
  * @version $Id: $Id
  */
+@Deprecated
 public final class ProxyCreator {
 	
 	private ProxyCreator() {}

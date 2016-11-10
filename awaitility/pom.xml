@@ -23,6 +23,7 @@
 	<properties>
 		<hamcrest.version>1.3</hamcrest.version>
 		<cglib.version>3.2.4</cglib.version>
+		<bytebuddy.version>1.5.3</bytebuddy.version>
 	</properties>
 	<build>
 		<plugins>
@@ -123,6 +124,11 @@
 			<groupId>cglib</groupId>
 			<artifactId>cglib-nodep</artifactId>
 			<version>${cglib.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>net.bytebuddy</groupId>
+			<artifactId>byte-buddy</artifactId>
+			<version>${bytebuddy.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.objenesis</groupId>
