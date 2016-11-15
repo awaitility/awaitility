@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 public class ByteBuddyProxyCreatorTest {
 
     @Test
-    public void interceptsStandardMethodCalls() throws Exception {
+    public void interceptsStandardMethodCalls() {
         ClassWithMethods object = (ClassWithMethods) ByteBuddyProxyCreator.create(ClassWithMethods.class, TestMethodExecutor.class);
 
         assertEquals("test aMethod", object.aMethod());
@@ -42,10 +42,32 @@ public class ByteBuddyProxyCreatorTest {
         assertEquals("test aMethod", method.invoke(object));
     }
 
+    @SuppressWarnings("FinalizeCalledExplicitly")
+    @Test
+    public void ignoreFinalizeCalls() {
+        ClassWithMethods object = (ClassWithMethods) ByteBuddyProxyCreator.create(ClassWithMethods.class, TestFinalizeMethodExecutor.class);
+        assertEquals(TestFinalizeMethodExecutor.finalizeCallCounter, 0);
+
+        object.finalize();
+
+        assertEquals(TestFinalizeMethodExecutor.finalizeCallCounter, 0);
+    }
+
     public static class TestMethodExecutor {
         @RuntimeType
         public static Object interceptExecutionDetails(@Origin Method method, @AllArguments Object[] args) {
             return "test " + method.getName();
+        }
+    }
+
+    public static class TestFinalizeMethodExecutor {
+        //Not thread-safe - dirty hack to test intercepting finalize method call
+        private static int finalizeCallCounter;
+
+        @RuntimeType
+        public static Object interceptExecutionDetails(@Origin Method method, @AllArguments Object[] args) {
+            finalizeCallCounter++;
+            return null;
         }
     }
 }

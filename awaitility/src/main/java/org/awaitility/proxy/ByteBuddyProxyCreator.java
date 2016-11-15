@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static net.bytebuddy.matcher.ElementMatchers.isDeclaredBy;
+import static net.bytebuddy.matcher.ElementMatchers.isFinalizer;
 import static net.bytebuddy.matcher.ElementMatchers.not;
 
 /**
@@ -46,7 +46,7 @@ public class ByteBuddyProxyCreator {
         Class<?> proxyType = new ByteBuddy()
                 .subclass(effectiveTargetClass)
                 .implement(interfacesToImplementAsList)
-                .method(not(isDeclaredBy(Object.class)))
+                .method(not(isFinalizer()))
                 .intercept(MethodDelegation.to(interceptorClass))
                 .make()
                 .load(classLoader)
