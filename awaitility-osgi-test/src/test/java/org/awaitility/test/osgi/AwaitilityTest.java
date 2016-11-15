@@ -51,9 +51,6 @@ public class AwaitilityTest {
          mavenBundle("org.awaitility", "awaitility").versionAsInProject(), 
          mavenBundle("org.objenesis", "objenesis").versionAsInProject(),
          mavenBundle("net.bytebuddy", "byte-buddy").versionAsInProject(),
-         /*
-         mavenBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.cglib")
-             .version("3.2.4_1")*/
             // CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
     }

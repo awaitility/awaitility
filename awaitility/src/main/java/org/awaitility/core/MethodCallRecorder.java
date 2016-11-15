@@ -19,7 +19,6 @@ import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 import org.awaitility.proxy.ByteBuddyProxyCreator;
-import org.awaitility.proxy.ProxyCreator;
 import org.awaitility.proxy.TypeUtils;
 
 import java.lang.reflect.InvocationHandler;
@@ -70,13 +69,6 @@ public class MethodCallRecorder {
 	 */
 	public static Object createProxy(Object target) {
 		Object proxy = ByteBuddyProxyCreator.create(target.getClass(), MethodCallInterceptor.class);
-		lastTarget.set(target);
-		return proxy;
-	}
-
-	@Deprecated
-	public static Object createOldCglibProxy(Object target) {
-		Object proxy = ProxyCreator.create(target.getClass(), invocationHandler);
 		lastTarget.set(target);
 		return proxy;
 	}
