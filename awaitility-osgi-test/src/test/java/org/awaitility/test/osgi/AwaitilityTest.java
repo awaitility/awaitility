@@ -50,9 +50,7 @@ public class AwaitilityTest {
          systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
          mavenBundle("org.awaitility", "awaitility").versionAsInProject(), 
          mavenBundle("org.objenesis", "objenesis").versionAsInProject(),
-         /*
-         mavenBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.cglib")
-             .version("3.2.4_1")*/
+         mavenBundle("net.bytebuddy", "byte-buddy").versionAsInProject(),
             // CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
         };
     }

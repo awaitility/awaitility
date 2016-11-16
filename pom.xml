@@ -128,6 +128,10 @@
                     <artifactId>maven-shade-plugin</artifactId>
                     <version>2.4.3</version>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>2.19.1</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -142,6 +146,15 @@
         </dependencies>
     </dependencyManagement>
     <profiles>
+        <profile>
+            <id>java8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <modules>
+                <module>awaitility-java8-test</module>
+            </modules>
+        </profile>
         <profile>
             <id>release</id>
             <build>
@@ -183,7 +196,6 @@
         <module>awaitility</module>
         <module>awaitility-scala</module>
         <module>awaitility-groovy</module>
-        <module>awaitility-java8-test</module>
         <module>awaitility-osgi-test</module>
     </modules>
 </project>

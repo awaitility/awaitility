@@ -20,4 +20,7 @@ public class ClassWithMethods {
     public String aMethod() {
         return "aMethod";
     }
+
+    public void finalize() {
+    }
 }

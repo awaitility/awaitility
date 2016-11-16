@@ -15,7 +15,10 @@
  */
 package org.awaitility.core;
 
-import org.awaitility.proxy.ProxyCreator;
+import net.bytebuddy.implementation.bind.annotation.AllArguments;
+import net.bytebuddy.implementation.bind.annotation.Origin;
+import net.bytebuddy.implementation.bind.annotation.RuntimeType;
+import org.awaitility.proxy.ByteBuddyProxyCreator;
 import org.awaitility.proxy.TypeUtils;
 
 import java.lang.reflect.InvocationHandler;
@@ -47,13 +50,25 @@ public class MethodCallRecorder {
     };
 
 	/**
+	 * Intercepts all methods executions in a proxied class feeding MethodCallRecorder.
+	 */
+    public static class MethodCallInterceptor {
+        @RuntimeType
+        public static Object interceptExecutionDetails(@Origin Method method, @AllArguments Object[] args) {
+            lastMethod.set(method);
+            lastArgs.set(args);
+            return TypeUtils.getDefaultValue(method.getReturnType());
+        }
+    }
+
+	/**
 	 * <p>createProxy.</p>
 	 *
 	 * @param target a {@link java.lang.Object} object.
 	 * @return a {@link java.lang.Object} object.
 	 */
 	public static Object createProxy(Object target) {
-		Object proxy = ProxyCreator.create(target.getClass(), invocationHandler);
+		Object proxy = ByteBuddyProxyCreator.create(target.getClass(), MethodCallInterceptor.class);
 		lastTarget.set(target);
 		return proxy;
 	}
