@@ -29,12 +29,11 @@ class AwaitilityExtensionModule {
   }
 
   static def until(ConditionFactory self, Runnable runnable) {
-    if (runnable instanceof Closure)
-      self.until(runnable as Callable<Boolean>)
-    if (runnable instanceof Callable)
-      self.until(runnable as Callable)
-    else
+    if (runnable instanceof Closure) {
+      self.until({ (runnable as Closure).call().asBoolean() } as Callable<Boolean>)
+    } else {
       self.until(new AssertionCondition(runnable, self.generateConditionSettings()))
+    }
     // Return true to signal that everything went OK (for spock tests)
     return true
   }

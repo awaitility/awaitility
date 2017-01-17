@@ -21,6 +21,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
 
+import java.util.concurrent.Callable
+
 import static org.awaitility.Awaitility.await
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 import static org.hamcrest.Matchers.equalTo
@@ -32,10 +34,21 @@ class AwaitilityExtensionModuleTest {
   public def ExpectedException exception = ExpectedException.none()
 
   @Test
-  def void groovyClosureSupport() {
+  def void groovyBooleanClosureSupport() {
     def asynch = new Asynch().perform()
 
     await().until { asynch.getValue() == 1 }
+  }
+
+  @Test
+  def void groovyNonBooleanClosureSupport() {
+    int calls = 0
+    // using "false" to detect a buggy implementation making use of toBoolean(): "false".toBoolean() returns false
+    Closure<String> stringClosure = { ++calls > 1 ? "false" : null }
+
+    await().until(stringClosure)
+    // e37a311 caused conditions to be evaluated twice
+    assert calls == 2
   }
 
   @Test
@@ -47,7 +60,19 @@ class AwaitilityExtensionModuleTest {
       void run() {
         assertThat(asynch.getValue(), equalTo(1))
       }
-    });
+    })
+  }
+
+  @Test
+  def void groovyBooleanCallableSupport() {
+    def asynch = new Asynch().perform()
+
+    await().until(new Callable<Boolean>() {
+      @Override
+      Boolean call() {
+        return asynch.getValue() == 1
+      }
+    })
   }
 
   @Test
