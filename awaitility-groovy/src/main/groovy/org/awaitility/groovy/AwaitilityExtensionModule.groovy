@@ -28,13 +28,11 @@ class AwaitilityExtensionModule {
     timeout_message = "Condition was not fulfilled"
   }
 
-  static def until(ConditionFactory self, Runnable runnable) {
+  static void until(ConditionFactory self, Runnable runnable) {
     if (runnable instanceof Closure) {
       self.until({ (runnable as Closure).call().asBoolean() } as Callable<Boolean>)
     } else {
       self.until(new AssertionCondition(runnable, self.generateConditionSettings()))
     }
-    // Return true to signal that everything went OK (for spock tests)
-    return true
   }
 }
