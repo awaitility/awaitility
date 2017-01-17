@@ -29,6 +29,8 @@ class AwaitilityExtensionModule {
   }
 
   static def until(ConditionFactory self, Runnable runnable) {
+    if (runnable instanceof Closure)
+      self.until(runnable as Callable<Boolean>)
     if (runnable instanceof Callable)
       self.until(runnable as Callable)
     else
@@ -36,5 +38,4 @@ class AwaitilityExtensionModule {
     // Return true to signal that everything went OK (for spock tests)
     return true
   }
-
 }
