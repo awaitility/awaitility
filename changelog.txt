@@ -5,6 +5,7 @@ Changelog next version
 * Removed the deprecated value org.awaitility.Duration#SAME_AS_POLL_INTERVAL (thanks to Paweł Chorążyk for pull request).
 * Cleaned up some internal code and reduced some internal boiler-plate (thanks to Mykhailo Kovalskyi for pull request)
 * Migrated from CgLib to ByteBuddy for class proxies (thanks to Marcin Zajączkowski for pull request)
+* Fixed regression of ClassCastException for non-bool Groovy closures (thanks to Piotr Kubowicz for pull request) (issue 72)
 
 Changelog 2.0.0 (2016-06-17)
 ----------------------------
