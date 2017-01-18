@@ -19,6 +19,8 @@ import org.awaitility.core.ConditionTimeoutException
 import org.awaitility.groovy.classes.Asynch
 import spock.lang.Specification
 
+import java.util.concurrent.Callable
+
 import static org.awaitility.Awaitility.await
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 import static org.hamcrest.Matchers.equalTo
@@ -28,9 +30,17 @@ class AwaitilitySupportGroovyWithTraitTest extends Specification implements Awai
 
   def asynch = new Asynch()
 
-  def "groovy closure support should work"() {
+  def "groovy boolean closure support should work"() {
     when: asynch.perform()
     then: await().until { asynch.getValue() == 1 }
+  }
+
+  def "groovy non-boolean closure support should work"() {
+    given:
+    int calls = 0
+    expect:
+    await().until { ++calls > 1 ? "false" : null }
+    assert calls == 2
   }
 
   def "groovy closure runnable should work in spock"() {
@@ -42,6 +52,19 @@ class AwaitilitySupportGroovyWithTraitTest extends Specification implements Awai
         assertThat(asynch.getValue(), equalTo(1))
       }
     });
+  }
+
+  // cannot be anonymous in the test below - "InternalError: Enclosing method not found" is thrown
+  class AsynchCallable implements Callable<Boolean> {
+    @Override
+    Boolean call() {
+      return asynch.getValue() == 1
+    }
+  }
+
+  def "groovy boolean callable should work in spock"() {
+    when: asynch.perform()
+    then: await().until(new AsynchCallable())
   }
 
   def "timeout messages shouldn't contain anonymous class details"() {
