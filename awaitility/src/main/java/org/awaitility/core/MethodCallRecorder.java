@@ -30,9 +30,9 @@ import java.lang.reflect.Method;
 public class MethodCallRecorder {
 
     private static final String NO_METHOD_CALL_RECORDED_MESSAGE = "No method call has been recorded. Perhaps the method was final?";
-    private static ThreadLocal<Object> lastTarget = new ThreadLocal<Object>();
-    private static ThreadLocal<Method> lastMethod = new ThreadLocal<Method>();
-    private static ThreadLocal<Object[]> lastArgs = new ThreadLocal<Object[]>();
+    private static final ThreadLocal<Object> lastTarget = new ThreadLocal<Object>();
+    private static final ThreadLocal<Method> lastMethod = new ThreadLocal<Method>();
+    private static final ThreadLocal<Object[]> lastArgs = new ThreadLocal<Object[]>();
 
     private static InvocationHandler invocationHandler = new InvocationHandler() {
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
