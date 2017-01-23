@@ -71,7 +71,7 @@ public class FieldSupplierBuilder {
     }
 
     public class NameFieldSupplier<T> implements Callable<T> {
-        private Field foundField;
+        private final Field foundField;
 
         public NameFieldSupplier() {
             foundField = WhiteboxImpl.getFieldAnnotatedWith(object, expectedAnnotation);
