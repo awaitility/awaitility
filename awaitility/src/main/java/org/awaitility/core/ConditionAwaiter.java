@@ -165,7 +165,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                     throwable = e;
                 }
             }
-        });
+        }, "awaitility-poll-scheduling");
     }
 
     /**
