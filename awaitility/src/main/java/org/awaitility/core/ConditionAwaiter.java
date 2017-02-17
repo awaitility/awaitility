@@ -166,7 +166,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                         pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
                         Thread.sleep(pollInterval.getValueInMS());
                     }
-                } catch (Exception e) {
+                } catch (Throwable e) {
                     throwable = e;
                 }
             }
