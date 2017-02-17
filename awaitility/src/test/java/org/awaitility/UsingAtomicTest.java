@@ -81,7 +81,8 @@ public class UsingAtomicTest {
     @Test(timeout = 2000)
     public void usingAtomicLongAndTimeout() throws Exception {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage("expected <1L> but was <0> within 200 milliseconds.");
+		exception.expectMessage(
+				"org.awaitility.core.ConditionFactory.untilAtomic Callable expected <1L> but was <0L> within 200 milliseconds.");
         AtomicLong atomic = new AtomicLong(0);
 		await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo(1L));
     }
@@ -96,7 +97,8 @@ public class UsingAtomicTest {
     @Test(timeout = 2000)
     public void usingAtomicReferenceAndTimeout() throws Exception {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage("expected \"1\" but was <0> within 200 milliseconds.");
+		exception.expectMessage(
+				"org.awaitility.core.ConditionFactory.untilAtomic Callable expected \"1\" but was \"0\" within 200 milliseconds.");
         AtomicReference<String> atomic = new AtomicReference<String>("0");
 		await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo("1"));
     }

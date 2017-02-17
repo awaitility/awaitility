@@ -61,8 +61,7 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         conditionAwaiter = new ConditionAwaiter(callable, settings) {
             @Override
             protected String getTimeoutMessage() {
-                // Use "return getMismatchMessage(supplier, matcher);" to more descriptive message
-                return String.format("%s expected %s but was <%s>", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher), lastResult);
+                return getMismatchMessage(supplier, matcher);
             }
         };
     }
