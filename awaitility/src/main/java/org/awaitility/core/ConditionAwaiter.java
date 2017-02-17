@@ -125,7 +125,12 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             } finally {
                 executor.shutdown();
                 if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                    executor.shutdownNow();
+                    try {
+                        executor.shutdownNow();
+                        executor.awaitTermination(1, TimeUnit.SECONDS);
+                    } catch (InterruptedException e) {
+                        CheckedExceptionRethrower.safeRethrow(e);
+                    }
                 }
             }
         } catch (Throwable e) {
