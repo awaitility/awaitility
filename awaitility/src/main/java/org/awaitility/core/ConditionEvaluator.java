@@ -22,5 +22,5 @@ interface ConditionEvaluator {
     /**
      * @param pollInterval The poll interval for the for this evaluation round
      */
-    boolean eval(Duration pollInterval) throws Exception;
+    ConditionEvaluationResult eval(Duration pollInterval) throws Exception;
 }

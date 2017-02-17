@@ -46,7 +46,7 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
 
         conditionEvaluationHandler = new ConditionEvaluationHandler<T>(matcher, settings);
         final ConditionEvaluator callable = new ConditionEvaluator() {
-            public boolean eval(Duration pollInterval) throws Exception{
+            public ConditionEvaluationResult eval(Duration pollInterval) throws Exception{
                 lastResult = supplier.call();
                 boolean matches = matcher.matches(lastResult);
                 if (matches) {
@@ -54,7 +54,7 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
                 } else {
                     conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, matcher), lastResult, pollInterval);
                 }
-                return matches;
+                return new ConditionEvaluationResult(matches);
 
             }
         };

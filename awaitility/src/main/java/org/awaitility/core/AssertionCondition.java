@@ -50,15 +50,15 @@ public class AssertionCondition implements Condition<Void> {
         conditionEvaluationHandler = new ConditionEvaluationHandler<Object>(null, settings);
 
         final ConditionEvaluator callable = new ConditionEvaluator() {
-            public boolean eval(Duration pollInterval) throws Exception {
+            public ConditionEvaluationResult eval(Duration pollInterval) throws Exception {
                 try {
                     supplier.run();
                     conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier, settings.getAlias()), null, pollInterval);
-                    return true;
+                    return new ConditionEvaluationResult(true);
                 } catch (AssertionError e) {
                     lastExceptionMessage = e.getMessage();
                     conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, lastExceptionMessage, settings.getAlias()), null, pollInterval);
-                    return false;
+                    return new ConditionEvaluationResult(false, e);
                 }
             }
         };

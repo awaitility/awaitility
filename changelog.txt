@@ -11,6 +11,7 @@ Changelog next version
 * Bumped property versions, plugin versions, dependency versions (thanks to Andy Glick for pull request) (issue 21)
 * Waiting for the condition awaiter thread to shutdown after "shutdownNow" in order to avoid having a thread left running after a test (issue 69)
 * Catching throwable instead of exception in poll-scheduling thread
+* Added root cause to ConditionTimeoutException when applicable so that one can more easily distinguish find where an error occurred (issue 67)
 
 Changelog 2.0.0 (2016-06-17)
 ----------------------------

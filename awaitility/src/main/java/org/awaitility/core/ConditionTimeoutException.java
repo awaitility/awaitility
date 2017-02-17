@@ -30,4 +30,14 @@ public class ConditionTimeoutException extends RuntimeException {
     public ConditionTimeoutException(String message) {
         super(message);
     }
+
+    /**
+     * <p>Constructor for ConditionTimeoutException.</p>
+     *
+     * @param message A description of why the timeout occurred.
+     * @param throwable The cause
+     */
+    public ConditionTimeoutException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
 }

@@ -96,7 +96,7 @@ class CallableCondition implements Condition<Void> {
             this.conditionEvaluationHandler = conditionEvaluationHandler;
         }
 
-        public boolean eval(Duration pollInterval) throws Exception {
+        public ConditionEvaluationResult eval(Duration pollInterval) throws Exception {
             boolean conditionFulfilled = matcher.call();
             if (conditionFulfilled) {
                 conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(matcher, settings.getAlias()), true, pollInterval);
@@ -104,7 +104,7 @@ class CallableCondition implements Condition<Void> {
                 conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(matcher, settings.getAlias()), false, pollInterval);
 
             }
-            return conditionFulfilled;
+            return new ConditionEvaluationResult(conditionFulfilled);
         }
 
         private String getMatchMessage(Callable<Boolean> matcher, String conditionAlias) {

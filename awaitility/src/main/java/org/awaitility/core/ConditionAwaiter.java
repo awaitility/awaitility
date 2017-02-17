@@ -28,6 +28,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     private final CountDownLatch latch;
     private final ConditionEvaluator conditionEvaluator;
     private Throwable throwable = null;
+    private Throwable cause = null;
     private final ConditionSettings conditionSettings;
 
     /**
@@ -100,19 +101,24 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                         message = String.format("%s within %s %s.", getTimeoutMessage(), maxTimeout, maxWaitTimeLowerCase);
                     }
 
-                    ConditionTimeoutException e = new ConditionTimeoutException(message);
+                    final ConditionTimeoutException e;
 
                     // Not all systems support deadlock detection so ignore if ThreadMXBean & ManagementFactory is not in classpath
                     if (existInCP("java.lang.management.ThreadMXBean") && existInCP("java.lang.management.ManagementFactory")) {
                         java.lang.management.ThreadMXBean bean = java.lang.management.ManagementFactory.getThreadMXBean();
+                        Throwable cause = this.cause;
                         try {
                             long[] threadIds = bean.findDeadlockedThreads();
-                            if (threadIds != null)
-                                e.initCause(new DeadlockException(threadIds));
+                            if (threadIds != null) {
+                                cause = new DeadlockException(threadIds);
+                            }
                         } catch (UnsupportedOperationException ignored) {
                             // findDeadLockedThreads() not supported on this VM,
                             // don't init cause and move on.
                         }
+                        e = new ConditionTimeoutException(message, cause);
+                    } else {
+                        e = new ConditionTimeoutException(message, this.cause);
                     }
 
                     throw e;
@@ -216,8 +222,11 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
 
         public void run() {
             try {
-                if (conditionEvaluator.eval(delayed)) {
+                ConditionEvaluationResult result = conditionEvaluator.eval(delayed);
+                if (result.isSuccessful()) {
                     latch.countDown();
+                } else if (result.hasThrowable()) {
+                    cause = result.getThrowable();
                 }
             } catch (Exception e) {
                 if (!conditionSettings.shouldExceptionBeIgnored(e)) {

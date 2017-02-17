@@ -19,9 +19,9 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 
 import org.awaitility.Awaitility._
 import org.awaitility.core.ConditionTimeoutException
-import org.hamcrest.CoreMatchers
 import org.hamcrest.CoreMatchers.is
 import org.hamcrest.Matchers.{containsString, endsWith, startsWith}
+import org.hamcrest.{CoreMatchers, Matchers}
 import org.junit.Assert._
 import org.junit._
 
