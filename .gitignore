@@ -8,3 +8,5 @@ target
 .settings
 .springBeans
 */dependency-reduced-pom.xml
+
+pom.xml.versionsBackup
