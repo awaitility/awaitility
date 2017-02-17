@@ -20,10 +20,7 @@
 	<url>http://awaitility.org</url>
 	<name>Awaitility</name>
 	<description>A Java DSL for synchronizing asynchronous operations</description>
-	<properties>
-		<hamcrest.version>1.3</hamcrest.version>
-		<bytebuddy.version>1.5.3</bytebuddy.version>
-	</properties>
+
 	<build>
 		<plugins>
 			<!-- Warning: maven bundle plugin runs before shade so we need to hand tune the manifest -->

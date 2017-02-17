@@ -9,7 +9,7 @@
 	<artifactId>awaitility-osgi-test</artifactId>
 	
 	<properties>
-		<pax-exam.version>4.8.0</pax-exam.version>
+		<pax-exam.version>4.10.0</pax-exam.version>
 	</properties>
 
 	<dependencies>
