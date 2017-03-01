@@ -30,11 +30,10 @@ import org.junit.rules.ExpectedException;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
-import static org.awaitility.Awaitility.matches;
-import static org.awaitility.Awaitility.with;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.awaitility.Awaitility.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * Tests for await().until(Runnable) using AssertionCondition.
@@ -162,6 +161,20 @@ public class AwaitilityJava8Test {
     @Test public void
     canMakeUseOfThrowingMethodInAwaitilityToWrapRunnablesThatThrowsExceptions() {
         await().until(matches(() -> stringEquals("test", "test")));
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Test(timeout = 2000L)
+    public void includesCauseInStackTrace()  {
+        try {
+            await().atMost(200, MILLISECONDS).until(() -> {
+                assertNotNull("34");
+                assertNotNull(null);
+            });
+            fail("Should throw ConditionTimeoutException");
+        } catch (ConditionTimeoutException e) {
+            assertThat(e.getCause().getClass().getName()).isEqualTo(AssertionError.class.getName());
+        }
     }
 
     private void stringEquals(String first, String second) {

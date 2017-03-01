@@ -7,6 +7,11 @@ Changelog next version
 * Migrated from CgLib to ByteBuddy for class proxies (thanks to Marcin Zajączkowski for pull request)
 * Fixed regression of ClassCastException for non-bool Groovy closures (thanks to Piotr Kubowicz for pull request) (issue 72)
 * Named the thread in ConditionAwaiter#pollSchedulingThread to "awaitility-poll-scheduling" (thanks to Piotr Kubowicz for pull request) (issue 70)
+* Updated AbstractHamcrestCondition to use the matcher's mismatch message (thanks to chanceVermilion for pull request) (issue 21)
+* Bumped property versions, plugin versions, dependency versions (thanks to Andy Glick for pull request) (issue 21)
+* Waiting for the condition awaiter thread to shutdown after "shutdownNow" in order to avoid having a thread left running after a test (issue 69)
+* Catching throwable instead of exception in poll-scheduling thread
+* Added root cause to ConditionTimeoutException when applicable so that one can more easily distinguish find where an error occurred (issue 67)
 
 Changelog 2.0.0 (2016-06-17)
 ----------------------------
