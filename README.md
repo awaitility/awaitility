@@ -36,7 +36,7 @@ public void updatesCustomerStatus() throws Exception {
         ```
       
         The `to` method has been moved to "org.awaitility.proxy.AwaitilityClassProxy" in the `awaitility-proxy` project.
-  2. The `until(Runnable ...)` method in `org.awaitility.core.ConditionFactory` to `untilAsserted(Runnable ...)`. This means that if you previously did:
+  2. The `until(Runnable ...)` method in `org.awaitility.core.ConditionFactory` is renamed to `untilAsserted(Runnable ...)`. This means that if you previously did:
     
         ```java
         await().until(() -> assertThat(something()).isEqualTo("Something"));
