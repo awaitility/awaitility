@@ -18,34 +18,47 @@ public void updatesCustomerStatus() throws Exception {
 ```
 
 ## News
-* 2017-03-17: Awaitility 3.0.0-rc1 is released. It includes several bug fixes and some two major (non-backward compatible) changes: 
-  1. The proxy creation is now done by bytebuddy instead of cglib and it this has been extracted to its own project called `awaitility-proxy`. This means that if you need to use proxies you need to depend on this project in addition to vanilla `awaitility`:
+* 2017-03-17: Awaitility `3.0.0-rc1` is released. It includes several bug fixes and some two major (non-backward compatible) changes: 
+  
+   1. The proxy creation is now done by bytebuddy instead of cglib and it this has been extracted to its own project called `awaitility-proxy`. This means that if you need to use proxies you need to depend on this project in addition to vanilla `awaitility`:
+        ```xml    
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility-proxy</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        ``` 
+       
+        You create a proxy when you do:
+    
+        ```java
+        await().untilCall( to(someObject).someMethod(), is(4) );
+        ```
+      
+        The `to` method has been moved to "org.awaitility.proxy.AwaitilityClassProxy" in the `awaitility-proxy` project.
+  2. The `until(Runnable ...)` method in `org.awaitility.core.ConditionFactory` to `untilAsserted(Runnable ...)`. This means that if you previously did:
     
-    ```xml
-    <dependency>
-    	<groupId>org.awaitility</groupId>
-    	<artifactId>awaitility-proxy</artifactId>
-    	<version>3.0.0</version>
-    </dependency>
-   
-   
-   You create a proxy when you do:
-
-    ```java
-    await().untilCall( to(someObject).someMethod(), is(4) );
-    
-  
-  The `to` method has been moved to "org.awaitility.proxy.AwaitilityClassProxy" in the `awaitility-proxy` project.
-  2. The `until(Runnable ...)` method in `org.awaitility.core.ConditionFactory` to `untilAsserted(Runnable ...)`. This means that if you previously did:
-    ```java
-    await().until(() -> assertThat(something()).isEqualTo("Something"));
-    
-    you now need to do:
-    ```java
-    await().untilAsserted(() -> assertThat(something()).isEqualTo("Something"));
+        ```java
+        await().until(() -> assertThat(something()).isEqualTo("Something"));
+        ```
+            
+        you now need to do:
+           
+        ```java
+        await().untilAsserted(() -> assertThat(something()).isEqualTo("Something"));
+        ```
+ 
+    To use it depend on:
+        
+    ```xml    
+    <dependency>
+        <groupId>org.awaitility</groupId>
+        <artifactId>awaitility-proxy</artifactId>
+        <version>3.0.0</version>
+    </dependency>
+    ``` 
     
   **Please help out and test it and provide feedback** 
-  
 * 2016-06-17: [Awaitility 2.0.0](http://dl.bintray.com/johanhaleby/generic/awaitility-2.0.0.zip) is released with support for [at least](https://github.com/awaitility/awaitility/wiki/Usage#example-11---at-least) expressions as well as upgraded [Groovy](https://github.com/awaitility/awaitility/wiki/Groovy) and [Scala](https://github.com/awaitility/awaitility/wiki/Scala) support. See [release notes](https://github.com/awaitility/awaitility/wiki/ReleaseNotes20) for more details.
 * 2016-06-17: Awaitility has a new website, [http://www.awaitility.org](http://www.awaitility.org). Feel free to update your bookmarks. 
 
