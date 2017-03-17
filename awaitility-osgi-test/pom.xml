@@ -18,7 +18,11 @@
 			<artifactId>awaitility</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-	
+		<dependency>
+			<groupId>org.awaitility</groupId>
+			<artifactId>awaitility-proxy</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
 			<artifactId>geronimo-atinject_1.0_spec</artifactId>

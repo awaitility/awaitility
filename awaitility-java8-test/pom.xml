@@ -56,10 +56,7 @@
         </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
+            <artifactId>awaitility-test-support</artifactId>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>

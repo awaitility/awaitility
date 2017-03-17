@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2010 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,24 @@
  */
 package org.awaitility.classes;
 
-public class ClassWithMethods {
+public class Asynch {
+	private final FakeRepository repository;
 
-    public String aMethod() {
-        return "aMethod";
-    }
+	public Asynch(FakeRepository repository) {
+		this.repository = repository;
+	}
 
-    public void finalize() {
-    }
+	public void perform() {
+		Thread thread = new Thread(new Runnable() {
+			public void run() {
+				try {
+					Thread.sleep(600);
+					repository.setValue(1);
+				} catch (InterruptedException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		});
+		thread.start();
+	}
 }

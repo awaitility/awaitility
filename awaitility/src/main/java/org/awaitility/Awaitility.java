@@ -231,7 +231,6 @@ public class Awaitility {
             }
         });
         Thread.setDefaultUncaughtExceptionHandler(null);
-        MethodCallRecorder.reset();
     }
 
     /**
@@ -416,25 +415,6 @@ public class Awaitility {
      */
     public static void setDefaultConditionEvaluationListener(ConditionEvaluationListener defaultConditionEvaluationListener) {
         Awaitility.defaultConditionEvaluationListener = defaultConditionEvaluationListener;
-    }
-
-    /**
-     * Await until a specific method invocation returns something. E.g.
-     * <p>
-     * <pre>
-     * await().untilCall(to(service).getCount(), greaterThan(2));
-     * </pre>
-     * <p>
-     * Here we tell Awaitility to wait until the <code>service.getCount()</code>
-     * method returns a value that is greater than 2.
-     *
-     * @param <S>    The type of the service.
-     * @param object the object that contains the method of interest.
-     * @return A proxy of the service
-     */
-    @SuppressWarnings("unchecked")
-    public static <S> S to(S object) {
-        return (S) MethodCallRecorder.createProxy(object);
     }
 
     /**

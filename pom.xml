@@ -190,6 +190,12 @@
         <version>4.12</version>
         <scope>test</scope>
       </dependency>
+      <dependency>
+        <groupId>org.awaitility</groupId>
+        <artifactId>awaitility-test-support</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -242,8 +248,10 @@
 
   <modules>
     <module>awaitility</module>
+    <module>awaitility-proxy</module>
     <module>awaitility-scala</module>
     <module>awaitility-groovy</module>
     <module>awaitility-osgi-test</module>
+    <module>awaitility-test-support</module>
   </modules>
 </project>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2010 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,22 @@
  */
 package org.awaitility.classes;
 
-public class ClassWithMethods {
+import java.util.concurrent.Callable;
 
-    public String aMethod() {
-        return "aMethod";
+public class ThrowExceptionUnlessFakeRepositoryEqualsOne implements Callable<Boolean> {
+
+    private final FakeRepository repository;
+
+    public ThrowExceptionUnlessFakeRepositoryEqualsOne(FakeRepository repository) {
+        super();
+        this.repository = repository;
     }
 
-    public void finalize() {
+    public Boolean call() {
+        if (repository.getValue() != 1) {
+            throw new IllegalArgumentException("Repository value is not 1");
+        }
+        return true;
     }
 }
+

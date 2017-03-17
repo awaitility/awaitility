@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2010 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,16 @@
  */
 package org.awaitility.classes;
 
-public class ClassWithMethods {
+public class FakeRepositoryWithStaticFieldAndAnnotation implements FakeRepository {
 
-    public String aMethod() {
-        return "aMethod";
+    @ExampleAnnotation
+    private static volatile int value = 0;
+
+    public int getValue() {
+        return value;
     }
 
-    public void finalize() {
+    public void setValue(int value) {
+        FakeRepositoryWithStaticFieldAndAnnotation.value = value;
     }
 }

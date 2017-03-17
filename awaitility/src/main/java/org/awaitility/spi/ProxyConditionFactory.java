@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.awaitility.classes;
 
-public class ClassWithMethods {
+package org.awaitility.spi;
 
-    public String aMethod() {
-        return "aMethod";
-    }
+import org.awaitility.core.Condition;
+import org.awaitility.core.ConditionSettings;
+import org.hamcrest.Matcher;
 
-    public void finalize() {
-    }
+public interface ProxyConditionFactory<T> {
+
+    Condition<T> createProxyCondition(T ignore, final Matcher<? super T> matcher, ConditionSettings settings);
+
 }

@@ -12,6 +12,15 @@ Changelog next version
 * Waiting for the condition awaiter thread to shutdown after "shutdownNow" in order to avoid having a thread left running after a test (issue 69)
 * Catching throwable instead of exception in poll-scheduling thread
 * Added root cause to ConditionTimeoutException when applicable so that one can more easily distinguish find where an error occurred (issue 67)
+* Moved proxy creation to a new project called "awaitility-proxy". This means that if you need to use proxies you need to depend on this project:
+    <dependency>
+    	<groupId>org.awaitility</groupId>
+    	<artifactId>awaitility-proxy</artifactId>
+    	<version>3.0.0</version>
+    </dependency>
+  You create a proxy when you do:
+    await().untilCall( to(someObject).someMethod(), is(4) );
+  The "to" function has been moved to "org.awaitility.proxy.AwaitilityClassProxy".
 
 Changelog 2.0.0 (2016-06-17)
 ----------------------------

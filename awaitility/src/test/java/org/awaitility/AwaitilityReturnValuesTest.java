@@ -25,7 +25,8 @@ import org.junit.rules.ExpectedException;
 
 import java.util.concurrent.Callable;
 
-import static org.awaitility.Awaitility.*;
+import static org.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.fieldIn;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
@@ -41,13 +42,6 @@ public class AwaitilityReturnValuesTest {
     public void setup() {
         fakeRepository = new FakeRepositoryImpl();
         Awaitility.reset();
-    }
-
-    @Test(timeout = 2000)
-    public void returnsResultAfterProxyCall() throws Exception {
-        new Asynch(fakeRepository).perform();
-        int value = await().untilCall(to(fakeRepository).getValue(), greaterThan(0));
-        assertEquals(1, value);
     }
 
     @Test(timeout = 2000)

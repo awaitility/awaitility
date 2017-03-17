@@ -22,7 +22,7 @@ import org.hamcrest.StringDescription;
 
 import java.util.concurrent.Callable;
 
-abstract class AbstractHamcrestCondition<T> implements Condition<T> {
+public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
 
     private ConditionAwaiter conditionAwaiter;
 
@@ -36,7 +36,7 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
      * @param matcher  a {@link org.hamcrest.Matcher} object.
      * @param settings a {@link org.awaitility.core.ConditionSettings} object.
      */
-    public AbstractHamcrestCondition(final Callable<T> supplier, final Matcher<? super T> matcher, final ConditionSettings settings) {
+    protected AbstractHamcrestCondition(final Callable<T> supplier, final Matcher<? super T> matcher, final ConditionSettings settings) {
         if (supplier == null) {
             throw new IllegalArgumentException("You must specify a supplier (was null).");
         }
@@ -87,5 +87,5 @@ abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         return lastResult;
     }
 
-    abstract String getCallableDescription(final Callable<T> supplier);
+    protected abstract String getCallableDescription(final Callable<T> supplier);
 }

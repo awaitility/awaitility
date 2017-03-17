@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.awaitility.proxy;
+package org.awaitility.classes;
 
-/**
- * The Class CannotCreateProxyException.
- */
-public class CannotCreateProxyException extends RuntimeException {
-	
-	/** The Constant serialVersionUID. */
-	private static final long serialVersionUID = -2443849094145412513L;
+import java.util.concurrent.Callable;
 
-	/**
-	 * Instantiates a new cannot create proxy exception.
-	 *
-	 * @param message the message
-	 */
-	public CannotCreateProxyException(String message) {
-		super(message);
+public class FakeRepositoryEqualsOne implements Callable<Boolean> {
+
+	private final FakeRepository repository;
+
+	public FakeRepositoryEqualsOne(FakeRepository repository) {
+		super();
+		this.repository = repository;
 	}
 
+	public Boolean call() {
+		return repository.getValue() == 1;
+	}
 }

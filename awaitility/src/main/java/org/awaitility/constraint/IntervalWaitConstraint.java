@@ -6,11 +6,11 @@ public class IntervalWaitConstraint extends AtMostWaitConstraint {
 
     private final Duration atLeastConstraint;
 
-    public static IntervalWaitConstraint between(Duration notBeforeThan, Duration notLaterThan) {
+    private static IntervalWaitConstraint between(Duration notBeforeThan, Duration notLaterThan) {
         return new IntervalWaitConstraint(notBeforeThan, notLaterThan);
     }
 
-    public IntervalWaitConstraint(Duration atLeastConstraint, Duration atMostDuration) {
+    IntervalWaitConstraint(Duration atLeastConstraint, Duration atMostDuration) {
         super(atMostDuration);
         this.atLeastConstraint = atLeastConstraint;
     }

@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.awaitility.classes;
+package org.awaitility.proxy;
 
-public class ClassWithMethods {
+/**
+ * The Class CannotCreateProxyException.
+ */
+public class CannotCreateProxyException extends RuntimeException {
+	
+	/** The Constant serialVersionUID. */
+	private static final long serialVersionUID = -2443849094145412513L;
 
-    public String aMethod() {
-        return "aMethod";
-    }
+	/**
+	 * Instantiates a new cannot create proxy exception.
+	 *
+	 * @param message the message
+	 */
+	public CannotCreateProxyException(String message) {
+		super(message);
+	}
 
-    public void finalize() {
-    }
 }

@@ -19,7 +19,7 @@ import org.awaitility.Duration;
 import org.awaitility.constraint.WaitConstraint;
 import org.awaitility.pollinterval.PollInterval;
 
-class ConditionSettings {
+public class ConditionSettings {
     private final String alias;
     private final WaitConstraint waitConstraint;
     private final PollInterval pollInterval;
@@ -39,9 +39,9 @@ class ConditionSettings {
      * @param conditionEvaluationListener a {@link ConditionEvaluationListener} object.
      * @param ignoreExceptions            a boolean.
      */
-    public ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
-                             PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
-                             ExceptionIgnorer ignoreExceptions) {
+    ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
+                      PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
+                      ExceptionIgnorer ignoreExceptions) {
         if (waitConstraint == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }

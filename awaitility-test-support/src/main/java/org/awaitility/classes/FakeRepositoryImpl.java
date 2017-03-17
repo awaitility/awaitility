@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 the original author or authors.
+ * Copyright 2010 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,25 @@
  */
 package org.awaitility.classes;
 
-public class ClassWithMethods {
+public class FakeRepositoryImpl implements FakeRepository {
 
-    public String aMethod() {
-        return "aMethod";
-    }
+	private volatile int value = 0;
 
-    public void finalize() {
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.powermock.utils.classes.FakeRepository#getValue()
+	 */
+	public int getValue() {
+		return value;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.powermock.utils.classes.FakeRepository#setValue(int)
+	 */
+	public void setValue(int value) {
+		this.value = value;
+	}
 }

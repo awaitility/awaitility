@@ -20,10 +20,10 @@ import org.awaitility.constraint.AtMostWaitConstraint;
 import org.awaitility.constraint.WaitConstraint;
 import org.awaitility.pollinterval.FixedPollInterval;
 import org.awaitility.pollinterval.PollInterval;
+import org.awaitility.spi.ProxyConditionFactory;
 import org.hamcrest.Matcher;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.awaitility.classpath.ClassPathResolver.existInCP;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 
@@ -562,11 +563,27 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public <T> T untilCall(T ignore, final Matcher<? super T> matcher) {
-        final MethodCaller<T> supplier = new MethodCaller<T>(MethodCallRecorder.getLastTarget(), MethodCallRecorder
-                .getLastMethod(), MethodCallRecorder.getLastArgs());
-        MethodCallRecorder.reset();
-        final ProxyHamcrestCondition<T> proxyCondition = new ProxyHamcrestCondition<T>(supplier, matcher, generateConditionSettings());
-        return until(proxyCondition);
+        if (!existInCP("java.util.ServiceLoader")) {
+            throw new UnsupportedOperationException("java.util.ServiceLoader not found in classpath so cannot create condition");
+        }
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (cl == null) {
+            cl = ClassLoader.getSystemClassLoader();
+        }
+        Iterator<ProxyConditionFactory> iterator = java.util.ServiceLoader.load(ProxyConditionFactory.class, cl).iterator();
+        if (!iterator.hasNext()) {
+            throw new UnsupportedOperationException("There's currently no plugin installed that can handle proxy conditions, please consider adding 'awaitility-proxy' to the classpath. If using Maven you can do:" +
+                    "<dependency>\n" +
+                    "\t<groupId>org.awaitility</groupId>\n" +
+                    "\t<artifactId>awaitility</artifactId>\n" +
+                    "\t<version>${awaitility.version}</version>\n" +
+                    "</dependency>\n");
+        }
+        @SuppressWarnings("unchecked") ProxyConditionFactory<T> factory = iterator.next();
+        if (factory == null) {
+            throw new IllegalArgumentException("Internal error: Proxy condition plugin initialization returned null, please report an issue.");
+        }
+        return until(factory.createProxyCondition(ignore, matcher, generateConditionSettings()));
     }
 
     /**
@@ -808,60 +825,6 @@ public class ConditionFactory {
     private <T> T until(Condition<T> condition) {
         return condition.await();
     }
-
-    /**
-     * The Class MethodCaller.
-     *
-     * @param <T> the generic type
-     */
-    static class MethodCaller<T> implements Callable<T> {
-
-        /**
-         * The target.
-         */
-        final Object target;
-
-        /**
-         * The method.
-         */
-        final Method method;
-
-        /**
-         * The args.
-         */
-        final Object[] args;
-
-        /**
-         * Instantiates a new method caller.
-         *
-         * @param target the target
-         * @param method the method
-         * @param args   the args
-         */
-        public MethodCaller(Object target, Method method, Object[] args) {
-            this.target = target;
-            this.method = method;
-            this.args = args;
-            method.setAccessible(true);
-        }
-
-        /*
-           * (non-Javadoc)
-           *
-           * @see java.util.concurrent.Callable#call()
-           */
-        @SuppressWarnings("unchecked")
-        public T call() {
-            try {
-                return (T) method.invoke(target, args);
-            } catch (IllegalAccessException e) {
-                return CheckedExceptionRethrower.safeRethrow(e);
-            } catch (InvocationTargetException e) {
-                return CheckedExceptionRethrower.safeRethrow(e.getCause());
-            }
-        }
-    }
-
 
     /**
      * Ensures backward compatibility (especially that poll delay is the same as poll interval for fixed poll interval).
