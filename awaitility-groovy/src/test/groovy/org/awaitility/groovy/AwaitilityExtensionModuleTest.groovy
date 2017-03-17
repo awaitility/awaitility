@@ -97,7 +97,7 @@ class AwaitilityExtensionModuleTest {
   }
 
   @Test
-  def void assertionTest() {
+  def void untilAssertedTest() {
     def asynch = new Asynch().perform()
 
     await("groovy").atMost(2000, MILLISECONDS).untilAsserted { assertEquals(1, asynch.getValue()) }
