@@ -23,6 +23,7 @@ Changelog next version
   The "to" function has been moved to "org.awaitility.proxy.AwaitilityClassProxy".
 * Upgraded Scale support module to use Scala 2.12.1 (previous version was 2.11.8)
 * Upgraded Groovy support module to use Groovy 2.4.9 (previous version was 2.4.8)
+* Removed the deprecated classes org.awaitility.groovy.AwaitilitySupport and org.awaitility.groovy.AwaitilityTrait from the Groovy module
 
 Changelog 2.0.0 (2016-06-17)
 ----------------------------

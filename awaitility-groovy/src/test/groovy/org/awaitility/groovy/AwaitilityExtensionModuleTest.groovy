@@ -23,9 +23,10 @@ import org.junit.rules.ExpectedException
 
 import java.util.concurrent.Callable
 
-import static org.awaitility.Awaitility.await
 import static java.util.concurrent.TimeUnit.MILLISECONDS
+import static org.awaitility.Awaitility.await
 import static org.hamcrest.Matchers.equalTo
+import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertThat
 
 class AwaitilityExtensionModuleTest {
@@ -93,5 +94,12 @@ class AwaitilityExtensionModuleTest {
     def asynch = new Asynch().perform()
 
     await("groovy").atMost(500, MILLISECONDS).until { asynch.getValue() == 2 }
+  }
+
+  @Test
+  def void assertionTest() {
+    def asynch = new Asynch().perform()
+
+    await("groovy").atMost(2000, MILLISECONDS).untilAsserted { assertEquals(1, asynch.getValue()) }
   }
 }
