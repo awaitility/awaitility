@@ -40,8 +40,7 @@ public void updatesCustomerStatus() throws Exception {
     
         ```java
         await().until(() -> assertThat(something()).isEqualTo("Something"));
-        ```
-            
+        ```            
         you now need to do:
            
         ```java
