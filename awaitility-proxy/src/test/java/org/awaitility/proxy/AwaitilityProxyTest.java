@@ -96,7 +96,7 @@ public class AwaitilityProxyTest {
         String alias = "test";
         exception.expect(ConditionTimeoutException.class);
         exception.expectMessage(
-                "Condition with alias 'test' didn't complete within 120 milliseconds because org.awaitility.classes.FakeRepositoryImpl.getValue() expected a value greater than <0> but <0> was equal to <0>.");
+                "Condition with alias 'test' didn't complete within 120 milliseconds because org.awaitility.classes.FakeRepositoryImpl.getValue() expected a value greater than <0> but <0> was");
 
         await(alias).atMost(120, MILLISECONDS).untilCall(to(fakeRepository).getValue(), greaterThan(0));
     }
