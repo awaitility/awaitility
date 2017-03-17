@@ -20,7 +20,7 @@ Changelog 3.0.0-rc1 (2017-03-17)
     <dependency>
     	<groupId>org.awaitility</groupId>
     	<artifactId>awaitility-proxy</artifactId>
-    	<version>3.0.0</version>
+    	<version>3.0.0-rc1</version>
     </dependency>
   You create a proxy when you do:
     await().untilCall( to(someObject).someMethod(), is(4) );
