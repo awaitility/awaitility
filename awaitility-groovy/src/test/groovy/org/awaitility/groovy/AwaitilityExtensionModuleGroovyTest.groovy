@@ -21,8 +21,8 @@ import spock.lang.Specification
 
 import java.util.concurrent.Callable
 
-import static org.awaitility.Awaitility.await
 import static java.util.concurrent.TimeUnit.MILLISECONDS
+import static org.awaitility.Awaitility.await
 import static org.hamcrest.Matchers.equalTo
 import static org.junit.Assert.assertThat
 

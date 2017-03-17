@@ -15,11 +15,23 @@
 */
 package org.awaitility.groovy
 
+import org.awaitility.core.ConditionFactory
+
+import java.util.concurrent.Callable
+
 import static org.awaitility.spi.Timeout.timeout_message
 
 class AwaitilityExtensionModule {
 
   static {
     timeout_message = "Condition was not fulfilled"
+  }
+
+  static void until(ConditionFactory self, Runnable runnable) {
+    if (runnable instanceof Closure) {
+      self.until({ (runnable as Closure).call().asBoolean() } as Callable<Boolean>)
+    } else {
+      self.untilAsserted(runnable)
+    }
   }
 }
