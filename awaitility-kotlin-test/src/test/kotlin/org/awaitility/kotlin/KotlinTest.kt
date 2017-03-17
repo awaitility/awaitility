@@ -20,11 +20,20 @@ import org.awaitility.Awaitility.await
 import org.awaitility.classes.Asynch
 import org.awaitility.classes.FakeRepository
 import org.awaitility.classes.FakeRepositoryImpl
+import org.awaitility.core.ConditionTimeoutException
+import org.hamcrest.Matchers.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-
+import org.junit.rules.ExpectedException
+import java.util.concurrent.TimeUnit.SECONDS
+import kotlin.test.assertEquals
 
 class KotlinTest {
+
+    @Rule @JvmField
+    val exception = ExpectedException.none()
+
     lateinit var asynch: Asynch
     lateinit var fakeRepository: FakeRepository
 
@@ -33,8 +42,29 @@ class KotlinTest {
         asynch = Asynch(fakeRepository)
     }
 
-    @Test fun testPath() {
+    @Test fun booleanCondition() {
         Asynch(fakeRepository).perform()
         await().until { fakeRepository.value == 1 }
+    }
+
+    @Test fun assertionCondition() {
+        Asynch(fakeRepository).perform()
+        await().untilAsserted { assertEquals(1, fakeRepository.value) }
+    }
+
+    @Test fun assertionConditionFailsWithANiceErrorMessage() {
+        exception.expect(ConditionTimeoutException::class.java)
+        exception.expectMessage(allOf(startsWith("Assertion condition defined in"), endsWith("Expected <2>, actual <1> within 1 seconds.")))
+
+        Asynch(fakeRepository).perform()
+        await().atMost(1, SECONDS).untilAsserted { assertEquals(2, fakeRepository.value) }
+    }
+
+    @Test fun booleanConditionFailsWithANiceErrorMessage() {
+        exception.expect(ConditionTimeoutException::class.java)
+        exception.expectMessage(allOf(startsWith("Condition"), endsWith("was not fulfilled within 1 seconds.")))
+
+        Asynch(fakeRepository).perform()
+        await().atMost(1, SECONDS).until { fakeRepository.value == 2 }
     }
 }

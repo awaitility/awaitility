@@ -39,7 +39,6 @@ public class ConditionEvaluationListenerJava8Test {
     @Rule
     public TestName testName = new TestName();
 
-
     @Test(timeout = 2000)
     public void expectedMatchMessageForAssertionConditionsWhenUsingLambdasWithoutAlias() {
         final AtomicReference<String> lastMatchMessage = new AtomicReference<>();
@@ -56,7 +55,7 @@ public class ConditionEvaluationListenerJava8Test {
                 .untilAsserted(() -> assertEquals(5, (int) countDown.get()));
 
         String expectedMatchMessage = String.format("%s reached its end value", CountDown.class.getName());
-        assertThat(lastMatchMessage.get(), allOf(startsWith("Condition defined as a lambda expression"), endsWith(expectedMatchMessage)));
+        assertThat(lastMatchMessage.get(), allOf(startsWith("Assertion condition defined as a lambda expression"), endsWith(expectedMatchMessage)));
     }
 
     @Test(timeout = 2000)
@@ -75,7 +74,7 @@ public class ConditionEvaluationListenerJava8Test {
                 .untilAsserted(() -> assertEquals(5, (int) countDown.get()));
 
         String expectedMatchMessage = String.format("%s reached its end value", CountDown.class.getName());
-        assertThat(lastMatchMessage.get(), allOf(startsWith("Condition with alias my alias defined as a lambda expression"), endsWith(expectedMatchMessage)));
+        assertThat(lastMatchMessage.get(), allOf(startsWith("Assertion condition with alias my alias defined as a lambda expression"), endsWith(expectedMatchMessage)));
     }
 
     @Test(timeout = 2000)
@@ -94,7 +93,7 @@ public class ConditionEvaluationListenerJava8Test {
                     }).await().atMost(150, MILLISECONDS).untilAsserted(() -> assertEquals(-1, (int) countDown.get()));
             fail("Test should fail");
         } catch (ConditionTimeoutException e) {
-            assertThat(lastMatchMessage.get(), allOf(startsWith("Condition defined as a lambda expression in"), containsString("expected:<-1> but was:<")));
+            assertThat(lastMatchMessage.get(), allOf(startsWith("Assertion condition defined as a lambda expression in"), containsString("expected:<-1> but was:<")));
         }
     }
 
@@ -113,7 +112,7 @@ public class ConditionEvaluationListenerJava8Test {
             }).await("my alias").atMost(150, MILLISECONDS).untilAsserted(() -> assertEquals(-1, (int) countDown.get()));
             fail("Test should fail");
         } catch (ConditionTimeoutException e) {
-            assertThat(lastMatchMessage.get(), startsWith("Condition with alias my alias defined as a lambda expression"));
+            assertThat(lastMatchMessage.get(), startsWith("Assertion condition with alias my alias defined as a lambda expression"));
         }
     }
 
@@ -138,7 +137,7 @@ public class ConditionEvaluationListenerJava8Test {
                     }
                 });
 
-        assertThat(lastMatchMessage.get(), allOf(startsWith("Runnable condition defined in"), containsString(testName.getMethodName()), endsWith("reached its end value")));
+        assertThat(lastMatchMessage.get(), allOf(startsWith("Assertion condition defined in"), containsString(testName.getMethodName()), endsWith("reached its end value")));
     }
 
     @SuppressWarnings("Convert2Lambda")
@@ -162,7 +161,7 @@ public class ConditionEvaluationListenerJava8Test {
                     }
                 });
 
-        assertThat(lastMatchMessage.get(), allOf(startsWith("Runnable condition with alias my alias defined in"), containsString(testName.getMethodName()), endsWith("reached its end value")));
+        assertThat(lastMatchMessage.get(), allOf(startsWith("Assertion condition with alias my alias defined in"), containsString(testName.getMethodName()), endsWith("reached its end value")));
     }
 
     @SuppressWarnings("Convert2Lambda")
@@ -187,7 +186,7 @@ public class ConditionEvaluationListenerJava8Test {
             });
             fail("Expected to fail");
         } catch (ConditionTimeoutException e) {
-            assertThat(lastMatchMessage.get(), allOf(startsWith("Runnable condition defined in"), containsString(testName.getMethodName()), containsString("expected:")));
+            assertThat(lastMatchMessage.get(), allOf(startsWith("Assertion condition defined in"), containsString(testName.getMethodName()), containsString("expected:")));
         }
     }
 
@@ -214,7 +213,7 @@ public class ConditionEvaluationListenerJava8Test {
                     });
             fail("Expected to fail");
         } catch (ConditionTimeoutException e) {
-            assertThat(lastMatchMessage.get(), allOf(startsWith("Runnable condition with alias my alias defined in"), containsString(testName.getMethodName()), containsString("expected:")));
+            assertThat(lastMatchMessage.get(), allOf(startsWith("Assertion condition with alias my alias defined in"), containsString(testName.getMethodName()), containsString("expected:")));
         }
     }
 

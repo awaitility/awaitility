@@ -83,7 +83,7 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000)
     public void awaitAssertJAssertionDisplaysOriginalErrorMessageAndTimeoutWhenConditionTimeoutExceptionOccurs() {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage(startsWith("Condition defined as a lambda expression in " + AwaitilityJava8Test.class.getName()));
+        exception.expectMessage(startsWith("Assertion condition defined as a lambda expression in " + AwaitilityJava8Test.class.getName()));
         exception.expectMessage(endsWith("expected:<[1]> but was:<[0]> within 120 milliseconds."));
 
         new Asynch(fakeRepository).perform();
@@ -100,7 +100,7 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000)
     public void awaitJUnitAssertionDisplaysOriginalErrorMessageAndTimeoutWhenConditionTimeoutExceptionOccurs() {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage(startsWith("Condition defined as a lambda expression in " + AwaitilityJava8Test.class.getName()));
+        exception.expectMessage(startsWith("Assertion condition defined as a lambda expression in " + AwaitilityJava8Test.class.getName()));
         exception.expectMessage(endsWith("expected:<1> but was:<0> within 120 milliseconds."));
 
         with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).untilAsserted(

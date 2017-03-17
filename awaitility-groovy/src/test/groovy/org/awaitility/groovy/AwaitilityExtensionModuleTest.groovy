@@ -108,6 +108,6 @@ class AwaitilityExtensionModuleTest {
     exception.expect AssertionError
 
     def asynch = new Asynch().perform()
-    await("groovy").atMost(2000, MILLISECONDS).until { assertEquals(1, asynch.getValue()) }
+    await("groovy").atMost(2000, MILLISECONDS).until { assertEquals(2, asynch.getValue()) }
   }
 }

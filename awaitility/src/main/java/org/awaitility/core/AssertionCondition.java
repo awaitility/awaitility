@@ -70,12 +70,15 @@ public class AssertionCondition implements Condition<Void> {
         };
     }
 
-
     private String getMatchMessage(Runnable supplier, String conditionAlias) {
         return generateDescriptionPrefix(supplier, conditionAlias) + " reached its end value";
     }
 
     private String getMismatchMessage(Runnable supplier, String exceptionMessage, String conditionAlias) {
+        if (exceptionMessage != null && exceptionMessage.endsWith(".")) {
+            // Remove the "." of the Hamcrest match description since Awaitility adds more
+            exceptionMessage = exceptionMessage.substring(0, exceptionMessage.length() - 1);
+        }
         return generateDescriptionPrefix(supplier, conditionAlias) + " " + exceptionMessage;
     }
 
@@ -85,13 +88,13 @@ public class AssertionCondition implements Condition<Void> {
         if (isLambdaClass(supplier.getClass())) {
             final String prefix;
             if (hasAlias) {
-                prefix = "Condition with alias " + conditionAlias + " defined as a ";
+                prefix = "Assertion condition with alias " + conditionAlias + " defined as a ";
             } else {
-                prefix = "Condition defined as a ";
+                prefix = "Assertion condition defined as a ";
             }
             return prefix + generateLambdaErrorMessagePrefix(supplier.getClass(), false) + methodDescription;
         }
-        return "Runnable condition" + (hasAlias ? " with alias " + conditionAlias : "") + methodDescription;
+        return "Assertion condition" + (hasAlias ? " with alias " + conditionAlias : "") + methodDescription;
     }
 
     private String generateMethodDescription(Runnable supplier) {
