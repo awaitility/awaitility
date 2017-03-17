@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <groupId>org.sonatype.oss</groupId>
     <artifactId>oss-parent</artifactId>
@@ -25,14 +24,14 @@
   <groupId>org.awaitility</groupId>
   <artifactId>awaitility-parent</artifactId>
   <packaging>pom</packaging>
-  <version>2.0.1-SNAPSHOT</version>
+  <version>3.0.0-rc1</version>
   <url>http://github.com/awaitility/awaitility</url>
   <name>Awaitility Parent POM</name>
   <description>A Java DSL for synchronizing asynchronous operations</description>
   <inceptionYear>2010</inceptionYear>
   <issueManagement>
     <system>GitHub Issue Tracking</system>
-    <url/>
+    <url />
   </issueManagement>
   <licenses>
     <license>
@@ -57,7 +56,7 @@
     <url>http://github.com/awaitility/awaitility/tree/${scm.branch}</url>
     <connection>scm:git:git://github.com/awaitility/awaitility.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/awaitility/awaitility.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>awaitility-3.0.0-rc1</tag>
   </scm>
   <mailingLists>
     <mailingList>
