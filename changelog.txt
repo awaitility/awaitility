@@ -12,7 +12,7 @@ Changelog 3.0.0-rc1 (2017-03-17)
 * Waiting for the condition awaiter thread to shutdown after "shutdownNow" in order to avoid having a thread left running after a test (issue 69)
 * Catching throwable instead of exception in poll-scheduling thread
 * Added root cause to ConditionTimeoutException when applicable so that one can more easily distinguish find where an error occurred (issue 67)
-* Moved proxy creation to a new project called "awaitility-proxy". This means that if you need to use proxies you need to depend on this project:
+* Non-backward compatible change: Moved proxy creation to a new project called "awaitility-proxy". This means that if you need to use proxies you need to depend on this project:
     <dependency>
     	<groupId>org.awaitility</groupId>
     	<artifactId>awaitility-proxy</artifactId>
@@ -25,6 +25,14 @@ Changelog 3.0.0-rc1 (2017-03-17)
 * Upgraded Groovy support module to use Groovy 2.4.9 (previous version was 2.4.8)
 * Removed the deprecated classes org.awaitility.groovy.AwaitilitySupport and org.awaitility.groovy.AwaitilityTrait from the Groovy module
 * Fixed an issue where a condition didn't fail until the condition timeout even though an exception was thrown in the condition (issue 78)
+* Non-backward compatible change: Renamed the "until(Runnable)" method in org.awaitility.core.ConditionFactory to "untilAsserted(Runnable)".
+  The reason for this is twofold:
+    1. Runnable and Callable are ambiguous in other languages such as Kotlin and Groovy which causes problems when integration with these languages.
+    2. It's not clear (enough) when to use the Callable variant vs the Runnable variant when using plain Java
+  This means that if you previously did:
+    await().until(() -> assertThat(something()).isEqualTo("Something"));
+  you now need to do:
+    await().untilAsserted(() -> assertThat(something()).isEqualTo("Something"));
 
 Changelog 2.0.0 (2016-06-17)
 ----------------------------
