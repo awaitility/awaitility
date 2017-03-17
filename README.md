@@ -25,7 +25,7 @@ public void updatesCustomerStatus() throws Exception {
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility-proxy</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.0-rc1</version>
         </dependency>
         ``` 
        
@@ -53,8 +53,8 @@ public void updatesCustomerStatus() throws Exception {
     ```xml    
     <dependency>
         <groupId>org.awaitility</groupId>
-        <artifactId>awaitility-proxy</artifactId>
-        <version>3.0.0</version>
+        <artifactId>awaitility</artifactId>
+        <version>3.0.0-rc1</version>
     </dependency>
     ``` 
     
