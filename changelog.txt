@@ -22,6 +22,7 @@ Changelog next version
     await().untilCall( to(someObject).someMethod(), is(4) );
   The "to" function has been moved to "org.awaitility.proxy.AwaitilityClassProxy".
 * Upgraded Scale support module to use Scala 2.12.1 (previous version was 2.11.8)
+* Upgraded Groovy support module to use Groovy 2.4.9 (previous version was 2.4.8)
 
 Changelog 2.0.0 (2016-06-17)
 ----------------------------
