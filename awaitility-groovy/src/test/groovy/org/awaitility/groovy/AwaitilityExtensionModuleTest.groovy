@@ -102,4 +102,12 @@ class AwaitilityExtensionModuleTest {
 
     await("groovy").atMost(2000, MILLISECONDS).untilAsserted { assertEquals(1, asynch.getValue()) }
   }
+
+  @Test
+  def void untilWithAssertionThrowsException() {
+    exception.expect AssertionError
+
+    def asynch = new Asynch().perform()
+    await("groovy").atMost(2000, MILLISECONDS).until { assertEquals(1, asynch.getValue()) }
+  }
 }

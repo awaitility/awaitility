@@ -351,6 +351,4 @@ public class AwaitilityTest {
             }
         };
     }
-
-
 }

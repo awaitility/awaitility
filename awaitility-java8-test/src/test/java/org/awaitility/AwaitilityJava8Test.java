@@ -28,6 +28,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -175,6 +177,31 @@ public class AwaitilityJava8Test {
         } catch (ConditionTimeoutException e) {
             assertThat(e.getCause().getClass().getName()).isEqualTo(AssertionError.class.getName());
         }
+    }
+
+    // This was previously a bug (https://github.com/awaitility/awaitility/issues/78)
+    @Test(timeout = 2000L)
+    public void throwsExceptionImmediatelyWhenCallableConditionThrowsAssertionError() throws Exception {
+        // Given
+        long timeStart = System.currentTimeMillis();
+        new Asynch(fakeRepository).perform();
+
+        // When
+        final AtomicInteger counter = new AtomicInteger(0);
+        try {
+            await().atMost(1500, MILLISECONDS).until(() -> {
+                counter.incrementAndGet();
+                assertTrue(counter.get() >= 2);
+                return true;
+            });
+            fail("Expecting error");
+        } catch (AssertionError ignored) {
+            // expected
+        }
+
+        // Then
+        long timeEnd = System.currentTimeMillis();
+        assertThat(timeEnd - timeStart).isLessThan(1500L);
     }
 
     private void stringEquals(String first, String second) {

@@ -27,8 +27,8 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     private final ExecutorService executor;
     private final CountDownLatch latch;
     private final ConditionEvaluator conditionEvaluator;
-    private Throwable throwable = null;
-    private Throwable cause = null;
+    private volatile Throwable throwable = null;
+    private volatile Throwable cause = null;
     private final ConditionSettings conditionSettings;
 
     /**
@@ -88,7 +88,6 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 Duration evaluationDuration =
                         new Duration(System.currentTimeMillis() - pollingStarted, TimeUnit.MILLISECONDS)
                                 .minus(pollDelay);
-
                 if (throwable != null) {
                     throw throwable;
                 } else if (!finishedBeforeTimeout) {
@@ -173,7 +172,12 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                         Thread.sleep(pollInterval.getValueInMS());
                     }
                 } catch (Throwable e) {
-                    throwable = e;
+                    if (e instanceof ExecutionException) {
+                        throwable = e.getCause();
+                    } else {
+                        throwable = e;
+                    }
+                    latch.countDown();
                 }
             }
         }, "awaitility-poll-scheduling");

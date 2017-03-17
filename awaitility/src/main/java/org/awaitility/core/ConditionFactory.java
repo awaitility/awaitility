@@ -657,12 +657,12 @@ public class ConditionFactory {
      * <p>&nbsp;</p>
      * If your condition calls a method that throws a checked exception then please wrap it in {@link org.awaitility.Awaitility#matches(ThrowingRunnable)}.
      *
-     * @param supplier the supplier that is responsible for executing the assertion and throwing AssertionError on failure.
+     * @param assertion the supplier that is responsible for executing the assertion and throwing AssertionError on failure.
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      * @since 1.6.0
      */
-    public void untilAsserted(final Runnable supplier) {
-        until(new AssertionCondition(supplier, generateConditionSettings()));
+    public void untilAsserted(final Runnable assertion) {
+        until(new AssertionCondition(assertion, generateConditionSettings()));
     }
 
     /**

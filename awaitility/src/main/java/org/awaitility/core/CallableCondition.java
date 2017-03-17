@@ -36,7 +36,7 @@ class CallableCondition implements Condition<Void> {
      * @param matcher  a {@link java.util.concurrent.Callable} object.
      * @param settings a {@link org.awaitility.core.ConditionSettings} object.
      */
-    public CallableCondition(final Callable<Boolean> matcher, ConditionSettings settings) {
+    CallableCondition(final Callable<Boolean> matcher, ConditionSettings settings) {
         conditionEvaluationHandler = new ConditionEvaluationHandler<Object>(null, settings);
         ConditionEvaluationWrapper conditionEvaluationWrapper = new ConditionEvaluationWrapper(matcher, settings, conditionEvaluationHandler);
         conditionAwaiter = new ConditionAwaiter(conditionEvaluationWrapper, settings) {
