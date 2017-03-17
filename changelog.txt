@@ -1,3 +1,7 @@
+Changelog next version
+----------------------
+* Updated ByteBuddy to version 1.6.11
+
 Changelog 3.0.0-rc1 (2017-03-17)
 --------------------------------
 * Fixed issue in org.awaitility.Duration which made it depend on Java 7 features (issue 50)
