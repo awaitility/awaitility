@@ -81,15 +81,15 @@ class AwaitilitySupportTest extends AwaitilitySupport {
     val c1 = new Counter()
     val c2 = new Counter()
 
-    await until { assertThat(c1.count() + c2.count(),  is(6)) }
-    await until { assertThat(isDone(), is(true)) }
-    await until { assertThat(isDone, CoreMatchers is true)  }
+    await untilAsserted { assertThat(c1.count() + c2.count(),  is(6)) }
+    await untilAsserted { assertThat(isDone(), is(true)) }
+    await untilAsserted { assertThat(isDone, CoreMatchers is true)  }
   }
 
   @Test
   def awaitWithAliasAndRunnable() = {
     try {
-      await("scala") atMost(500, MILLISECONDS) until { assertThat(2 == 1, is(true))}
+      await("scala") atMost(500, MILLISECONDS) untilAsserted { assertThat(2 == 1, is(true))}
       fail("Expected timeout exception")
     } catch {
         case e : ConditionTimeoutException =>

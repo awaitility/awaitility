@@ -57,7 +57,7 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000)
     public void awaitAssertJAssertionAsLambda() {
         new Asynch(fakeRepository).perform();
-        await().until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+        await().untilAsserted(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
     @Test(timeout = 2000)
@@ -70,7 +70,7 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000)
     public void awaitAssertJAssertionAsAnonymousClass() {
         new Asynch(fakeRepository).perform();
-        await().until(new Runnable() {
+        await().untilAsserted(new Runnable() {
             @Override
             public void run() {
                 Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1);
@@ -85,14 +85,14 @@ public class AwaitilityJava8Test {
         exception.expectMessage(endsWith("expected:<[1]> but was:<[0]> within 120 milliseconds."));
 
         new Asynch(fakeRepository).perform();
-        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).untilAsserted(
                 () -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
     @Test(timeout = 2000)
     public void awaitJUnitAssertionAsLambda() {
         new Asynch(fakeRepository).perform();
-        await().until(() -> assertEquals(1, fakeRepository.getValue()));
+        await().untilAsserted(() -> assertEquals(1, fakeRepository.getValue()));
     }
 
     @Test(timeout = 2000)
@@ -101,7 +101,7 @@ public class AwaitilityJava8Test {
         exception.expectMessage(startsWith("Condition defined as a lambda expression in " + AwaitilityJava8Test.class.getName()));
         exception.expectMessage(endsWith("expected:<1> but was:<0> within 120 milliseconds."));
 
-        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).untilAsserted(
                 () -> assertEquals(1, fakeRepository.getValue()));
     }
 
@@ -160,14 +160,14 @@ public class AwaitilityJava8Test {
 
     @Test public void
     canMakeUseOfThrowingMethodInAwaitilityToWrapRunnablesThatThrowsExceptions() {
-        await().until(matches(() -> stringEquals("test", "test")));
+        await().untilAsserted(matches(() -> stringEquals("test", "test")));
     }
 
     @SuppressWarnings("ConstantConditions")
     @Test(timeout = 2000L)
     public void includesCauseInStackTrace()  {
         try {
-            await().atMost(200, MILLISECONDS).until(() -> {
+            await().atMost(200, MILLISECONDS).untilAsserted(() -> {
                 assertNotNull("34");
                 assertNotNull(null);
             });

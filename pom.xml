@@ -251,6 +251,7 @@
     <module>awaitility-proxy</module>
     <module>awaitility-scala</module>
     <module>awaitility-groovy</module>
+    <module>awaitility-kotlin-test</module>
     <module>awaitility-osgi-test</module>
     <module>awaitility-test-support</module>
   </modules>

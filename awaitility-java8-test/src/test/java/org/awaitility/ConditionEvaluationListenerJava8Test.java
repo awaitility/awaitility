@@ -53,7 +53,7 @@ public class ConditionEvaluationListenerJava8Test {
                     }
                     lastMatchMessage.set(condition.getDescription());
                 })
-                .until(() -> assertEquals(5, (int) countDown.get()));
+                .untilAsserted(() -> assertEquals(5, (int) countDown.get()));
 
         String expectedMatchMessage = String.format("%s reached its end value", CountDown.class.getName());
         assertThat(lastMatchMessage.get(), allOf(startsWith("Condition defined as a lambda expression"), endsWith(expectedMatchMessage)));
@@ -72,7 +72,7 @@ public class ConditionEvaluationListenerJava8Test {
                     }
                     lastMatchMessage.set(condition.getDescription());
                 }).await("my alias")
-                .until(() -> assertEquals(5, (int) countDown.get()));
+                .untilAsserted(() -> assertEquals(5, (int) countDown.get()));
 
         String expectedMatchMessage = String.format("%s reached its end value", CountDown.class.getName());
         assertThat(lastMatchMessage.get(), allOf(startsWith("Condition with alias my alias defined as a lambda expression"), endsWith(expectedMatchMessage)));
@@ -91,7 +91,7 @@ public class ConditionEvaluationListenerJava8Test {
                             throw new RuntimeException(e);
                         }
                         lastMatchMessage.set(condition.getDescription());
-                    }).await().atMost(150, MILLISECONDS).until(() -> assertEquals(-1, (int) countDown.get()));
+                    }).await().atMost(150, MILLISECONDS).untilAsserted(() -> assertEquals(-1, (int) countDown.get()));
             fail("Test should fail");
         } catch (ConditionTimeoutException e) {
             assertThat(lastMatchMessage.get(), allOf(startsWith("Condition defined as a lambda expression in"), containsString("expected:<-1> but was:<")));
@@ -110,7 +110,7 @@ public class ConditionEvaluationListenerJava8Test {
                     throw new RuntimeException(e);
                 }
                 lastMatchMessage.set(condition.getDescription());
-            }).await("my alias").atMost(150, MILLISECONDS).until(() -> assertEquals(-1, (int) countDown.get()));
+            }).await("my alias").atMost(150, MILLISECONDS).untilAsserted(() -> assertEquals(-1, (int) countDown.get()));
             fail("Test should fail");
         } catch (ConditionTimeoutException e) {
             assertThat(lastMatchMessage.get(), startsWith("Condition with alias my alias defined as a lambda expression"));
@@ -131,7 +131,7 @@ public class ConditionEvaluationListenerJava8Test {
                     }
                     lastMatchMessage.set(condition.getDescription());
                 })
-                .until(new Runnable() {
+                .untilAsserted(new Runnable() {
                     @Override
                     public void run() {
                         assertEquals(5, (int) countDown.get());
@@ -155,7 +155,7 @@ public class ConditionEvaluationListenerJava8Test {
                     }
                     lastMatchMessage.set(condition.getDescription());
                 }).await("my alias")
-                .until(new Runnable() {
+                .untilAsserted(new Runnable() {
                     @Override
                     public void run() {
                         assertEquals(5, (int) countDown.get());
@@ -179,7 +179,7 @@ public class ConditionEvaluationListenerJava8Test {
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
-                    }).await().atMost(150, MILLISECONDS).until(new Runnable() {
+                    }).await().atMost(150, MILLISECONDS).untilAsserted(new Runnable() {
                 @Override
                 public void run() {
                     assertEquals(-1, (int) countDown.get());
@@ -206,7 +206,7 @@ public class ConditionEvaluationListenerJava8Test {
                             throw new RuntimeException(e);
                         }
                     }).await("my alias").atMost(150, MILLISECONDS)
-                    .until(new Runnable() {
+                    .untilAsserted(new Runnable() {
                         @Override
                         public void run() {
                             assertEquals(5, (int) countDown.get());

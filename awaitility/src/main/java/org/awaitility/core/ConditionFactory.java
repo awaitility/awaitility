@@ -631,11 +631,11 @@ public class ConditionFactory {
      * Await until a {@link java.lang.Runnable} supplier execution passes (ends without throwing an exception). E.g. with Java 8:
      * <p>&nbsp;</p>
      * <pre>
-     * await().until(() -&gt; Assertions.assertThat(personRepository.size()).isEqualTo(6));
+     * await().untilAsserted(() -&gt; Assertions.assertThat(personRepository.size()).isEqualTo(6));
      * </pre>
      * or
      * <pre>
-     * await().until(() -&gt; assertEquals(6, personRepository.size()));
+     * await().untilAsserted(() -&gt; assertEquals(6, personRepository.size()));
      * </pre>
      * <p>&nbsp;</p>
      * This method is intended to benefit from lambda expressions introduced in Java 8. It allows to use standard AssertJ/FEST Assert assertions
@@ -648,7 +648,7 @@ public class ConditionFactory {
      * the readability of the test case, e.g.
      * <p>&nbsp;</p>
      * <pre>
-     * await().untilPass(new Runnable() {
+     * await().untilAsserted(new Runnable() {
      *     public void run() {
      *         Assertions.assertThat(personRepository.size()).isEqualTo(6);
      *     }
@@ -661,7 +661,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      * @since 1.6.0
      */
-    public void until(final Runnable supplier) {
+    public void untilAsserted(final Runnable supplier) {
         until(new AssertionCondition(supplier, generateConditionSettings()));
     }
 
