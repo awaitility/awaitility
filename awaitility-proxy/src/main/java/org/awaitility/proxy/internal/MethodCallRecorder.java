@@ -19,7 +19,6 @@ import net.bytebuddy.implementation.bind.annotation.AllArguments;
 import net.bytebuddy.implementation.bind.annotation.Origin;
 import net.bytebuddy.implementation.bind.annotation.RuntimeType;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 /**
@@ -31,21 +30,6 @@ public class MethodCallRecorder {
     private static final ThreadLocal<Object> lastTarget = new ThreadLocal<Object>();
     private static final ThreadLocal<Method> lastMethod = new ThreadLocal<Method>();
     private static final ThreadLocal<Object[]> lastArgs = new ThreadLocal<Object[]>();
-
-    private static InvocationHandler invocationHandler = new InvocationHandler() {
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            if (shouldBeRecorded(method)) {
-                lastMethod.set(method);
-                lastArgs.set(args);
-            }
-            return TypeUtils.getDefaultValue(method.getReturnType());
-        }
-
-        private boolean shouldBeRecorded(Method method) {
-            return !(method.getDeclaringClass().equals(Object.class) && method.getName().equals("finalize"));
-        }
-
-    };
 
     /**
      * Intercepts all methods executions in a proxied class feeding MethodCallRecorder.
@@ -76,7 +60,7 @@ public class MethodCallRecorder {
      *
      * @return a {@link java.lang.Object} object.
      */
-    public static Object getLastTarget() {
+    static Object getLastTarget() {
         Object target = lastTarget.get();
         if (target == null) {
             throw new IllegalStateException(NO_METHOD_CALL_RECORDED_MESSAGE);
@@ -89,7 +73,7 @@ public class MethodCallRecorder {
      *
      * @return a {@link java.lang.reflect.Method} object.
      */
-    public static Method getLastMethod() {
+    static Method getLastMethod() {
         Method method = lastMethod.get();
         if (method == null) {
             throw new IllegalStateException(NO_METHOD_CALL_RECORDED_MESSAGE);
@@ -102,7 +86,7 @@ public class MethodCallRecorder {
      *
      * @return an array of {@link java.lang.Object} objects.
      */
-    public static Object[] getLastArgs() {
+    static Object[] getLastArgs() {
         Object target = lastTarget.get();
         if (target == null) {
             throw new IllegalStateException(NO_METHOD_CALL_RECORDED_MESSAGE);
@@ -113,7 +97,7 @@ public class MethodCallRecorder {
     /**
      * <p>reset.</p>
      */
-    public static void reset() {
+    static void reset() {
         lastTarget.remove();
         lastMethod.remove();
         lastArgs.remove();

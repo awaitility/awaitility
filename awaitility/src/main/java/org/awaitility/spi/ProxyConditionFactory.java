@@ -20,8 +20,26 @@ import org.awaitility.core.Condition;
 import org.awaitility.core.ConditionSettings;
 import org.hamcrest.Matcher;
 
+/**
+ * An SPI that can be used to implement proxy conditions. Typical use case:
+ * <pre>
+ * await().untilCall( to(someObject).someMethod(), is(4) );
+ * </pre>
+ *
+ * where "to" is a static method defined by the provider that generates the proxy instance.
+ *
+ * @param <T> The type of the condition
+ */
 public interface ProxyConditionFactory<T> {
 
-    Condition<T> createProxyCondition(T ignore, final Matcher<? super T> matcher, ConditionSettings settings);
+    /**
+     * Create a proxy condition
+     *
+     * @param proxyMethodReturnValue The return value of the proxy method invocation
+     * @param matcher The hamcrest matcher
+     * @param settings Condition settings
+     * @return A condition
+     */
+    Condition<T> createProxyCondition(T proxyMethodReturnValue, final Matcher<? super T> matcher, ConditionSettings settings);
 
 }

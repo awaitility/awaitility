@@ -557,12 +557,12 @@ public class ConditionFactory {
      * </pre>
      *
      * @param <T>     the generic type
-     * @param ignore  the return value of the method call
+     * @param proxyMethodReturnValue  the return value of the method call
      * @param matcher The condition that must be met when
      * @return a T object.
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
-    public <T> T untilCall(T ignore, final Matcher<? super T> matcher) {
+    public <T> T untilCall(T proxyMethodReturnValue, final Matcher<? super T> matcher) {
         if (!existInCP("java.util.ServiceLoader")) {
             throw new UnsupportedOperationException("java.util.ServiceLoader not found in classpath so cannot create condition");
         }
@@ -583,7 +583,7 @@ public class ConditionFactory {
         if (factory == null) {
             throw new IllegalArgumentException("Internal error: Proxy condition plugin initialization returned null, please report an issue.");
         }
-        return until(factory.createProxyCondition(ignore, matcher, generateConditionSettings()));
+        return until(factory.createProxyCondition(proxyMethodReturnValue, matcher, generateConditionSettings()));
     }
 
     /**

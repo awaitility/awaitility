@@ -24,7 +24,7 @@ import org.hamcrest.Matcher;
 public class ByteBuddyProxyConditionFactory<T> implements ProxyConditionFactory<T> {
 
     @Override
-    public Condition<T> createProxyCondition(T ignore, Matcher<? super T> matcher, ConditionSettings settings) {
+    public Condition<T> createProxyCondition(T __, Matcher<? super T> matcher, ConditionSettings settings) {
         final MethodCaller<T> supplier = new MethodCaller<T>(MethodCallRecorder.getLastTarget(), MethodCallRecorder
                 .getLastMethod(), MethodCallRecorder.getLastArgs());
         MethodCallRecorder.reset();
