@@ -17,7 +17,7 @@ Changelog 3.0.0-rc1 (2017-03-17)
 * Waiting for the condition awaiter thread to shutdown after "shutdownNow" in order to avoid having a thread left running after a test (issue 69)
 * Catching throwable instead of exception in poll-scheduling thread
 * Added root cause to ConditionTimeoutException when applicable so that one can more easily distinguish find where an error occurred (issue 67)
-* Non-backward compatible change: Moved proxy creation to a new project called "awaitility-proxy". This means that if you need to use proxies you need to depend on this project:
+* Non-backward compatible change: Moved proxy creation to a new project called "awaitility-proxy". This means that if you need to use proxies depend on this project:
     <dependency>
     	<groupId>org.awaitility</groupId>
     	<artifactId>awaitility-proxy</artifactId>
@@ -26,7 +26,7 @@ Changelog 3.0.0-rc1 (2017-03-17)
   You create a proxy when you do:
     await().untilCall( to(someObject).someMethod(), is(4) );
   The "to" method has been moved to "org.awaitility.proxy.AwaitilityClassProxy".
-* Upgraded Scale support module to use Scala 2.12.1 (previous version was 2.11.8)
+* Upgraded Scala support module to use Scala 2.12.1 (previous version was 2.11.8)
 * Upgraded Groovy support module to use Groovy 2.4.9 (previous version was 2.4.8)
 * Removed the deprecated classes org.awaitility.groovy.AwaitilitySupport and org.awaitility.groovy.AwaitilityTrait from the Groovy module
 * Fixed an issue where a condition didn't fail until the condition timeout even though an exception was thrown in the condition (issue 78)
