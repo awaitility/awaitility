@@ -20,7 +20,7 @@ public void updatesCustomerStatus() throws Exception {
 ## News
 * 2017-03-17: Awaitility `3.0.0-rc1` is released. It includes several bug fixes and some major (non-backward compatible) changes: 
   
-   1. The proxy creation is now done by bytebuddy instead of cglib and it this has been extracted to its own project called `awaitility-proxy`. This means that if you need to use proxies you need to depend on this project in addition to vanilla `awaitility`:
+   1. The proxy creation is now done by bytebuddy instead of cglib and this has been extracted to its own project called `awaitility-proxy`. This means that if you need to use proxies depend on this project in addition to vanilla `awaitility`:
         ```xml    
         <dependency>
             <groupId>org.awaitility</groupId>
