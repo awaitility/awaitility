@@ -28,14 +28,14 @@ class ConditionEvaluationHandler<T> {
     private final ConditionSettings settings;
     private final StopWatch watch;
 
-    public ConditionEvaluationHandler(Matcher<? super T> matcher, ConditionSettings settings) {
+    ConditionEvaluationHandler(Matcher<? super T> matcher, ConditionSettings settings) {
         this.matcher = matcher;
         this.settings = settings;
         watch = new StopWatch();
     }
 
     @SuppressWarnings("unchecked")
-    public void handleConditionResultMismatch(String mismatchMessage, T currentConditionValue, Duration pollInterval) {
+    void handleConditionResultMismatch(String mismatchMessage, T currentConditionValue, Duration pollInterval) {
         ConditionEvaluationListener<T> listener = settings.getConditionEvaluationListener();
         if (listener == null) {
             return;
@@ -52,7 +52,7 @@ class ConditionEvaluationHandler<T> {
     }
 
     @SuppressWarnings("unchecked")
-    public void handleConditionResultMatch(String matchMessage, T currentConditionValue, Duration pollInterval) {
+    void handleConditionResultMatch(String matchMessage, T currentConditionValue, Duration pollInterval) {
         ConditionEvaluationListener<T> listener = settings.getConditionEvaluationListener();
         if (listener == null) {
             return;
@@ -87,7 +87,7 @@ class ConditionEvaluationHandler<T> {
             this.startTime = System.currentTimeMillis();
         }
 
-        public long getElapsedTimeInMS() {
+        long getElapsedTimeInMS() {
             return System.currentTimeMillis() - startTime;
         }
     }

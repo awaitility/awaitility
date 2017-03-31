@@ -19,7 +19,10 @@ import org.awaitility.Duration;
 
 import java.beans.Introspector;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -49,7 +52,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         }
         this.conditionSettings = conditionSettings;
         this.conditionEvaluator = conditionEvaluator;
-        this.executor = initExecutorService();
+        this.executor = conditionSettings.getPollExecutorService();
         this.uncaughtThrowable = new AtomicReference<Throwable>();
     }
 
@@ -167,20 +170,6 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         uncaughtThrowable.set(throwable);
         // We shutdown the executor "now" in order to fail the test immediately
         executor.shutdownNow();
-    }
-
-    private ExecutorService initExecutorService() {
-        return Executors.newSingleThreadExecutor(new ThreadFactory() {
-            public Thread newThread(Runnable r) {
-                Thread thread;
-                if (conditionSettings.hasAlias()) {
-                    thread = new Thread(Thread.currentThread().getThreadGroup(), r, "awaitility[" + conditionSettings.getAlias() + ']');
-                } else {
-                    thread = new Thread(Thread.currentThread().getThreadGroup(), r, "awaitility-thread");
-                }
-                return thread;
-            }
-        });
     }
 
     private class ConditionPoller implements Callable<ConditionEvaluationResult> {

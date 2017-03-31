@@ -19,6 +19,8 @@ import org.awaitility.Duration;
 import org.awaitility.constraint.WaitConstraint;
 import org.awaitility.pollinterval.PollInterval;
 
+import java.util.concurrent.ExecutorService;
+
 public class ConditionSettings {
     private final String alias;
     private final WaitConstraint waitConstraint;
@@ -27,6 +29,7 @@ public class ConditionSettings {
     private final boolean catchUncaughtExceptions;
     private final ExceptionIgnorer ignoreExceptions;
     private final ConditionEvaluationListener conditionEvaluationListener;
+    private final ExecutorService pollExecutorService;
 
     /**
      * <p>Constructor for ConditionSettings.</p>
@@ -37,17 +40,20 @@ public class ConditionSettings {
      * @param pollInterval                a {@link org.awaitility.Duration} object.
      * @param pollDelay                   a {@link org.awaitility.Duration} object.
      * @param conditionEvaluationListener a {@link ConditionEvaluationListener} object.
-     * @param ignoreExceptions            a boolean.
+     * @param ignoreExceptions            a {@link ExceptionIgnorer} object.
+     * @param pollExecutorService         The executor service that will be used to execute the condition
+     *
      */
     ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
                       PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
-                      ExceptionIgnorer ignoreExceptions) {
+                      ExceptionIgnorer ignoreExceptions, ExecutorService pollExecutorService) {
         if (waitConstraint == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
         if (pollInterval == null) {
             throw new IllegalArgumentException("You must specify a poll interval (was null).");
         }
+        this.pollExecutorService = pollExecutorService;
         this.alias = alias;
         this.waitConstraint = waitConstraint;
         this.pollInterval = pollInterval;
@@ -134,5 +140,12 @@ public class ConditionSettings {
      */
     public boolean shouldExceptionBeIgnored(Exception e) {
         return ignoreExceptions.shouldIgnoreException(e);
+    }
+
+    /**
+     * @return The executor service that is used during polling
+     */
+    public ExecutorService getPollExecutorService() {
+        return pollExecutorService;
     }
 }
