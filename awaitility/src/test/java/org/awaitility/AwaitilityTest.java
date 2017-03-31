@@ -110,7 +110,7 @@ public class AwaitilityTest {
         assertEquals(1, fakeRepository.getValue());
     }
 
-    @Test(expected = ConditionTimeoutException.class)
+    @Test(timeout = 2000L, expected = ConditionTimeoutException.class)
     public void awaitOperationSupportsDefaultTimeout() throws Exception {
         Awaitility.setDefaultTimeout(120, TimeUnit.MILLISECONDS);
         await().until(value(), greaterThan(0));

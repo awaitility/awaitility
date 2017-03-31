@@ -2,6 +2,7 @@ Changelog next version
 ----------------------
 * Updated ByteBuddy to version 1.6.11
 * Downgraded Scala version to 2.11.8 again since 2.12.x requires Java 8
+* Removed the need for the Awaitility poll scheduling thread which means that Awaitility only used one thread.
 
 Changelog 3.0.0-rc1 (2017-03-17)
 --------------------------------

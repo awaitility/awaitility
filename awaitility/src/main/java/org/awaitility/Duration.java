@@ -17,8 +17,7 @@ package org.awaitility;
 
 import java.util.concurrent.TimeUnit;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 
 /**
  * <p>Duration class.</p>
@@ -29,7 +28,7 @@ public class Duration implements Comparable<Duration> {
     /**
      * Constant <code>FOREVER</code>
      */
-    public static final Duration FOREVER = new Duration(); // Isn't it better to represent forever as Long.MAX_VALUE TimeUnit.MILLISEONDS?
+    public static final Duration FOREVER = new Duration(Long.MAX_VALUE, DAYS);
 
     /**
      * Constant <code>ZERO</code>
@@ -139,7 +138,7 @@ public class Duration implements Comparable<Duration> {
      * @return a boolean.
      */
     public boolean isForever() {
-        return unit == null && value == NONE;
+        return this == FOREVER;
     }
 
     /**
