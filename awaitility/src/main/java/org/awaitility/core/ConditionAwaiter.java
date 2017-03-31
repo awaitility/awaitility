@@ -118,8 +118,6 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                         message = String.format("%s within %s %s.", getTimeoutMessage(), maxTimeout, maxWaitTimeLowerCase);
                     }
 
-                    final ConditionTimeoutException e;
-
                     Throwable cause = lastResult != null && lastResult.hasTrace() ? lastResult.getTrace() : null;
                     // Not all systems support deadlock detection so ignore if ThreadMXBean & ManagementFactory is not in classpath
                     if (existInCP("java.lang.management.ThreadMXBean") && existInCP("java.lang.management.ManagementFactory")) {
@@ -133,12 +131,8 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                             // findDeadLockedThreads() not supported on this VM,
                             // don't init trace and move on.
                         }
-                        e = new ConditionTimeoutException(message, cause);
-                    } else {
-                        e = new ConditionTimeoutException(message, cause);
                     }
-
-                    throw e;
+                    throw new ConditionTimeoutException(message, cause);
                 } else if (evaluationDuration.compareTo(minWaitTime) < 0) {
                     String message = String.format("Condition was evaluated in %s %s which is earlier than expected " +
                                     "minimum timeout %s %s", evaluationDuration.getValue(), evaluationDuration.getTimeUnit(),
