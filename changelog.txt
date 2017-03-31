@@ -3,7 +3,7 @@ Changelog 3.0.0-rc2 (2017-03-31)
 * Updated ByteBuddy to version 1.6.11
 * Downgraded Scala version to 2.11.8 again since 2.12.x requires Java 8
 * Removed the need for the Awaitility poll scheduling thread which means that Awaitility only uses one thread by default
-* Removed all public constructors in org.awaitility.core.ConditionFactory since they shouldn't be used
+* Non-backward compatible change: Removed most public constructors in org.awaitility.core.ConditionFactory since they shouldn't be used
 * Moved inner class org.awaitility.pollinterval.IterativePollInterval.Function to org.awaitility.core.Function and changed it to use generics for input and output
 * Added ability to specify the executor service or thread to be used to perform condition evaluations (polling) by using ConditionFactory#pollThread or ConditionFactory#pollExecutorService, for example:
     given().pollThread(Thread::new).await().atMost(1000, MILLISECONDS).until(() -> fakeRepository.getValue() == 1);
