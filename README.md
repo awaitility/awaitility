@@ -18,6 +18,7 @@ public void updatesCustomerStatus() throws Exception {
 ```
 
 ## News
+* 2017-03-31: Awaitility `3.0.0-rc2` is released. It includes some bug fixes that were found in the last `rc` release and it includes the ability to specify the polling thread executor service and uses one less thread by default.
 * 2017-03-17: Awaitility `3.0.0-rc1` is released. It includes several bug fixes and some major (non-backward compatible) changes: 
   
    1. The proxy creation is now done by bytebuddy instead of cglib and this has been extracted to its own project called `awaitility-proxy`. This means that if you need to use proxies depend on this project in addition to vanilla `awaitility`:
@@ -60,7 +61,6 @@ public void updatesCustomerStatus() throws Exception {
     
   **Please help out and test it and provide feedback** 
 * 2016-06-17: [Awaitility 2.0.0](http://dl.bintray.com/johanhaleby/generic/awaitility-2.0.0.zip) is released with support for [at least](https://github.com/awaitility/awaitility/wiki/Usage#example-11---at-least) expressions as well as upgraded [Groovy](https://github.com/awaitility/awaitility/wiki/Groovy) and [Scala](https://github.com/awaitility/awaitility/wiki/Scala) support. See [release notes](https://github.com/awaitility/awaitility/wiki/ReleaseNotes20) for more details.
-* 2016-06-17: Awaitility has a new website, [http://www.awaitility.org](http://www.awaitility.org). Feel free to update your bookmarks. 
 
 [Older news](https://github.com/awaitility/awaitility/wiki/OldNews)
 
