@@ -24,7 +24,7 @@
     <groupId>org.awaitility</groupId>
     <artifactId>awaitility-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.0.0-rc2</version>
+    <version>3.0.0-SNAPSHOT</version>
     <url>http://github.com/awaitility/awaitility</url>
     <name>Awaitility Parent POM</name>
     <description>A Java DSL for synchronizing asynchronous operations</description>
@@ -56,7 +56,7 @@
         <url>http://github.com/awaitility/awaitility/tree/${scm.branch}</url>
         <connection>scm:git:git://github.com/awaitility/awaitility.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/awaitility/awaitility.git</developerConnection>
-        <tag>awaitility-3.0.0-rc2</tag>
+        <tag>HEAD</tag>
     </scm>
     <mailingLists>
         <mailingList>
