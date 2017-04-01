@@ -18,16 +18,16 @@ package org.awaitility.core;
 
 public class PredicateExceptionIgnorer implements ExceptionIgnorer {
 
-    private final Predicate<Exception> predicate;
+    private final Predicate<? super Throwable> predicate;
 
-    public PredicateExceptionIgnorer(Predicate<Exception> predicate) {
+    public PredicateExceptionIgnorer(Predicate<? super Throwable> predicate) {
         if (predicate == null) {
             throw new IllegalArgumentException("predicate cannot be null");
         }
         this.predicate = predicate;
     }
 
-    public boolean shouldIgnoreException(Exception exception) {
+    public boolean shouldIgnoreException(Throwable exception) {
         return predicate.matches(exception);
     }
 }

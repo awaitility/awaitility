@@ -134,8 +134,8 @@ public class Awaitility {
     /**
      * Ignore caught exceptions by default?
      */
-    private static volatile ExceptionIgnorer defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Exception>() {
-        public boolean matches(Exception e) {
+    private static volatile ExceptionIgnorer defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Throwable>() {
+        public boolean matches(Throwable e) {
             return false;
         }
     });
@@ -174,8 +174,8 @@ public class Awaitility {
      * upon an exception, unless it times out.
      */
     public static void ignoreExceptionsByDefault() {
-        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Exception>() {
-            public boolean matches(Exception e) {
+        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Throwable>() {
+            public boolean matches(Throwable e) {
                 return true;
             }
         });
@@ -186,9 +186,9 @@ public class Awaitility {
      * Exceptions will be treated as evaluating to <code>false</code>. Your test will not fail
      * upon an exception matching the supplied exception type, unless it times out.
      */
-    public static void ignoreExceptionByDefault(final Class<? extends Exception> exceptionType) {
-        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Exception>() {
-            public boolean matches(Exception e) {
+    public static void ignoreExceptionByDefault(final Class<? extends Throwable> exceptionType) {
+        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Throwable>() {
+            public boolean matches(Throwable e) {
                 return e.getClass().equals(exceptionType);
             }
         });
@@ -199,7 +199,7 @@ public class Awaitility {
      * Exceptions will be treated as evaluating to <code>false</code>. Your test will not fail
      * upon an exception matching the supplied predicate, unless it times out.
      */
-    public static void ignoreExceptionsByDefaultMatching(Predicate<Exception> predicate) {
+    public static void ignoreExceptionsByDefaultMatching(Predicate<? super Throwable> predicate) {
         defaultExceptionIgnorer = new PredicateExceptionIgnorer(predicate);
     }
 
@@ -208,7 +208,7 @@ public class Awaitility {
      * Exceptions will be treated as evaluating to <code>false</code>. Your test will not fail
      * upon an exception matching the supplied exception type, unless it times out.
      */
-    public static void ignoreExceptionsByDefaultMatching(Matcher<? super Exception> matcher) {
+    public static void ignoreExceptionsByDefaultMatching(Matcher<? super Throwable> matcher) {
         defaultExceptionIgnorer = new HamcrestExceptionIgnorer(matcher);
     }
 
@@ -275,8 +275,8 @@ public class Awaitility {
         defaultCatchUncaughtExceptions = true;
         defaultConditionEvaluationListener = null;
         defaultPollExecutorService = null;
-        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Exception>() {
-            public boolean matches(Exception e) {
+        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Throwable>() {
+            public boolean matches(Throwable e) {
                 return false;
             }
         });

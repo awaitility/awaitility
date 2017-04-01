@@ -28,8 +28,8 @@ import org.junit.rules.ExpectedException;
 
 import java.util.concurrent.Callable;
 
-import static org.awaitility.Awaitility.await;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 
@@ -48,39 +48,64 @@ public class AwaitilityIgnoreExceptionsTest {
     @Test(timeout = 2000)
     public void exceptionsDuringEvaluationAreIgnoredUponRequest() {
         new Asynch(fakeRepository).perform();
-        await().atMost(1000, MILLISECONDS).and().ignoreExceptions().until(conditionsThatIsThrowingAnExceptionForATime());
+        await().atMost(1000, MILLISECONDS).and().ignoreExceptions().until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
+    }
+
+    @Test(timeout = 2000)
+    public void throwablesDuringEvaluationAreIgnoredUponRequest() {
+        new Asynch(fakeRepository).perform();
+        await().atMost(1000, MILLISECONDS).and().ignoreExceptions().until(conditionsThatIsThrowingAnExceptionForATime(AssertionError.class));
     }
 
     @Test(timeout = 2000)
     public void exceptionsOnlySpecifiedExceptionsAreIgnored() {
         new Asynch(fakeRepository).perform();
-        await().atMost(1000, MILLISECONDS).and().ignoreException(IllegalArgumentException.class).until(conditionsThatIsThrowingAnExceptionForATime());
+        await().atMost(1000, MILLISECONDS).and().ignoreException(IllegalArgumentException.class).until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
+    }
+    
+    @Test(timeout = 2000)
+    public void ignoreExceptionWorksWithThrowable() {
+        new Asynch(fakeRepository).perform();
+        await().atMost(1000, MILLISECONDS).and().ignoreException(AssertionError.class).until(conditionsThatIsThrowingAnExceptionForATime(AssertionError.class));
     }
 
     @Test(timeout = 2000)
     public void exceptionsOnlySpecifiedExceptionsAreIgnoredWhenUsingShortcut() {
         new Asynch(fakeRepository).perform();
-        await().atMost(1000, MILLISECONDS).and().ignoreExceptionsInstanceOf(RuntimeException.class).until(conditionsThatIsThrowingAnExceptionForATime());
+        await().atMost(1000, MILLISECONDS).and().ignoreExceptionsInstanceOf(RuntimeException.class).until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
     }
 
     @Test(timeout = 2000)
     public void exceptionsDuringEvaluationAreIgnoredWhenSetAsDefault() {
         new Asynch(fakeRepository).perform();
         Awaitility.ignoreExceptionsByDefault();
-        await().atMost(1000, MILLISECONDS).until(conditionsThatIsThrowingAnExceptionForATime());
+        await().atMost(1000, MILLISECONDS).until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
+    }
+    
+    @Test(timeout = 2000)
+    public void throwablesDuringEvaluationAreIgnoredWhenSetAsDefault() {
+        new Asynch(fakeRepository).perform();
+        Awaitility.ignoreExceptionsByDefault();
+        await().atMost(1000, MILLISECONDS).until(conditionsThatIsThrowingAnExceptionForATime(AssertionError.class));
     }
 
     @Test(timeout = 2000)
     public void exceptionIgnoringWorksForHamcrestMatchers() {
         new Asynch(fakeRepository).perform();
-        await().atMost(1000, MILLISECONDS).with().ignoreExceptionsMatching(instanceOf(RuntimeException.class)).until(conditionsThatIsThrowingAnExceptionForATime());
+        await().atMost(1000, MILLISECONDS).with().ignoreExceptionsMatching(instanceOf(RuntimeException.class)).until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
+    }
+
+    @Test(timeout = 2000)
+    public void assertionErrorIgnoringWorksForHamcrestMatchers() {
+        new Asynch(fakeRepository).perform();
+        await().atMost(1000, MILLISECONDS).with().ignoreExceptionsMatching(instanceOf(AssertionError.class)).until(conditionsThatIsThrowingAnExceptionForATime(AssertionError.class));
     }
 
     @Test(timeout = 2000)
     public void exceptionIgnoringWorksForHamcrestMatchersStatically() {
         new Asynch(fakeRepository).perform();
         Awaitility.ignoreExceptionsByDefaultMatching(instanceOf(RuntimeException.class));
-        await().atMost(1000, MILLISECONDS).until(conditionsThatIsThrowingAnExceptionForATime());
+        await().atMost(1000, MILLISECONDS).until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
     }
 
     @Test(timeout = 2000)
@@ -90,28 +115,28 @@ public class AwaitilityIgnoreExceptionsTest {
 
         new Asynch(fakeRepository).perform();
         Awaitility.ignoreExceptionsByDefaultMatching(instanceOf(RuntimeException.class));
-        await().atMost(1000, MILLISECONDS).with().ignoreNoExceptions().until(conditionsThatIsThrowingAnExceptionForATime());
+        await().atMost(1000, MILLISECONDS).with().ignoreNoExceptions().until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
     }
 
     @Test(timeout = 2000)
     public void exceptionIgnoringWorksForPredicates() {
         new Asynch(fakeRepository).perform();
-        await().atMost(1000, MILLISECONDS).with().ignoreExceptionsMatching(new Predicate<Exception>() {
-            public boolean matches(Exception e) {
+        await().atMost(1000, MILLISECONDS).with().ignoreExceptionsMatching(new Predicate<Throwable>() {
+            public boolean matches(Throwable e) {
                 return e instanceof RuntimeException;
             }
-        }).until(conditionsThatIsThrowingAnExceptionForATime());
+        }).until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
     }
 
     @Test(timeout = 2000)
     public void exceptionIgnoringWorksForPredicatesStatically() {
         new Asynch(fakeRepository).perform();
-        Awaitility.ignoreExceptionsByDefaultMatching(new Predicate<Exception>() {
-            public boolean matches(Exception e) {
+        Awaitility.ignoreExceptionsByDefaultMatching(new Predicate<Throwable>() {
+            public boolean matches(Throwable e) {
                 return e instanceof RuntimeException;
             }
         });
-        await().atMost(1000, MILLISECONDS).until(conditionsThatIsThrowingAnExceptionForATime());
+        await().atMost(1000, MILLISECONDS).until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
     }
 
     @Test(timeout = 2000)
@@ -120,10 +145,10 @@ public class AwaitilityIgnoreExceptionsTest {
         exception.expectMessage(is("Repository value is not 1"));
 
         new Asynch(fakeRepository).perform();
-        await().atMost(1000, MILLISECONDS).with().until(conditionsThatIsThrowingAnExceptionForATime());
+        await().atMost(1000, MILLISECONDS).with().until(conditionsThatIsThrowingAnExceptionForATime(RuntimeException.class));
     }
 
-    private Callable<Boolean> conditionsThatIsThrowingAnExceptionForATime() {
-        return new ThrowExceptionUnlessFakeRepositoryEqualsOne(fakeRepository);
+    private Callable<Boolean> conditionsThatIsThrowingAnExceptionForATime(Class<? extends Throwable> throwable) {
+        return new ThrowExceptionUnlessFakeRepositoryEqualsOne(fakeRepository, throwable);
     }
 }

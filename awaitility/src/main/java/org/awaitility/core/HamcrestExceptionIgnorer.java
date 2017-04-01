@@ -20,16 +20,16 @@ import org.hamcrest.Matcher;
 
 public class HamcrestExceptionIgnorer implements ExceptionIgnorer {
 
-    private final Matcher<? super Exception> matcher;
+    private final Matcher<? super Throwable> matcher;
 
-    public HamcrestExceptionIgnorer(Matcher<? super Exception> matcher) {
+    public HamcrestExceptionIgnorer(Matcher<? super Throwable> matcher) {
         if (matcher == null) {
             throw new IllegalArgumentException("matcher cannot be null");
         }
         this.matcher = matcher;
     }
 
-    public boolean shouldIgnoreException(Exception exception) {
+    public boolean shouldIgnoreException(Throwable exception) {
         return matcher.matches(exception);
     }
 }

@@ -19,13 +19,20 @@ package org.awaitility;
 import org.awaitility.classes.Asynch;
 import org.awaitility.classes.FakeRepository;
 import org.awaitility.classes.FakeRepositoryImpl;
+import org.awaitility.core.CheckedExceptionRethrower;
+import org.awaitility.core.ConditionTimeoutException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import static org.awaitility.Awaitility.await;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.given;
 
 public class AwaitilityIgnoreExceptionsJava8Test {
     private FakeRepository fakeRepository;
@@ -59,6 +66,36 @@ public class AwaitilityIgnoreExceptionsJava8Test {
                 throw new IllegalArgumentException("Repository value is not 1");
             }
             return true;
+        });
+    }
+
+    @Test(timeout = 2000L)
+    public void untilAssertedCanIgnoreThrowable() throws Exception {
+        new Asynch(fakeRepository).perform();
+        AtomicInteger counter = new AtomicInteger(0);
+
+        given().ignoreExceptionsMatching(Objects::nonNull).await().atMost(1000, MILLISECONDS).untilAsserted(() -> {
+            if (counter.incrementAndGet() < 3) {
+                CheckedExceptionRethrower.safeRethrow(new Throwable("Test"));
+            }
+            assertThat(fakeRepository.getValue()).isEqualTo(1);
+        });
+    }
+
+    /*
+     * Note that this might actually be a bug/limitation. The reason is that when the exception is
+     * caught and the condition reevaluated and thus end up in an infinite loop that will be
+     * broken by the timeout. What ought to happen is that Awaitility somehow remembers that
+     * the condition was fulfilled even though an exception is thrown later in the condition?
+     * Or perhaps this behavior is correct?
+     */
+    @Test(timeout = 2000L, expected = ConditionTimeoutException.class)
+    public void cannotHandleExceptionsThrownAfterAStatementIsFulfilled() throws Exception {
+        new Asynch(fakeRepository).perform();
+
+        given().ignoreExceptionsMatching(Objects::nonNull).await().atMost(800, MILLISECONDS).untilAsserted(() -> {
+            assertThat(fakeRepository.getValue()).isEqualTo(1);
+            CheckedExceptionRethrower.safeRethrow(new Throwable("Test"));
         });
     }
 }

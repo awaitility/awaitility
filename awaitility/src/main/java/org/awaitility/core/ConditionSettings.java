@@ -138,7 +138,7 @@ public class ConditionSettings {
     /**
      * @return true if a particular exception should be ignored
      */
-    public boolean shouldExceptionBeIgnored(Exception e) {
+    public boolean shouldExceptionBeIgnored(Throwable e) {
         return ignoreExceptions.shouldIgnoreException(e);
     }
 

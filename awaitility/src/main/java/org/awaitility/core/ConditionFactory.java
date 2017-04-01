@@ -326,13 +326,13 @@ public class ConditionFactory {
      * @param exceptionType The exception type (hierarchy) to ignore
      * @return the condition factory
      */
-    public ConditionFactory ignoreExceptionsInstanceOf(final Class<? extends Exception> exceptionType) {
+    public ConditionFactory ignoreExceptionsInstanceOf(final Class<? extends Throwable> exceptionType) {
         if (exceptionType == null) {
             throw new IllegalArgumentException("exceptionType cannot be null");
         }
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
-                new PredicateExceptionIgnorer(new Predicate<Exception>() {
-                    public boolean matches(Exception e) {
+                new PredicateExceptionIgnorer(new Predicate<Throwable>() {
+                    public boolean matches(Throwable e) {
                         return exceptionType.isAssignableFrom(e.getClass());
                     }
                 }),
@@ -348,13 +348,13 @@ public class ConditionFactory {
      * @param exceptionType The exception type to ignore
      * @return the condition factory
      */
-    public ConditionFactory ignoreException(final Class<? extends Exception> exceptionType) {
+    public ConditionFactory ignoreException(final Class<? extends Throwable> exceptionType) {
         if (exceptionType == null) {
             throw new IllegalArgumentException("exception cannot be null");
         }
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
-                new PredicateExceptionIgnorer(new Predicate<Exception>() {
-                    public boolean matches(Exception e) {
+                new PredicateExceptionIgnorer(new Predicate<Throwable>() {
+                    public boolean matches(Throwable e) {
                         return e.getClass().equals(exceptionType);
                     }
                 }),
@@ -370,8 +370,8 @@ public class ConditionFactory {
      * @return the condition factory.
      */
     public ConditionFactory ignoreExceptions() {
-        return ignoreExceptionsMatching(new Predicate<Exception>() {
-            public boolean matches(Exception e) {
+        return ignoreExceptionsMatching(new Predicate<Throwable>() {
+            public boolean matches(Throwable e) {
                 return true;
             }
         });
@@ -385,8 +385,8 @@ public class ConditionFactory {
      * @return the condition factory.
      */
     public ConditionFactory ignoreNoExceptions() {
-        return ignoreExceptionsMatching(new Predicate<Exception>() {
-            public boolean matches(Exception e) {
+        return ignoreExceptionsMatching(new Predicate<Throwable>() {
+            public boolean matches(Throwable e) {
                 return false;
             }
         });
@@ -399,7 +399,7 @@ public class ConditionFactory {
      *
      * @return the condition factory.
      */
-    public ConditionFactory ignoreExceptionsMatching(Matcher<? super Exception> matcher) {
+    public ConditionFactory ignoreExceptionsMatching(Matcher<? super Throwable> matcher) {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
                 new HamcrestExceptionIgnorer(matcher), conditionEvaluationListener, pollExecutorService);
     }
@@ -411,7 +411,7 @@ public class ConditionFactory {
      *
      * @return the condition factory.
      */
-    public ConditionFactory ignoreExceptionsMatching(Predicate<Exception> predicate) {
+    public ConditionFactory ignoreExceptionsMatching(Predicate<? super Throwable> predicate) {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
                 new PredicateExceptionIgnorer(predicate), conditionEvaluationListener, pollExecutorService);
     }

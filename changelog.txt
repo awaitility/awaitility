@@ -1,3 +1,19 @@
+Changelog next version
+----------------------
+* Possible non-backward compatible change: You can now ignore throwables and not only exceptions. This shouldn't affect your old code if you previously used Java 8 lamda expressions or method references but if you previously did:
+    await().atMost(1000, MILLISECONDS).with().ignoreExceptionsMatching(new Predicate<Exception>() {
+            public boolean matches(Exception e) {
+                return e instanceof RuntimeException;
+            }
+        }).until(..);
+  then you now have to change the Predicate to use Throwable instead:
+      await().atMost(1000, MILLISECONDS).with().ignoreExceptionsMatching(new Predicate<Throwable>() {
+              public boolean matches(Throwable e) {
+                  return e instanceof RuntimeException;
+              }
+          }).until(..);
+  (issue 85)
+
 Changelog 3.0.0-rc2 (2017-03-31)
 --------------------------------
 * Updated ByteBuddy to version 1.6.11
