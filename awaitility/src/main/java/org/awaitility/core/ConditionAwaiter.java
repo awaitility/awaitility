@@ -167,10 +167,11 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
      * {@inheritDoc}
      */
     public void uncaughtException(Thread thread, Throwable throwable) {
-        // TODO Ignore exception if applicable!!!
-        uncaughtThrowable.set(throwable);
-        // We shutdown the executor "now" in order to fail the test immediately
-        executor.shutdownNow();
+        if (!conditionSettings.shouldExceptionBeIgnored(throwable)) {
+            uncaughtThrowable.set(throwable);
+            // We shutdown the executor "now" in order to fail the test immediately
+            executor.shutdownNow();
+        }
     }
 
     private class ConditionPoller implements Callable<ConditionEvaluationResult> {

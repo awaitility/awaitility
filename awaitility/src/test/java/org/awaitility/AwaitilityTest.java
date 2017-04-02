@@ -26,13 +26,18 @@ import org.junit.rules.ExpectedException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.concurrent.TimeUnit.*;
 import static org.awaitility.Awaitility.*;
 import static org.awaitility.Duration.ONE_SECOND;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AwaitilityTest {
 
@@ -139,13 +144,13 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 3000, expected = ConditionTimeoutException.class)
-    public void throwsTimeoutExceptionWhenDoneEarlierThanAtLeastConstraint() throws Exception{
+    public void throwsTimeoutExceptionWhenDoneEarlierThanAtLeastConstraint() throws Exception {
         new Asynch(fakeRepository).perform();
         await().atLeast(1, SECONDS).and().atMost(2, SECONDS).until(value(), equalTo(1));
     }
 
     @Test(timeout = 3000)
-    public void doesNotThrowTimeoutExceptionWhenDoneLaterThanAtLeastConstraint() throws Exception{
+    public void doesNotThrowTimeoutExceptionWhenDoneLaterThanAtLeastConstraint() throws Exception {
         new Asynch(fakeRepository).perform();
         await().atLeast(100, NANOSECONDS).until(value(), equalTo(1));
     }
@@ -177,6 +182,69 @@ public class AwaitilityTest {
     public void uncaughtThrowablesArePropagatedToAwaitingThreadAndBreaksForeverBlockWhenSetToCatchAllUncaughtExceptions() {
         new ExceptionThrowingAsynch(new ComparisonFailure("Message", "Something", "Something else")).perform();
         await().forever().until(value(), equalTo(1));
+    }
+
+    @Test(timeout = 2000)
+    public void uncaughtThrowablesFromOtherThreadsCanBeIgnored() throws Exception {
+        final AtomicInteger atomicInteger = new AtomicInteger(0);
+        final AtomicBoolean exceptionThrown = new AtomicBoolean(false);
+        final ExecutorService es = Executors.newFixedThreadPool(5);
+        final FakeRepository fakeRepository = new FakeRepository() {
+
+            @Override
+            public int getValue() {
+                int value = atomicInteger.get();
+                if (value < 3) {
+                    exceptionThrown.set(true);
+                    throw new IllegalArgumentException("Error!");
+                }
+                return value;
+            }
+
+            @Override
+            public void setValue(int value) {
+
+                atomicInteger.set(value);
+            }
+        };
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (atomicInteger.get() < 3) {
+                    try {
+                        es.submit(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(50);
+                                    fakeRepository.setValue(atomicInteger.incrementAndGet());
+
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        }).get();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        });
+        thread.start();
+
+        try {
+            given().pollDelay(0, MILLISECONDS).and().ignoreExceptions().await().until(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    return fakeRepository.getValue() == 3;
+                }
+            });
+            assertEquals(3, atomicInteger.get());
+            assertTrue(exceptionThrown.get());
+        } finally {
+            thread.join();
+            es.shutdownNow();
+        }
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)
@@ -231,8 +299,8 @@ public class AwaitilityTest {
     public void awaitWithAliasDisplaysAliasWhenConditionTimeoutExceptionOccurs() throws Exception {
         String alias = "test";
         exception.expect(ConditionTimeoutException.class);
-		exception.expectMessage(
-				"Condition with alias 'test' didn't complete within 120 milliseconds because org.awaitility.classes.FakeRepositoryValue expected a value greater than <0> but <0> was equal to <0>.");
+        exception.expectMessage(
+                "Condition with alias 'test' didn't complete within 120 milliseconds because org.awaitility.classes.FakeRepositoryValue expected a value greater than <0> but <0> was equal to <0>.");
 
         await(alias).atMost(120, MILLISECONDS).until(value(), greaterThan(0));
     }
@@ -251,10 +319,10 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-	public void awaitDisplaysSupplierAndMatcherMismatchMessageWhenConditionTimeoutExceptionOccurs() throws Exception {
+    public void awaitDisplaysSupplierAndMatcherMismatchMessageWhenConditionTimeoutExceptionOccurs() throws Exception {
         exception.expect(ConditionTimeoutException.class);
         exception.expectMessage(FakeRepositoryValue.class.getName()
-				+ " expected a value greater than <0> but <0> was equal to <0> within 120 milliseconds.");
+                + " expected a value greater than <0> but <0> was equal to <0> within 120 milliseconds.");
 
         with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(value(), greaterThan(0));
     }
