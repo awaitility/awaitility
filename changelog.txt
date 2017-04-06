@@ -15,6 +15,9 @@ Changelog next version
   (issue 85)
 * Uncaught exceptions from other threads now takes "ignore exceptions" into account. For example if any thread throws IllegalArgumentException and this exception has been marked as ignored then it won't be treated as an error.
   Previously this was only applicable to exceptions that were thrown by the polling (condition evaluation) thread.
+* Potential backward-incompatible change: The untilAsserted method no longer takes a "Runnable" as argument but rather a "ThrowingRunnable" which allows the runnable to throw checked exceptions.
+  This is backward incompatible only if you've supplied an explicit instance of Runnable to the function. If using Java 8 lambda expressions then nothing should change.
+* Removed org.awaitility.Awaitility#matches method since it's no longer needed
 
 Changelog 3.0.0-rc2 (2017-03-31)
 --------------------------------

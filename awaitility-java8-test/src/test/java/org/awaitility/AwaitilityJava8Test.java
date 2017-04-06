@@ -22,6 +22,7 @@ import org.awaitility.classes.FakeRepository;
 import org.awaitility.classes.FakeRepositoryImpl;
 import org.awaitility.core.ConditionEvaluationLogger;
 import org.awaitility.core.ConditionTimeoutException;
+import org.awaitility.core.ThrowingRunnable;
 import org.awaitility.support.CountDown;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,7 +34,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.awaitility.Awaitility.*;
+import static org.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.with;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -72,7 +74,7 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000)
     public void awaitAssertJAssertionAsAnonymousClass() {
         new Asynch(fakeRepository).perform();
-        await().untilAsserted(new Runnable() {
+        await().untilAsserted(new ThrowingRunnable() {
             @Override
             public void run() {
                 Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1);
@@ -162,7 +164,7 @@ public class AwaitilityJava8Test {
 
     @Test public void
     canMakeUseOfThrowingMethodInAwaitilityToWrapRunnablesThatThrowsExceptions() {
-        await().untilAsserted(matches(() -> stringEquals("test", "test")));
+        await().untilAsserted(() -> stringEquals("test", "test"));
     }
 
     @SuppressWarnings("ConstantConditions")

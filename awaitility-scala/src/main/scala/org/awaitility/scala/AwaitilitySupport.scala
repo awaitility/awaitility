@@ -17,6 +17,7 @@ package org.awaitility.scala
 
 import java.util.concurrent.Callable
 
+import org.awaitility.core.ThrowingRunnable
 import org.awaitility.spi.Timeout._
 
 trait AwaitilitySupport {
@@ -34,9 +35,9 @@ trait AwaitilitySupport {
     }
   }
 
-  implicit def byNameFunctionToRunnable[T](function: => T): Runnable = {
-    new Runnable {
-      def run(): Unit = function
+  implicit def byNameFunctionToRunnable[T](function: => T): ThrowingRunnable = {
+    new ThrowingRunnable {
+      override def run(): Unit = function
     }
   }
 }

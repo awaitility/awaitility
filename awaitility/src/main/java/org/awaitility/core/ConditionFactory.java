@@ -647,11 +647,9 @@ public class ConditionFactory {
      * });
      * </pre>
      * <p>&nbsp;</p>
-     * If your condition calls a method that throws a checked exception then please wrap it in {@link org.awaitility.Awaitility#matches(ThrowingRunnable)}.
-     * <p>&nbsp;</p>
      * <b>NOTE:</b><br>
      * Be <i>VERY</i> careful so that you're not using this method incorrectly in languages (like Kotlin and Groovy) that doesn't
-     * disambiguate between a {@link Runnable} that doesn't return anything (void) and {@link Callable} that returns a value.
+     * disambiguate between a {@link ThrowingRunnable} that doesn't return anything (void) and {@link Callable} that returns a value.
      * For example in Kotlin you can do like this:
      * <p>&nbsp;</p>
      * <pre>
@@ -663,7 +661,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      * @since 1.6.0
      */
-    public void untilAsserted(final Runnable assertion) {
+    public void untilAsserted(final ThrowingRunnable assertion) {
         until(new AssertionCondition(assertion, generateConditionSettings()));
     }
 

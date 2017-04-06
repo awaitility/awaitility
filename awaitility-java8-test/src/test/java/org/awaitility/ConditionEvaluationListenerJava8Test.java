@@ -17,6 +17,7 @@
 package org.awaitility;
 
 import org.awaitility.core.ConditionTimeoutException;
+import org.awaitility.core.ThrowingRunnable;
 import org.awaitility.support.CountDown;
 import org.junit.Rule;
 import org.junit.Test;
@@ -27,8 +28,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.awaitility.Awaitility.with;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.awaitility.Awaitility.with;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
@@ -130,7 +131,7 @@ public class ConditionEvaluationListenerJava8Test {
                     }
                     lastMatchMessage.set(condition.getDescription());
                 })
-                .untilAsserted(new Runnable() {
+                .untilAsserted(new ThrowingRunnable() {
                     @Override
                     public void run() {
                         assertEquals(5, (int) countDown.get());
@@ -154,7 +155,7 @@ public class ConditionEvaluationListenerJava8Test {
                     }
                     lastMatchMessage.set(condition.getDescription());
                 }).await("my alias")
-                .untilAsserted(new Runnable() {
+                .untilAsserted(new ThrowingRunnable() {
                     @Override
                     public void run() {
                         assertEquals(5, (int) countDown.get());
@@ -178,7 +179,7 @@ public class ConditionEvaluationListenerJava8Test {
                         } catch (Exception e) {
                             throw new RuntimeException(e);
                         }
-                    }).await().atMost(150, MILLISECONDS).untilAsserted(new Runnable() {
+                    }).await().atMost(150, MILLISECONDS).untilAsserted(new ThrowingRunnable() {
                 @Override
                 public void run() {
                     assertEquals(-1, (int) countDown.get());
@@ -205,7 +206,7 @@ public class ConditionEvaluationListenerJava8Test {
                             throw new RuntimeException(e);
                         }
                     }).await("my alias").atMost(150, MILLISECONDS)
-                    .untilAsserted(new Runnable() {
+                    .untilAsserted(new ThrowingRunnable() {
                         @Override
                         public void run() {
                             assertEquals(5, (int) countDown.get());
