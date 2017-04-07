@@ -1,5 +1,5 @@
-Changelog next version
-----------------------
+Changelog 3.0.0-rc3 (2017-04-07)
+--------------------------------
 * Possible non-backward compatible change: You can now ignore throwables and not only exceptions. This shouldn't affect your old code if you previously used Java 8 lamda expressions or method references but if you previously did:
     await().atMost(1000, MILLISECONDS).with().ignoreExceptionsMatching(new Predicate<Exception>() {
             public boolean matches(Exception e) {
