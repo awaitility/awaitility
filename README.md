@@ -18,6 +18,7 @@ public void updatesCustomerStatus() throws Exception {
 ```
 
 ## News
+* 2017-04-07: Awaitility `3.0.0-rc3` is released. It allows you to specify poll thread(s) and changed the behavior of `untilAsserted` so that lambda expressions are allowed to thrown checked exceptions. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2017-03-31: Awaitility `3.0.0-rc2` is released. It fixes some bugs that were found in the previous release candidate and it includes the ability to specify the poll executor service and uses one less thread by default. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2017-03-17: Awaitility `3.0.0-rc1` is released. It includes several bug fixes and some major (non-backward compatible) changes: 
   
@@ -60,7 +61,6 @@ public void updatesCustomerStatus() throws Exception {
     ``` 
     
   **Please help out and test it and provide feedback** 
-* 2016-06-17: [Awaitility 2.0.0](http://dl.bintray.com/johanhaleby/generic/awaitility-2.0.0.zip) is released with support for [at least](https://github.com/awaitility/awaitility/wiki/Usage#example-11---at-least) expressions as well as upgraded [Groovy](https://github.com/awaitility/awaitility/wiki/Groovy) and [Scala](https://github.com/awaitility/awaitility/wiki/Scala) support. See [release notes](https://github.com/awaitility/awaitility/wiki/ReleaseNotes20) for more details.
 
 [Older news](https://github.com/awaitility/awaitility/wiki/OldNews)
 
