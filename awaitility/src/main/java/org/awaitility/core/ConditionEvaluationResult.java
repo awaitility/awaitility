@@ -15,19 +15,32 @@
  */
 package org.awaitility.core;
 
-import org.awaitility.Duration;
-
 class ConditionEvaluationResult {
-    private Throwable throwable;
-    private boolean successful;
+    private final Throwable trace;
+    private final Throwable throwable;
+    private final boolean successful;
 
-     ConditionEvaluationResult(boolean successful) {
-        this(successful, null);
+    /**
+     * Return the result of the condition evaluation as either just <code>true</code> or <code>false</code>.
+     * If <code>false</code> this means that the condition could be retried later.
+     *
+     * @param successful <code>true</code> or <code>false</code>
+     */
+    ConditionEvaluationResult(boolean successful) {
+        this(successful, null, null);
     }
 
-    ConditionEvaluationResult(boolean successful, Throwable throwable) {
+    /**
+     * Fail the condition evaluation due to an exception with an optional trace.
+     * The purpose of the trace is to identify where in the code (which line) that
+     * contained the condition that failed. Note that a trace is independent of the <code>throwable</code>
+     * (i.e. the condition must necessarily have failed with an exception)
+     * @param throwable The exception that caused the condition to fail
+     */
+    ConditionEvaluationResult(boolean successful, Throwable throwable, Throwable trace) {
         this.successful = successful;
         this.throwable = throwable;
+        this.trace = trace;
     }
 
     boolean isSuccessful() {
@@ -42,7 +55,42 @@ class ConditionEvaluationResult {
         return throwable;
     }
 
+    Throwable getTrace() {
+        return trace;
+    }
+
     boolean hasThrowable() {
-         return throwable != null;
+        return throwable != null;
+    }
+
+    boolean hasTrace() {
+        return trace != null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ConditionEvaluationResult)) return false;
+
+        ConditionEvaluationResult result = (ConditionEvaluationResult) o;
+
+        if (successful != result.successful) return false;
+        return throwable != null ? throwable.equals(result.throwable) : result.throwable == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = throwable != null ? throwable.hashCode() : 0;
+        result = 31 * result + (successful ? 1 : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ConditionEvaluationResult{" +
+                "trace=" + trace +
+                ", throwable=" + throwable +
+                ", successful=" + successful +
+                '}';
     }
 }

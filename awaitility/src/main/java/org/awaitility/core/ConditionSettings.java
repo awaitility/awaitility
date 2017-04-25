@@ -19,7 +19,9 @@ import org.awaitility.Duration;
 import org.awaitility.constraint.WaitConstraint;
 import org.awaitility.pollinterval.PollInterval;
 
-class ConditionSettings {
+import java.util.concurrent.ExecutorService;
+
+public class ConditionSettings {
     private final String alias;
     private final WaitConstraint waitConstraint;
     private final PollInterval pollInterval;
@@ -27,6 +29,7 @@ class ConditionSettings {
     private final boolean catchUncaughtExceptions;
     private final ExceptionIgnorer ignoreExceptions;
     private final ConditionEvaluationListener conditionEvaluationListener;
+    private final ExecutorService pollExecutorService;
 
     /**
      * <p>Constructor for ConditionSettings.</p>
@@ -37,17 +40,20 @@ class ConditionSettings {
      * @param pollInterval                a {@link org.awaitility.Duration} object.
      * @param pollDelay                   a {@link org.awaitility.Duration} object.
      * @param conditionEvaluationListener a {@link ConditionEvaluationListener} object.
-     * @param ignoreExceptions            a boolean.
+     * @param ignoreExceptions            a {@link ExceptionIgnorer} object.
+     * @param pollExecutorService         The executor service that will be used to execute the condition
+     *
      */
-    public ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
-                             PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
-                             ExceptionIgnorer ignoreExceptions) {
+    ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
+                      PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
+                      ExceptionIgnorer ignoreExceptions, ExecutorService pollExecutorService) {
         if (waitConstraint == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
         if (pollInterval == null) {
             throw new IllegalArgumentException("You must specify a poll interval (was null).");
         }
+        this.pollExecutorService = pollExecutorService;
         this.alias = alias;
         this.waitConstraint = waitConstraint;
         this.pollInterval = pollInterval;
@@ -132,7 +138,14 @@ class ConditionSettings {
     /**
      * @return true if a particular exception should be ignored
      */
-    public boolean shouldExceptionBeIgnored(Exception e) {
+    public boolean shouldExceptionBeIgnored(Throwable e) {
         return ignoreExceptions.shouldIgnoreException(e);
+    }
+
+    /**
+     * @return The executor service that is used during polling
+     */
+    public ExecutorService getPollExecutorService() {
+        return pollExecutorService;
     }
 }

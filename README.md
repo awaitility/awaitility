@@ -18,9 +18,49 @@ public void updatesCustomerStatus() throws Exception {
 ```
 
 ## News
-* 2016-06-17: [Awaitility 2.0.0](http://dl.bintray.com/johanhaleby/generic/awaitility-2.0.0.zip) is released with support for [at least](https://github.com/awaitility/awaitility/wiki/Usage#example-11---at-least) expressions as well as upgraded [Groovy](https://github.com/awaitility/awaitility/wiki/Groovy) and [Scala](https://github.com/awaitility/awaitility/wiki/Scala) support. See [release notes](https://github.com/awaitility/awaitility/wiki/ReleaseNotes20) for more details.
-* 2016-06-17: Awaitility has a new website, [http://www.awaitility.org](http://www.awaitility.org). Feel free to update your bookmarks. 
-* 2015-11-27: [Awaitility 1.7.0](http://dl.bintray.com/johanhaleby/generic/awaitility-1.7.0.zip) is released with support for non-fixed [poll intervals](https://github.com/awaitility/awaitility/wiki/Usage#polling). By default Awaitility ships with [fibonacci](https://github.com/awaitility/awaitility/wiki/Usage#fibonacci-poll-interval), [iterative](https://github.com/awaitility/awaitility/wiki/Usage#iterative-poll-interval) and ability to [roll your own](https://github.com/awaitility/awaitility/wiki/Usage#custom-poll-interval). To simplify custom poll intervals [Duration](https://github.com/awaitility/awaitility/wiki/Usage#duration) has been updated with methods such as `plus`, `minus`, `multiply` and `divide`. A new helper method called [matches](https://github.com/awaitility/awaitility/wiki/Usage#example-10---checked-exceptions-in-runnable-lambda-expressions) has also been added to Awaitility to reduce boiler plate code when creating lambda expressions that call methods that throws exception. See [change log](http://github.com/awaitility/awaitility/raw/master/changelog.txt) for details and see [this blog](http://code.haleby.se/2015/11/27/non-fixed-poll-intervals-in-awaitility/) for additional info.
+* 2017-04-07: Awaitility `3.0.0-rc3` is released. It allows you to specify poll thread(s) and changed the behavior of `untilAsserted` so that lambda expressions are allowed to throw checked exceptions. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
+* 2017-03-31: Awaitility `3.0.0-rc2` is released. It fixes some bugs that were found in the previous release candidate and it includes the ability to specify the poll executor service and uses one less thread by default. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
+* 2017-03-17: Awaitility `3.0.0-rc1` is released. It includes several bug fixes and some major (non-backward compatible) changes: 
+  
+   1. The proxy creation is now done by bytebuddy instead of cglib and this has been extracted to its own project called `awaitility-proxy`. This means that if you need to use proxies depend on this project in addition to vanilla `awaitility`:
+        ```xml    
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility-proxy</artifactId>
+            <version>3.0.0-rc1</version>
+        </dependency>
+        ``` 
+       
+        You create a proxy when you do:
+    
+        ```java
+        await().untilCall( to(someObject).someMethod(), is(4) );
+        ```
+      
+        The `to` method has been moved to "org.awaitility.proxy.AwaitilityClassProxy" in the `awaitility-proxy` project.
+  2. The `until(Runnable ...)` method in `org.awaitility.core.ConditionFactory` is renamed to `untilAsserted(Runnable ...)`. This means that if you previously did:
+    
+        ```java
+        await().until(() -> assertThat(something()).isEqualTo("Something"));
+        ```   
+
+        you now need to do:
+
+        ```java
+        await().untilAsserted(() -> assertThat(something()).isEqualTo("Something"));
+        ```
+ 
+    To use it depend on:
+        
+    ```xml    
+    <dependency>
+        <groupId>org.awaitility</groupId>
+        <artifactId>awaitility</artifactId>
+        <version>3.0.0-rc1</version>
+    </dependency>
+    ``` 
+    
+  **Please help out and test it and provide feedback** 
 
 [Older news](https://github.com/awaitility/awaitility/wiki/OldNews)
 

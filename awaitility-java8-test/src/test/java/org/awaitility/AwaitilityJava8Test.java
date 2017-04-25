@@ -22,16 +22,20 @@ import org.awaitility.classes.FakeRepository;
 import org.awaitility.classes.FakeRepositoryImpl;
 import org.awaitility.core.ConditionEvaluationLogger;
 import org.awaitility.core.ConditionTimeoutException;
+import org.awaitility.core.ThrowingRunnable;
 import org.awaitility.support.CountDown;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.awaitility.Awaitility.*;
+import static org.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.with;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -57,7 +61,7 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000)
     public void awaitAssertJAssertionAsLambda() {
         new Asynch(fakeRepository).perform();
-        await().until(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+        await().untilAsserted(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
     @Test(timeout = 2000)
@@ -70,7 +74,7 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000)
     public void awaitAssertJAssertionAsAnonymousClass() {
         new Asynch(fakeRepository).perform();
-        await().until(new Runnable() {
+        await().untilAsserted(new ThrowingRunnable() {
             @Override
             public void run() {
                 Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1);
@@ -81,27 +85,27 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000)
     public void awaitAssertJAssertionDisplaysOriginalErrorMessageAndTimeoutWhenConditionTimeoutExceptionOccurs() {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage(startsWith("Condition defined as a lambda expression in " + AwaitilityJava8Test.class.getName()));
+        exception.expectMessage(startsWith("Assertion condition defined as a lambda expression in " + AwaitilityJava8Test.class.getName()));
         exception.expectMessage(endsWith("expected:<[1]> but was:<[0]> within 120 milliseconds."));
 
         new Asynch(fakeRepository).perform();
-        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).untilAsserted(
                 () -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
     @Test(timeout = 2000)
     public void awaitJUnitAssertionAsLambda() {
         new Asynch(fakeRepository).perform();
-        await().until(() -> assertEquals(1, fakeRepository.getValue()));
+        await().untilAsserted(() -> assertEquals(1, fakeRepository.getValue()));
     }
 
     @Test(timeout = 2000)
     public void awaitJUnitAssertionDisplaysOriginalErrorMessageAndTimeoutWhenConditionTimeoutExceptionOccurs() {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage(startsWith("Condition defined as a lambda expression in " + AwaitilityJava8Test.class.getName()));
+        exception.expectMessage(startsWith("Assertion condition defined as a lambda expression in " + AwaitilityJava8Test.class.getName()));
         exception.expectMessage(endsWith("expected:<1> but was:<0> within 120 milliseconds."));
 
-        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(
+        with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).untilAsserted(
                 () -> assertEquals(1, fakeRepository.getValue()));
     }
 
@@ -160,14 +164,14 @@ public class AwaitilityJava8Test {
 
     @Test public void
     canMakeUseOfThrowingMethodInAwaitilityToWrapRunnablesThatThrowsExceptions() {
-        await().until(matches(() -> stringEquals("test", "test")));
+        await().untilAsserted(() -> stringEquals("test", "test"));
     }
 
     @SuppressWarnings("ConstantConditions")
     @Test(timeout = 2000L)
     public void includesCauseInStackTrace()  {
         try {
-            await().atMost(200, MILLISECONDS).until(() -> {
+            await().atMost(200, MILLISECONDS).untilAsserted(() -> {
                 assertNotNull("34");
                 assertNotNull(null);
             });
@@ -175,6 +179,31 @@ public class AwaitilityJava8Test {
         } catch (ConditionTimeoutException e) {
             assertThat(e.getCause().getClass().getName()).isEqualTo(AssertionError.class.getName());
         }
+    }
+
+    // This was previously a bug (https://github.com/awaitility/awaitility/issues/78)
+    @Test(timeout = 2000L)
+    public void throwsExceptionImmediatelyWhenCallableConditionThrowsAssertionError() throws Exception {
+        // Given
+        long timeStart = System.currentTimeMillis();
+        new Asynch(fakeRepository).perform();
+
+        // When
+        final AtomicInteger counter = new AtomicInteger(0);
+        try {
+            await().atMost(1500, MILLISECONDS).until(() -> {
+                counter.incrementAndGet();
+                assertTrue(counter.get() >= 2);
+                return true;
+            });
+            fail("Expecting error");
+        } catch (AssertionError ignored) {
+            // expected
+        }
+
+        // Then
+        long timeEnd = System.currentTimeMillis();
+        assertThat(timeEnd - timeStart).isLessThan(1500L);
     }
 
     private void stringEquals(String first, String second) {

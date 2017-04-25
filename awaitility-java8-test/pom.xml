@@ -20,7 +20,7 @@
     <parent>
         <artifactId>awaitility-parent</artifactId>
         <groupId>org.awaitility</groupId>
-        <version>2.0.1-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>awaitility-java8-test</artifactId>
     <name>Awaitility tests for Java 8</name>
@@ -56,10 +56,7 @@
         </dependency>
         <dependency>
             <groupId>org.awaitility</groupId>
-            <artifactId>awaitility</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
+            <artifactId>awaitility-test-support</artifactId>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>

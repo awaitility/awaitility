@@ -41,7 +41,7 @@ public class ExceptionsInSetupAreIgnoredWhenIgnoreExceptionsIsActiveTest {
     }
 
     private static Callable<Boolean> conditionsThatIsThrowingAnExceptionForATime() {
-        return new ThrowExceptionUnlessFakeRepositoryEqualsOne(fakeRepository);
+        return new ThrowExceptionUnlessFakeRepositoryEqualsOne(fakeRepository, IllegalArgumentException.class);
     }
 
     @Test

@@ -17,6 +17,6 @@ package org.awaitility.core;
 
 public interface ExceptionIgnorer {
 
-    boolean shouldIgnoreException(Exception exception);
+    boolean shouldIgnoreException(Throwable exception);
 
 }

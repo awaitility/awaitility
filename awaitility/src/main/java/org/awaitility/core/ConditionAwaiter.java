@@ -19,16 +19,19 @@ import org.awaitility.Duration;
 
 import java.beans.Introspector;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.awaitility.classpath.ClassPathResolver.existInCP;
 
 abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     private final ExecutorService executor;
-    private final CountDownLatch latch;
     private final ConditionEvaluator conditionEvaluator;
-    private Throwable throwable = null;
-    private Throwable cause = null;
+    private final AtomicReference<Throwable> uncaughtThrowable;
     private final ConditionSettings conditionSettings;
 
     /**
@@ -37,8 +40,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
      * @param conditionEvaluator a {@link ConditionEvaluator} object.
      * @param conditionSettings  a {@link org.awaitility.core.ConditionSettings} object.
      */
-    public ConditionAwaiter(final ConditionEvaluator conditionEvaluator,
-                            final ConditionSettings conditionSettings) {
+    ConditionAwaiter(final ConditionEvaluator conditionEvaluator, final ConditionSettings conditionSettings) {
         if (conditionEvaluator == null) {
             throw new IllegalArgumentException("You must specify a condition (was null).");
         }
@@ -49,13 +51,9 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             Thread.setDefaultUncaughtExceptionHandler(this);
         }
         this.conditionSettings = conditionSettings;
-        this.latch = new CountDownLatch(1);
         this.conditionEvaluator = conditionEvaluator;
-        this.executor = initExecutorService();
-    }
-
-    private boolean conditionCompleted() {
-        return latch.getCount() == 0;
+        this.executor = conditionSettings.getPollExecutorService();
+        this.uncaughtThrowable = new AtomicReference<Throwable>();
     }
 
     /**
@@ -73,110 +71,89 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         final TimeUnit maxTimeoutUnit = maxWaitTime.getTimeUnit();
 
         long pollingStarted = System.currentTimeMillis() - pollDelay.getValueInMS();
-        pollSchedulingThread(conditionEvaluationHandler, pollDelay, maxWaitTime).start();
+
+        int pollCount = 0;
+        boolean succeededBeforeTimeout = false;
+        ConditionEvaluationResult lastResult = null;
+        Duration evaluationDuration = new Duration(0, MILLISECONDS);
+        try {
+            conditionEvaluationHandler.start();
+            if (!pollDelay.isZero()) {
+                Thread.sleep(pollDelay.getValueInMS());
+            }
+            Duration pollInterval = pollDelay;
+            while (!executor.isShutdown() && maxWaitTime.compareTo(evaluationDuration) > 0) {
+                pollCount = pollCount + 1;
+                lastResult = executor.submit(new ConditionPoller(pollInterval)).get(maxTimeout, maxTimeoutUnit);
+                if (lastResult.isSuccessful() || lastResult.hasThrowable()) {
+                    break;
+                }
+                pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
+                Thread.sleep(pollInterval.getValueInMS());
+                evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStarted);
+            }
+            evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStarted);
+            succeededBeforeTimeout = maxWaitTime.compareTo(evaluationDuration) > 0;
+        } catch (Throwable e1) {
+            final Throwable throwable;
+            if (e1 instanceof ExecutionException) {
+                throwable = e1.getCause();
+            } else {
+                throwable = e1;
+            }
+            lastResult = new ConditionEvaluationResult(false, throwable, null);
+        }
 
         try {
-            try {
-                final boolean finishedBeforeTimeout;
-                if (maxWaitTime == Duration.FOREVER) {
-                    latch.await();
-                    finishedBeforeTimeout = true;
+            if (uncaughtThrowable.get() != null) {
+                throw uncaughtThrowable.get();
+            } else if (lastResult != null && lastResult.hasThrowable()) {
+                throw lastResult.getThrowable();
+            } else if (!succeededBeforeTimeout) {
+                final String maxWaitTimeLowerCase = maxWaitTime.getTimeUnitAsString();
+                final String message;
+                if (conditionSettings.hasAlias()) {
+                    message = String.format("Condition with alias '%s' didn't complete within %s %s because %s.",
+                            conditionSettings.getAlias(), maxTimeout, maxWaitTimeLowerCase, Introspector.decapitalize(getTimeoutMessage()));
                 } else {
-                    finishedBeforeTimeout = latch.await(maxTimeout, maxTimeoutUnit);
+                    message = String.format("%s within %s %s.", getTimeoutMessage(), maxTimeout, maxWaitTimeLowerCase);
                 }
 
-                Duration evaluationDuration =
-                        new Duration(System.currentTimeMillis() - pollingStarted, TimeUnit.MILLISECONDS)
-                                .minus(pollDelay);
-
-                if (throwable != null) {
-                    throw throwable;
-                } else if (!finishedBeforeTimeout) {
-                    final String maxWaitTimeLowerCase = maxWaitTime.getTimeUnitAsString();
-                    final String message;
-                    if (conditionSettings.hasAlias()) {
-                        message = String.format("Condition with alias '%s' didn't complete within %s %s because %s.",
-                                conditionSettings.getAlias(), maxTimeout, maxWaitTimeLowerCase, Introspector.decapitalize(getTimeoutMessage()));
-                    } else {
-                        message = String.format("%s within %s %s.", getTimeoutMessage(), maxTimeout, maxWaitTimeLowerCase);
-                    }
-
-                    final ConditionTimeoutException e;
-
-                    // Not all systems support deadlock detection so ignore if ThreadMXBean & ManagementFactory is not in classpath
-                    if (existInCP("java.lang.management.ThreadMXBean") && existInCP("java.lang.management.ManagementFactory")) {
-                        java.lang.management.ThreadMXBean bean = java.lang.management.ManagementFactory.getThreadMXBean();
-                        Throwable cause = this.cause;
-                        try {
-                            long[] threadIds = bean.findDeadlockedThreads();
-                            if (threadIds != null) {
-                                cause = new DeadlockException(threadIds);
-                            }
-                        } catch (UnsupportedOperationException ignored) {
-                            // findDeadLockedThreads() not supported on this VM,
-                            // don't init cause and move on.
-                        }
-                        e = new ConditionTimeoutException(message, cause);
-                    } else {
-                        e = new ConditionTimeoutException(message, this.cause);
-                    }
-
-                    throw e;
-                } else if (evaluationDuration.compareTo(minWaitTime) < 0) {
-                    String message = String.format("Condition was evaluated in %s %s which is earlier than expected " +
-                                    "minimum timeout %s %s", evaluationDuration.getValue(), evaluationDuration.getTimeUnit(),
-                            minWaitTime.getValue(), minWaitTime.getTimeUnit());
-                    throw new ConditionTimeoutException(message);
-                }
-            } finally {
-                executor.shutdown();
-                if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+                Throwable cause = lastResult != null && lastResult.hasTrace() ? lastResult.getTrace() : null;
+                // Not all systems support deadlock detection so ignore if ThreadMXBean & ManagementFactory is not in classpath
+                if (existInCP("java.lang.management.ThreadMXBean") && existInCP("java.lang.management.ManagementFactory")) {
+                    java.lang.management.ThreadMXBean bean = java.lang.management.ManagementFactory.getThreadMXBean();
                     try {
-                        executor.shutdownNow();
-                        executor.awaitTermination(1, TimeUnit.SECONDS);
-                    } catch (InterruptedException e) {
-                        CheckedExceptionRethrower.safeRethrow(e);
+                        long[] threadIds = bean.findDeadlockedThreads();
+                        if (threadIds != null) {
+                            cause = new DeadlockException(threadIds);
+                        }
+                    } catch (UnsupportedOperationException ignored) {
+                        // findDeadLockedThreads() not supported on this VM,
+                        // don't init trace and move on.
                     }
                 }
+                throw new ConditionTimeoutException(message, cause);
+            } else if (evaluationDuration.compareTo(minWaitTime) < 0) {
+                String message = String.format("Condition was evaluated in %s %s which is earlier than expected " +
+                                "minimum timeout %s %s", evaluationDuration.getValue(), evaluationDuration.getTimeUnit(),
+                        minWaitTime.getValue(), minWaitTime.getTimeUnit());
+                throw new ConditionTimeoutException(message);
             }
         } catch (Throwable e) {
             CheckedExceptionRethrower.safeRethrow(e);
-        }
-    }
-
-    private <T> Thread pollSchedulingThread(final ConditionEvaluationHandler<T> conditionEvaluationHandler,
-                                            final Duration pollDelay, final Duration maxWaitTime) {
-        final long maxTimeout = maxWaitTime.getValue();
-        final TimeUnit maxTimeoutUnit = maxWaitTime.getTimeUnit();
-
-        return new Thread(new Runnable() {
-            public void run() {
-                int pollCount = 0;
-                try {
-                    conditionEvaluationHandler.start();
-                    if (!pollDelay.isZero()) {
-                        Thread.sleep(pollDelay.getValueInMS());
-                    }
-                    Duration pollInterval = pollDelay;
-                    while (!executor.isShutdown()) {
-                        if (conditionCompleted()) {
-                            break;
-                        }
-                        pollCount = pollCount + 1;
-                        Future<?> future = executor.submit(new ConditionPoller(pollInterval));
-                        if (maxWaitTime == Duration.FOREVER) {
-                            future.get();
-                        } else {
-                            future.get(maxTimeout, maxTimeoutUnit);
-                        }
-                        pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
-                        Thread.sleep(pollInterval.getValueInMS());
-                    }
-                } catch (Throwable e) {
-                    throwable = e;
+        } finally {
+            uncaughtThrowable.set(null);
+            executor.shutdown();
+            try {
+                if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                    executor.awaitTermination(1, TimeUnit.SECONDS);
                 }
+            } catch (InterruptedException e) {
+                CheckedExceptionRethrower.safeRethrow(e);
             }
-        }, "awaitility-poll-scheduling");
+        }
     }
 
     /**
@@ -190,50 +167,37 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
      * {@inheritDoc}
      */
     public void uncaughtException(Thread thread, Throwable throwable) {
-        this.throwable = throwable;
-        if (latch.getCount() != 0) {
-            latch.countDown();
+        if (!conditionSettings.shouldExceptionBeIgnored(throwable)) {
+            uncaughtThrowable.set(throwable);
+            // We shutdown the executor "now" in order to fail the test immediately
+            executor.shutdownNow();
         }
     }
 
-    private ExecutorService initExecutorService() {
-        return Executors.newSingleThreadExecutor(new ThreadFactory() {
-            public Thread newThread(Runnable r) {
-                Thread thread;
-                if (conditionSettings.hasAlias()) {
-                    thread = new Thread(Thread.currentThread().getThreadGroup(), r, "awaitility[" + conditionSettings.getAlias() + ']');
-                } else {
-                    thread = new Thread(Thread.currentThread().getThreadGroup(), r, "awaitility-thread");
-                }
-                return thread;
-            }
-        });
-    }
-
-    private class ConditionPoller implements Runnable {
+    private class ConditionPoller implements Callable<ConditionEvaluationResult> {
         private final Duration delayed;
 
         /**
          * @param delayed The duration of the poll interval
          */
-        public ConditionPoller(Duration delayed) {
+        ConditionPoller(Duration delayed) {
             this.delayed = delayed;
         }
 
-        public void run() {
+        @Override
+        public ConditionEvaluationResult call() throws Exception {
             try {
-                ConditionEvaluationResult result = conditionEvaluator.eval(delayed);
-                if (result.isSuccessful()) {
-                    latch.countDown();
-                } else if (result.hasThrowable()) {
-                    cause = result.getThrowable();
+                return conditionEvaluator.eval(delayed);
+            } catch (Throwable e) {
+                if (conditionSettings.shouldExceptionBeIgnored(e)) {
+                    return new ConditionEvaluationResult(false);
                 }
-            } catch (Exception e) {
-                if (!conditionSettings.shouldExceptionBeIgnored(e)) {
-                    throwable = e;
-                    latch.countDown();
-                }
+                return new ConditionEvaluationResult(false, e, null);
             }
         }
+    }
+
+    private Duration calculateConditionEvaluationDuration(Duration pollDelay, long pollingStarted) {
+        return new Duration(System.currentTimeMillis() - pollingStarted, MILLISECONDS).minus(pollDelay);
     }
 }

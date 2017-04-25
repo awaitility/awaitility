@@ -15,7 +15,7 @@
  */
 package org.awaitility.core;
 
-interface Condition<T> {
+public interface Condition<T> {
 
 	/**
 	 * <p>Await for the condition to complete</p>

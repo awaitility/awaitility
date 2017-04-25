@@ -41,7 +41,7 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
     }
 
     @Override
-    String getCallableDescription(final Callable<T> supplier) {
+    protected String getCallableDescription(final Callable<T> supplier) {
         final Class<? extends Callable> supplierClass = supplier.getClass();
         Method enclosingMethod = supplierClass.getEnclosingMethod();
         if (isFieldSupplier(supplierClass)) {

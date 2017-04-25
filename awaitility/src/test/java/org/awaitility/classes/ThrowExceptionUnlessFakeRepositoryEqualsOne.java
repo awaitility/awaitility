@@ -15,20 +15,33 @@
  */
 package org.awaitility.classes;
 
+import org.awaitility.core.CheckedExceptionRethrower;
+
+import java.lang.reflect.Constructor;
 import java.util.concurrent.Callable;
 
 public class ThrowExceptionUnlessFakeRepositoryEqualsOne implements Callable<Boolean> {
 
     private final FakeRepository repository;
+    private final Class<? extends Throwable> throwable;
 
-    public ThrowExceptionUnlessFakeRepositoryEqualsOne(FakeRepository repository) {
+    public ThrowExceptionUnlessFakeRepositoryEqualsOne(FakeRepository repository, Class<? extends Throwable> throwable) {
         super();
         this.repository = repository;
+        this.throwable = throwable;
     }
 
     public Boolean call() {
         if (repository.getValue() != 1) {
-            throw new IllegalArgumentException("Repository value is not 1");
+            Throwable throwable;
+            try {
+                Constructor<? extends Throwable> constructor = this.throwable.getDeclaredConstructor(String.class);
+                constructor.setAccessible(true);
+                throwable = constructor.newInstance("Repository value is not 1");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            CheckedExceptionRethrower.safeRethrow(throwable);
         }
         return true;
     }

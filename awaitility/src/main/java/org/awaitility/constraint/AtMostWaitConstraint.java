@@ -10,7 +10,7 @@ public class AtMostWaitConstraint implements WaitConstraint {
 
     public static final AtMostWaitConstraint TEN_SECONDS = new AtMostWaitConstraint(Duration.TEN_SECONDS);
 
-    public AtMostWaitConstraint(Duration atMostDuration) {
+    AtMostWaitConstraint(Duration atMostDuration) {
         this.atMostDuration = atMostDuration;
     }
 

@@ -15,8 +15,8 @@
 */
 package org.awaitility.groovy
 
-import org.awaitility.core.AssertionCondition
 import org.awaitility.core.ConditionFactory
+import org.awaitility.core.ThrowingRunnable
 
 import java.util.concurrent.Callable
 
@@ -28,11 +28,17 @@ class AwaitilityExtensionModule {
     timeout_message = "Condition was not fulfilled"
   }
 
+  @SuppressWarnings("ChangeToOperator")
   static void until(ConditionFactory self, Runnable runnable) {
     if (runnable instanceof Closure) {
       self.until({ (runnable as Closure).call().asBoolean() } as Callable<Boolean>)
     } else {
-      self.until(new AssertionCondition(runnable, self.generateConditionSettings()))
+      self.untilAsserted(new ThrowingRunnable() {
+        @Override
+        void run() throws Throwable {
+          runnable.run()
+        }
+      })
     }
   }
 }

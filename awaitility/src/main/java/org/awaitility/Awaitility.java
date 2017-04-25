@@ -22,6 +22,7 @@ import org.awaitility.pollinterval.FixedPollInterval;
 import org.awaitility.pollinterval.PollInterval;
 import org.hamcrest.Matcher;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Duration.ONE_HUNDRED_MILLISECONDS;
@@ -133,8 +134,8 @@ public class Awaitility {
     /**
      * Ignore caught exceptions by default?
      */
-    private static volatile ExceptionIgnorer defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Exception>() {
-        public boolean matches(Exception e) {
+    private static volatile ExceptionIgnorer defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Throwable>() {
+        public boolean matches(Throwable e) {
             return false;
         }
     });
@@ -143,6 +144,11 @@ public class Awaitility {
      * Default listener of condition evaluation results.
      */
     private static volatile ConditionEvaluationListener defaultConditionEvaluationListener = null;
+
+    /**
+     * Default condition evaluation executor service.
+     */
+    private static volatile ExecutorService defaultPollExecutorService = null;
 
     /**
      * Instruct Awaitility to catch uncaught exceptions from other threads by
@@ -168,8 +174,8 @@ public class Awaitility {
      * upon an exception, unless it times out.
      */
     public static void ignoreExceptionsByDefault() {
-        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Exception>() {
-            public boolean matches(Exception e) {
+        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Throwable>() {
+            public boolean matches(Throwable e) {
                 return true;
             }
         });
@@ -180,9 +186,9 @@ public class Awaitility {
      * Exceptions will be treated as evaluating to <code>false</code>. Your test will not fail
      * upon an exception matching the supplied exception type, unless it times out.
      */
-    public static void ignoreExceptionByDefault(final Class<? extends Exception> exceptionType) {
-        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Exception>() {
-            public boolean matches(Exception e) {
+    public static void ignoreExceptionByDefault(final Class<? extends Throwable> exceptionType) {
+        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Throwable>() {
+            public boolean matches(Throwable e) {
                 return e.getClass().equals(exceptionType);
             }
         });
@@ -193,7 +199,7 @@ public class Awaitility {
      * Exceptions will be treated as evaluating to <code>false</code>. Your test will not fail
      * upon an exception matching the supplied predicate, unless it times out.
      */
-    public static void ignoreExceptionsByDefaultMatching(Predicate<Exception> predicate) {
+    public static void ignoreExceptionsByDefaultMatching(Predicate<? super Throwable> predicate) {
         defaultExceptionIgnorer = new PredicateExceptionIgnorer(predicate);
     }
 
@@ -202,8 +208,51 @@ public class Awaitility {
      * Exceptions will be treated as evaluating to <code>false</code>. Your test will not fail
      * upon an exception matching the supplied exception type, unless it times out.
      */
-    public static void ignoreExceptionsByDefaultMatching(Matcher<? super Exception> matcher) {
+    public static void ignoreExceptionsByDefaultMatching(Matcher<? super Throwable> matcher) {
         defaultExceptionIgnorer = new HamcrestExceptionIgnorer(matcher);
+    }
+
+    /**
+     * Instructs Awaitility to execute the polling of the condition from the same as the test.
+     * This is an advanced feature and you should be careful when combining this with conditions that
+     * wait forever (or a long time) since Awaitility cannot interrupt the thread when using the same
+     * thread as the test. For safety you should always combine tests using this feature with a test framework specific timeout,
+     * for example in JUnit:
+     *<pre>
+     * @Test(timeout = 2000L)
+     * public void myTest() {
+     *     Awaitility.pollInSameThread();
+     *     await().forever().until(...);
+     * }
+     *</pre>
+     *
+     * @since 3.0.0
+     */
+    public static void pollInSameThread() {
+        defaultPollExecutorService = InternalExecutorServiceFactory.sameThreadExecutorService();
+    }
+
+    /**
+     * Specify the executor service whose threads will be used to evaluate the poll condition in Awaitility.
+     * This is an advanced feature and it should only be used sparingly.
+     *
+     * @param executorService The executor service that Awaitility will use when polling condition evaluations
+     * @since 3.0.0
+     */
+    public static void pollExecutorService(ExecutorService executorService) {
+        defaultPollExecutorService = executorService;
+    }
+
+    /**
+     * Specify a thread supplier whose thread will be used to evaluate the poll condition in Awaitility.
+     * The supplier will be called only once and the thread it returns will be reused during all condition evaluations.
+     * This is an advanced feature and it should only be used sparingly.
+     *
+     * @param threadSupplier A supplier of the thread that Awaitility will use when polling
+     * @since 3.0.0
+     */
+    public static void pollThread(Function<Runnable, Thread> threadSupplier) {
+        defaultPollExecutorService = InternalExecutorServiceFactory.create(threadSupplier);
     }
 
     /**
@@ -225,13 +274,13 @@ public class Awaitility {
         defaultWaitConstraint = AtMostWaitConstraint.TEN_SECONDS;
         defaultCatchUncaughtExceptions = true;
         defaultConditionEvaluationListener = null;
-        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Exception>() {
-            public boolean matches(Exception e) {
+        defaultPollExecutorService = null;
+        defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Throwable>() {
+            public boolean matches(Throwable e) {
                 return false;
             }
         });
         Thread.setDefaultUncaughtExceptionHandler(null);
-        MethodCallRecorder.reset();
     }
 
     /**
@@ -254,7 +303,8 @@ public class Awaitility {
      */
     public static ConditionFactory await(String alias) {
         return new ConditionFactory(alias, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener);
+                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                defaultPollExecutorService);
     }
 
     /**
@@ -265,7 +315,9 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory catchUncaughtExceptions() {
-        return new ConditionFactory(defaultWaitConstraint, defaultPollInterval, defaultPollDelay, true, defaultExceptionIgnorer);
+        return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
+                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                defaultPollExecutorService);
     }
 
     /**
@@ -275,7 +327,9 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory dontCatchUncaughtExceptions() {
-        return new ConditionFactory(defaultWaitConstraint, defaultPollInterval, defaultPollDelay, false, defaultExceptionIgnorer);
+        return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
+                false, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                defaultPollExecutorService);
     }
 
     /**
@@ -288,8 +342,9 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory with() {
-        return new ConditionFactory(defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener);
+        return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
+                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                defaultPollExecutorService);
     }
 
     /**
@@ -302,8 +357,9 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory given() {
-        return new ConditionFactory(defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultExceptionIgnorer);
+        return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
+                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                defaultPollExecutorService);
     }
 
     /**
@@ -314,8 +370,9 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory waitAtMost(Duration timeout) {
-        return new ConditionFactory(defaultWaitConstraint.withMaxWaitTime(timeout), defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultExceptionIgnorer);
+        return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(timeout), defaultPollInterval, defaultPollDelay,
+                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                defaultPollExecutorService);
     }
 
     /**
@@ -327,8 +384,9 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory waitAtMost(long value, TimeUnit unit) {
-        return new ConditionFactory(defaultWaitConstraint.withMaxWaitTime(new Duration(value, unit)), defaultPollInterval,
-                defaultPollDelay, defaultCatchUncaughtExceptions, defaultExceptionIgnorer);
+        return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(new Duration(value, unit)), defaultPollInterval, defaultPollDelay,
+                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                defaultPollExecutorService);
     }
 
     /**
@@ -416,67 +474,6 @@ public class Awaitility {
      */
     public static void setDefaultConditionEvaluationListener(ConditionEvaluationListener defaultConditionEvaluationListener) {
         Awaitility.defaultConditionEvaluationListener = defaultConditionEvaluationListener;
-    }
-
-    /**
-     * Await until a specific method invocation returns something. E.g.
-     * <p>
-     * <pre>
-     * await().untilCall(to(service).getCount(), greaterThan(2));
-     * </pre>
-     * <p>
-     * Here we tell Awaitility to wait until the <code>service.getCount()</code>
-     * method returns a value that is greater than 2.
-     *
-     * @param <S>    The type of the service.
-     * @param object the object that contains the method of interest.
-     * @return A proxy of the service
-     */
-    @SuppressWarnings("unchecked")
-    public static <S> S to(S object) {
-        return (S) MethodCallRecorder.createProxy(object);
-    }
-
-    /**
-     * Await until a {@link ThrowingRunnable} supplier execution passes (ends without throwing an exception).
-     * <p>&nbsp;</p>
-     * This method is intended to benefit from lambda expressions introduced in Java 8. It allows to use standard AssertJ/FEST Assert assertions
-     * (by the way also standard JUnit/TestNG assertions) to test asynchronous calls and systems.
-     * It accepts {@link ThrowingRunnable} interface instead of plain {@link Runnable} to allow passing lambda expressions that throw exceptions
-     * in their bodies, e.g.:
-     * <pre>
-     * await().until(matches(() -> {
-     *      methodThatHasThrowsInItsDeclaration();
-     * }));
-     * </pre>
-     * when using {@link Runnable} user would have to write something like:
-     * <pre>
-     * await().until(matches(() -> {
-     *      try {
-     *          methodThatHasThrowsInItsDeclaration();
-     *      } catch(Exception e) {
-     *          throw new RuntimeException(e);
-     *      }
-     * }));
-     * </pre>
-     * <p>&nbsp;</p>
-     * {@link java.lang.AssertionError} instances thrown by the supplier are treated as an assertion failure and proper error message is propagated on timeout.
-     * Other exceptions are rethrown immediately as an execution errors.
-     *
-     * @param throwingRunnable the supplier that is responsible for executing the assertion and throwing AssertionError on failure.
-     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
-     * @since 1.7.0
-     */
-    public static Runnable matches(final ThrowingRunnable throwingRunnable) {
-        return new Runnable() {
-            public void run() {
-                try {
-                    throwingRunnable.run();
-                } catch (Throwable e) {
-                    CheckedExceptionRethrower.safeRethrow(e);
-                }
-            }
-        };
     }
 
     /**

@@ -42,7 +42,7 @@ public class AssertionCondition implements Condition<Void> {
      * @param supplier a {@link java.lang.Runnable} object.
      * @param settings a {@link org.awaitility.core.ConditionSettings} object.
      */
-    public AssertionCondition(final Runnable supplier, final ConditionSettings settings) {
+    public AssertionCondition(final ThrowingRunnable supplier, final ConditionSettings settings) {
         if (supplier == null) {
             throw new IllegalArgumentException("You must specify a supplier (was null).");
         }
@@ -58,7 +58,9 @@ public class AssertionCondition implements Condition<Void> {
                 } catch (AssertionError e) {
                     lastExceptionMessage = e.getMessage();
                     conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, lastExceptionMessage, settings.getAlias()), null, pollInterval);
-                    return new ConditionEvaluationResult(false, e);
+                    return new ConditionEvaluationResult(false, null, e);
+                } catch (Throwable throwable) {
+                    return CheckedExceptionRethrower.safeRethrow(throwable);
                 }
             }
         };
@@ -70,31 +72,34 @@ public class AssertionCondition implements Condition<Void> {
         };
     }
 
-
-    private String getMatchMessage(Runnable supplier, String conditionAlias) {
+    private String getMatchMessage(ThrowingRunnable supplier, String conditionAlias) {
         return generateDescriptionPrefix(supplier, conditionAlias) + " reached its end value";
     }
 
-    private String getMismatchMessage(Runnable supplier, String exceptionMessage, String conditionAlias) {
+    private String getMismatchMessage(ThrowingRunnable supplier, String exceptionMessage, String conditionAlias) {
+        if (exceptionMessage != null && exceptionMessage.endsWith(".")) {
+            // Remove the "." of the Hamcrest match description since Awaitility adds more
+            exceptionMessage = exceptionMessage.substring(0, exceptionMessage.length() - 1);
+        }
         return generateDescriptionPrefix(supplier, conditionAlias) + " " + exceptionMessage;
     }
 
-    private String generateDescriptionPrefix(Runnable supplier, String conditionAlias) {
+    private String generateDescriptionPrefix(ThrowingRunnable supplier, String conditionAlias) {
         String methodDescription = generateMethodDescription(supplier);
         boolean hasAlias = conditionAlias != null;
         if (isLambdaClass(supplier.getClass())) {
             final String prefix;
             if (hasAlias) {
-                prefix = "Condition with alias " + conditionAlias + " defined as a ";
+                prefix = "Assertion condition with alias " + conditionAlias + " defined as a ";
             } else {
-                prefix = "Condition defined as a ";
+                prefix = "Assertion condition defined as a ";
             }
             return prefix + generateLambdaErrorMessagePrefix(supplier.getClass(), false) + methodDescription;
         }
-        return "Runnable condition" + (hasAlias ? " with alias " + conditionAlias : "") + methodDescription;
+        return "Assertion condition" + (hasAlias ? " with alias " + conditionAlias : "") + methodDescription;
     }
 
-    private String generateMethodDescription(Runnable supplier) {
+    private String generateMethodDescription(ThrowingRunnable supplier) {
         String methodDescription = "";
         Method enclosingMethod = null;
         try {
