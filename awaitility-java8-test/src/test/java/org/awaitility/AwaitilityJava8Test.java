@@ -20,6 +20,7 @@ import org.assertj.core.api.Assertions;
 import org.awaitility.classes.Asynch;
 import org.awaitility.classes.FakeRepository;
 import org.awaitility.classes.FakeRepositoryImpl;
+import org.awaitility.classes.FakeRepositoryList;
 import org.awaitility.core.ConditionEvaluationLogger;
 import org.awaitility.core.ConditionTimeoutException;
 import org.awaitility.core.ThrowingRunnable;
@@ -34,8 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.awaitility.Awaitility.await;
-import static org.awaitility.Awaitility.with;
+import static org.awaitility.Awaitility.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -206,7 +206,32 @@ public class AwaitilityJava8Test {
         assertThat(timeEnd - timeStart).isLessThan(1500L);
     }
 
+    // Asserts that https://github.com/awaitility/awaitility/issues/87 is resolved
+    @Test
+    public void errorMessageLooksOkForHamcrestLambdaExpressionsWhoseMismatchDescriptionOriginallyIsEmptyStringByHamcrest() throws Exception {
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage(endsWith("expected a collection containing a string ending with \"hello\" but was <[]> within 50 milliseconds."));
+
+        // Given
+        FakeRepositoryList fakeRepositoryList = new FakeRepositoryList();
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            fakeRepositoryList.add("hello");
+        });
+            
+        // When
+        given().pollDelay(10, MILLISECONDS).await().atMost(50, MILLISECONDS).until(fakeRepositoryList::state, hasItem(endsWith("hello")));
+
+    }
+
     private void stringEquals(String first, String second) {
         Assertions.assertThat(first).isEqualTo(second);
     }
+
+
 }

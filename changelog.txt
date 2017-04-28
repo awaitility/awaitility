@@ -18,6 +18,7 @@ Changelog 3.0.0-rc3 (2017-04-07)
 * Potential backward-incompatible change: The untilAsserted method no longer takes a "Runnable" as argument but rather a "ThrowingRunnable" which allows the runnable to throw checked exceptions.
   This is backward incompatible only if you've supplied an explicit instance of Runnable to the function. If using Java 8 lambda expressions then nothing should change.
 * Removed org.awaitility.Awaitility#matches method since it's no longer needed
+* Error messages are improved for Hamcrest lambda expressions whose mismatch description originally is generated as empty by Hamcrest (issue 87)
 
 Changelog 3.0.0-rc2 (2017-03-31)
 --------------------------------

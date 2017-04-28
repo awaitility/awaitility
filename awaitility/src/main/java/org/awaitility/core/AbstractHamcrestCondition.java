@@ -46,7 +46,7 @@ public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
 
         conditionEvaluationHandler = new ConditionEvaluationHandler<T>(matcher, settings);
         final ConditionEvaluator callable = new ConditionEvaluator() {
-            public ConditionEvaluationResult eval(Duration pollInterval) throws Exception{
+            public ConditionEvaluationResult eval(Duration pollInterval) throws Exception {
                 lastResult = supplier.call();
                 boolean matches = matcher.matches(lastResult);
                 if (matches) {
@@ -74,6 +74,9 @@ public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
     private String getMismatchMessage(Callable<T> supplier, Matcher<? super T> matcher) {
         Description mismatchDescription = new StringDescription();
         matcher.describeMismatch(lastResult, mismatchDescription);
+        if (mismatchDescription.toString() != null && mismatchDescription.toString().isEmpty()) {
+            mismatchDescription.appendText("was ").appendValue(lastResult);
+        }
         return String.format("%s expected %s but %s", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher), mismatchDescription);
     }
 
