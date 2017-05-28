@@ -1,3 +1,7 @@
+Changelog 3.0.0 (2017-04-28)
+----------------------------
+* Error messages are improved for Hamcrest lambda expressions whose mismatch description originally is generated as empty by Hamcrest (issue 87)
+
 Changelog 3.0.0-rc3 (2017-04-07)
 --------------------------------
 * Possible non-backward compatible change: You can now ignore throwables and not only exceptions. This shouldn't affect your old code if you previously used Java 8 lamda expressions or method references but if you previously did:
