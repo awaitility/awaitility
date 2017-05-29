@@ -1,3 +1,7 @@
+Changelog next version
+----------------------
+* Bumped all identified out of data properties, some of which applied to dependencies, and bumped all plugin versions, tests are all passing (thanks to Andy Glick for pull request)
+
 Changelog 3.0.0 (2017-04-28)
 ----------------------------
 * Error messages are improved for Hamcrest lambda expressions whose mismatch description originally is generated as empty by Hamcrest (issue 87)
