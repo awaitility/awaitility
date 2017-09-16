@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * Bumped all identified out of data properties, some of which applied to dependencies, and bumped all plugin versions, tests are all passing (thanks to Andy Glick for pull request)
+* Fixed issue with ConditionAwaiter calculating a negative condition duration (and thus raised an IllegalArgumentException) in cases where System.currentTimeMillis returned a non-monotonic value (issue 95)
 
 Changelog 3.0.0 (2017-04-28)
 ----------------------------

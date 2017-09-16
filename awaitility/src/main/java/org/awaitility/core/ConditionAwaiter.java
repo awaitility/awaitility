@@ -197,7 +197,14 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         }
     }
 
-    private Duration calculateConditionEvaluationDuration(Duration pollDelay, long pollingStarted) {
-        return new Duration(System.currentTimeMillis() - pollingStarted, MILLISECONDS).minus(pollDelay);
+    static Duration calculateConditionEvaluationDuration(Duration pollDelay, long pollingStarted) {
+        final long calculatedDuration = System.currentTimeMillis() - pollingStarted - pollDelay.getValueInMS();
+        // System.currentTimeMillis() is not strictly monotonic and may appear to run backwards,
+        // e.g. when a thread transitions to a different core or an NTP update, and the underlying
+        // source may be fairly coarse. Thus, the value between calls can cause a negative calculation on
+        // a heavily loaded system. Because of this we return a duration of minimum 1 millis.
+        // See https://github.com/awaitility/awaitility/issues/95
+        final long potentiallyCompensatedDuration = Math.max(calculatedDuration, 1L);
+        return new Duration(potentiallyCompensatedDuration, MILLISECONDS);
     }
 }
