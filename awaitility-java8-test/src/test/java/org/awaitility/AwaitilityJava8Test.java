@@ -229,6 +229,18 @@ public class AwaitilityJava8Test {
 
     }
 
+    // Asserts that https://github.com/awaitility/awaitility/issues/97 is resolved
+    @Test(timeout = 2000L)
+    public void longConditionThrowsConditionTimeoutException() throws Exception {
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage("Condition with org.awaitility.AwaitilityJava8Test was not fulfilled within 50 milliseconds.");
+
+        given().pollDelay(10, MILLISECONDS).await().atMost(50, MILLISECONDS).until(() -> {
+            Thread.sleep(1000);
+            return false;
+        });
+    }
+
     private void stringEquals(String first, String second) {
         Assertions.assertThat(first).isEqualTo(second);
     }

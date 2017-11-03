@@ -23,6 +23,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -94,14 +95,12 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             }
             evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStarted);
             succeededBeforeTimeout = maxWaitTime.compareTo(evaluationDuration) > 0;
-        } catch (Throwable e1) {
-            final Throwable throwable;
-            if (e1 instanceof ExecutionException) {
-                throwable = e1.getCause();
-            } else {
-                throwable = e1;
-            }
-            lastResult = new ConditionEvaluationResult(false, throwable, null);
+        } catch (TimeoutException e) {
+            lastResult = new ConditionEvaluationResult(false, null, e);
+        } catch (ExecutionException e) {
+            lastResult = new ConditionEvaluationResult(false, e.getCause(), null);
+        } catch (Throwable e) {
+            lastResult = new ConditionEvaluationResult(false, e, null);
         }
 
         try {
