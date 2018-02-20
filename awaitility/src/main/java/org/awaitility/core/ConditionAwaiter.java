@@ -27,6 +27,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.awaitility.classpath.ClassPathResolver.existInCP;
 
 abstract class ConditionAwaiter implements UncaughtExceptionHandler {
@@ -71,7 +72,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         final long maxTimeout = maxWaitTime.getValue();
         final TimeUnit maxTimeoutUnit = maxWaitTime.getTimeUnit();
 
-        long pollingStarted = System.currentTimeMillis() - pollDelay.getValueInMS();
+        long pollingStartedNanos = System.nanoTime() - pollDelay.getValueInNS();
 
         int pollCount = 0;
         boolean succeededBeforeTimeout = false;
@@ -91,9 +92,9 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 }
                 pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
                 Thread.sleep(pollInterval.getValueInMS());
-                evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStarted);
+                evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStartedNanos);
             }
-            evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStarted);
+            evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStartedNanos);
             succeededBeforeTimeout = maxWaitTime.compareTo(evaluationDuration) > 0;
         } catch (TimeoutException e) {
             lastResult = new ConditionEvaluationResult(false, null, e);
@@ -197,13 +198,6 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     }
 
     static Duration calculateConditionEvaluationDuration(Duration pollDelay, long pollingStarted) {
-        final long calculatedDuration = System.currentTimeMillis() - pollingStarted - pollDelay.getValueInMS();
-        // System.currentTimeMillis() is not strictly monotonic and may appear to run backwards,
-        // e.g. when a thread transitions to a different core or an NTP update, and the underlying
-        // source may be fairly coarse. Thus, the value between calls can cause a negative calculation on
-        // a heavily loaded system. Because of this we return a duration of minimum 1 millis.
-        // See https://github.com/awaitility/awaitility/issues/95
-        final long potentiallyCompensatedDuration = Math.max(calculatedDuration, 1L);
-        return new Duration(potentiallyCompensatedDuration, MILLISECONDS);
+        return new Duration(System.nanoTime() - pollingStarted - pollDelay.getValueInNS(), NANOSECONDS);
     }
 }

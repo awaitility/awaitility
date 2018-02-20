@@ -160,7 +160,7 @@ public class Duration implements Comparable<Duration> {
     }
 
     /**
-     * <p>getValueInMS.</p>
+     * Get the value in milliseconds.
      *
      * @return a long.
      */
@@ -169,6 +169,18 @@ public class Duration implements Comparable<Duration> {
             return value;
         }
         return MILLISECONDS.convert(value, unit);
+    }
+
+    /**
+     * Get the value in nanoseconds.
+     *
+     * @return a long.
+     */
+    public long getValueInNS() {
+        if (value == NONE) {
+            return value;
+        }
+        return NANOSECONDS.convert(value, unit);
     }
 
     /**

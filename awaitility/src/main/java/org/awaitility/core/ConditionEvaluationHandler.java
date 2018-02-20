@@ -18,6 +18,8 @@ package org.awaitility.core;
 import org.awaitility.Duration;
 import org.hamcrest.Matcher;
 
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
 /**
  * Handler for {@link Condition} implementations that calls {@link ConditionEvaluationListener} with condition evaluation result and message.
  * It also serves as stop watch for elapsed time.
@@ -84,11 +86,11 @@ class ConditionEvaluationHandler<T> {
         private long startTime;
 
         public void start() {
-            this.startTime = System.currentTimeMillis();
+            this.startTime = System.nanoTime();
         }
 
         long getElapsedTimeInMS() {
-            return System.currentTimeMillis() - startTime;
+            return NANOSECONDS.toMillis(System.nanoTime() - startTime);
         }
     }
 }
