@@ -33,6 +33,7 @@ import org.junit.rules.ExpectedException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.awaitility.Awaitility.*;
@@ -185,7 +186,7 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000L)
     public void throwsExceptionImmediatelyWhenCallableConditionThrowsAssertionError() throws Exception {
         // Given
-        long timeStart = System.currentTimeMillis();
+        long timeStart = System.nanoTime();
         new Asynch(fakeRepository).perform();
 
         // When
@@ -202,8 +203,8 @@ public class AwaitilityJava8Test {
         }
 
         // Then
-        long timeEnd = System.currentTimeMillis();
-        assertThat(timeEnd - timeStart).isLessThan(1500L);
+        long timeEnd = System.nanoTime();
+        assertThat(NANOSECONDS.toMillis(timeEnd - timeStart)).isLessThan(1500L);
     }
 
     // Asserts that https://github.com/awaitility/awaitility/issues/87 is resolved
