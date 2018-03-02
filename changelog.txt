@@ -5,6 +5,7 @@ Changelog next version
 * Throw TimeoutException from executing long-running Callables as ConditionTimeoutException (thanks to James Withers for pull request) (issue 97)
 * Updated Objenesis dependency from 2.5.1 to 2.6.0 (issue 104)
 * Use wall-clock agnostic System.nanoTime instead of System.currentTimeMillis internally (thanks to Ben Barnard for pull request)
+* Improved error messages for assertion conditions when using aliases. Previously aliases could be included twice in the ConditionTimeoutException which obscured the error message somewhat (issue 108).
 
 Changelog 3.0.0 (2017-04-28)
 ----------------------------

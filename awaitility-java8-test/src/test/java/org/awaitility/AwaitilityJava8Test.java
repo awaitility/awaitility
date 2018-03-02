@@ -31,10 +31,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.NANOSECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.concurrent.TimeUnit.*;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.awaitility.Awaitility.*;
 import static org.hamcrest.Matchers.*;
@@ -108,6 +107,33 @@ public class AwaitilityJava8Test {
 
         with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).untilAsserted(
                 () -> assertEquals(1, fakeRepository.getValue()));
+    }
+
+    /**
+     * See <a href="https://github.com/awaitility/awaitility/issues/108">issue 108</a>
+     */
+    @Test(timeout = 2000)
+    public void doesntRepeatAliasInLambdaConditionsForAssertConditions() {
+        try {
+            with().pollInterval(10, MILLISECONDS).then().await("my alias").atMost(120, MILLISECONDS).untilAsserted(
+                    () -> assertEquals(1, fakeRepository.getValue()));
+            fail("Should throw ConditionTimeoutException");
+        } catch (ConditionTimeoutException e) {
+            assertThat(countOfOccurrences(e.getMessage(), "my alias")).isEqualTo(1);
+        }
+    }
+
+    /**
+     * See <a href="https://github.com/awaitility/awaitility/issues/108">issue 108</a>
+     */
+    @Test(timeout = 2000)
+    public void doesntRepeatAliasInLambdaConditionsForCallableConditions() {
+        try {
+            with().pollInterval(10, MILLISECONDS).then().await("my alias").atMost(120, MILLISECONDS).until(() -> fakeRepository.getValue() == 1);
+            fail("Should throw ConditionTimeoutException");
+        } catch (ConditionTimeoutException e) {
+            assertThat(countOfOccurrences(e.getMessage(), "my alias")).isEqualTo(1);
+        }
     }
 
     @Test(timeout = 2000)
@@ -247,4 +273,8 @@ public class AwaitilityJava8Test {
     }
 
 
+
+    private static int countOfOccurrences(String str, String subStr) {
+        return (str.length() - str.replaceAll(Pattern.quote(subStr), "").length()) / subStr.length();
+    }
 }
