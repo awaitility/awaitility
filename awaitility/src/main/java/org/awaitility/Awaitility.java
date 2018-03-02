@@ -148,7 +148,7 @@ public class Awaitility {
     /**
      * Default condition evaluation executor service.
      */
-    private static volatile ExecutorService defaultPollExecutorService = null;
+    private static volatile ExecutorLifecycle defaultExecutorLifecycle = null;
 
     /**
      * Instruct Awaitility to catch uncaught exceptions from other threads by
@@ -229,18 +229,24 @@ public class Awaitility {
      * @since 3.0.0
      */
     public static void pollInSameThread() {
-        defaultPollExecutorService = InternalExecutorServiceFactory.sameThreadExecutorService();
+        defaultExecutorLifecycle = ExecutorLifecycle.withNormalCleanupBehavior(new Supplier<ExecutorService>() {
+            @Override
+            public ExecutorService get() {
+                return InternalExecutorServiceFactory.sameThreadExecutorService();
+            }
+        });
     }
 
     /**
      * Specify the executor service whose threads will be used to evaluate the poll condition in Awaitility.
+     * Note that the executor service must be shutdown manually!
      * This is an advanced feature and it should only be used sparingly.
      *
      * @param executorService The executor service that Awaitility will use when polling condition evaluations
      * @since 3.0.0
      */
-    public static void pollExecutorService(ExecutorService executorService) {
-        defaultPollExecutorService = executorService;
+    public static void pollExecutorService(final ExecutorService executorService) {
+        defaultExecutorLifecycle = ExecutorLifecycle.withoutCleanup(executorService);
     }
 
     /**
@@ -251,8 +257,13 @@ public class Awaitility {
      * @param threadSupplier A supplier of the thread that Awaitility will use when polling
      * @since 3.0.0
      */
-    public static void pollThread(Function<Runnable, Thread> threadSupplier) {
-        defaultPollExecutorService = InternalExecutorServiceFactory.create(threadSupplier);
+    public static void pollThread(final Function<Runnable, Thread> threadSupplier) {
+        defaultExecutorLifecycle = ExecutorLifecycle.withNormalCleanupBehavior(new Supplier<ExecutorService>() {
+            @Override
+            public ExecutorService get() {
+                return InternalExecutorServiceFactory.create(threadSupplier);
+            }
+        });
     }
 
     /**
@@ -274,7 +285,7 @@ public class Awaitility {
         defaultWaitConstraint = AtMostWaitConstraint.TEN_SECONDS;
         defaultCatchUncaughtExceptions = true;
         defaultConditionEvaluationListener = null;
-        defaultPollExecutorService = null;
+        defaultExecutorLifecycle = null;
         defaultExceptionIgnorer = new PredicateExceptionIgnorer(new Predicate<Throwable>() {
             public boolean matches(Throwable e) {
                 return false;
@@ -304,7 +315,7 @@ public class Awaitility {
     public static ConditionFactory await(String alias) {
         return new ConditionFactory(alias, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultPollExecutorService);
+                defaultExecutorLifecycle);
     }
 
     /**
@@ -317,7 +328,7 @@ public class Awaitility {
     public static ConditionFactory catchUncaughtExceptions() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultPollExecutorService);
+                defaultExecutorLifecycle);
     }
 
     /**
@@ -329,7 +340,7 @@ public class Awaitility {
     public static ConditionFactory dontCatchUncaughtExceptions() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 false, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultPollExecutorService);
+                defaultExecutorLifecycle);
     }
 
     /**
@@ -344,7 +355,7 @@ public class Awaitility {
     public static ConditionFactory with() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultPollExecutorService);
+                defaultExecutorLifecycle);
     }
 
     /**
@@ -359,7 +370,7 @@ public class Awaitility {
     public static ConditionFactory given() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultPollExecutorService);
+                defaultExecutorLifecycle);
     }
 
     /**
@@ -372,7 +383,7 @@ public class Awaitility {
     public static ConditionFactory waitAtMost(Duration timeout) {
         return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(timeout), defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultPollExecutorService);
+                defaultExecutorLifecycle);
     }
 
     /**
@@ -386,7 +397,7 @@ public class Awaitility {
     public static ConditionFactory waitAtMost(long value, TimeUnit unit) {
         return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(new Duration(value, unit)), defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultPollExecutorService);
+                defaultExecutorLifecycle);
     }
 
     /**

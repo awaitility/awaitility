@@ -1,7 +1,7 @@
 package org.awaitility.core;
 
 /**
- * A function (because Awaitility doesn't use Java 8)
+ * A function (because Awaitility doesn't require Java 8)
  *
  * @param <T> the type of the input to the function
  * @param <R> the type of the result of the function

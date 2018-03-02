@@ -6,6 +6,8 @@ Changelog next version
 * Updated Objenesis dependency from 2.5.1 to 2.6.0 (issue 104)
 * Use wall-clock agnostic System.nanoTime instead of System.currentTimeMillis internally (thanks to Ben Barnard for pull request)
 * Improved error messages for assertion conditions when using aliases. Previously aliases could be included twice in the ConditionTimeoutException which obscured the error message somewhat (issue 108).
+* Fixed so that Awaitility doesn't stop working when using custom threading with multiple conditions. This also greatly improves use cases where one supplies a custom ExecutorService to Awaitility.
+  It'll no longer be shutdown after each call to Awaitility. It's up to you as a user to shutdown the ExecutorService that you provide to Awaitility (issue 101).
 
 Changelog 3.0.0 (2017-04-28)
 ----------------------------

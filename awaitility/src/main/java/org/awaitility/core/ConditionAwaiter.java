@@ -19,11 +19,7 @@ import org.awaitility.Duration;
 
 import java.beans.Introspector;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -54,7 +50,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         }
         this.conditionSettings = conditionSettings;
         this.conditionEvaluator = conditionEvaluator;
-        this.executor = conditionSettings.getPollExecutorService();
+        this.executor = conditionSettings.getExecutorLifecycle().supplyExecutorService();
         this.uncaughtThrowable = new AtomicReference<Throwable>();
     }
 
@@ -79,12 +75,16 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         ConditionEvaluationResult lastResult = null;
         Duration evaluationDuration = new Duration(0, MILLISECONDS);
         try {
+            if (executor.isShutdown() || executor.isTerminated()) {
+                throw new IllegalStateException("The executor service that Awaitility is instructed to use has been shutdown so condition evaluation cannot be performed. Is there something wrong the thread or executor configuration?");
+            }
+
             conditionEvaluationHandler.start();
             if (!pollDelay.isZero()) {
                 Thread.sleep(pollDelay.getValueInMS());
             }
             Duration pollInterval = pollDelay;
-            while (!executor.isShutdown() && maxWaitTime.compareTo(evaluationDuration) > 0) {
+            while (maxWaitTime.compareTo(evaluationDuration) > 0) {
                 pollCount = pollCount + 1;
                 lastResult = executor.submit(new ConditionPoller(pollInterval)).get(maxTimeout, maxTimeoutUnit);
                 if (lastResult.isSuccessful() || lastResult.hasThrowable()) {
@@ -144,15 +144,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             CheckedExceptionRethrower.safeRethrow(e);
         } finally {
             uncaughtThrowable.set(null);
-            executor.shutdown();
-            try {
-                if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                    executor.shutdownNow();
-                    executor.awaitTermination(1, TimeUnit.SECONDS);
-                }
-            } catch (InterruptedException e) {
-                CheckedExceptionRethrower.safeRethrow(e);
-            }
+            conditionSettings.getExecutorLifecycle().executeNormalCleanupBehavior(executor);
         }
     }
 
@@ -166,11 +158,12 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
         if (!conditionSettings.shouldExceptionBeIgnored(throwable)) {
             uncaughtThrowable.set(throwable);
             // We shutdown the executor "now" in order to fail the test immediately
-            executor.shutdownNow();
+            conditionSettings.getExecutorLifecycle().executeUnexpectedCleanupBehavior(executor);
         }
     }
 
