@@ -21,7 +21,9 @@ import org.awaitility.constraint.WaitConstraint;
 import org.awaitility.pollinterval.FixedPollInterval;
 import org.awaitility.pollinterval.PollInterval;
 import org.awaitility.spi.ProxyConditionFactory;
+import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 
 import java.util.Iterator;
 import java.util.concurrent.Callable;
@@ -629,6 +631,20 @@ public class ConditionFactory {
      */
     public <T> T until(final Callable<T> supplier, final Matcher<? super T> matcher) {
         return until(new CallableHamcrestCondition<T>(supplier, matcher, generateConditionSettings()));
+    }
+
+    public <T> T until(final Callable<T> supplier, final Predicate<? super T> predicate) {
+        return until(supplier, new TypeSafeMatcher<T>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("the predicate to return true");
+            }
+
+            @Override
+            protected boolean matchesSafely(T item) {
+                return predicate.matches(item);
+            }
+        });
     }
 
     /**
