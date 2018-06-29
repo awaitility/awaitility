@@ -1,3 +1,7 @@
+Changelog next version
+----------------------
+* Hamcrest condition evaluation should be safer if called from multiple threads
+
 Changelog 3.1.0 (2018-03-02)
 ----------------------------
 * Bumped all identified out of data properties, some of which applied to dependencies, and bumped all plugin versions, tests are all passing (thanks to Andy Glick for pull request)

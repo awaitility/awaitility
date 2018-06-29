@@ -26,7 +26,7 @@ public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
 
     private ConditionAwaiter conditionAwaiter;
 
-    private T lastResult;
+    private volatile T lastResult;
     private final ConditionEvaluationHandler<T> conditionEvaluationHandler;
 
     /**
