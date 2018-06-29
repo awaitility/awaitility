@@ -16,11 +16,13 @@
 
 package org.awaitility.kotlin
 
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.catchThrowable
 import org.awaitility.Awaitility.await
 import org.awaitility.classes.Asynch
 import org.awaitility.classes.FakeRepository
 import org.awaitility.classes.FakeRepositoryImpl
-import org.awaitility.core.ConditionFactory
 import org.awaitility.core.ConditionTimeoutException
 import org.hamcrest.Matchers.*
 import org.junit.Before
@@ -34,7 +36,7 @@ class KotlinTest {
 
     @Rule
     @JvmField
-    val exception = ExpectedException.none()
+    val exception: ExpectedException = ExpectedException.none()
 
     lateinit var asynch: Asynch
     lateinit var fakeRepository: FakeRepository
@@ -60,7 +62,7 @@ class KotlinTest {
     @Test
     fun assertionConditionFailsWithANiceErrorMessage() {
         exception.expect(ConditionTimeoutException::class.java)
-        exception.expectMessage(allOf(startsWith("Assertion condition defined in"), endsWith("Expected <2>, actual <1> within 1 seconds.")))
+        exception.expectMessage(startsWith("Assertion condition defined in"))
 
         Asynch(fakeRepository).perform()
         await().atMost(1, SECONDS).untilAsserted { assertEquals(2, fakeRepository.value) }
@@ -76,15 +78,20 @@ class KotlinTest {
     }
 
     @Test
-    fun extensionFn() {
+    fun untilCallToExtensionFn() {
         Asynch(fakeRepository).perform()
 
-        await().untilFun { fakeRepository.value } matches { it == 1 }
+        await().untilCallTo { fakeRepository.value } matches { it == 1 }
+    }
+
+    @Test
+    fun untilCallToExtensionFnHasADecentErrorMessage() {
+        Asynch(fakeRepository).perform()
+
+        val throwable = catchThrowable {
+            await().atMost(1, SECONDS).untilCallTo { fakeRepository.value } matches { it == 2 }
+        }
+
+        assertThat(throwable).isExactlyInstanceOf(ConditionTimeoutException::class.java).hasMessageEndingWith("expected the predicate to return <true> but it returned <false> for input of <1> within 1 seconds.")
     }
 }
-
-data class AwaitilityKotlinCondition<T>(val cond: ConditionFactory, val fn: () -> T?)
-
-fun <T> ConditionFactory.untilFun(fn: () -> T?) = AwaitilityKotlinCondition(this, fn)
-
-infix fun <T> AwaitilityKotlinCondition<T>.matches(pred: (T?) -> Boolean) = cond.until(fn, pred)

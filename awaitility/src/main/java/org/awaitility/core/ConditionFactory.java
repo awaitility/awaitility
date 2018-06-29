@@ -633,11 +633,29 @@ public class ConditionFactory {
         return until(new CallableHamcrestCondition<T>(supplier, matcher, generateConditionSettings()));
     }
 
+    /**
+     * Wait until the given supplier matches the supplied predicate. For example:
+     *
+     * <pre>
+     * await().until(myRepository::count, cnt -> cnt == 2);
+     * </pre>
+     *
+     * @param supplier The supplier that returns the object that will be evaluated by the predicate.
+     * @param predicate The predicate that must match
+     * @param <T> the generic type
+     * @since 3.1.1
+     * @return a T object.
+     */
     public <T> T until(final Callable<T> supplier, final Predicate<? super T> predicate) {
         return until(supplier, new TypeSafeMatcher<T>() {
             @Override
+            protected void describeMismatchSafely(T item, Description description) {
+                description.appendText("it returned <false> for input of ").appendValue(item);
+            }
+
+            @Override
             public void describeTo(Description description) {
-                description.appendText("the predicate to return true");
+                description.appendText("the predicate to return <true>");
             }
 
             @Override

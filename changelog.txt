@@ -2,6 +2,19 @@ Changelog next version
 ----------------------
 * Hamcrest condition evaluation should be safer if called from multiple threads
 * Fixed bug where error message showed in Hamcrest condition could be the same as the expected value when conditional evaluation time exceeded at most time (issue 109).
+* Added org.awaitility.core.ConditionFactory.until(java.util.concurrent.Callable<T>, org.awaitility.core.Predicate<? super T>) that allows you to use a predicate to evaluate a condition like this:
+    await().until(myRepository::count, cnt -> cnt == 2);
+* Added Kotlin module. In maven add:
+
+    <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility-kotlin</artifactId>
+            <version>3.1.1</version>
+    </dependency>
+
+  This module adds an extension function called "untilCallTo" (in org.awaitility.kotlin.AwaitilityKt) that allows you to write conditions as:
+
+     await().untilCallTo { fakeRepository.value } matches { it == 1 }
 
 Changelog 3.1.0 (2018-03-02)
 ----------------------------
