@@ -19,7 +19,7 @@ import org.awaitility.core.ConditionFactory
 data class AwaitilityKtUntilFunCondition<T> internal constructor(val factory: ConditionFactory, val fn: () -> T?)
 
 /**
- * Infix function which is what allows us to write the supplier to the left-hand side of [matches].
+ * Infix function which is what allows us to write the predicate on right-hand side of [matches] without using a dot.
  *
  * @param pred The predicate that determines whether or not the condition is fulfilled.
  */
