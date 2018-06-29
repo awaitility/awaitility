@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * Hamcrest condition evaluation should be safer if called from multiple threads
+* Fixed bug where error message showed in Hamcrest condition could be the same as the expected value when conditional evaluation time exceeded at most time (issue 109).
 
 Changelog 3.1.0 (2018-03-02)
 ----------------------------

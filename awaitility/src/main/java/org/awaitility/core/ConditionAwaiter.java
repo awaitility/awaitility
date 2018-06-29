@@ -66,14 +66,13 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         final Duration minWaitTime = conditionSettings.getMinWaitTime();
 
         final long maxTimeout = maxWaitTime.getValue();
-        final TimeUnit maxTimeoutUnit = maxWaitTime.getTimeUnit();
-
         long pollingStartedNanos = System.nanoTime() - pollDelay.getValueInNS();
 
         int pollCount = 0;
         boolean succeededBeforeTimeout = false;
         ConditionEvaluationResult lastResult = null;
         Duration evaluationDuration = new Duration(0, MILLISECONDS);
+        Future<ConditionEvaluationResult> currentConditionEvaluation = null;
         try {
             if (executor.isShutdown() || executor.isTerminated()) {
                 throw new IllegalStateException("The executor service that Awaitility is instructed to use has been shutdown so condition evaluation cannot be performed. Is there something wrong the thread or executor configuration?");
@@ -86,7 +85,11 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             Duration pollInterval = pollDelay;
             while (maxWaitTime.compareTo(evaluationDuration) > 0) {
                 pollCount = pollCount + 1;
-                lastResult = executor.submit(new ConditionPoller(pollInterval)).get(maxTimeout, maxTimeoutUnit);
+                // Only wait for the next condition evaluation for at most what's remaining of
+                Duration maxWaitTimeForThisCondition = maxWaitTime.minus(evaluationDuration);
+                currentConditionEvaluation = executor.submit(new ConditionPoller(pollInterval));
+                // Wait for condition evaluation to complete with "maxWaitTimeForThisCondition" or else throw TimeoutException
+                lastResult = currentConditionEvaluation.get(maxWaitTimeForThisCondition.getValue(), maxWaitTimeForThisCondition.getTimeUnit());
                 if (lastResult.isSuccessful() || lastResult.hasThrowable()) {
                     break;
                 }
@@ -102,6 +105,12 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             lastResult = new ConditionEvaluationResult(false, e.getCause(), null);
         } catch (Throwable e) {
             lastResult = new ConditionEvaluationResult(false, e, null);
+        } finally {
+            if (currentConditionEvaluation != null) {
+                // Cancelling future in order to avoid race-condition with last result for Hamcrest matchers
+                // See https://github.com/awaitility/awaitility/issues/109
+                currentConditionEvaluation.cancel(true);
+            }
         }
 
         try {
