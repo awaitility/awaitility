@@ -150,6 +150,18 @@ public class ConditionFactory {
     }
 
     /**
+     * Set the alias
+     *
+     * @param alias alias
+     * @return the condition factory
+     * @see org.awaitility.Awaitility#await(String)
+     */
+    public ConditionFactory alias(String alias) {
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay,
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+    }
+
+    /**
      * Condition has to be evaluated not earlier than <code>timeout</code> before throwing a timeout exception.
      *
      * @param timeout the timeout

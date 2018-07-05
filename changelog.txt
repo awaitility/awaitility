@@ -1,3 +1,8 @@
+Changelog next version
+----------------------
+* Added "alias" method to awaitility which allows one to set the alias using a more english-like DSL:
+    await().with().alias("my alias"). ..
+
 Changelog 3.1.1 (2018-06-29)
 ----------------------------
 * Hamcrest condition evaluation should be safer if called from multiple threads
