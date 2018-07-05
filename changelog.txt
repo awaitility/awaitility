@@ -2,6 +2,20 @@ Changelog next version
 ----------------------
 * Added "alias" method to awaitility which allows one to set the alias using a more english-like DSL:
     await().with().alias("my alias"). ..
+* Added several new Kotlin extension methods. For example you can now do:
+
+    await withPollInterval ONE_HUNDRED_MILLISECONDS ignoreException IllegalArgumentException::class untilAsserted  {
+        assertThat(fakeRepository.value).isEqualTo(1)
+    }
+
+  or:
+
+     await withAlias "Kotlin Test" ignoreExceptionsInstanceOf
+            IllegalArgumentException::class withPollDelay ONE_HUNDRED_MILLISECONDS withPollInterval
+            fibonacci().with().offset(1).and().timeUnit(MILLISECONDS) atLeast TWO_HUNDRED_MILLISECONDS atMost
+            ONE_MINUTE untilCallTo { fakeRepository.value } matches { it == 1 }
+
+  All extension functions can be imported from the "org.awaitility.kotlin" package (e.g. 'import org.awaitility.kotlin.*')
 
 Changelog 3.1.1 (2018-06-29)
 ----------------------------
