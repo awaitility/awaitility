@@ -40,8 +40,8 @@ class KotlinTest {
     @JvmField
     val exception: ExpectedException = ExpectedException.none()
 
-    lateinit var asynch: Asynch
-    lateinit var fakeRepository: FakeRepository
+    private lateinit var asynch: Asynch
+    private lateinit var fakeRepository: FakeRepository
 
     @Before
     fun setup() {
