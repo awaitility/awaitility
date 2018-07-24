@@ -1,4 +1,4 @@
-Changelog 3.1.1 (2018-07-24)
+Changelog 3.1.2 (2018-07-24)
 ----------------------------
 * Added "alias" method to awaitility which allows one to set the alias using a more english-like DSL:
     await().with().alias("my alias"). ..
