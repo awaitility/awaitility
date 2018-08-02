@@ -593,7 +593,7 @@ public class ConditionFactory {
             throw new UnsupportedOperationException("There's currently no plugin installed that can handle proxy conditions, please consider adding 'awaitility-proxy' to the classpath. If using Maven you can do:" +
                     "<dependency>\n" +
                     "\t<groupId>org.awaitility</groupId>\n" +
-                    "\t<artifactId>awaitility</artifactId>\n" +
+                    "\t<artifactId>awaitility-proxy</artifactId>\n" +
                     "\t<version>${awaitility.version}</version>\n" +
                     "</dependency>\n");
         }
