@@ -36,7 +36,6 @@ import static org.awaitility.proxy.AwaitilityClassProxy.to;
 import static org.hamcrest.Matchers.is;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
-@Ignore
 @RunWith(PaxExam.class)
 public class AwaitilityTest {
 
@@ -76,6 +75,7 @@ public class AwaitilityTest {
     }
 
     @Test
+    @Ignore
     public void testProxy() {
 
         Executors.newScheduledThreadPool(1).schedule(new Runnable() {
