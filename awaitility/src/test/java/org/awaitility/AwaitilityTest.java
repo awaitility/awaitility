@@ -36,8 +36,7 @@ import static java.util.concurrent.TimeUnit.*;
 import static org.awaitility.Awaitility.*;
 import static org.awaitility.Duration.ONE_SECOND;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class AwaitilityTest {
 
@@ -244,6 +243,23 @@ public class AwaitilityTest {
         } finally {
             thread.join();
             es.shutdownNow();
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void ignoredExceptionsAreAddedToExceptionHierarchy() {
+        try {
+            await().ignoreExceptions().atMost(200, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    throw new Exception("Nested");
+                }
+            });
+            fail();
+        }
+        catch (ConditionTimeoutException e) {
+            assertNotNull(e.getCause());
+            assertEquals("Nested", e.getCause().getMessage());
         }
     }
 

@@ -192,7 +192,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 return conditionEvaluator.eval(delayed);
             } catch (Throwable e) {
                 if (conditionSettings.shouldExceptionBeIgnored(e)) {
-                    return new ConditionEvaluationResult(false);
+                    return new ConditionEvaluationResult(false, null, e);
                 }
                 return new ConditionEvaluationResult(false, e, null);
             }
