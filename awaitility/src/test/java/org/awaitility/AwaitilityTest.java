@@ -52,14 +52,14 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-    public void awaitOperationBlocksAutomatically() throws Exception {
+    public void awaitOperationBlocksAutomatically() {
         new Asynch(fakeRepository).perform();
         await().until(fakeRepositoryValueEqualsOne());
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
-    public void awaitOperationSupportsSpecifyingPollIntervalUsingTimeunit() throws Exception {
+    public void awaitOperationSupportsSpecifyingPollIntervalUsingTimeunit() {
         new Asynch(fakeRepository).perform();
         with().pollInterval(20, TimeUnit.MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
         given().pollInterval(20, TimeUnit.MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
@@ -67,28 +67,28 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-    public void awaitOperationSupportsSpecifyingPollInterval() throws Exception {
+    public void awaitOperationSupportsSpecifyingPollInterval() {
         new Asynch(fakeRepository).perform();
         with().pollInterval(Duration.ONE_HUNDRED_MILLISECONDS).then().await().until(fakeRepositoryValueEqualsOne());
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
-    public void awaitOperationSupportsSpecifyingZeroAsPollDelay() throws Exception {
+    public void awaitOperationSupportsSpecifyingZeroAsPollDelay() {
         new Asynch(fakeRepository).perform();
         with().pollDelay(Duration.ZERO).pollInterval(Duration.ONE_HUNDRED_MILLISECONDS).then().await().until(fakeRepositoryValueEqualsOne());
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
-    public void awaitOperationSupportsSpecifyingZeroAsPollInterval() throws Exception {
+    public void awaitOperationSupportsSpecifyingZeroAsPollInterval() {
         new Asynch(fakeRepository).perform();
         with().pollDelay(Duration.TWO_HUNDRED_MILLISECONDS).pollInterval(Duration.ZERO).then().await().until(fakeRepositoryValueEqualsOne());
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
-    public void awaitOperationDoesntSupportSpecifyingForeverAsPollDelay() throws Exception {
+    public void awaitOperationDoesntSupportSpecifyingForeverAsPollDelay() {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("Cannot delay polling forever");
 
@@ -98,7 +98,7 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-    public void awaitOperationDoesntSupportSpecifyingForeverAsPollInterval() throws Exception {
+    public void awaitOperationDoesntSupportSpecifyingForeverAsPollInterval() {
         exception.expect(IllegalArgumentException.class);
         exception.expectMessage("Cannot use a fixed poll interval of length 'forever'");
 
@@ -108,54 +108,54 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-    public void awaitOperationSupportsSpecifyingPollDelay() throws Exception {
+    public void awaitOperationSupportsSpecifyingPollDelay() {
         new Asynch(fakeRepository).perform();
         with().pollDelay(Duration.ONE_HUNDRED_MILLISECONDS).await().until(fakeRepositoryValueEqualsOne());
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000L, expected = ConditionTimeoutException.class)
-    public void awaitOperationSupportsDefaultTimeout() throws Exception {
+    public void awaitOperationSupportsDefaultTimeout() {
         Awaitility.setDefaultTimeout(120, TimeUnit.MILLISECONDS);
         await().until(value(), greaterThan(0));
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
-    public void foreverConditionSpecificationUsingUntilWithDirectBlock() throws Exception {
+    public void foreverConditionSpecificationUsingUntilWithDirectBlock() {
         new Asynch(fakeRepository).perform();
         await().forever().until(fakeRepositoryValueEqualsOne());
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
-    public void foreverConditionWithHamcrestMatchersWithDirectBlock() throws Exception {
+    public void foreverConditionWithHamcrestMatchersWithDirectBlock() {
         new Asynch(fakeRepository).perform();
         await().forever().until(value(), equalTo(1));
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000)
-    public void foreverConditionWithHamcrestCollectionMatchersWithDirectBlock() throws Exception {
+    public void foreverConditionWithHamcrestCollectionMatchersWithDirectBlock() {
         new Asynch(fakeRepository).perform();
         await().forever().until(valueAsList(), hasItem(1));
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 3000, expected = ConditionTimeoutException.class)
-    public void throwsTimeoutExceptionWhenDoneEarlierThanAtLeastConstraint() throws Exception {
+    public void throwsTimeoutExceptionWhenDoneEarlierThanAtLeastConstraint() {
         new Asynch(fakeRepository).perform();
         await().atLeast(1, SECONDS).and().atMost(2, SECONDS).until(value(), equalTo(1));
     }
 
     @Test(timeout = 3000)
-    public void doesNotThrowTimeoutExceptionWhenDoneLaterThanAtLeastConstraint() throws Exception {
+    public void doesNotThrowTimeoutExceptionWhenDoneLaterThanAtLeastConstraint() {
         new Asynch(fakeRepository).perform();
         await().atLeast(100, NANOSECONDS).until(value(), equalTo(1));
     }
 
     @Test(timeout = 2000)
-    public void specifyingDefaultPollIntervalImpactsAllSubsequentUndefinedPollIntervalStatements() throws Exception {
+    public void specifyingDefaultPollIntervalImpactsAllSubsequentUndefinedPollIntervalStatements() {
         Awaitility.setDefaultPollInterval(20, TimeUnit.MILLISECONDS);
         new Asynch(fakeRepository).perform();
         await().until(value(), equalTo(1));
@@ -163,15 +163,14 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000, expected = ConditionTimeoutException.class)
-    public void conditionBreaksAfterDurationTimeout() throws Exception {
+    public void conditionBreaksAfterDurationTimeout() {
         new Asynch(fakeRepository).perform();
         await().atMost(200, TimeUnit.MILLISECONDS).until(value(), equalTo(1));
         assertEquals(1, fakeRepository.getValue());
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)
-    public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockWhenSetToCatchAllUncaughtExceptions()
-            throws Exception {
+    public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockWhenSetToCatchAllUncaughtExceptions() {
         catchUncaughtExceptionsByDefault();
         new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
         await().forever().until(value(), equalTo(1));
@@ -234,7 +233,7 @@ public class AwaitilityTest {
         try {
             given().pollDelay(0, MILLISECONDS).and().ignoreExceptions().await().until(new Callable<Boolean>() {
                 @Override
-                public Boolean call() throws Exception {
+                public Boolean call() {
                     return fakeRepository.getValue() == 3;
                 }
             });
@@ -264,8 +263,7 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)
-    public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockWhenCatchingAllUncaughtExceptions()
-            throws Exception {
+    public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockWhenCatchingAllUncaughtExceptions() {
         new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
         catchUncaughtExceptions().and().await().forever().until(value(), equalTo(1));
     }
@@ -305,14 +303,14 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)
-    public void exceptionsInConditionsArePropagatedToAwaitingThreadAndBreaksForeverBlock() throws Exception {
+    public void exceptionsInConditionsArePropagatedToAwaitingThreadAndBreaksForeverBlock() {
         final ExceptionThrowingFakeRepository repository = new ExceptionThrowingFakeRepository();
         new Asynch(repository).perform();
         await().until(new FakeRepositoryValue(repository), equalTo(1));
     }
 
     @Test(timeout = 2000)
-    public void awaitWithAliasDisplaysAliasWhenConditionTimeoutExceptionOccurs() throws Exception {
+    public void awaitWithAliasDisplaysAliasWhenConditionTimeoutExceptionOccurs() {
         String alias = "test";
         exception.expect(ConditionTimeoutException.class);
         exception.expectMessage(
@@ -322,20 +320,20 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-    public void awaitWithAliasDisplaysAliasWhenConditionTimeoutExceptionAndConditionIsACallableOccurs() throws Exception {
+    public void awaitWithAliasDisplaysAliasWhenConditionTimeoutExceptionAndConditionIsACallableOccurs() {
         String alias = "test";
         exception.expect(ConditionTimeoutException.class);
         exception.expectMessage("Condition with alias 'test' didn't complete within 120 milliseconds because condition returned by method \"awaitWithAliasDisplaysAliasWhenConditionTimeoutExceptionAndConditionIsACallableOccurs\" in class org.awaitility.AwaitilityTest was not fulfilled.");
 
         await(alias).atMost(120, MILLISECONDS).until(new Callable<Boolean>() {
-            public Boolean call() throws Exception {
+            public Boolean call() {
                 return fakeRepository.getValue() > 0;
             }
         });
     }
 
     @Test(timeout = 2000)
-    public void awaitDisplaysSupplierAndMatcherMismatchMessageWhenConditionTimeoutExceptionOccurs() throws Exception {
+    public void awaitDisplaysSupplierAndMatcherMismatchMessageWhenConditionTimeoutExceptionOccurs() {
         exception.expect(ConditionTimeoutException.class);
         exception.expectMessage(FakeRepositoryValue.class.getName()
                 + " expected a value greater than <0> but <0> was equal to <0> within 120 milliseconds.");
@@ -344,7 +342,7 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-    public void awaitDisplaysCallableNameWhenConditionTimeoutExceptionOccurs() throws Exception {
+    public void awaitDisplaysCallableNameWhenConditionTimeoutExceptionOccurs() {
         exception.expect(ConditionTimeoutException.class);
         exception.expectMessage(String.format("Condition %s was not fulfilled within 120 milliseconds.",
                 FakeRepositoryEqualsOne.class.getName()));
@@ -353,8 +351,7 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-    public void awaitDisplaysMethodDeclaringTheCallableWhenCallableIsAnonymousClassAndConditionTimeoutExceptionOccurs()
-            throws Exception {
+    public void awaitDisplaysMethodDeclaringTheCallableWhenCallableIsAnonymousClassAndConditionTimeoutExceptionOccurs() {
         exception.expect(ConditionTimeoutException.class);
         exception
                 .expectMessage(String
@@ -365,8 +362,7 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
-    public void awaitDisplaysMethodDeclaringTheSupplierWhenSupplierIsAnonymousClassAndConditionTimeoutExceptionOccurs()
-            throws Exception {
+    public void awaitDisplaysMethodDeclaringTheSupplierWhenSupplierIsAnonymousClassAndConditionTimeoutExceptionOccurs() {
         exception.expect(ConditionTimeoutException.class);
         exception
                 .expectMessage(String
@@ -377,7 +373,7 @@ public class AwaitilityTest {
     }
 
     @Test
-    public void awaitilityThrowsIllegalStateExceptionWhenTimeoutIsLessThanPollDelay() throws Exception {
+    public void awaitilityThrowsIllegalStateExceptionWhenTimeoutIsLessThanPollDelay() {
         exception.expect(IllegalStateException.class);
         exception.expectMessage(is("Timeout (10 seconds) must be greater than the poll delay (10 minutes)."));
 
@@ -385,7 +381,7 @@ public class AwaitilityTest {
     }
 
     @Test
-    public void awaitilityThrowsIllegalStateExceptionWhenTimeoutIsEqualToPollDelay() throws Exception {
+    public void awaitilityThrowsIllegalStateExceptionWhenTimeoutIsEqualToPollDelay() {
         exception.expect(IllegalStateException.class);
         exception.expectMessage(is("Timeout (200 milliseconds) must be greater than the poll delay (200 milliseconds)."));
 
@@ -396,7 +392,7 @@ public class AwaitilityTest {
     public void rethrowsExceptionsInCallable() {
         await().atMost(1, TimeUnit.SECONDS)
                 .until(new Callable<Boolean>() {
-                           public Boolean call() throws Exception {
+                           public Boolean call() {
                                throw new IllegalStateException("Hello");
                            }
                        }
@@ -410,7 +406,7 @@ public class AwaitilityTest {
     private Callable<Boolean> fakeRepositoryValueEqualsOneAsAnonymous() {
         return new Callable<Boolean>() {
 
-            public Boolean call() throws Exception {
+            public Boolean call() {
                 return fakeRepository.getValue() == 1;
             }
         };
@@ -422,7 +418,7 @@ public class AwaitilityTest {
 
     private Callable<Integer> valueAsAnonymous() {
         return new Callable<Integer>() {
-            public Integer call() throws Exception {
+            public Integer call() {
                 return fakeRepository.getValue();
             }
         };
@@ -430,7 +426,7 @@ public class AwaitilityTest {
 
     private Callable<List<Integer>> valueAsList() {
         return new Callable<List<Integer>>() {
-            public List<Integer> call() throws Exception {
+            public List<Integer> call() {
                 return Collections.singletonList(fakeRepository.getValue());
             }
         };
