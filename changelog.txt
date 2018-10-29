@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * Last exception is included in hierarchy even if ignoreExceptions is set (issue 121) (thanks to Bryn Cooke for pull request)
+* Removed the use of java.beans.Introspector for de-capitalization of String's since it doesn't work on Android (issue 125)
 
 Changelog 3.1.2 (2018-07-24)
 ----------------------------

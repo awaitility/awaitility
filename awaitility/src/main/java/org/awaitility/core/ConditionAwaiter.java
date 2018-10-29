@@ -17,7 +17,6 @@ package org.awaitility.core;
 
 import org.awaitility.Duration;
 
-import java.beans.Introspector;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -121,11 +120,12 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             } else if (!succeededBeforeTimeout) {
                 final String maxWaitTimeLowerCase = maxWaitTime.getTimeUnitAsString();
                 final String message;
+                String timeoutMessage = getTimeoutMessage();
                 if (conditionSettings.hasAlias()) {
                     message = String.format("Condition with alias '%s' didn't complete within %s %s because %s.",
-                            conditionSettings.getAlias(), maxTimeout, maxWaitTimeLowerCase, Introspector.decapitalize(getTimeoutMessage()));
+                            conditionSettings.getAlias(), maxTimeout, maxWaitTimeLowerCase, decapitalize(timeoutMessage));
                 } else {
-                    message = String.format("%s within %s %s.", getTimeoutMessage(), maxTimeout, maxWaitTimeLowerCase);
+                    message = String.format("%s within %s %s.", timeoutMessage, maxTimeout, maxWaitTimeLowerCase);
                 }
 
                 Throwable cause = lastResult != null && lastResult.hasTrace() ? lastResult.getTrace() : null;
@@ -155,6 +155,15 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             uncaughtThrowable.set(null);
             conditionSettings.getExecutorLifecycle().executeNormalCleanupBehavior(executor);
         }
+    }
+
+    private static String decapitalize(String str) {
+        if (str == null) {
+            return "";
+        }
+        String firstLetter = str.substring(0, 1).toLowerCase();
+        String restLetters = str.substring(1);
+        return firstLetter + restLetters;
     }
 
     /**
