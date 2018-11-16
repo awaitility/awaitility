@@ -6,4 +6,3 @@ mvn release:prepare -Prelease -DautoVersionSubmodules=true -Dtag=awaitility-${re
 mvn release:perform -Prelease
 
 echo "Maven release of Awaitility $releaseVersion completed successfully"
-
