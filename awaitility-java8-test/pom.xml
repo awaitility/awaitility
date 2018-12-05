@@ -20,7 +20,7 @@
     <parent>
         <artifactId>awaitility-parent</artifactId>
         <groupId>org.awaitility</groupId>
-        <version>3.1.4</version>
+        <version>3.1.5-SNAPSHOT</version>
     </parent>
     <artifactId>awaitility-java8-test</artifactId>
     <name>Awaitility tests for Java 8</name>
