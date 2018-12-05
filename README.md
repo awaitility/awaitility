@@ -18,9 +18,9 @@ public void updatesCustomerStatus() throws Exception {
 ```
 
 ## News
+* 2018-12-05: Awaitility `3.1.4` is released with a new Kotlin extension function: `untilNotNull`. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2018-11-16: Awaitility `3.1.3` is released with improvements and changes. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2018-07-24: Awaitility `3.1.2` is released with a new `alias` method and many more [Kotlin](https://github.com/awaitility/awaitility/wiki/Kotlin) extension functions. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
-* 2018-06-29: Awaitility `3.1.1` is released with bug fixes, improvements and a [Kotlin](https://github.com/awaitility/awaitility/wiki/Kotlin) extension. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 
 [Older news](https://github.com/awaitility/awaitility/wiki/OldNews)
 
