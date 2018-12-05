@@ -61,6 +61,20 @@ infix fun <T> AwaitilityKtUntilFunCondition<T>.matches(pred: (T?) -> Boolean) = 
  */
 infix fun <T> ConditionFactory.untilCallTo(fn: () -> T?) = AwaitilityKtUntilFunCondition(this, fn)
 
+
+/**
+ * An extension function to `ConditionFactory` that allows you do write conditions such as:
+ *
+ * ```
+ * val data = await untilNotNull { myDataRepository.findById("id") }
+ * ```
+ *
+ * Note that [await] is a getter that needs to imported from `org.awaitility.kotlin`.
+ *
+ * @since 3.1.4
+ */
+infix fun <T> ConditionFactory.untilNotNull(fn: () -> T?) = (untilCallTo(fn).matches { it != null })!!
+
 /**
  * An extension function to `ConditionFactory` that allows you do write conditions such as:
  *

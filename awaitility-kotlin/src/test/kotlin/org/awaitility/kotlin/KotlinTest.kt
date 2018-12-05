@@ -108,7 +108,7 @@ class KotlinTest {
     fun untilAsserted() {
         Asynch(fakeRepository).perform()
 
-        await withPollInterval ONE_HUNDRED_MILLISECONDS ignoreException IllegalArgumentException::class untilAsserted  {
+        await withPollInterval ONE_HUNDRED_MILLISECONDS ignoreException IllegalArgumentException::class untilAsserted {
             assertThat(fakeRepository.value).isEqualTo(1)
         }
     }
@@ -123,4 +123,32 @@ class KotlinTest {
 
         assertThat(throwable).isExactlyInstanceOf(ConditionTimeoutException::class.java).hasMessageEndingWith("expected the predicate to return <true> but it returned <false> for input of <1> within 1 seconds.")
     }
+
+    @Test
+    fun usingLotsOfMethodsInDsl2() {
+        val fakeObjectRepository = FakeStringRepository(null)
+        AsynchObject(fakeObjectRepository).perform()
+
+        val data = await untilNotNull { fakeObjectRepository.value }
+        assertThat(data.value).isEqualTo("Hello") // No need for "data?.value" since we know it's not null!
+    }
 }
+
+class AsynchObject(private val repository: FakeStringRepository) {
+
+    fun perform() {
+        val thread = Thread(Runnable {
+            try {
+                Thread.sleep(600)
+                repository.value = Data("Hello")
+            } catch (e: InterruptedException) {
+                throw RuntimeException(e)
+            }
+        })
+        thread.start()
+    }
+}
+
+
+data class Data(var value: String)
+data class FakeStringRepository(var value: Data?)
