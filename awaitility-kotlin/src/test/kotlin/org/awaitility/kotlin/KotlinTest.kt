@@ -150,7 +150,7 @@ class AsynchObject(private val repository: FakeStringRepository) {
     fun perform() {
         val thread = Thread(Runnable {
             try {
-                Thread.sleep(2600)
+                Thread.sleep(600)
                 repository.data = Data("Hello")
             } catch (e: InterruptedException) {
                 throw RuntimeException(e)
