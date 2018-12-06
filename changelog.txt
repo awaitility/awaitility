@@ -1,3 +1,22 @@
+Changelog next version
+----------------------
+* Added a new Kotlin extension function called "has" that allows writing succinct expressions when testing for properties in e.g. data classes. For example:
+
+  val data = await untilCallTo { fakeObjectRepository.data } has {
+       state == "Hello"
+  }
+
+  where "data" is defined as:
+
+  data class Data(var state: String)
+
+  I.e. inside the scope of "has" the "Data" instance is used as "this" (see [here](https://kotlinlang.org/docs/reference/lambdas.html#function-literals-with-receiver) for more info).
+  This is the same as doing:
+
+  await untilCallTo { fakeObjectRepository.data } matches { data ->
+      data?.state == "Hello"
+  }
+
 Changelog 3.1.4 (2018-12-05)
 ----------------------------
 * Added "untilNotNull" extension function to the Kotlin DSL: val data = await untilNotNull { myDataRepository.findById("id") }

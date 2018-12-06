@@ -125,12 +125,23 @@ class KotlinTest {
     }
 
     @Test
-    fun usingLotsOfMethodsInDsl2() {
+    fun untilNotNull() {
         val fakeObjectRepository = FakeStringRepository(null)
         AsynchObject(fakeObjectRepository).perform()
 
-        val data = await untilNotNull { fakeObjectRepository.value }
-        assertThat(data.value).isEqualTo("Hello") // No need for "data?.value" since we know it's not null!
+        val data = await untilNotNull { fakeObjectRepository.data }
+        assertThat(data.state).isEqualTo("Hello") // No need for "data?.value" since we know it's not null!
+    }
+
+    @Test
+    fun has() {
+        val fakeObjectRepository = FakeStringRepository(null)
+        AsynchObject(fakeObjectRepository).perform()
+
+        val data = await untilCallTo { fakeObjectRepository.data } has {
+            state == "Hello"
+        }
+        assertThat(data.state).isEqualTo("Hello")
     }
 }
 
@@ -139,8 +150,8 @@ class AsynchObject(private val repository: FakeStringRepository) {
     fun perform() {
         val thread = Thread(Runnable {
             try {
-                Thread.sleep(600)
-                repository.value = Data("Hello")
+                Thread.sleep(2600)
+                repository.data = Data("Hello")
             } catch (e: InterruptedException) {
                 throw RuntimeException(e)
             }
@@ -150,5 +161,5 @@ class AsynchObject(private val repository: FakeStringRepository) {
 }
 
 
-data class Data(var value: String)
-data class FakeStringRepository(var value: Data?)
+data class Data(var state: String)
+data class FakeStringRepository(var data: Data?)

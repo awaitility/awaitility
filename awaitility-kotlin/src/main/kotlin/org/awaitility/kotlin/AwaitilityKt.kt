@@ -1,4 +1,5 @@
 @file:JvmName("AwaitilityKt")
+@file:Suppress("UNCHECKED_CAST")
 
 /**
  * Contains Awaitility extension functions
@@ -47,6 +48,30 @@ data class AwaitilityKtUntilFunCondition<T> internal constructor(internal val fa
  */
 infix fun <T> AwaitilityKtUntilFunCondition<T>.matches(pred: (T?) -> Boolean) = factory.until(fn, pred)
 
+
+/**
+ * Infix function that allows us to write the predicate on right-hand side of [has] without using a dot.
+ * This allows expressions such as:
+ *
+ * ```
+ * val data = await untilCallTo { fakeObjectRepository.data } has {
+ *     state == "Hello"
+ * }
+ * ```
+ * where `data` is defined as:
+ *
+ * ```
+ * data class Data(var state: String)
+ * ```
+ *
+ * I.e. inside the scope of `has` the `Data` instance is used as `this` (see [here](https://kotlinlang.org/docs/reference/lambdas.html#function-literals-with-receiver) for more info).
+ *
+ * @param pred The predicate that determines whether or not the condition is fulfilled.
+ */
+infix fun <T> AwaitilityKtUntilFunCondition<T?>.has(pred: T.() -> Boolean) = factory.until(fn) { t : T? ->
+    pred(t!!)
+} as T
+
 /**
  * An extension function to `ConditionFactory` that allows you do write conditions such as:
  *
@@ -59,7 +84,7 @@ infix fun <T> AwaitilityKtUntilFunCondition<T>.matches(pred: (T?) -> Boolean) = 
  * @param fn A function that returns the value that will be evaluated by the predicate in [matches].
  * @since 3.1.1
  */
-infix fun <T> ConditionFactory.untilCallTo(fn: () -> T?) = AwaitilityKtUntilFunCondition(this, fn)
+infix fun <T> ConditionFactory.untilCallTo(fn: () -> T) = AwaitilityKtUntilFunCondition(this, fn)
 
 
 /**
