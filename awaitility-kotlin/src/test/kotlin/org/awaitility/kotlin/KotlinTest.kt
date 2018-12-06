@@ -127,16 +127,24 @@ class KotlinTest {
     @Test
     fun untilNotNull() {
         val fakeObjectRepository = FakeStringRepository(null)
-        AsynchObject(fakeObjectRepository).perform()
+        AsynchObject(fakeObjectRepository, Data("Hello")).perform()
 
         val data = await untilNotNull { fakeObjectRepository.data }
         assertThat(data.state).isEqualTo("Hello") // No need for "data?.value" since we know it's not null!
     }
 
     @Test
+    fun untilNull() {
+        val fakeObjectRepository = FakeStringRepository(Data("Hello"))
+        AsynchObject(fakeObjectRepository, null).perform()
+
+        await untilNull { fakeObjectRepository.data }
+    }
+
+    @Test
     fun has() {
         val fakeObjectRepository = FakeStringRepository(null)
-        AsynchObject(fakeObjectRepository).perform()
+        AsynchObject(fakeObjectRepository, Data("Hello")).perform()
 
         val data = await untilCallTo { fakeObjectRepository.data } has {
             state == "Hello"
@@ -145,13 +153,13 @@ class KotlinTest {
     }
 }
 
-class AsynchObject(private val repository: FakeStringRepository) {
+class AsynchObject(private val repository: FakeStringRepository, private val changeTo: Data?) {
 
     fun perform() {
         val thread = Thread(Runnable {
             try {
                 Thread.sleep(600)
-                repository.data = Data("Hello")
+                repository.data = changeTo
             } catch (e: InterruptedException) {
                 throw RuntimeException(e)
             }

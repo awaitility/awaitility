@@ -11,6 +11,8 @@ import org.awaitility.Duration
 import org.awaitility.core.ConditionFactory
 import org.awaitility.pollinterval.PollInterval
 import org.hamcrest.Matcher
+import org.hamcrest.Matchers.not
+import org.hamcrest.Matchers.nullValue
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KClass
@@ -67,8 +69,9 @@ infix fun <T> AwaitilityKtUntilFunCondition<T>.matches(pred: (T?) -> Boolean) = 
  * I.e. inside the scope of `has` the `Data` instance is used as `this` (see [here](https://kotlinlang.org/docs/reference/lambdas.html#function-literals-with-receiver) for more info).
  *
  * @param pred The predicate that determines whether or not the condition is fulfilled.
+ * @since 3.1.5
  */
-infix fun <T> AwaitilityKtUntilFunCondition<T?>.has(pred: T.() -> Boolean) = factory.until(fn) { t : T? ->
+infix fun <T> AwaitilityKtUntilFunCondition<T?>.has(pred: T.() -> Boolean) = factory.until(fn) { t: T? ->
     pred(t!!)
 } as T
 
@@ -86,7 +89,6 @@ infix fun <T> AwaitilityKtUntilFunCondition<T?>.has(pred: T.() -> Boolean) = fac
  */
 infix fun <T> ConditionFactory.untilCallTo(fn: () -> T) = AwaitilityKtUntilFunCondition(this, fn)
 
-
 /**
  * An extension function to `ConditionFactory` that allows you do write conditions such as:
  *
@@ -98,7 +100,22 @@ infix fun <T> ConditionFactory.untilCallTo(fn: () -> T) = AwaitilityKtUntilFunCo
  *
  * @since 3.1.4
  */
-infix fun <T> ConditionFactory.untilNotNull(fn: () -> T?) = (untilCallTo(fn).matches { it != null })!!
+infix fun <T> ConditionFactory.untilNotNull(fn: () -> T?) = (until(fn, not(nullValue())))!!
+
+/**
+ * An extension function to `ConditionFactory` that allows you do write conditions such as:
+ *
+ * ```
+ * await untilNull { myDataRepository.findById("id") }
+ * ```
+ *
+ * Note that [await] is a getter that needs to imported from `org.awaitility.kotlin`.
+ *
+ * @since 3.1.5
+ */
+infix fun <T> ConditionFactory.untilNull(fn: () -> T?) {
+    until(fn, nullValue())
+}
 
 /**
  * An extension function to `ConditionFactory` that allows you do write conditions such as:
