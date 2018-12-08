@@ -24,6 +24,7 @@ public class ConditionSettings {
     private final WaitConstraint waitConstraint;
     private final PollInterval pollInterval;
     private final Duration pollDelay;
+    private final Consumer<OnTimeoutContext> onTimeoutCallback;
     private final boolean catchUncaughtExceptions;
     private final ExceptionIgnorer ignoreExceptions;
     private final ConditionEvaluationListener conditionEvaluationListener;
@@ -37,13 +38,15 @@ public class ConditionSettings {
      * @param waitConstraint              a {@link org.awaitility.constraint.WaitConstraint} object.
      * @param pollInterval                a {@link org.awaitility.Duration} object.
      * @param pollDelay                   a {@link org.awaitility.Duration} object.
+     * @param onTimeoutCallback           The callback to call on timeout
      * @param conditionEvaluationListener a {@link ConditionEvaluationListener} object.
      * @param ignoreExceptions            a {@link ExceptionIgnorer} object.
      * @param executorLifecycle           Responsible for performing executor service cleanup after each condition evaluation round
      */
     ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
-                      PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
-                      ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle) {
+                      PollInterval pollInterval, Duration pollDelay, Consumer<OnTimeoutContext> onTimeoutCallback,
+                      ConditionEvaluationListener conditionEvaluationListener, ExceptionIgnorer ignoreExceptions,
+                      ExecutorLifecycle executorLifecycle) {
         if (waitConstraint == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
@@ -55,6 +58,7 @@ public class ConditionSettings {
         this.waitConstraint = waitConstraint;
         this.pollInterval = pollInterval;
         this.pollDelay = pollDelay;
+        this.onTimeoutCallback = onTimeoutCallback;
         this.catchUncaughtExceptions = catchUncaughtExceptions;
         this.conditionEvaluationListener = conditionEvaluationListener;
         this.ignoreExceptions = ignoreExceptions;
@@ -103,6 +107,13 @@ public class ConditionSettings {
      */
     public Duration getPollDelay() {
         return pollDelay;
+    }
+
+    /**
+     * @return The callback to call on timeout
+     */
+    public Consumer<OnTimeoutContext> getOnTimeoutCallback() {
+        return onTimeoutCallback;
     }
 
     /**

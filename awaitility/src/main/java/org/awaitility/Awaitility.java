@@ -110,6 +110,11 @@ public class Awaitility {
     private static final Duration DEFAULT_POLL_DELAY = null;
 
     private static final PollInterval DEFAULT_POLL_INTERVAL = new FixedPollInterval(ONE_HUNDRED_MILLISECONDS);
+    
+    /**
+     * The default method to call on timeout.
+     */
+    private static final Consumer<OnTimeoutContext> DEFAULT_ON_TIMEOUT_CALLBACK = new ConditionTimeoutExceptionThrowingOnTimeoutCallback();
 
     /**
      * The default poll interval (fixed 100 ms).
@@ -314,7 +319,7 @@ public class Awaitility {
      */
     public static ConditionFactory await(String alias) {
         return new ConditionFactory(alias, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                DEFAULT_ON_TIMEOUT_CALLBACK, defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
                 defaultExecutorLifecycle);
     }
 
@@ -327,7 +332,7 @@ public class Awaitility {
      */
     public static ConditionFactory catchUncaughtExceptions() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                DEFAULT_ON_TIMEOUT_CALLBACK, defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
                 defaultExecutorLifecycle);
     }
 
@@ -339,7 +344,7 @@ public class Awaitility {
      */
     public static ConditionFactory dontCatchUncaughtExceptions() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
-                false, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                DEFAULT_ON_TIMEOUT_CALLBACK, false, defaultExceptionIgnorer, defaultConditionEvaluationListener,
                 defaultExecutorLifecycle);
     }
 
@@ -354,7 +359,7 @@ public class Awaitility {
      */
     public static ConditionFactory with() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                DEFAULT_ON_TIMEOUT_CALLBACK, defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
                 defaultExecutorLifecycle);
     }
 
@@ -369,7 +374,7 @@ public class Awaitility {
      */
     public static ConditionFactory given() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                DEFAULT_ON_TIMEOUT_CALLBACK, defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
                 defaultExecutorLifecycle);
     }
 
@@ -382,7 +387,7 @@ public class Awaitility {
      */
     public static ConditionFactory waitAtMost(Duration timeout) {
         return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(timeout), defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                DEFAULT_ON_TIMEOUT_CALLBACK, defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
                 defaultExecutorLifecycle);
     }
 
@@ -396,7 +401,7 @@ public class Awaitility {
      */
     public static ConditionFactory waitAtMost(long value, TimeUnit unit) {
         return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(new Duration(value, unit)), defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
+                DEFAULT_ON_TIMEOUT_CALLBACK, defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
                 defaultExecutorLifecycle);
     }
 

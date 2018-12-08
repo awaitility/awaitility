@@ -38,6 +38,10 @@ import static org.awaitility.Duration.ONE_SECOND;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
+import java.util.concurrent.atomic.AtomicReference;
+import org.awaitility.core.OnTimeoutContext;
+import org.awaitility.pollinterval.FixedPollInterval;
+
 public class AwaitilityTest {
 
     private FakeRepository fakeRepository;
@@ -397,6 +401,38 @@ public class AwaitilityTest {
                            }
                        }
                 );
+    }
+    
+    @Test
+    public void callsOnTimeoutCallbackIfSet() {
+        AtomicReference<OnTimeoutContext> capturedCallbackContext = new AtomicReference<>();
+        await().atMost(Duration.ONE_SECOND)
+            .pollInterval(1, MILLISECONDS)
+            .pollDelay(2, MILLISECONDS)
+            .onTimeout(ctx -> capturedCallbackContext.set(ctx))
+            .alias("this is a test")
+            .ignoreException(AssertionError.class)
+            .until(() -> {
+                    throw new AssertionError("This will never be true");
+                });
+        
+        assertThat(capturedCallbackContext.get(), notNullValue());
+        OnTimeoutContext context = capturedCallbackContext.get();
+        assertThat(context.getAlias().isPresent(), is(true));
+        assertThat(context.getAlias().get(), is("this is a test"));
+        assertThat(context.getMaxWaitTime(), is(Duration.ONE_SECOND));
+        assertThat(context.getPollInterval(), is(new FixedPollInterval(1, MILLISECONDS)));
+        assertThat(context.getPollDelay(), is(new Duration(2, MILLISECONDS)));
+        assertThat(context.getTimeoutMessage(), notNullValue());
+        assertThat(context.getCause().isPresent(), is(true));
+        assertThat(context.getCause().get(), instanceOf(AssertionError.class));
+    }
+    
+    @Test(expected = AssertionError.class)
+    public void throwsAssertionErrorOnTimeoutIfConfiguredToDoSo() {
+        await().atMost(1, TimeUnit.SECONDS)
+            .throwAssertionErrorOnTimeout()
+            .until(() -> false);
     }
 
     private Callable<Boolean> fakeRepositoryValueEqualsOne() {

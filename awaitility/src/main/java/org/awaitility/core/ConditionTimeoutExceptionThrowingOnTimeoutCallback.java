@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.awaitility.core;
 
-/**
- * A consumer (because Awaitility doesn't require Java 8)
- *
- * @since 3.1.0
- */
-public interface Consumer<T> {
+public class ConditionTimeoutExceptionThrowingOnTimeoutCallback implements Consumer<OnTimeoutContext> {
 
-    /**
-     * Performs this operation on the given argument.
-     *
-     * @param t the input argument
-     */
-    void accept(T t);
+    private final DefaultTimeoutMessageBuilder messageBuilder = new DefaultTimeoutMessageBuilder();
+    
+    @Override
+    public void accept(OnTimeoutContext ctx) {
+        String message = messageBuilder.getTimeoutErrorMessage(ctx);
+        throw new ConditionTimeoutException(message, ctx.getCause().orElse(null));
+    }
+
 }
