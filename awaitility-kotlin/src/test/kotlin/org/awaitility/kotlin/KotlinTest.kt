@@ -151,6 +151,17 @@ class KotlinTest {
         }
         assertThat(data.state).isEqualTo("Hello")
     }
+
+    @Test
+    fun hasWithNonNullableType() {
+        val fakeObjectRepository = FakeGenericRepository(Data("Before"))
+        AsynchObject(fakeObjectRepository, Data("After")).perform()
+
+        val data : Data = await untilCallTo { fakeObjectRepository.data } has {
+            state == "After"
+        }
+        assertThat(data.state).isEqualTo("After")
+    }
 }
 
 class AsynchObject<T>(private val repository: FakeGenericRepository<T>, private val changeTo: T) {
