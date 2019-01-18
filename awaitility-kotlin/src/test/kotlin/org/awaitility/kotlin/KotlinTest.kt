@@ -126,7 +126,7 @@ class KotlinTest {
 
     @Test
     fun untilNotNull() {
-        val fakeObjectRepository = FakeStringRepository(null)
+        val fakeObjectRepository = FakeGenericRepository<Data?>(null)
         AsynchObject(fakeObjectRepository, Data("Hello")).perform()
 
         val data = await untilNotNull { fakeObjectRepository.data }
@@ -135,15 +135,15 @@ class KotlinTest {
 
     @Test
     fun untilNull() {
-        val fakeObjectRepository = FakeStringRepository(Data("Hello"))
+        val fakeObjectRepository = FakeGenericRepository<Data?>(Data("Hello"))
         AsynchObject(fakeObjectRepository, null).perform()
 
         await untilNull { fakeObjectRepository.data }
     }
 
     @Test
-    fun has() {
-        val fakeObjectRepository = FakeStringRepository(null)
+    fun hasWithNullableType() {
+        val fakeObjectRepository = FakeGenericRepository<Data?>(null)
         AsynchObject(fakeObjectRepository, Data("Hello")).perform()
 
         val data = await untilCallTo { fakeObjectRepository.data } has {
@@ -153,7 +153,7 @@ class KotlinTest {
     }
 }
 
-class AsynchObject(private val repository: FakeStringRepository, private val changeTo: Data?) {
+class AsynchObject<T>(private val repository: FakeGenericRepository<T>, private val changeTo: T) {
 
     fun perform() {
         val thread = Thread(Runnable {
@@ -170,4 +170,4 @@ class AsynchObject(private val repository: FakeStringRepository, private val cha
 
 
 data class Data(var state: String)
-data class FakeStringRepository(var data: Data?)
+data class FakeGenericRepository<T>(var data: T)

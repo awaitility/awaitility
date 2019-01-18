@@ -72,7 +72,11 @@ infix fun <T> AwaitilityKtUntilFunCondition<T>.matches(pred: (T?) -> Boolean) = 
  * @since 3.1.5
  */
 infix fun <T> AwaitilityKtUntilFunCondition<T?>.has(pred: T.() -> Boolean) = factory.until(fn) { t: T? ->
-    pred(t!!)
+    if (t == null) {
+        false
+    } else {
+        pred(t)
+    }
 } as T
 
 /**
