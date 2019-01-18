@@ -1,3 +1,7 @@
+Changelog next version
+----------------------
+* The Kotlin extension function called "has" is now null safe
+
 Changelog 3.1.5 (2018-12-06)
 ----------------------------
 * Added a new Kotlin extension function called "has" that allows writing succinct expressions when testing for properties in e.g. data classes. For example:
