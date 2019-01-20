@@ -26,7 +26,7 @@
     <description>Simplifies Awaitility usage from Kotlin</description>
 
     <properties>
-        <kotlin.version>1.2.50</kotlin.version>
+        <kotlin.version>1.3.11</kotlin.version>
     </properties>
 
     <dependencies>
