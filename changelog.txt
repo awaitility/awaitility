@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * The Kotlin extension function called "has" is now null safe
+* The Kotlin extension function called "has" now accepts non-null types
 
 Changelog 3.1.5 (2018-12-06)
 ----------------------------

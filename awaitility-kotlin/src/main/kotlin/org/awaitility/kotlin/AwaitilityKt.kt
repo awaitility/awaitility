@@ -41,14 +41,14 @@ val await: ConditionFactory
  * @param fn The function to call in order to extract the value used by the predicate
  * @see untilCallTo
  */
-data class AwaitilityKtUntilFunCondition<T> internal constructor(internal val factory: ConditionFactory, internal val fn: () -> T?)
+data class AwaitilityKtUntilFunCondition<out T> internal constructor(internal val factory: ConditionFactory, internal val fn: () -> T)
 
 /**
  * Infix function which is what allows us to write the predicate on right-hand side of [matches] without using a dot.
  *
  * @param pred The predicate that determines whether or not the condition is fulfilled.
  */
-infix fun <T> AwaitilityKtUntilFunCondition<T>.matches(pred: (T?) -> Boolean) = factory.until(fn, pred)
+infix fun <T> AwaitilityKtUntilFunCondition<T?>.matches(pred: (T?) -> Boolean) = factory.until(fn, pred)
 
 
 /**
@@ -77,7 +77,7 @@ infix fun <T> AwaitilityKtUntilFunCondition<T?>.has(pred: T.() -> Boolean) = fac
     } else {
         pred(t)
     }
-} as T
+}!!
 
 /**
  * An extension function to `ConditionFactory` that allows you do write conditions such as:
