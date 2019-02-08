@@ -25,10 +25,8 @@ import java.util.concurrent.Callable;
 public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
 
     private ConditionAwaiter conditionAwaiter;
-
     private volatile T lastResult;
     private final ConditionEvaluationHandler<T> conditionEvaluationHandler;
-
     /**
      * <p>Constructor for AbstractHamcrestCondition.</p>
      *
@@ -55,17 +53,15 @@ public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
                     conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, matcher), lastResult, pollInterval);
                 }
                 return new ConditionEvaluationResult(matches);
-
             }
         };
-        conditionAwaiter = new ConditionAwaiter(callable, settings) {
+        conditionAwaiter = ConditionAwaiterFactory.getInstance().newConditionAwaiter(callable, settings, new TimeoutMessageSupplier() {
             @Override
-            protected String getTimeoutMessage() {
+            public String getTimeoutMessage() {
                 return getMismatchMessage(supplier, matcher);
             }
-        };
+        });
     }
-
 
     private String getMatchMessage(Callable<T> supplier, Matcher<? super T> matcher) {
         return String.format("%s reached its end value of %s", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher));

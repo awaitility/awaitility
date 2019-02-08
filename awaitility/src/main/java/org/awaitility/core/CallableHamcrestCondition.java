@@ -28,7 +28,6 @@ import static org.awaitility.core.LambdaErrorMessageGenerator.isLambdaClass;
 
 class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
 
-
     /**
      * <p>Constructor for CallableHamcrestCondition.</p>
      *
