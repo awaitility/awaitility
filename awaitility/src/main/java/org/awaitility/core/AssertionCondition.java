@@ -32,7 +32,6 @@ import static org.awaitility.core.LambdaErrorMessageGenerator.isLambdaClass;
 public class AssertionCondition implements Condition<Void> {
 
     private final ConditionAwaiter conditionAwaiter;
-
     private String lastExceptionMessage;
     private final ConditionEvaluationHandler<Object> conditionEvaluationHandler;
 
@@ -64,12 +63,13 @@ public class AssertionCondition implements Condition<Void> {
                 }
             }
         };
-        conditionAwaiter = new ConditionAwaiter(callable, settings) {
+
+        conditionAwaiter = ConditionAwaiterFactory.getInstance().newConditionAwaiter(callable, settings, new TimeoutMessageSupplier() {
             @Override
-            protected String getTimeoutMessage() {
+            public String getTimeoutMessage() {
                 return getMismatchMessage(supplier, lastExceptionMessage, settings.getAlias(), false);
             }
-        };
+        });
     }
 
     private String getMatchMessage(ThrowingRunnable supplier, String conditionAlias) {
