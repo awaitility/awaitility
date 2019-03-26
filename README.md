@@ -12,7 +12,7 @@ public void updatesCustomerStatus() throws Exception {
     // Publish an asynchronous event:
     publishEvent(updateCustomerStatusEvent);
     // Awaitility lets you wait until the asynchronous operation completes:
-    await().atMost(5, SECONDS).until(customerStatusIsUpdated());
+    await().atMost(5, SECONDS).until(() -> customerStatusIsUpdated());
     ...
 }
 ```
