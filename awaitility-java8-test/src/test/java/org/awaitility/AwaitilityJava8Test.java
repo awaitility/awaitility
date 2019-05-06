@@ -237,7 +237,7 @@ public class AwaitilityJava8Test {
     @Test
     public void errorMessageLooksOkForHamcrestLambdaExpressionsWhoseMismatchDescriptionOriginallyIsEmptyStringByHamcrest() throws Exception {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage(endsWith("expected a collection containing a string ending with \"hello\" but was <[]> within 50 milliseconds."));
+        exception.expectMessage(endsWith("expected a collection containing a string ending with \"hello\" but was empty within 50 milliseconds."));
 
         // Given
         FakeRepositoryList fakeRepositoryList = new FakeRepositoryList();

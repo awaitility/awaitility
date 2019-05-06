@@ -76,7 +76,7 @@
 
   <properties>
     <bytebuddy.version>1.7.0</bytebuddy.version>
-    <hamcrest.version>1.3</hamcrest.version>
+    <hamcrest.version>2.1</hamcrest.version>
     <java.version>1.6</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
