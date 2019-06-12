@@ -694,7 +694,7 @@ public class ConditionFactory {
      * {@link java.lang.AssertionError} instances thrown by the supplier are treated as an assertion failure and proper error message is propagated on timeout.
      * Other exceptions are rethrown immediately as an execution errors.
      * <p>&nbsp;</p>
-     * Why technically it is completely valid to use plain Runnable class in Java 7 code, the resulting expression is very verbose and can decrease
+     * While technically it is completely valid to use plain Runnable class in Java 7 code, the resulting expression is very verbose and can decrease
      * the readability of the test case, e.g.
      * <p>&nbsp;</p>
      * <pre>
