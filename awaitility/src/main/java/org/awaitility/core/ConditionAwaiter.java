@@ -118,16 +118,6 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             } else if (lastResult != null && lastResult.hasThrowable()) {
                 throw lastResult.getThrowable();
             } else if (!succeededBeforeTimeout) {
-                final String maxWaitTimeLowerCase = maxWaitTime.getTimeUnitAsString();
-                final String message;
-                String timeoutMessage = getTimeoutMessage();
-                if (conditionSettings.hasAlias()) {
-                    message = String.format("Condition with alias '%s' didn't complete within %s %s because %s.",
-                            conditionSettings.getAlias(), maxTimeout, maxWaitTimeLowerCase, decapitalize(timeoutMessage));
-                } else {
-                    message = String.format("%s within %s %s.", timeoutMessage, maxTimeout, maxWaitTimeLowerCase);
-                }
-
                 Throwable cause = lastResult != null && lastResult.hasTrace() ? lastResult.getTrace() : null;
                 // Not all systems support deadlock detection so ignore if ThreadMXBean & ManagementFactory is not in classpath
                 if (existInCP("java.lang.management.ThreadMXBean") && existInCP("java.lang.management.ManagementFactory")) {
@@ -142,7 +132,10 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                         // don't init trace and move on.
                     }
                 }
-                throw new ConditionTimeoutException(message, cause);
+                conditionSettings.getOnTimeoutCallback().accept(
+                    new OnTimeoutContext(conditionSettings.getAlias(), conditionSettings.getMaxWaitTime(),
+                        conditionSettings.getPollInterval(), conditionSettings.getPollDelay(),
+                        getTimeoutMessage(), cause, evaluationDuration));
             } else if (evaluationDuration.compareTo(minWaitTime) < 0) {
                 String message = String.format("Condition was evaluated in %s %s which is earlier than expected " +
                                 "minimum timeout %s %s", evaluationDuration.getValue(), evaluationDuration.getTimeUnit(),
