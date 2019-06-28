@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.awaitility.classpath.ClassPathResolver.existInCP;
+import static org.awaitility.core.Uninterruptibles.sleepUninterruptibly;
 
 abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     private final ExecutorService executor;
@@ -58,7 +59,6 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
      *
      * @param conditionEvaluationHandler The conditionEvaluationHandler
      */
-    @SuppressWarnings("deprecation")
     public <T> void await(final ConditionEvaluationHandler<T> conditionEvaluationHandler) {
         final Duration pollDelay = conditionSettings.getPollDelay();
         final Duration maxWaitTime = conditionSettings.getMaxWaitTime();
@@ -79,7 +79,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
 
             conditionEvaluationHandler.start();
             if (!pollDelay.isZero()) {
-                Thread.sleep(pollDelay.getValueInMS());
+                sleepUninterruptibly(pollDelay.getValueInNS(), NANOSECONDS);
             }
             Duration pollInterval = pollDelay;
             while (maxWaitTime.compareTo(evaluationDuration) > 0) {
@@ -93,7 +93,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                     break;
                 }
                 pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
-                Thread.sleep(pollInterval.getValueInMS());
+                sleepUninterruptibly(pollInterval.getValueInNS(), NANOSECONDS);
                 evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStartedNanos);
             }
             evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStartedNanos);
