@@ -19,7 +19,6 @@ package org.awaitility.test.osgi;
   under the License.
  */
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -31,8 +30,6 @@ import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
-import static org.awaitility.proxy.AwaitilityClassProxy.to;
-import static org.hamcrest.Matchers.is;
 import static org.ops4j.pax.exam.Constants.EXAM_FAIL_ON_UNRESOLVED_KEY;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
@@ -55,7 +52,6 @@ public class AwaitilityTest {
                         mavenBundle().groupId("org.hamcrest").artifactId("hamcrest").versionAsInProject(),
                         mavenBundle("org.awaitility", "awaitility").versionAsInProject(),
                         mavenBundle("org.objenesis", "objenesis").versionAsInProject(),
-                        mavenBundle("net.bytebuddy", "byte-buddy").versionAsInProject(),
                         // CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
                 };
     }
@@ -70,19 +66,5 @@ public class AwaitilityTest {
         }, 1, SECONDS);
         await().atMost(2, TimeUnit.SECONDS).until(() -> success);
 
-    }
-
-    @Test
-    @Ignore
-    public void testProxy() {
-
-        Executors.newScheduledThreadPool(1).schedule(() -> {
-            success = true;
-        }, 1, SECONDS);
-        await().atMost(2, TimeUnit.SECONDS).untilCall(to(this).getState(), is(true));
-    }
-
-    private boolean getState() {
-        return success;
     }
 }

@@ -76,7 +76,6 @@
     </prerequisites>
 
     <properties>
-        <bytebuddy.version>1.9.13</bytebuddy.version>
         <hamcrest.version>2.1</hamcrest.version>
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -93,7 +92,6 @@
 
     <modules>
         <module>awaitility</module>
-        <module>awaitility-proxy</module>
         <module>awaitility-scala</module>
         <module>awaitility-groovy</module>
         <module>awaitility-osgi-test</module>

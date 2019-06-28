@@ -9,6 +9,7 @@ Changelog next version
 * Awaitility now requires Java 8
 * Scala version is updated from 2.11.8 to 2.13.0
 * Upgraded Groovy from 2.4.11 to 2.5.7
+* Removed the awaitility-proxy module since it's no longer required when using Java 8+
 
 Changelog 3.1.6 (2019-01-25)
 ----------------------------
