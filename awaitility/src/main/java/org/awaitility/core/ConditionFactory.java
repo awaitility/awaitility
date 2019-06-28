@@ -20,12 +20,10 @@ import org.awaitility.constraint.AtMostWaitConstraint;
 import org.awaitility.constraint.WaitConstraint;
 import org.awaitility.pollinterval.FixedPollInterval;
 import org.awaitility.pollinterval.PollInterval;
-import org.awaitility.spi.ProxyConditionFactory;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
-import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,7 +33,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.awaitility.classpath.ClassPathResolver.existInCP;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 
@@ -564,44 +561,6 @@ public class ConditionFactory {
                 return InternalExecutorServiceFactory.sameThreadExecutorService();
             }
         }));
-    }
-
-    /**
-     * Specify the condition that must be met when waiting for a method call.
-     * E.g.
-     * <p>&nbsp;</p>
-     * <pre>
-     * await().untilCall(to(orderService).size(), is(greaterThan(2)));
-     * </pre>
-     *
-     * @param <T>     the generic type
-     * @param proxyMethodReturnValue  the return value of the method call
-     * @param matcher The condition that must be met when
-     * @return a T object.
-     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
-     */
-    public <T> T untilCall(T proxyMethodReturnValue, final Matcher<? super T> matcher) {
-        if (!existInCP("java.util.ServiceLoader")) {
-            throw new UnsupportedOperationException("java.util.ServiceLoader not found in classpath so cannot create condition");
-        }
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        if (cl == null) {
-            cl = ClassLoader.getSystemClassLoader();
-        }
-        Iterator<ProxyConditionFactory> iterator = java.util.ServiceLoader.load(ProxyConditionFactory.class, cl).iterator();
-        if (!iterator.hasNext()) {
-            throw new UnsupportedOperationException("There's currently no plugin installed that can handle proxy conditions, please consider adding 'awaitility-proxy' to the classpath. If using Maven you can do:" +
-                    "<dependency>\n" +
-                    "\t<groupId>org.awaitility</groupId>\n" +
-                    "\t<artifactId>awaitility-proxy</artifactId>\n" +
-                    "\t<version>${awaitility.version}</version>\n" +
-                    "</dependency>\n");
-        }
-        @SuppressWarnings("unchecked") ProxyConditionFactory<T> factory = iterator.next();
-        if (factory == null) {
-            throw new IllegalArgumentException("Internal error: Proxy condition plugin initialization returned null, please report an issue.");
-        }
-        return until(factory.createProxyCondition(proxyMethodReturnValue, matcher, generateConditionSettings()));
     }
 
     /**

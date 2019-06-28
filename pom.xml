@@ -94,8 +94,8 @@
         <module>awaitility</module>
         <module>awaitility-scala</module>
         <module>awaitility-groovy</module>
-        <module>awaitility-osgi-test</module>
         <module>awaitility-test-support</module>
+        <module>awaitility-kotlin</module>
     </modules>
 
     <build>
@@ -224,12 +224,6 @@
 
     <profiles>
         <profile>
-            <id>kotlin</id>
-            <modules>
-                <module>awaitility-kotlin</module>
-            </modules>
-        </profile>
-        <profile>
             <id>osgi-tests</id>
             <modules>
                 <module>awaitility-osgi-test</module>
@@ -238,7 +232,6 @@
         <profile>
             <id>release</id>
             <modules>
-                <module>awaitility-kotlin</module>
                 <module>awaitility-osgi-test</module>
             </modules>
             <build>

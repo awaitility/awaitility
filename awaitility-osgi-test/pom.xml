@@ -10,18 +10,12 @@
     <properties>
         <animal.sniffer.skip>true</animal.sniffer.skip>
         <pax-exam.version>4.12.0</pax-exam.version>
-        <surefire.version>2.18</surefire.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.awaitility</groupId>
-            <artifactId>awaitility-proxy</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -92,6 +86,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18</version>
 				<configuration>
 					<forkCount>1</forkCount>
 					<reuseForks>false</reuseForks>

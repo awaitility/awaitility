@@ -20,6 +20,8 @@ import java.util.concurrent.Callable
 import org.awaitility.core.ThrowingRunnable
 import org.awaitility.spi.Timeout._
 
+import scala.language.implicitConversions
+
 trait AwaitilitySupport {
   timeout_message = "Condition was not fulfilled"
 

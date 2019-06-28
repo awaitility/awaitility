@@ -38,7 +38,7 @@ public class AwaitilityTest {
 
     @Configuration
     public static Option[] configure() {
-        return new Option[] //
+        return new Option[]
                 {
                         /* System Properties */
                         systemProperty(EXAM_FAIL_ON_UNRESOLVED_KEY).value("true"),
@@ -48,7 +48,6 @@ public class AwaitilityTest {
                         junitBundles(),
 
                         /* Deps */
-                        // mavenBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.hamcrest", "1.3_1"),
                         mavenBundle().groupId("org.hamcrest").artifactId("hamcrest").versionAsInProject(),
                         mavenBundle("org.awaitility", "awaitility").versionAsInProject(),
                         mavenBundle("org.objenesis", "objenesis").versionAsInProject(),
