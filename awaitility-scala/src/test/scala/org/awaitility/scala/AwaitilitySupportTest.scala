@@ -25,11 +25,13 @@ import org.hamcrest.{CoreMatchers, Matchers}
 import org.junit.Assert._
 import org.junit._
 
+import scala.language.postfixOps
+
 @Test
 class AwaitilitySupportTest extends AwaitilitySupport {
 
   @Test
-  def functionAsCondition() = {
+  def functionAsCondition(): Unit = {
     val c1 = new Counter()
     val c2 = new Counter()
 
@@ -39,12 +41,12 @@ class AwaitilitySupportTest extends AwaitilitySupport {
   }
 
   @Test(expected = classOf[ConditionTimeoutException])
-  def timeout() = {
+  def timeout(): Unit = {
     await atMost(500, MILLISECONDS) until { 2 == 1 }
   }
 
   @Test
-  def awaitWithAlias() = {
+  def awaitWithAlias(): Unit = {
     try {
       await("scala") atMost(500, MILLISECONDS) until { 2 == 1 }
       fail("Expected timeout exception")
@@ -61,11 +63,11 @@ class AwaitilitySupportTest extends AwaitilitySupport {
 
     await until (c1.count() + c2.count(),  is(6))
     await until (isDone(), is(java.lang.Boolean.TRUE))
-    await until (isDone, CoreMatchers is java.lang.Boolean.TRUE )
+    await until (isDone, Matchers is java.lang.Boolean.TRUE )
   }
 
   @Test
-  def awaitWithAliasSupplierAndMatcher() = {
+  def awaitWithAliasSupplierAndMatcher(): Unit = {
     try {
       await("scala") atMost(500, MILLISECONDS) until (2 == 1, is(java.lang.Boolean.TRUE))
       fail("Expected timeout exception")
@@ -87,7 +89,7 @@ class AwaitilitySupportTest extends AwaitilitySupport {
   }
 
   @Test
-  def awaitWithAliasAndRunnable() = {
+  def awaitWithAliasAndRunnable(): Unit = {
     try {
       await("scala") atMost(500, MILLISECONDS) untilAsserted { assertThat(2 == 1, is(true))}
       fail("Expected timeout exception")
@@ -101,7 +103,7 @@ class AwaitilitySupportTest extends AwaitilitySupport {
 
   class Counter {
       var value = 0
-      def count() = {
+      def count(): Int = {
         value = value + 1
         value
       }

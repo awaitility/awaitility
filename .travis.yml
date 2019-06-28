@@ -1,5 +1,20 @@
-dist: trusty # Otherwise oraclejdk8 is not found, see https://travis-ci.community/t/solved-oraclejdk8-installation-failing-still-again/3428
 language: java
-jdk:
-  - oraclejdk8
-  - openjdk7
+sudo: false
+
+cache:
+  directories:
+  - $HOME/.m2
+  
+matrix:
+  include:
+    - env: PROFILES='-P osgi-tests,awaitility-kotlin'
+      jdk: oraclejdk8
+      dist: trusty # Otherwise oraclejdk8 is not found, see https://travis-ci.community/t/solved-oraclejdk8-installation-failing-still-again/3428
+    - env: PROFILES='-P awaitility-kotlin'
+      jdk: openjdk11
+    - env: PROFILES='-P awaitility-kotlin'
+      jdk: openjdk12
+
+script:
+  - echo JAVA_HOME = ${JAVA_HOME}
+  - mvn clean install -B $PROFILES

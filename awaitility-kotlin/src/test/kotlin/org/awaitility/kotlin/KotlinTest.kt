@@ -26,13 +26,13 @@ import org.awaitility.classes.FakeRepositoryImpl
 import org.awaitility.core.ConditionTimeoutException
 import org.awaitility.pollinterval.FibonacciPollInterval.fibonacci
 import org.hamcrest.Matchers.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
-import kotlin.test.assertEquals
 
 class KotlinTest {
 

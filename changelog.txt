@@ -4,6 +4,10 @@ Changelog next version
 * Better handling of InterruptedException using code from Guava (Uninterruptibles#sleepUninterruptibly) (issue 134)
 * Added org.awaitility.core.ConditionEvaluationLogger#conditionEvaluationLogger() methods. This is only useful for syntactic sugar to avoid having to write the "new" keyword in Java when using a ConditionEvaluationLogger. For example:
     await().with().conditionEvaluationListener(conditionEvaluationLogger()). ..
+* Awaitility now requires Java 8+ (i.e. support for Java 6 and Java 7 is dropped).
+* Hamcrest is update from version 1.3 to 2.1.
+* Awaitility now requires Java 8
+* Scala version is updated from 2.11.8 to 2.13.0
 
 Changelog 3.1.6 (2019-01-25)
 ----------------------------

@@ -26,7 +26,6 @@ import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExam;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -34,19 +33,26 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.proxy.AwaitilityClassProxy.to;
 import static org.hamcrest.Matchers.is;
+import static org.ops4j.pax.exam.Constants.EXAM_FAIL_ON_UNRESOLVED_KEY;
 import static org.ops4j.pax.exam.CoreOptions.*;
 
 @RunWith(PaxExam.class)
 public class AwaitilityTest {
 
     @Configuration
-    public static Option[] configure() throws Exception {
+    public static Option[] configure() {
         return new Option[] //
                 {
-                        mavenBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.hamcrest", "1.3_1"),
-                        junitBundles(),
-                        systemProperty("pax.exam.osgi.unresolved.fail").value("true"),
+                        /* System Properties */
+                        systemProperty(EXAM_FAIL_ON_UNRESOLVED_KEY).value("true"),
                         systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
+
+                        /* Hamcrest & JUnit bundles */
+                        junitBundles(),
+
+                        /* Deps */
+                        // mavenBundle("org.apache.servicemix.bundles", "org.apache.servicemix.bundles.hamcrest", "1.3_1"),
+                        mavenBundle().groupId("org.hamcrest").artifactId("hamcrest").versionAsInProject(),
                         mavenBundle("org.awaitility", "awaitility").versionAsInProject(),
                         mavenBundle("org.objenesis", "objenesis").versionAsInProject(),
                         mavenBundle("net.bytebuddy", "byte-buddy").versionAsInProject(),
@@ -59,18 +65,10 @@ public class AwaitilityTest {
     @Test
     public void testWaitUntil() {
 
-        Executors.newScheduledThreadPool(1).schedule(new Runnable() {
-            @Override
-            public void run() {
-                success = true;
-            }
+        Executors.newScheduledThreadPool(1).schedule(() -> {
+            success = true;
         }, 1, SECONDS);
-        await().atMost(2, TimeUnit.SECONDS).until(new Callable<Boolean>() {
-            @Override
-            public Boolean call() throws Exception {
-                return success;
-            }
-        });
+        await().atMost(2, TimeUnit.SECONDS).until(() -> success);
 
     }
 
@@ -78,17 +76,13 @@ public class AwaitilityTest {
     @Ignore
     public void testProxy() {
 
-        Executors.newScheduledThreadPool(1).schedule(new Runnable() {
-            @Override
-            public void run() {
-                success = true;
-            }
+        Executors.newScheduledThreadPool(1).schedule(() -> {
+            success = true;
         }, 1, SECONDS);
         await().atMost(2, TimeUnit.SECONDS).untilCall(to(this).getState(), is(true));
     }
 
-    boolean getState() {
+    private boolean getState() {
         return success;
     }
-
 }
