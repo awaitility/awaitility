@@ -16,24 +16,25 @@
 
 package org.awaitility;
 
+import org.assertj.core.api.Assertions;
 import org.awaitility.classes.Asynch;
 import org.awaitility.classes.FakeRepository;
 import org.awaitility.classes.FakeRepositoryImpl;
 import org.awaitility.core.ConditionEvaluationLogger;
 import org.awaitility.pollinterval.FibonacciPollInterval;
-import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Duration.FIVE_HUNDRED_MILLISECONDS;
 import static org.awaitility.Duration.TWO_HUNDRED_MILLISECONDS;
+import static org.awaitility.core.ConditionEvaluationLogger.conditionEvaluationLogger;
 import static org.awaitility.pollinterval.FibonacciPollInterval.fibonacci;
 import static org.awaitility.pollinterval.FixedPollInterval.fixed;
 import static org.awaitility.pollinterval.IterativePollInterval.iterative;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * Tests for await().until(Runnable) using AssertionCondition.
@@ -63,7 +64,7 @@ public class PollIntervalTest {
     @Test(timeout = 2000)
     public void fibonacciPollIntervalStaticallyImported() {
         new Asynch(fakeRepository).perform();
-        await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
+        await().with().conditionEvaluationListener(conditionEvaluationLogger()).
                 pollInterval(fibonacci().with().offset(10).and().timeUnit(MILLISECONDS)).
                 untilAsserted(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
     }

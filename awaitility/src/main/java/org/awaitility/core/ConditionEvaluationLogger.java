@@ -60,4 +60,24 @@ public class ConditionEvaluationLogger implements ConditionEvaluationListener<Ob
                     condition.getPollInterval().getTimeUnitAsString());
         }
     }
+
+    /**
+     * Syntactic sugar to avoid writing the <code>new</code> keyword in Java.
+     * Uses {@link java.util.concurrent.TimeUnit#MILLISECONDS} as unit for elapsed and remaining time.
+     *
+     * @return A new instance of {@link ConditionEvaluationLogger}
+     */
+    public static ConditionEvaluationLogger conditionEvaluationLogger() {
+        return new ConditionEvaluationLogger();
+    }
+
+    /**
+     * Syntactic sugar to avoid writing the <code>new</code> keyword in Java.
+     * Specifies the {@link java.util.concurrent.TimeUnit} to use as unit for elapsed and remaining time.
+     *
+     * @param timeUnit The time unit to use.
+     */
+    public static ConditionEvaluationLogger conditionEvaluationLogger(TimeUnit timeUnit) {
+        return new ConditionEvaluationLogger(timeUnit);
+    }
 }
