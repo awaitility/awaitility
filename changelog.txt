@@ -9,7 +9,12 @@ Changelog next version
 * Awaitility now requires Java 8
 * Scala version is updated from 2.11.8 to 2.13.0
 * Upgraded Groovy from 2.4.11 to 2.5.7
-* Removed the awaitility-proxy module since it's no longer required when using Java 8+
+* Removed the awaitility-proxy module since it's no longer required when using Java 8+.
+* Removed the org.awaitility.core.Predicate interface, use java.util.function.Predicate instead.
+* Removed the org.awaitility.core.BiFunction interface, use java.util.function.BiFunction instead.
+* Removed the org.awaitility.core.Supplier interface, use java.util.function.Supplier instead.
+* Replaced IllegalStateException with IllegalArgumentException when constructing erroneous ConditionSettings
+* Removed org.awaitility.Duration, use java.time.Duration instead. Constants such as ONE_SECOND, TWO_HUNDRED_MILLISECONDS have been moved to org.awaitility.Durations.
 
 Changelog 3.1.6 (2019-01-25)
 ----------------------------
@@ -61,7 +66,7 @@ Changelog 3.1.2 (2018-07-24)
 
      await withAlias "Kotlin Test" ignoreExceptionsInstanceOf
             IllegalArgumentException::class withPollDelay ONE_HUNDRED_MILLISECONDS withPollInterval
-            fibonacci().with().offset(1).and().timeUnit(MILLISECONDS) atLeast TWO_HUNDRED_MILLISECONDS atMost
+            fibonacci().with().offset(1).and().unit(MILLISECONDS) atLeast TWO_HUNDRED_MILLISECONDS atMost
             ONE_MINUTE untilCallTo { fakeRepository.value } matches { it == 1 }
 
   All extension functions can be imported from the "org.awaitility.kotlin" package (e.g. 'import org.awaitility.kotlin.*')
@@ -204,7 +209,7 @@ Changelog 1.7.0 (2015-11-27)
   this will generate a poll interval of 1, 1, 2, 3, 5, 8, 13, .. . Note that Duration.ZERO is used as start value for all non-fixed poll intervals
   (for fixed poll intervals the poll delay is equal to the duration of the FixedPollInterval for backward compatible reasons). (issue 36)
 * Improvement to Duration (com.jayway.awaitility.Duration). You can invoke make use of the new methods plus, minus, multiply, divide. For example:
-    new Duration(5, SECONDS).plus(17, MILLISECONDS); // Will return a new Duration of 5017 milliseconds.
+    Duration.of(5, SECONDS).plus(17, MILLISECONDS); // Will return a Duration.of( of 5017 milliseconds.
 * Added Duration.ONE_MILLISECOND
 * Added ability to wait for Runnable (void) conditions that declares check exceptions. For example if we have the following method:
     public void something() throws Exception { ... }

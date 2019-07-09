@@ -20,7 +20,6 @@ import org.awaitility.classes.Asynch;
 import org.awaitility.classes.FakeRepository;
 import org.awaitility.classes.FakeRepositoryImpl;
 import org.awaitility.classes.ThrowExceptionUnlessFakeRepositoryEqualsOne;
-import org.awaitility.core.Predicate;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -121,21 +120,13 @@ public class AwaitilityIgnoreExceptionsTest {
     @Test(timeout = 2000)
     public void exceptionIgnoringWorksForPredicates() {
         new Asynch(fakeRepository).perform();
-        await().atMost(1000, MILLISECONDS).with().ignoreExceptionsMatching(new Predicate<Throwable>() {
-            public boolean matches(Throwable e) {
-                return e instanceof RuntimeException;
-            }
-        }).until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
+        await().atMost(1000, MILLISECONDS).with().ignoreExceptionsMatching(RuntimeException.class::isInstance).until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
     }
 
     @Test(timeout = 2000)
     public void exceptionIgnoringWorksForPredicatesStatically() {
         new Asynch(fakeRepository).perform();
-        Awaitility.ignoreExceptionsByDefaultMatching(new Predicate<Throwable>() {
-            public boolean matches(Throwable e) {
-                return e instanceof RuntimeException;
-            }
-        });
+        Awaitility.ignoreExceptionsByDefaultMatching(RuntimeException.class::isInstance);
         await().atMost(1000, MILLISECONDS).until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
     }
 

@@ -1,14 +1,16 @@
 package org.awaitility.constraint;
 
-import org.awaitility.Duration;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 public class AtMostWaitConstraint implements WaitConstraint {
 
     private final Duration atMostDuration;
 
-    public static final AtMostWaitConstraint FOREVER = new AtMostWaitConstraint(Duration.FOREVER);
+    public static final AtMostWaitConstraint FOREVER = new AtMostWaitConstraint(ChronoUnit.FOREVER.getDuration());
 
-    public static final AtMostWaitConstraint TEN_SECONDS = new AtMostWaitConstraint(Duration.TEN_SECONDS);
+    public static final AtMostWaitConstraint TEN_SECONDS = new AtMostWaitConstraint(Duration.ofSeconds(10));
 
     AtMostWaitConstraint(Duration atMostDuration) {
         this.atMostDuration = atMostDuration;

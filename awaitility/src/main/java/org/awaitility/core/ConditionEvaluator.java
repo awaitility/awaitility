@@ -15,7 +15,7 @@
  */
 package org.awaitility.core;
 
-import org.awaitility.Duration;
+import java.time.Duration;
 
 interface ConditionEvaluator {
 

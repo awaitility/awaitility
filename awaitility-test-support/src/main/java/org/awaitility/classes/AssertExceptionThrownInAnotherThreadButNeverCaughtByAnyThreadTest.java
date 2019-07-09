@@ -21,7 +21,7 @@ import java.io.PrintStream;
 
 // TODO: 2017-03-17 Very ugly, consider refactoring
 public abstract class AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest {
-    @SuppressWarnings({"ThrowFromFinallyBlock", "finally"})
+    @SuppressWarnings("ThrowFromFinallyBlock")
     public AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest() throws Exception {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         System.setErr(new PrintStream(byteArrayOutputStream, true, "UTF-8"));

@@ -19,7 +19,7 @@ package org.awaitility.kotlin
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
 import org.awaitility.Awaitility.await
-import org.awaitility.Duration.*
+import org.awaitility.Durations.*
 import org.awaitility.classes.Asynch
 import org.awaitility.classes.FakeRepository
 import org.awaitility.classes.FakeRepositoryImpl
@@ -31,6 +31,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
+import java.time.Duration
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
 
@@ -99,7 +100,7 @@ class KotlinTest {
 
         await withAlias "Kotlin Test" ignoreExceptionsInstanceOf
                 IllegalArgumentException::class withPollDelay ONE_HUNDRED_MILLISECONDS withPollInterval
-                fibonacci().with().offset(1).and().timeUnit(MILLISECONDS) atLeast TWO_HUNDRED_MILLISECONDS atMost
+                fibonacci().with().offset(1).and().unit(MILLISECONDS) atLeast TWO_HUNDRED_MILLISECONDS atMost
                 ONE_MINUTE untilCallTo { fakeRepository.value } matches { it == 1 }
 
     }
@@ -118,7 +119,7 @@ class KotlinTest {
         Asynch(fakeRepository).perform()
 
         val throwable = catchThrowable {
-            await() atMost (ONE_SECOND) untilCallTo { fakeRepository.value } matches { it == 2 }
+            await() atMost Duration.ofSeconds(1) untilCallTo { fakeRepository.value } matches { it == 2 }
         }
 
         assertThat(throwable).isExactlyInstanceOf(ConditionTimeoutException::class.java).hasMessageEndingWith("expected the predicate to return <true> but it returned <false> for input of <1> within 1 seconds.")

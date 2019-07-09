@@ -36,6 +36,8 @@ import java.util.regex.Pattern;
 import static java.util.concurrent.TimeUnit.*;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.awaitility.Awaitility.*;
+import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
+import static org.awaitility.Durations.TWO_SECONDS;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
@@ -175,8 +177,8 @@ public class AwaitilityJava8Test {
     public void conditionResultsCanBeLoggedToSystemOut() {
         with()
                 .conditionEvaluationListener(condition -> System.out.printf("%s (elapsed time %dms, remaining time %dms)\n", condition.getDescription(), condition.getElapsedTimeInMS(), condition.getRemainingTimeInMS()))
-                .pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
-                .atMost(Duration.TWO_SECONDS)
+                .pollInterval(ONE_HUNDRED_MILLISECONDS)
+                .atMost(TWO_SECONDS)
                 .until(new CountDown(5), anyOf(is(0), lessThan(0)));
     }
 
@@ -184,8 +186,8 @@ public class AwaitilityJava8Test {
     public void loggingIntermediaryHandlerLogsToSystemOut() {
         with()
                 .conditionEvaluationListener(new ConditionEvaluationLogger(SECONDS))
-                .pollInterval(Duration.ONE_HUNDRED_MILLISECONDS)
-                .atMost(Duration.TWO_SECONDS)
+                .pollInterval(ONE_HUNDRED_MILLISECONDS)
+                .atMost(TWO_SECONDS)
                 .until(new CountDown(5), is(equalTo(0)));
     }
 
@@ -194,7 +196,7 @@ public class AwaitilityJava8Test {
         await().untilAsserted(() -> stringEquals("test", "test"));
     }
 
-    @SuppressWarnings("ConstantConditions")
+    @SuppressWarnings("ObviousNullCheck")
     @Test(timeout = 2000L)
     public void includesCauseInStackTrace()  {
         try {

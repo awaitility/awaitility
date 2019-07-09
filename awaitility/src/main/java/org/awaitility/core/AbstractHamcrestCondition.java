@@ -15,7 +15,6 @@
  */
 package org.awaitility.core;
 
-import org.awaitility.Duration;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
@@ -45,18 +44,16 @@ public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         }
 
         conditionEvaluationHandler = new ConditionEvaluationHandler<T>(matcher, settings);
-        final ConditionEvaluator callable = new ConditionEvaluator() {
-            public ConditionEvaluationResult eval(Duration pollInterval) throws Exception {
-                lastResult = supplier.call();
-                boolean matches = matcher.matches(lastResult);
-                if (matches) {
-                    conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier, matcher), lastResult, pollInterval);
-                } else {
-                    conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, matcher), lastResult, pollInterval);
-                }
-                return new ConditionEvaluationResult(matches);
-
+        final ConditionEvaluator callable = pollInterval -> {
+            lastResult = supplier.call();
+            boolean matches = matcher.matches(lastResult);
+            if (matches) {
+                conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier, matcher), lastResult, pollInterval);
+            } else {
+                conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, matcher), lastResult, pollInterval);
             }
+            return new ConditionEvaluationResult(matches);
+
         };
         conditionAwaiter = new ConditionAwaiter(callable, settings) {
             @Override

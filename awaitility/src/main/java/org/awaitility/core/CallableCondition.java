@@ -15,9 +15,8 @@
  */
 package org.awaitility.core;
 
-import org.awaitility.Duration;
-
 import java.lang.reflect.Method;
+import java.time.Duration;
 import java.util.concurrent.Callable;
 
 import static org.awaitility.core.LambdaErrorMessageGenerator.generateLambdaErrorMessagePrefix;

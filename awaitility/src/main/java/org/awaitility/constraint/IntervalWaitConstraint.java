@@ -1,6 +1,6 @@
 package org.awaitility.constraint;
 
-import org.awaitility.Duration;
+import java.time.Duration;
 
 public class IntervalWaitConstraint extends AtMostWaitConstraint {
 

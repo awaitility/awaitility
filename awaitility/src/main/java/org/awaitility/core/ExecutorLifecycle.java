@@ -17,6 +17,7 @@ package org.awaitility.core;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * Handles the lifecycle of an executor service.
@@ -37,12 +38,7 @@ public class ExecutorLifecycle {
     }
 
     public static ExecutorLifecycle withoutCleanup(final ExecutorService executorService) {
-        return withoutCleanup(new Supplier<ExecutorService>() {
-            @Override
-            public ExecutorService get() {
-                return executorService;
-            }
-        });
+        return withoutCleanup(() -> executorService);
     }
 
     public static ExecutorLifecycle withoutCleanup(Supplier<ExecutorService> executorServiceSupplier) {
@@ -66,34 +62,23 @@ public class ExecutorLifecycle {
     }
 
     private static EvaluationCleanup noCleanup() {
-        Consumer<ExecutorService> noop = new Consumer<ExecutorService>() {
-            @Override
-            public void accept(ExecutorService executorService) {
-            }
+        Consumer<ExecutorService> noop = executorService -> {
         };
         return new EvaluationCleanup(noop, noop);
     }
 
     private static EvaluationCleanup normalCleanupBehavior() {
         // Clean up after a successful or unsuccessful attempt
-        return new EvaluationCleanup(new Consumer<ExecutorService>() {
-            @Override
-            public void accept(ExecutorService executor) {
-                executor.shutdown();
-                try {
-                    if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                        executor.shutdownNow();
-                        executor.awaitTermination(1, TimeUnit.SECONDS);
-                    }
-                } catch (InterruptedException e) {
-                    CheckedExceptionRethrower.safeRethrow(e);
+        return new EvaluationCleanup(executor -> {
+            executor.shutdown();
+            try {
+                if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
+                    executor.shutdownNow();
+                    executor.awaitTermination(1, TimeUnit.SECONDS);
                 }
+            } catch (InterruptedException e) {
+                CheckedExceptionRethrower.safeRethrow(e);
             }
-        }, new Consumer<ExecutorService>() {
-            @Override
-            public void accept(ExecutorService executorService) {
-                executorService.shutdownNow();
-            }
-        });
+        }, ExecutorService::shutdownNow);
     }
 }

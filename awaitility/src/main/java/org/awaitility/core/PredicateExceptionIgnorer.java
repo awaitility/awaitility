@@ -16,6 +16,8 @@
 
 package org.awaitility.core;
 
+import java.util.function.Predicate;
+
 public class PredicateExceptionIgnorer implements ExceptionIgnorer {
 
     private final Predicate<? super Throwable> predicate;
@@ -28,6 +30,6 @@ public class PredicateExceptionIgnorer implements ExceptionIgnorer {
     }
 
     public boolean shouldIgnoreException(Throwable exception) {
-        return predicate.matches(exception);
+        return predicate.test(exception);
     }
 }

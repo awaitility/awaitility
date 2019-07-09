@@ -7,12 +7,12 @@
 package org.awaitility.kotlin
 
 import org.awaitility.Awaitility
-import org.awaitility.Duration
 import org.awaitility.core.ConditionFactory
 import org.awaitility.pollinterval.PollInterval
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.not
 import org.hamcrest.Matchers.nullValue
+import java.time.Duration
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KClass
@@ -48,6 +48,7 @@ data class AwaitilityKtUntilFunCondition<out T> internal constructor(internal va
  *
  * @param pred The predicate that determines whether or not the condition is fulfilled.
  */
+@Suppress("HasPlatformType")
 infix fun <T> AwaitilityKtUntilFunCondition<T?>.matches(pred: (T?) -> Boolean) = factory.until(fn, pred)
 
 

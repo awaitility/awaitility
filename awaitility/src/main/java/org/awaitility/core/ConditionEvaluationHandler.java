@@ -15,8 +15,10 @@
  */
 package org.awaitility.core;
 
-import org.awaitility.Duration;
 import org.hamcrest.Matcher;
+
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
@@ -49,7 +51,7 @@ class ConditionEvaluationHandler<T> {
             listener.conditionEvaluated(new EvaluatedCondition<T>(mismatchMessage, matcher, currentConditionValue, elapsedTimeInMS,
                     remainingTimeInMS, false, settings.getAlias(), pollInterval));
         } catch (ClassCastException e) {
-            throwClassCastExceptionBecauseConditionEvaluationListenerCouldntBeApplied(e, listener);
+            throwClassCastExceptionBecauseConditionEvaluationListenerCouldNotBeApplied(e, listener);
         }
     }
 
@@ -65,16 +67,15 @@ class ConditionEvaluationHandler<T> {
             listener.conditionEvaluated(new EvaluatedCondition<T>(matchMessage, matcher, currentConditionValue, elapsedTimeInMS,
                     remainingTimeInMS, true, settings.getAlias(), pollInterval));
         } catch (ClassCastException e) {
-            throwClassCastExceptionBecauseConditionEvaluationListenerCouldntBeApplied(e, listener);
+            throwClassCastExceptionBecauseConditionEvaluationListenerCouldNotBeApplied(e, listener);
         }
     }
 
     private long getRemainingTimeInMS(long elapsedTimeInMS, Duration maxWaitTime) {
-        return maxWaitTime.equals(Duration.FOREVER) ?
-                Long.MAX_VALUE : maxWaitTime.getValueInMS() - elapsedTimeInMS;
+        return maxWaitTime == null || ChronoUnit.FOREVER.getDuration().equals(maxWaitTime) ? Long.MAX_VALUE : maxWaitTime.toMillis() - elapsedTimeInMS;
     }
 
-    private void throwClassCastExceptionBecauseConditionEvaluationListenerCouldntBeApplied(ClassCastException e, ConditionEvaluationListener listener) {
+    private void throwClassCastExceptionBecauseConditionEvaluationListenerCouldNotBeApplied(ClassCastException e, ConditionEvaluationListener listener) {
         throw new ClassCastException("Cannot apply condition evaluation listener " + listener.getClass().getName() + " because " + e.getMessage());
     }
 

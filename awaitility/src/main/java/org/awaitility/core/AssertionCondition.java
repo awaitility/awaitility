@@ -15,7 +15,6 @@
  */
 package org.awaitility.core;
 
-import org.awaitility.Duration;
 
 import java.lang.reflect.Method;
 
@@ -49,19 +48,17 @@ public class AssertionCondition implements Condition<Void> {
 
         conditionEvaluationHandler = new ConditionEvaluationHandler<Object>(null, settings);
 
-        final ConditionEvaluator callable = new ConditionEvaluator() {
-            public ConditionEvaluationResult eval(Duration pollInterval) throws Exception {
-                try {
-                    supplier.run();
-                    conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier, settings.getAlias()), null, pollInterval);
-                    return new ConditionEvaluationResult(true);
-                } catch (AssertionError e) {
-                    lastExceptionMessage = e.getMessage();
-                    conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, lastExceptionMessage, settings.getAlias(), true), null, pollInterval);
-                    return new ConditionEvaluationResult(false, null, e);
-                } catch (Throwable throwable) {
-                    return CheckedExceptionRethrower.safeRethrow(throwable);
-                }
+        final ConditionEvaluator callable = pollInterval -> {
+            try {
+                supplier.run();
+                conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier, settings.getAlias()), null, pollInterval);
+                return new ConditionEvaluationResult(true);
+            } catch (AssertionError e) {
+                lastExceptionMessage = e.getMessage();
+                conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, lastExceptionMessage, settings.getAlias(), true), null, pollInterval);
+                return new ConditionEvaluationResult(false, null, e);
+            } catch (Throwable throwable) {
+                return CheckedExceptionRethrower.safeRethrow(throwable);
             }
         };
         conditionAwaiter = new ConditionAwaiter(callable, settings) {

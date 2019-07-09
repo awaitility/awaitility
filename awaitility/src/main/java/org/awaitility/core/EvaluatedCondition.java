@@ -16,8 +16,9 @@
 
 package org.awaitility.core;
 
-import org.awaitility.Duration;
 import org.hamcrest.Matcher;
+
+import java.time.Duration;
 
 /**
  * Contains properties of the condition at its current stage.

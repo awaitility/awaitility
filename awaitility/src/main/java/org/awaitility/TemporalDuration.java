@@ -1,0 +1,79 @@
+/*
+ * Copyright 2019 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.awaitility;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalField;
+import java.time.temporal.UnsupportedTemporalTypeException;
+
+import static java.time.temporal.ChronoField.*;
+
+public class TemporalDuration implements TemporalAccessor {
+    private static final Temporal BASE_TEMPORAL = LocalDateTime.of(0, 1, 1, 0, 0, 0, 0);
+
+    private static final DateTimeFormatter dtf = new DateTimeFormatterBuilder()
+            .optionalStart().appendValue(YEAR).appendLiteral(" years ").optionalEnd()
+            .optionalStart().appendValue(MONTH_OF_YEAR).appendLiteral(" months ").optionalEnd()
+            .optionalStart().appendValue(DAY_OF_MONTH).appendLiteral(" days ").optionalEnd()
+            .optionalStart().appendValue(HOUR_OF_DAY).appendLiteral(" hours ").optionalEnd()
+            .optionalStart().appendValue(MINUTE_OF_HOUR).appendLiteral(" minutes ").optionalEnd()
+            .optionalStart().appendValue(SECOND_OF_MINUTE).appendLiteral(" seconds").optionalEnd()
+            .optionalStart().appendValue(MILLI_OF_SECOND).appendLiteral(" milliseconds").optionalEnd()
+            .toFormatter();
+
+
+    private final Duration duration;
+    private final Temporal temporal;
+
+    public TemporalDuration(Duration duration) {
+        this.duration = duration;
+        this.temporal = duration.addTo(BASE_TEMPORAL);
+    }
+
+    @Override
+    public boolean isSupported(TemporalField field) {
+        if (!temporal.isSupported(field)) return false;
+        long value = temporal.getLong(field) - BASE_TEMPORAL.getLong(field);
+        return value != 0L;
+    }
+
+    @Override
+    public long getLong(TemporalField field) {
+        if (!isSupported(field)) {
+            throw new UnsupportedTemporalTypeException(field.toString());
+        }
+        return temporal.getLong(field) - BASE_TEMPORAL.getLong(field);
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    @Override
+    public String toString() {
+        if (duration.compareTo(Duration.ofMillis(1)) < 0) {
+            return duration.toNanos() + " nanoseconds";
+        } else {
+            return dtf.format(this).trim();
+        }
+    }
+}

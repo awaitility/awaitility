@@ -16,8 +16,9 @@
 
 package org.awaitility.pollinterval;
 
-import org.awaitility.Duration;
+import org.awaitility.core.DurationFactory;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -27,7 +28,7 @@ public class FibonacciPollInterval implements PollInterval {
 
     private static final int DEFAULT_OFFSET = 0;
 
-    private final TimeUnit timeUnit;
+    private final TimeUnit unit;
     private final int offset;
 
     /**
@@ -40,11 +41,11 @@ public class FibonacciPollInterval implements PollInterval {
     /**
      * Create an instance of the {@link FibonacciPollInterval} with the supplied time unit starting with offset equal to {@value #DEFAULT_OFFSET}.
      *
-     * @param timeUnit The time unit
+     * @param unit The time unit
      * @see FibonacciPollInterval#FibonacciPollInterval(int, TimeUnit)
      */
-    public FibonacciPollInterval(TimeUnit timeUnit) {
-        this(DEFAULT_OFFSET, timeUnit);
+    public FibonacciPollInterval(TimeUnit unit) {
+        this(DEFAULT_OFFSET, unit);
     }
 
     /**
@@ -53,17 +54,17 @@ public class FibonacciPollInterval implements PollInterval {
      * @param offset   The fibonacci offset. For example if offset is 5 and poll count is 1 then the returned duration will be 8 (since  <code>fib(6)</code> is equal to 8).
      *                 Default offset is {@value #DEFAULT_OFFSET}. You can set the offset to <tt>-1</tt> if you want the first value to be <code>fib(0)</code> (i.e. pollCount - offset).
      *                 By default the first value will be <code>fib(1)</code>.
-     * @param timeUnit The time unit
+     * @param unit The time unit
      */
-    public FibonacciPollInterval(int offset, TimeUnit timeUnit) {
+    public FibonacciPollInterval(int offset, TimeUnit unit) {
         if (offset <= -1) {
             throw new IllegalArgumentException("Offset must be greater than or equal to -1");
         }
-        if (timeUnit == null) {
-            throw new IllegalArgumentException("Time unit cannot be null");
+        if (unit == null) {
+            throw new IllegalArgumentException("Chrono unit cannot be null");
         }
         this.offset = offset;
-        this.timeUnit = timeUnit;
+        this.unit = unit;
     }
 
     /**
@@ -74,7 +75,7 @@ public class FibonacciPollInterval implements PollInterval {
      * @return The next duration in the fibonacci sequence.
      */
     public Duration next(int pollCount, Duration previousDuration) {
-        return new Duration(fibonacci(offset + pollCount), timeUnit);
+        return DurationFactory.of(fibonacci(offset + pollCount), unit);
     }
 
     /**
@@ -87,26 +88,26 @@ public class FibonacciPollInterval implements PollInterval {
     }
 
     /**
-     * Syntactic sugar for <code>new FibonacciPollInterval(timeUnit)</code>
+     * Syntactic sugar for <code>new FibonacciPollInterval(unit)</code>
      *
-     * @param timeUnit The time unit
+     * @param unit The time unit
      * @return A new instance of {@link FibonacciPollInterval}.
      */
-    public static FibonacciPollInterval fibonacci(TimeUnit timeUnit) {
-        return new FibonacciPollInterval(timeUnit);
+    public static FibonacciPollInterval fibonacci(TimeUnit unit) {
+        return new FibonacciPollInterval(unit);
     }
 
 
     /**
-     * Syntactic sugar for <code>new FibonacciPollInterval(offset, timeUnit)</code>
+     * Syntactic sugar for <code>new FibonacciPollInterval(offset, unit)</code>
      *
      * @param offset   The fibonacci offset. For example if offset is 5 and poll count is 1 then the returned duration will be 8 (since  <code>fib(6)</code> is equal to 8).
      *                 Default offset is {@value #DEFAULT_OFFSET}.
-     * @param timeUnit The time unit
+     * @param unit The time unit
      * @return A new instance of {@link FibonacciPollInterval}.
      */
-    public static FibonacciPollInterval fibonacci(int offset, TimeUnit timeUnit) {
-        return new FibonacciPollInterval(offset, timeUnit);
+    public static FibonacciPollInterval fibonacci(int offset, TimeUnit unit) {
+        return new FibonacciPollInterval(offset, unit);
     }
 
     /**
@@ -132,7 +133,7 @@ public class FibonacciPollInterval implements PollInterval {
      *
      * @return The same of instance of {@link FibonacciPollInterval}
      */
-    public FibonacciPollInterval timeUnit(TimeUnit unit) {
+    public FibonacciPollInterval unit(TimeUnit unit) {
         return new FibonacciPollInterval(offset, unit);
     }
 
@@ -142,7 +143,7 @@ public class FibonacciPollInterval implements PollInterval {
      * @return The same of instance of {@link FibonacciPollInterval}
      */
     public FibonacciPollInterval offset(int offset) {
-        return new FibonacciPollInterval(offset, timeUnit);
+        return new FibonacciPollInterval(offset, unit);
     }
 
     /**
@@ -172,12 +173,12 @@ public class FibonacciPollInterval implements PollInterval {
 
         FibonacciPollInterval that = (FibonacciPollInterval) o;
 
-        return offset == that.offset && timeUnit == that.timeUnit;
+        return offset == that.offset && unit == that.unit;
     }
 
     @Override
     public int hashCode() {
-        int result = timeUnit.hashCode();
+        int result = unit.hashCode();
         result = 31 * result + offset;
         return result;
     }
@@ -186,7 +187,7 @@ public class FibonacciPollInterval implements PollInterval {
     public String toString() {
         return "FibonacciPollInterval{" +
                 "offset=" + offset +
-                ", timeUnit=" + timeUnit +
+                ", unit=" + unit +
                 '}';
     }
 }

@@ -15,9 +15,10 @@
  */
 package org.awaitility.core;
 
-import org.awaitility.Duration;
 import org.awaitility.constraint.WaitConstraint;
 import org.awaitility.pollinterval.PollInterval;
+
+import java.time.Duration;
 
 public class ConditionSettings {
     private final String alias;

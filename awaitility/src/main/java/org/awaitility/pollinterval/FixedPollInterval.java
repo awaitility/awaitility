@@ -16,9 +16,13 @@
 
 package org.awaitility.pollinterval;
 
-import org.awaitility.Duration;
 
+import org.awaitility.core.DurationFactory;
+
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+
+import static org.awaitility.Durations.isForever;
 
 /**
  * Generates a fixed (linear) poll interval based on the supplied duration
@@ -35,7 +39,7 @@ public class FixedPollInterval implements PollInterval {
     public FixedPollInterval(Duration duration) {
         if (duration == null) {
             throw new IllegalArgumentException("Duration cannot be null");
-        } else if (duration.isForever()) {
+        } else if (isForever(duration)) {
             throw new IllegalArgumentException("Cannot use a fixed poll interval of length 'forever'");
         }
 
@@ -49,7 +53,7 @@ public class FixedPollInterval implements PollInterval {
      * @param unit         The time unit
      */
     public FixedPollInterval(long pollInterval, TimeUnit unit) {
-        this(new Duration(pollInterval, unit));
+        this(DurationFactory.of(pollInterval, unit));
     }
 
     /**
@@ -77,7 +81,7 @@ public class FixedPollInterval implements PollInterval {
      * Syntactic sugar for create a new instance of {@link FixedPollInterval}.
      *
      * @param pollInterval The poll interval amount
-     * @param unit         The time unit
+     * @param unit         The chrono unit
      * @return A new instance of {@link FixedPollInterval}
      */
     public static FixedPollInterval fixed(long pollInterval, TimeUnit unit) {

@@ -16,7 +16,8 @@
 
 package org.awaitility.pollinterval;
 
-import org.awaitility.Duration;
+
+import java.time.Duration;
 
 /**
  * A poll interval represents how often Awaitility will pause before reevaluating the supplied condition.

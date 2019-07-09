@@ -2,7 +2,7 @@ package org.awaitility.core;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.util.function.BiFunction;
 
 /**
  * Please don't use this class directly, it's for internal purposes only and will be moved/renamed without notice!
@@ -25,12 +25,7 @@ public class InternalExecutorServiceFactory {
         if (threadSupplier == null) {
             throw new IllegalArgumentException("Condition evaluation thread supplier cannot be null");
         }
-        return create(new BiFunction<Runnable, String, Thread>() {
-            @Override
-            public Thread apply(Runnable runnable, String __) {
-                return threadSupplier.apply(runnable);
-            }
-        }, null);
+        return create((runnable, __) -> threadSupplier.apply(runnable), null);
     }
 
     /**
@@ -44,11 +39,9 @@ public class InternalExecutorServiceFactory {
         if (threadSupplier == null) {
             throw new IllegalArgumentException("Condition evaluation thread supplier cannot be null");
         }
-        return Executors.newSingleThreadExecutor(new ThreadFactory() {
-            public Thread newThread(Runnable r) {
-                final String threadName = generateDefaultThreadName(alias);
-                return threadSupplier.apply(r, threadName);
-            }
+        return Executors.newSingleThreadExecutor(r -> {
+            final String threadName = generateDefaultThreadName(alias);
+            return threadSupplier.apply(r, threadName);
         });
     }
 

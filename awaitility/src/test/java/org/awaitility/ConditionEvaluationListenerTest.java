@@ -17,7 +17,6 @@
 package org.awaitility;
 
 import org.awaitility.core.ConditionEvaluationListener;
-import org.awaitility.core.EvaluatedCondition;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +30,8 @@ import java.util.concurrent.Callable;
 
 import static org.awaitility.Awaitility.setDefaultConditionEvaluationListener;
 import static org.awaitility.Awaitility.with;
+import static org.awaitility.Durations.ONE_SECOND;
+import static org.awaitility.Durations.TEN_SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -47,10 +48,8 @@ public class ConditionEvaluationListenerTest {
     public void listenerExceptionsAreNotCaught() {
         with()
                 .catchUncaughtExceptions()
-                .conditionEvaluationListener(new ConditionEvaluationListener<Integer>() {
-                    public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
-                        throw new RuntimeException();
-                    }
+                .conditionEvaluationListener(condition -> {
+                    throw new RuntimeException();
                 })
                 .until(new CountDown(10), is(equalTo(0)));
     }
@@ -60,14 +59,12 @@ public class ConditionEvaluationListenerTest {
 
         final CountDown globalCountDown = new CountDown(20);
 
-        ConditionEvaluationListener defaultConditionEvaluationListener = new ConditionEvaluationListener<Integer>() {
-            public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
-                try {
-                    if (!condition.isSatisfied()) {
-                        globalCountDown.call();
-                    }
-                } catch (Exception ignored) {
+        ConditionEvaluationListener defaultConditionEvaluationListener = condition -> {
+            try {
+                if (!condition.isSatisfied()) {
+                    globalCountDown.call();
                 }
+            } catch (Exception ignored) {
             }
         };
         Awaitility.setDefaultConditionEvaluationListener(defaultConditionEvaluationListener);
@@ -84,14 +81,12 @@ public class ConditionEvaluationListenerTest {
 
         final CountDown globalCountDown = new CountDown(20);
 
-        ConditionEvaluationListener defaultConditionEvaluationListener = new ConditionEvaluationListener<Integer>() {
-            public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
-                try {
-                    if (!condition.isSatisfied()) {
-                        globalCountDown.call();
-                    }
-                } catch (Exception ignored) {
+        ConditionEvaluationListener defaultConditionEvaluationListener = condition -> {
+            try {
+                if (!condition.isSatisfied()) {
+                    globalCountDown.call();
                 }
+            } catch (Exception ignored) {
             }
         };
         setDefaultConditionEvaluationListener(defaultConditionEvaluationListener);
@@ -112,14 +107,12 @@ public class ConditionEvaluationListenerTest {
     public void afterAwaitilityResetNoDefaultHandlerIsSet() {
         final CountDown globalCountDown = new CountDown(20);
 
-        ConditionEvaluationListener defaultConditionEvaluationListener = new ConditionEvaluationListener<Integer>() {
-            public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
-                try {
-                    if (!condition.isSatisfied()) {
-                        globalCountDown.call();
-                    }
-                } catch (Exception ignored) {
+        ConditionEvaluationListener defaultConditionEvaluationListener = condition -> {
+            try {
+                if (!condition.isSatisfied()) {
+                    globalCountDown.call();
                 }
+            } catch (Exception ignored) {
             }
         };
         setDefaultConditionEvaluationListener(defaultConditionEvaluationListener);
@@ -136,29 +129,25 @@ public class ConditionEvaluationListenerTest {
     @Test(timeout = 10000)
     public void conditionResultsCanBeLoggedToSystemOut() {
         with()
-                .conditionEvaluationListener(new ConditionEvaluationListener<Integer>() {
-                    public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
-                        if (condition.isSatisfied()) {
-                            System.out.printf("%s (in %ds)%n", condition.getDescription(), condition.getElapsedTimeInMS() / 1000);
-                        } else {
-                            System.out.printf("%s (elapsed time %ds, remaining time %ds)%n", condition.getDescription(), condition.getElapsedTimeInMS() / 1000, condition.getRemainingTimeInMS() / 1000);
-                        }
+                .conditionEvaluationListener(condition -> {
+                    if (condition.isSatisfied()) {
+                        System.out.printf("%s (in %ds)%n", condition.getDescription(), condition.getElapsedTimeInMS() / 1000);
+                    } else {
+                        System.out.printf("%s (elapsed time %ds, remaining time %ds)%n", condition.getDescription(), condition.getElapsedTimeInMS() / 1000, condition.getRemainingTimeInMS() / 1000);
                     }
                 })
-                .pollInterval(Duration.ONE_SECOND)
-                .atMost(Duration.TEN_SECONDS)
+                .pollInterval(ONE_SECOND)
+                .atMost(TEN_SECONDS)
                 .until(new CountDown(5), is(equalTo(0)));
     }
 
     @Test(timeout = 2000)
     public void conditionResultsCanBeBuffered() {
-        final List<String> buffer = new ArrayList<String>();
+        final List<String> buffer = new ArrayList<>();
         with()
-                .conditionEvaluationListener(new ConditionEvaluationListener<Integer>() {
-                    public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
-                        String msg = String.format("%s (elapsed time %ds, remaining time %ds)%n", condition.getDescription(), condition.getElapsedTimeInMS() / 1000, condition.getRemainingTimeInMS() / 1000);
-                        buffer.add(msg);
-                    }
+                .conditionEvaluationListener(condition -> {
+                    String msg = String.format("%s (elapsed time %ds, remaining time %ds)%n", condition.getDescription(), condition.getElapsedTimeInMS() / 1000, condition.getRemainingTimeInMS() / 1000);
+                    buffer.add(msg);
                 })
                 .until(new CountDown(5), is(equalTo(0)));
 
@@ -168,13 +157,11 @@ public class ConditionEvaluationListenerTest {
 
     @Test(timeout = 2000)
     public void expectedMismatchMessageForComplexMatchers() {
-        final ValueHolder<String> lastMismatchMessage = new ValueHolder<String>();
+        final ValueHolder<String> lastMismatchMessage = new ValueHolder<>();
         with()
-                .conditionEvaluationListener(new ConditionEvaluationListener<CountDownBean>() {
-                    public void conditionEvaluated(EvaluatedCondition<CountDownBean> condition) {
-                        if (!condition.isSatisfied()) {
-                            lastMismatchMessage.value = condition.getDescription();
-                        }
+                .conditionEvaluationListener((ConditionEvaluationListener<CountDownBean>) condition -> {
+                    if (!condition.isSatisfied()) {
+                        lastMismatchMessage.value = condition.getDescription();
                     }
                 })
                 .until(new CountDownProvider(new CountDownBean(10, 20)), samePropertyValuesAs(new CountDownBean(10, 10)));
@@ -186,13 +173,11 @@ public class ConditionEvaluationListenerTest {
 
     @Test(timeout = 2000)
     public void expectedMismatchMessage() {
-        final ValueHolder<String> lastMismatchMessage = new ValueHolder<String>();
+        final ValueHolder<String> lastMismatchMessage = new ValueHolder<>();
         with()
-                .conditionEvaluationListener(new ConditionEvaluationListener<Integer>() {
-                    public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
-                        if (!condition.isSatisfied()) {
-                            lastMismatchMessage.value = condition.getDescription();
-                        }
+                .conditionEvaluationListener(condition -> {
+                    if (!condition.isSatisfied()) {
+                        lastMismatchMessage.value = condition.getDescription();
                     }
                 })
                 .until(new CountDown(10), is(equalTo(5)));
@@ -204,13 +189,9 @@ public class ConditionEvaluationListenerTest {
 
     @Test(timeout = 2000)
     public void expectedMatchMessage() {
-        final ValueHolder<String> lastMatchMessage = new ValueHolder<String>();
+        final ValueHolder<String> lastMatchMessage = new ValueHolder<>();
         with()
-                .conditionEvaluationListener(new ConditionEvaluationListener<Integer>() {
-                    public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
-                        lastMatchMessage.value = condition.getDescription();
-                    }
-                })
+                .conditionEvaluationListener(condition -> lastMatchMessage.value = condition.getDescription())
                 .until(new CountDown(10), is(equalTo(5)));
 
         String expectedMatchMessage = String.format("%s reached its end value of <5>", CountDown.class.getName());
@@ -219,14 +200,12 @@ public class ConditionEvaluationListenerTest {
 
     @Test(timeout = 2000)
     public void awaitingForeverReturnsLongMaxValueAsRemainingTime() {
-        final Set<Long> remainingTimes = new HashSet<Long>();
-        final Set<Long> elapsedTimes = new HashSet<Long>();
+        final Set<Long> remainingTimes = new HashSet<>();
+        final Set<Long> elapsedTimes = new HashSet<>();
         with()
-                .conditionEvaluationListener(new ConditionEvaluationListener<Integer>() {
-                    public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
-                        remainingTimes.add(condition.getRemainingTimeInMS());
-                        elapsedTimes.add(condition.getElapsedTimeInMS());
-                    }
+                .conditionEvaluationListener(condition -> {
+                    remainingTimes.add(condition.getRemainingTimeInMS());
+                    elapsedTimes.add(condition.getElapsedTimeInMS());
                 })
                 .forever()
                 .until(new CountDown(10), is(equalTo(5)));

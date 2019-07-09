@@ -23,7 +23,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.awaitility.Awaitility.await;
-import static org.awaitility.Duration.FIVE_SECONDS;
+import static org.awaitility.Durations.FIVE_SECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class WaitForAtomicBooleanTest {
@@ -37,28 +37,28 @@ public class WaitForAtomicBooleanTest {
     }
 
     @Test(timeout = 2000L)
-    public void atomicBooleanExample() throws Exception {
+    public void atomicBooleanExample() {
         new WasAddedModifier().start();
 
         await().atMost(FIVE_SECONDS).until(wasAdded(), equalTo(true));
     }
 
     @Test(timeout = 2000L)
-    public void atomicBooleanWithUntilTrueWhenBooleanUsesDefaultValue() throws Exception {
+    public void atomicBooleanWithUntilTrueWhenBooleanUsesDefaultValue() {
         new WasAddedWithDefaultValue().start();
 
         await().atMost(FIVE_SECONDS).untilTrue(wasAddedWithDefaultValue);
     }
 
     @Test(timeout = 2000L)
-    public void atomicBooleanWithUntilTrue() throws Exception {
+    public void atomicBooleanWithUntilTrue() {
         new WasAddedModifier().start();
 
         await().atMost(FIVE_SECONDS).untilTrue(wasAdded);
     }
 
     @Test(timeout = 2000L)
-    public void atomicBooleanWithUntilFalse() throws Exception {
+    public void atomicBooleanWithUntilFalse() {
         wasAdded.set(true);
         new WasAddedModifier().start();
 
@@ -66,11 +66,7 @@ public class WaitForAtomicBooleanTest {
     }
 
     private Callable<Boolean> wasAdded() {
-        return new Callable<Boolean>() {
-            public Boolean call() throws Exception {
-                return wasAdded.get();
-            }
-        };
+        return () -> wasAdded.get();
     }
 
     private class WasAddedModifier extends Thread {

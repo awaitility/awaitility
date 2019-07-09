@@ -16,7 +16,6 @@
 
 package org.awaitility;
 
-import org.assertj.core.api.Assertions;
 import org.awaitility.classes.Asynch;
 import org.awaitility.classes.FakeRepository;
 import org.awaitility.classes.FakeRepositoryImpl;
@@ -28,9 +27,10 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.awaitility.Duration.FIVE_HUNDRED_MILLISECONDS;
-import static org.awaitility.Duration.TWO_HUNDRED_MILLISECONDS;
+import static org.awaitility.Durations.FIVE_HUNDRED_MILLISECONDS;
+import static org.awaitility.Durations.TWO_HUNDRED_MILLISECONDS;
 import static org.awaitility.core.ConditionEvaluationLogger.conditionEvaluationLogger;
 import static org.awaitility.pollinterval.FibonacciPollInterval.fibonacci;
 import static org.awaitility.pollinterval.FixedPollInterval.fixed;
@@ -58,31 +58,31 @@ public class PollIntervalTest {
     @Test(timeout = 2000)
     public void fibonacciPollInterval() {
         new Asynch(fakeRepository).perform();
-        await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).pollInterval(new FibonacciPollInterval()).untilAsserted(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+        await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).pollInterval(new FibonacciPollInterval()).untilAsserted(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
     @Test(timeout = 2000)
     public void fibonacciPollIntervalStaticallyImported() {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(conditionEvaluationLogger()).
-                pollInterval(fibonacci().with().offset(10).and().timeUnit(MILLISECONDS)).
-                untilAsserted(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+                pollInterval(fibonacci().with().offset(10).and().unit(MILLISECONDS)).
+                untilAsserted(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
     @Test(timeout = 2000)
     public void inlinePollInterval() {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
-                pollInterval((__, previous) -> previous.multiply(2).plus(1)).
-                untilAsserted(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+                pollInterval((__, previous) -> previous.multipliedBy(2).plusMillis(1)).
+                untilAsserted(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
     @Test(timeout = 2000)
     public void iterativePollInterval() {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
-                pollInterval(iterative(duration -> duration.multiply(2), FIVE_HUNDRED_MILLISECONDS)).
-                untilAsserted(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+                pollInterval(iterative(duration -> duration.multipliedBy(2), FIVE_HUNDRED_MILLISECONDS)).
+                untilAsserted(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
     @Test(timeout = 2000)
@@ -90,6 +90,6 @@ public class PollIntervalTest {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
                 pollInterval(fixed(TWO_HUNDRED_MILLISECONDS)).
-                untilAsserted(() -> Assertions.assertThat(fakeRepository.getValue()).isEqualTo(1));
+                untilAsserted(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 }
