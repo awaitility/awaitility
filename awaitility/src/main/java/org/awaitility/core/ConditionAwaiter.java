@@ -16,8 +16,6 @@
 package org.awaitility.core;
 
 
-import org.awaitility.TemporalDuration;
-
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -28,6 +26,7 @@ import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.time.temporal.ChronoUnit.NANOS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.awaitility.classpath.ClassPathResolver.existInCP;
+import static org.awaitility.core.TemporalDuration.formatAsString;
 import static org.awaitility.core.Uninterruptibles.sleepUninterruptibly;
 
 abstract class ConditionAwaiter implements UncaughtExceptionHandler {
@@ -123,10 +122,10 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             } else if (!succeededBeforeTimeout) {
                 final String message;
                 String timeoutMessage = getTimeoutMessage();
-                TemporalDuration durationAsString = new TemporalDuration(maxWaitTime);
+                String durationAsString = formatAsString(maxWaitTime);
                 if (conditionSettings.hasAlias()) {
                     message = String.format("Condition with alias '%s' didn't complete within %s because %s.",
-                            conditionSettings.getAlias(), durationAsString.toString(), decapitalize(timeoutMessage));
+                            conditionSettings.getAlias(), durationAsString, decapitalize(timeoutMessage));
                 } else {
                     message = String.format("%s within %s.", timeoutMessage, durationAsString);
                 }
@@ -148,7 +147,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 throw new ConditionTimeoutException(message, cause);
             } else if (evaluationDuration.compareTo(minWaitTime) < 0) {
                 String message = String.format("Condition was evaluated in %s which is earlier than expected minimum timeout %s",
-                        new TemporalDuration(evaluationDuration).toString(), new TemporalDuration(minWaitTime).toString());
+                        formatAsString(evaluationDuration), formatAsString(minWaitTime));
                 throw new ConditionTimeoutException(message);
             }
         } catch (Throwable e) {

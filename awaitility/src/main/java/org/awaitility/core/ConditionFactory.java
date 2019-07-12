@@ -15,7 +15,6 @@
  */
 package org.awaitility.core;
 
-import org.awaitility.TemporalDuration;
 import org.awaitility.constraint.AtMostWaitConstraint;
 import org.awaitility.constraint.WaitConstraint;
 import org.awaitility.pollinterval.FixedPollInterval;
@@ -33,9 +32,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static org.awaitility.Durations.isForever;
+import static org.awaitility.core.ForeverDuration.isForever;
+import static org.awaitility.core.TemporalDuration.formatAsString;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 
@@ -578,7 +579,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public <T> T until(final Callable<T> supplier, final Matcher<? super T> matcher) {
-        return until(new CallableHamcrestCondition<T>(supplier, matcher, generateConditionSettings()));
+        return until(new CallableHamcrestCondition<>(supplier, matcher, generateConditionSettings()));
     }
 
     /**
@@ -674,7 +675,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public Integer untilAtomic(final AtomicInteger atomic, final Matcher<? super Integer> matcher) {
-        return until(new CallableHamcrestCondition<Integer>(new Callable<Integer>() {
+        return until(new CallableHamcrestCondition<>(new Callable<Integer>() {
             public Integer call() {
                 return atomic.get();
             }
@@ -696,11 +697,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public Long untilAtomic(final AtomicLong atomic, final Matcher<? super Long> matcher) {
-        return until(new CallableHamcrestCondition<Long>(new Callable<Long>() {
-            public Long call() {
-                return atomic.get();
-            }
-        }, matcher, generateConditionSettings()));
+        return until(new CallableHamcrestCondition<>(atomic::get, matcher, generateConditionSettings()));
     }
 
     /**
@@ -717,11 +714,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAtomic(final AtomicBoolean atomic, final Matcher<? super Boolean> matcher) {
-        until(new CallableHamcrestCondition<Boolean>(new Callable<Boolean>() {
-            public Boolean call() {
-                return atomic.get();
-            }
-        }, matcher, generateConditionSettings()));
+        until(new CallableHamcrestCondition<>(atomic::get, matcher, generateConditionSettings()));
     }
 
     /**
@@ -760,11 +753,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public <V> V untilAtomic(final AtomicReference<V> atomic, final Matcher<? super V> matcher) {
-        return until(new CallableHamcrestCondition<V>(new Callable<V>() {
-            public V call() {
-                return atomic.get();
-            }
-        }, matcher, generateConditionSettings()));
+        return until(new CallableHamcrestCondition<>(atomic::get, matcher, generateConditionSettings()));
     }
 
     /**
@@ -806,10 +795,10 @@ public class ConditionFactory {
         Duration timeout = timeoutConstraint.getMaxWaitTime();
         if (!isForever(timeout) && timeout.toNanos() <= actualPollDelay.toNanos()) {
             throw new IllegalArgumentException(String.format("Timeout (%s) must be greater than the poll delay (%s).",
-                    new TemporalDuration(timeout).toString(), new TemporalDuration(actualPollDelay).toString()));
+                    formatAsString(timeout), formatAsString(actualPollDelay)));
         } else if ((!isForever(actualPollDelay) && !isForever(timeout)) && timeout.toNanos() <= actualPollDelay.toNanos()) {
             throw new IllegalArgumentException(String.format("Timeout (%s) must be greater than the poll delay (%s).",
-                    new TemporalDuration(timeout).toString(), new TemporalDuration(actualPollDelay).toString()));
+                    formatAsString(timeout), formatAsString(actualPollDelay)));
         }
 
         ExecutorLifecycle executorLifecycle;

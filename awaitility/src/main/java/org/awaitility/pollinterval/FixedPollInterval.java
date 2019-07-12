@@ -22,7 +22,7 @@ import org.awaitility.core.DurationFactory;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-import static org.awaitility.Durations.isForever;
+import static org.awaitility.core.ForeverDuration.isForever;
 
 /**
  * Generates a fixed (linear) poll interval based on the supplied duration

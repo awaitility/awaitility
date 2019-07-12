@@ -25,8 +25,8 @@ import org.hamcrest.Matcher;
 import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
 
@@ -44,7 +44,7 @@ import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
  * greater than 3.
  * <p/>
  * <pre>
- * await().forever().untilCall(to(orderService).orderCount(), greaterThan(3));
+ * await().forever().until(() -> orderService.orderCount()), greaterThan(3));
  * </pre>
  * <p/>
  * Wait 300 milliseconds until field in object <code>myObject</code> with name
@@ -79,6 +79,7 @@ import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
  * <p>&nbsp;</p>
  * <ul>
  * <li>org.awaitility.Awaitlity.*</li>
+ * <li>org.awaitility.Durations.*</li>
  * </ul>
  * It may also be useful to import these methods:
  * <ul>
@@ -172,7 +173,7 @@ public class Awaitility {
      * upon an exception, unless it times out.
      */
     public static void ignoreExceptionsByDefault() {
-        defaultExceptionIgnorer = new PredicateExceptionIgnorer((Predicate<Throwable>) e -> true);
+        defaultExceptionIgnorer = new PredicateExceptionIgnorer(e -> true);
     }
 
     /**
@@ -181,7 +182,7 @@ public class Awaitility {
      * upon an exception matching the supplied exception type, unless it times out.
      */
     public static void ignoreExceptionByDefault(final Class<? extends Throwable> exceptionType) {
-        defaultExceptionIgnorer = new PredicateExceptionIgnorer((Predicate<Throwable>) e -> e.getClass().equals(exceptionType));
+        defaultExceptionIgnorer = new PredicateExceptionIgnorer(e -> e.getClass().equals(exceptionType));
     }
 
     /**
@@ -243,12 +244,7 @@ public class Awaitility {
      * @since 3.0.0
      */
     public static void pollThread(final Function<Runnable, Thread> threadSupplier) {
-        defaultExecutorLifecycle = ExecutorLifecycle.withNormalCleanupBehavior(new Supplier<ExecutorService>() {
-            @Override
-            public ExecutorService get() {
-                return InternalExecutorServiceFactory.create(threadSupplier);
-            }
-        });
+        defaultExecutorLifecycle = ExecutorLifecycle.withNormalCleanupBehavior(() -> InternalExecutorServiceFactory.create(threadSupplier));
     }
 
     /**
@@ -271,7 +267,7 @@ public class Awaitility {
         defaultCatchUncaughtExceptions = true;
         defaultConditionEvaluationListener = null;
         defaultExecutorLifecycle = null;
-        defaultExceptionIgnorer = new PredicateExceptionIgnorer((Predicate<Throwable>) e -> false);
+        defaultExceptionIgnorer = new PredicateExceptionIgnorer(e -> false);
         Thread.setDefaultUncaughtExceptionHandler(null);
     }
 

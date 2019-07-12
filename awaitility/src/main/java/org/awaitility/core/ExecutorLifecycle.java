@@ -17,6 +17,7 @@ package org.awaitility.core;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -62,8 +63,7 @@ public class ExecutorLifecycle {
     }
 
     private static EvaluationCleanup noCleanup() {
-        Consumer<ExecutorService> noop = executorService -> {
-        };
+        Consumer<ExecutorService> noop = executorService -> {};
         return new EvaluationCleanup(noop, noop);
     }
 

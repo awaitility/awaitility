@@ -15,8 +15,9 @@
  */
 package org.awaitility;
 
+import org.awaitility.core.ForeverDuration;
+
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -28,9 +29,9 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 public final class Durations {
 
     /**
-     * Constant <code>ONE_MILLISECOND</code>
+     * Constant <code>FOREVER</code>
      */
-    public static final Duration FOREVER = ChronoUnit.FOREVER.getDuration();
+    public static final Duration FOREVER = ForeverDuration.FOREVER;
 
     /**
      * Constant <code>ONE_MILLISECOND</code>
@@ -82,12 +83,4 @@ public final class Durations {
      */
     public static final Duration TEN_MINUTES = Duration.of(600, SECONDS);
 
-    /**
-     * <p>isForever.</p>
-     *
-     * @return a boolean.
-     */
-    public static boolean isForever(Duration duration) {
-        return FOREVER.equals(duration);
-    }
 }

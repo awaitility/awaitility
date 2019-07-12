@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.awaitility.Awaitility.await;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
 
 public class UsingAtomicTest {
@@ -42,14 +42,14 @@ public class UsingAtomicTest {
     }
 
     @Test(timeout = 2000)
-    public void usingAtomicInteger() throws Exception {
+    public void usingAtomicInteger() {
         AtomicInteger atomic = new AtomicInteger(0);
         new Asynch(new FakeRepositoryWithAtomicInteger(atomic)).perform();
 		await().untilAtomic(atomic, equalTo(1));
     }
 
     @Test(timeout = 2000)
-    public void usingAtomicIntegerAndTimeout() throws Exception {
+    public void usingAtomicIntegerAndTimeout() {
         exception.expect(ConditionTimeoutException.class);
         exception.expectMessage("expected <1> but was <0> within 200 milliseconds.");
         AtomicInteger atomic = new AtomicInteger(0);
@@ -57,14 +57,14 @@ public class UsingAtomicTest {
     }
 
     @Test(timeout = 2000)
-    public void usingAtomicBoolean() throws Exception {
+    public void usingAtomicBoolean() {
         AtomicBoolean atomic = new AtomicBoolean(false);
         new Asynch(new FakeRepositoryWithAtomicBoolean(atomic)).perform();
 		await().untilAtomic(atomic, equalTo(true));
     }
 
     @Test(timeout = 2000)
-    public void usingAtomicBooleanAndTimeout() throws Exception {
+    public void usingAtomicBooleanAndTimeout() {
         exception.expect(ConditionTimeoutException.class);
         exception.expectMessage("expected <true> but was <false> within 200 milliseconds.");
         AtomicBoolean atomic = new AtomicBoolean(false);
@@ -72,37 +72,36 @@ public class UsingAtomicTest {
     }
 
     @Test(timeout = 2000)
-    public void usingAtomicLong() throws Exception {
+    public void usingAtomicLong() {
         AtomicLong atomic = new AtomicLong(0);
         new Asynch(new FakeRepositoryWithAtomicLong(atomic)).perform();
 		await().untilAtomic(atomic, equalTo(1L));
     }
 
     @Test(timeout = 2000)
-    public void usingAtomicLongAndTimeout() throws Exception {
+    public void usingAtomicLongAndTimeout() {
         exception.expect(ConditionTimeoutException.class);
 		exception.expectMessage(
-				"org.awaitility.core.ConditionFactory.untilAtomic Callable expected <1L> but was <0L> within 200 milliseconds.");
+				"Lambda expression in org.awaitility.core.ConditionFactory that uses java.util.concurrent.atomic.AtomicLong: expected <1L> but was <0L> within 200 milliseconds.");
         AtomicLong atomic = new AtomicLong(0);
 		await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo(1L));
     }
 
     @Test(timeout = 2000)
-    public void usingAtomicReference() throws Exception {
-        AtomicReference<String> atomic = new AtomicReference<String>("0");
+    public void usingAtomicReference() {
+        AtomicReference<String> atomic = new AtomicReference<>("0");
         new Asynch(new FakeRepositoryWithAtomicReference(atomic)).perform();
 		await().untilAtomic(atomic, equalTo("1"));
     }
 
     @Test(timeout = 2000)
-    public void usingAtomicReferenceAndTimeout() throws Exception {
+    public void usingAtomicReferenceAndTimeout() {
         exception.expect(ConditionTimeoutException.class);
 		exception.expectMessage(
-				"org.awaitility.core.ConditionFactory.untilAtomic Callable expected \"1\" but was \"0\" within 200 milliseconds.");
-        AtomicReference<String> atomic = new AtomicReference<String>("0");
+				"Lambda expression in org.awaitility.core.ConditionFactory that uses java.util.concurrent.atomic.AtomicReference: expected \"1\" but was \"0\" within 200 milliseconds.");
+        AtomicReference<String> atomic = new AtomicReference<>("0");
 		await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo("1"));
     }
-
 }
 
 class FakeRepositoryWithAtomicInteger implements FakeRepository {
@@ -174,5 +173,4 @@ class FakeRepositoryWithAtomicReference implements FakeRepository {
 	public void setValue(int value) {
 		atomic.set("" + value);
 	}
-
 }

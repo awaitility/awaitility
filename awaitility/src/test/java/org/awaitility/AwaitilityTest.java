@@ -17,6 +17,7 @@ package org.awaitility;
 
 import org.awaitility.classes.*;
 import org.awaitility.core.ConditionTimeoutException;
+import org.awaitility.core.ForeverDuration;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -98,7 +99,7 @@ public class AwaitilityTest {
         exception.expectMessage("Cannot delay polling forever");
 
         new Asynch(fakeRepository).perform();
-        with().pollDelay(FOREVER).pollInterval(ONE_HUNDRED_MILLISECONDS).then().await().until(fakeRepositoryValueEqualsOne());
+        with().pollDelay(ForeverDuration.FOREVER).pollInterval(ONE_HUNDRED_MILLISECONDS).then().await().until(fakeRepositoryValueEqualsOne());
         assertEquals(1, fakeRepository.getValue());
     }
 
@@ -108,7 +109,7 @@ public class AwaitilityTest {
         exception.expectMessage("Cannot use a fixed poll interval of length 'forever'");
 
         new Asynch(fakeRepository).perform();
-        with().pollDelay(ONE_HUNDRED_MILLISECONDS).pollInterval(FOREVER).then().await().until(fakeRepositoryValueEqualsOne());
+        with().pollDelay(ONE_HUNDRED_MILLISECONDS).pollInterval(ForeverDuration.FOREVER).then().await().until(fakeRepositoryValueEqualsOne());
         assertEquals(1, fakeRepository.getValue());
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 the original author or authors.
+ * Copyright 2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.awaitility.core;
 
-/**
- * A consumer (because Awaitility doesn't require Java 8)
- *
- * @since 3.1.0
- */
-interface Consumer<T> {
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
+public class ForeverDuration {
+    /**
+     * Constant <code>FOREVER</code>
+     */
+    public static final Duration FOREVER = ChronoUnit.FOREVER.getDuration();
 
     /**
-     * Performs this operation on the given argument.
+     * <p>isForever.</p>
      *
-     * @param t the input argument
+     * @return a boolean.
      */
-    void accept(T t);
+    public static boolean isForever(Duration duration) {
+        return FOREVER.equals(duration);
+    }
 }

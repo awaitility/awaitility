@@ -16,6 +16,7 @@
 package org.awaitility.core;
 
 import java.util.concurrent.ExecutorService;
+import java.util.function.Consumer;
 
 /**
  * Handles how threads and thread-pools are cleanup after each conditional evaluation round.
@@ -39,14 +40,6 @@ class EvaluationCleanup {
 
         this.normalShutdownBehavior = normalShutdownBehavior;
         this.unexpectedShutdownBehavior = unexpectedShutdownBehavior;
-    }
-
-    Consumer<ExecutorService> getNormalShutdownBehavior() {
-        return normalShutdownBehavior;
-    }
-
-    Consumer<ExecutorService> getUnexpectedShutdownBehavior() {
-        return unexpectedShutdownBehavior;
     }
 
     void executeNormalCleanupBehavior(ExecutorService executorService) {

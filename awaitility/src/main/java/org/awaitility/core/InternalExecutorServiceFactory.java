@@ -3,6 +3,7 @@ package org.awaitility.core;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * Please don't use this class directly, it's for internal purposes only and will be moved/renamed without notice!

@@ -15,7 +15,6 @@
  */
 package org.awaitility;
 
-import org.awaitility.core.Function;
 import org.junit.After;
 import org.junit.Test;
 
@@ -24,6 +23,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;

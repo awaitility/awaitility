@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.awaitility;
+package org.awaitility.core;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -27,8 +27,8 @@ import java.time.temporal.UnsupportedTemporalTypeException;
 
 import static java.time.temporal.ChronoField.*;
 
-public class TemporalDuration implements TemporalAccessor {
-    private static final Temporal BASE_TEMPORAL = LocalDateTime.of(0, 1, 1, 0, 0, 0, 0);
+class TemporalDuration implements TemporalAccessor {
+    private static final Temporal BASE = LocalDateTime.of(0, 1, 1, 0, 0, 0, 0);
 
     private static final DateTimeFormatter dtf = new DateTimeFormatterBuilder()
             .optionalStart().appendValue(YEAR).appendLiteral(" years ").optionalEnd()
@@ -44,24 +44,25 @@ public class TemporalDuration implements TemporalAccessor {
     private final Duration duration;
     private final Temporal temporal;
 
-    public TemporalDuration(Duration duration) {
+    TemporalDuration(Duration duration) {
         this.duration = duration;
-        this.temporal = duration.addTo(BASE_TEMPORAL);
+        this.temporal = duration.addTo(BASE);
     }
 
     @Override
     public boolean isSupported(TemporalField field) {
-        if (!temporal.isSupported(field)) return false;
-        long value = temporal.getLong(field) - BASE_TEMPORAL.getLong(field);
-        return value != 0L;
+        if (!temporal.isSupported(field)) {
+            return false;
+        }
+        return temporal.getLong(field) - BASE.getLong(field) != 0L;
     }
 
     @Override
-    public long getLong(TemporalField field) {
-        if (!isSupported(field)) {
-            throw new UnsupportedTemporalTypeException(field.toString());
+    public long getLong(TemporalField temporalField) {
+        if (!isSupported(temporalField)) {
+            throw new UnsupportedTemporalTypeException(temporalField.toString());
         }
-        return temporal.getLong(field) - BASE_TEMPORAL.getLong(field);
+        return temporal.getLong(temporalField) - BASE.getLong(temporalField);
     }
 
     public Duration getDuration() {
@@ -75,5 +76,9 @@ public class TemporalDuration implements TemporalAccessor {
         } else {
             return dtf.format(this).trim();
         }
+    }
+
+    static String formatAsString(Duration duration) {
+        return new TemporalDuration(duration).toString();
     }
 }
