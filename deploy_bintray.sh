@@ -7,7 +7,7 @@ tmpFolderRootName=/tmp/$RANDOM
 mkdir -p "${tmpFolderRootName}"
 
 maven_awaitility_folder=$HOME/.m2/repository/org/awaitility
-project_names=(awaitility awaitility-groovy awaitility-kotlin awaitility-scala awaitility-proxy awaitility-scala)
+project_names=(awaitility awaitility-groovy awaitility-kotlin awaitility-scala awaitility-scala)
 artifact_name_suffixes=(javadoc sources)
 
 for project in ${project_names[*]} ; do

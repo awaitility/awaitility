@@ -1,6 +1,6 @@
 #!/bin/sh
 read -p "Version to generate javadoc for: " version
-project_names=(awaitility awaitility-groovy awaitility-kotlin awaitility-scala awaitility-proxy awaitility-scala)
+project_names=(awaitility awaitility-groovy awaitility-kotlin awaitility-scala awaitility-scala)
 
 echo "Generating Javadoc for version ${version}."
 
