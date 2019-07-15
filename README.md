@@ -18,9 +18,9 @@ public void updatesCustomerStatus() throws Exception {
 ```
 
 ## News
+* 2018-12-05: Awaitility `4.0.0-rc1` is released. This release requires Java 8 or above. Please try it out and provide feedback. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details and upgrade instructions.
 * 2019-01-25: Awaitility `3.1.6` is released with upgrades to the Kotlin DSL. It bumps the Kotlin dependency to 1.3.11 and enables the `has` function to be used by non-null data types. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2018-12-06: Awaitility `3.1.5` is released with two new Kotlin extension functions: [untilNull](https://github.com/awaitility/awaitility/wiki/Kotlin#untilnulluntilnotnull) and [has](https://github.com/awaitility/awaitility/wiki/Kotlin#untilcallto). See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
-* 2018-12-05: Awaitility `3.1.4` is released with a new Kotlin extension function: `untilNotNull`. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 
 [Older news](https://github.com/awaitility/awaitility/wiki/OldNews)
 
