@@ -22,6 +22,9 @@ import java.util.concurrent.Callable
 
 import static org.awaitility.spi.Timeout.timeout_message
 
+/**
+ * Awaitility extension module for Groovy
+ */
 class AwaitilityExtensionModule {
 
   static {
