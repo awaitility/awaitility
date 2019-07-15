@@ -125,7 +125,7 @@ Changelog 3.0.0-rc3 (2017-04-07)
   This is backward incompatible only if you've supplied an explicit instance of Runnable to the function. If using Java 8 lambda expressions then nothing should change.
 * Removed org.awaitility.Awaitility#matches method since it's no longer needed
 
-Changelog 3.0.0-rc2 (2017-03-31)
+Changelog 3.0.0-rc1 (2017-03-31)
 --------------------------------
 * Updated ByteBuddy to version 1.6.11
 * Downgraded Scala version to 2.11.8 again since 2.12.x requires Java 8
