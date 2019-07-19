@@ -28,10 +28,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -735,6 +732,66 @@ public class ConditionFactory {
      */
     public void untilFalse(final AtomicBoolean atomic) {
         untilAtomic(atomic, anyOf(is(Boolean.FALSE), is(false)));
+    }
+
+    /**
+     * Await until a {@link LongAdder} has a value matching the specified {@link org.hamcrest.Matcher}. E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilAdder(myLongAdder, is(greaterThan(2L)));
+     * </pre>
+     *
+     * @param adder  the {@link LongAdder} variable
+     * @param matcher the matcher The hamcrest matcher that checks whether the condition is fulfilled.
+     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     */
+    public void untilAdder(final LongAdder adder, final Matcher<? super Long> matcher) {
+        until(new CallableHamcrestCondition<>(adder::longValue, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a {@link DoubleAdder} has a value matching the specified {@link org.hamcrest.Matcher}. E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilAdder(myDoubleAdder, is(greaterThan(2.0d)));
+     * </pre>
+     *
+     * @param adder  the {@link DoubleAdder} variable
+     * @param matcher the matcher The hamcrest matcher that checks whether the condition is fulfilled.
+     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     */
+    public void untilAdder(final DoubleAdder adder, final Matcher<? super Double> matcher) {
+        until(new CallableHamcrestCondition<>(adder::doubleValue, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a {@link LongAccumulator} has a value matching the specified {@link org.hamcrest.Matcher}. E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilAccumulator(myLongAccumulator, is(greaterThan(2L)));
+     * </pre>
+     *
+     * @param accumulator the {@link LongAccumulator} variable
+     * @param matcher the matcher The hamcrest matcher that checks whether the condition is fulfilled.
+     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     */
+    public void untilAccumulator(final LongAccumulator accumulator, final Matcher<? super Long> matcher) {
+        until(new CallableHamcrestCondition<>(accumulator::longValue, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a {@link DoubleAccumulator} has a value matching the specified {@link org.hamcrest.Matcher}. E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilAccumulator(myDoubleAccumulator, is(greaterThan(2.0d)));
+     * </pre>
+     *
+     * @param accumulator  the {@link DoubleAccumulator} variable
+     * @param matcher the matcher The hamcrest matcher that checks whether the condition is fulfilled.
+     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     */
+    public void untilAccumulator(final DoubleAccumulator accumulator, final Matcher<? super Double> matcher) {
+        until(new CallableHamcrestCondition<>(accumulator::doubleValue, matcher, generateConditionSettings()));
     }
 
     /**
