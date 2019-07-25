@@ -21,7 +21,7 @@ import org.junit.Test;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 
 @SuppressWarnings("UnnecessaryBoxing")
 public class BoxingTest {
@@ -37,9 +37,9 @@ public class BoxingTest {
                 throw new RuntimeException(e);
             }
 
-            ai.set(2);
+            ai.set(3);
         }).start();
 
-        await().until(() -> new Integer(ai.get()), equalTo(2));
+        await().until(() -> new Integer(ai.get()), greaterThan(2));
     }
 }
