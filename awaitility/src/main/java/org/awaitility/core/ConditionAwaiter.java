@@ -27,6 +27,7 @@ import static java.time.temporal.ChronoUnit.NANOS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static org.awaitility.classpath.ClassPathResolver.existInCP;
 import static org.awaitility.core.TemporalDuration.formatAsString;
+import static org.awaitility.core.Uninterruptibles.getUninterruptibly;
 import static org.awaitility.core.Uninterruptibles.sleepUninterruptibly;
 
 abstract class ConditionAwaiter implements UncaughtExceptionHandler {
@@ -90,7 +91,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 Duration maxWaitTimeForThisCondition = maxWaitTime.minus(evaluationDuration);
                 currentConditionEvaluation = executor.submit(new ConditionPoller(pollInterval));
                 // Wait for condition evaluation to complete with "maxWaitTimeForThisCondition" or else throw TimeoutException
-                lastResult = ChronoUnit.FOREVER.getDuration().equals(maxWaitTime) ? currentConditionEvaluation.get() : currentConditionEvaluation.get(maxWaitTimeForThisCondition.toNanos(), NANOSECONDS);
+                lastResult = ChronoUnit.FOREVER.getDuration().equals(maxWaitTime) ? getUninterruptibly(currentConditionEvaluation) : getUninterruptibly(currentConditionEvaluation, maxWaitTimeForThisCondition);
                 if (lastResult.isSuccessful() || lastResult.hasThrowable()) {
                     break;
                 }
