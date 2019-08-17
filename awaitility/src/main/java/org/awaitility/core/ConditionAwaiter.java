@@ -54,7 +54,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         this.conditionSettings = conditionSettings;
         this.conditionEvaluator = conditionEvaluator;
         this.executor = conditionSettings.getExecutorLifecycle().supplyExecutorService();
-        this.uncaughtThrowable = new AtomicReference<Throwable>();
+        this.uncaughtThrowable = new AtomicReference<>();
     }
 
     /**
