@@ -209,7 +209,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         }
     }
 
-    static Duration calculateConditionEvaluationDuration(Duration pollDelay, long pollingStarted) {
+    private static Duration calculateConditionEvaluationDuration(Duration pollDelay, long pollingStarted) {
         return Duration.of(System.nanoTime() - pollingStarted - pollDelay.toNanos(), NANOS);
     }
 }
