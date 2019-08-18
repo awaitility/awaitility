@@ -26,18 +26,15 @@ import java.util.function.Consumer;
  */
 class EvaluationCleanup {
 
-
     private final Consumer<ExecutorService> normalShutdownBehavior;
     private final Consumer<ExecutorService> unexpectedShutdownBehavior;
 
     /**
-     * @param normalShutdownBehavior The cleanup behavior that is executed when an <code>until</code> method succeeds, fails or times out.
+     * @param normalShutdownBehavior The cleanup behavior that is executed when an <code>until</code> method call succeeds, fails or times out.
      * @param unexpectedShutdownBehavior The cleanup behavior that is executed for unexpected failures.
      *                                   Currently this means when exceptions are thrown from non-test threads ("uncaught exceptions")
      */
-    public EvaluationCleanup(Consumer<ExecutorService> normalShutdownBehavior,
-                             Consumer<ExecutorService> unexpectedShutdownBehavior) {
-
+    EvaluationCleanup(Consumer<ExecutorService> normalShutdownBehavior, Consumer<ExecutorService> unexpectedShutdownBehavior) {
         this.normalShutdownBehavior = normalShutdownBehavior;
         this.unexpectedShutdownBehavior = unexpectedShutdownBehavior;
     }
