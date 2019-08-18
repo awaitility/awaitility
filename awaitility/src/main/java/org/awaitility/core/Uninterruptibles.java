@@ -112,6 +112,40 @@ class Uninterruptibles {
     }
 
     /**
+     * Shuts down an executor service uninterruptibly
+     * Note that this method is created by Johan Haleby and is thus not covered by the Guava license
+     *
+     * @param executor The executor service to shutdown
+     * @param timeout The timeout amount
+     * @param unit The time unit
+     */
+    static void shutdownUninterruptibly(ExecutorService executor, long timeout, TimeUnit unit) {
+        boolean interrupted = false;
+        try {
+            long remainingNanos = unit.toNanos(timeout);
+            long end = System.nanoTime() + remainingNanos;
+            executor.shutdown();
+
+            while (true) {
+                try {
+                    if (!executor.awaitTermination(remainingNanos, unit)) {
+                        executor.shutdownNow();
+                    }
+                    break;
+                } catch (InterruptedException e) {
+                    interrupted = true;
+                    remainingNanos = end - System.nanoTime();
+                    executor.shutdownNow();
+                }
+            }
+        } finally {
+            if (interrupted) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    /**
      * Returns the number of nanoseconds of the given duration without throwing or overflowing.
      *
      * <p>Instead of throwing {@link ArithmeticException}, this method silently saturates to either

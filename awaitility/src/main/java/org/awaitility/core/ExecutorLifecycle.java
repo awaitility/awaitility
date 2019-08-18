@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import static org.awaitility.core.Uninterruptibles.shutdownUninterruptibly;
+
 /**
  * Handles the lifecycle of an executor service.
  *
@@ -69,16 +71,6 @@ public class ExecutorLifecycle {
 
     private static EvaluationCleanup normalCleanupBehavior() {
         // Clean up after a successful or unsuccessful attempt
-        return new EvaluationCleanup(executor -> {
-            executor.shutdown();
-            try {
-                if (!executor.awaitTermination(1, TimeUnit.SECONDS)) {
-                    executor.shutdownNow();
-                    executor.awaitTermination(1, TimeUnit.SECONDS);
-                }
-            } catch (InterruptedException e) {
-                CheckedExceptionRethrower.safeRethrow(e);
-            }
-        }, ExecutorService::shutdownNow);
+        return new EvaluationCleanup(executor -> shutdownUninterruptibly(executor, 1, TimeUnit.SECONDS), ExecutorService::shutdownNow);
     }
 }
