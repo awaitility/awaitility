@@ -9,8 +9,8 @@ Testing asynchronous systems is hard. Not only does it require handling threads,
 ```java
 @Test
 public void updatesCustomerStatus() {
-    // Publish an asynchronous message:
-    publishMessage(updateCustomerStatusMessage);
+    // Publish an asynchronous message to a broker (e.g. RabbitMQ):
+    messageBroker.publishMessage(updateCustomerStatusMessage);
     // Awaitility lets you wait until the asynchronous operation completes:
     await().atMost(5, SECONDS).until(customerStatusIsUpdated());
     ...
