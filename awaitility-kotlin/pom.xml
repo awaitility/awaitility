@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.awaitility</groupId>
         <artifactId>awaitility-parent</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>awaitility-kotlin</artifactId>
     <name>Awaitility support for Kotlin</name>
