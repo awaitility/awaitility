@@ -29,7 +29,7 @@ public void updatesCustomerStatus() {
 * [Getting started](https://github.com/awaitility/awaitility/wiki/Getting_started)
 * [Usage Guide](https://github.com/awaitility/awaitility/wiki/Usage)
 * [Downloads](https://github.com/awaitility/awaitility/wiki/Downloads)
-* [Awaitility Javadoc](http://www.javadoc.io/doc/org.awaitility/awaitility/3.1.6)
+* [Awaitility Javadoc](http://www.javadoc.io/doc/org.awaitility/awaitility/4.0.0)
 
 ## Links
 * [Change log](https://github.com/awaitility/awaitility/raw/master/changelog.txt)
