@@ -50,7 +50,6 @@ public class AwaitilityTest {
                         /* Deps */
                         mavenBundle().groupId("org.hamcrest").artifactId("hamcrest").versionAsInProject(),
                         mavenBundle("org.awaitility", "awaitility").versionAsInProject(),
-                        mavenBundle("org.objenesis", "objenesis").versionAsInProject(),
                         // CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
                 };
     }
