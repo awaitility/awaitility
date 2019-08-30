@@ -1,5 +1,5 @@
-Changelog next version
-----------------------
+Changlog 4.0.0 (2019-08-30)
+---------------------------
 * Added support for Adder's. For example: await().untilAdder(myLongAdder, equalTo(5L))
 * Added support for Accumulators's. For example: await().untilAccumulator(myLongAccumulator, equalTo(5L))
 * Better handling of InterruptedException for Future's by using code from Guava (code from Uninterruptibles)
