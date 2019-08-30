@@ -4,10 +4,11 @@ Changelog next version
 * Added support for Accumulators's. For example: await().untilAccumulator(myLongAccumulator, equalTo(5L))
 * Better handling of InterruptedException for Future's by using code from Guava (code from Uninterruptibles)
 * Shutting down cleanup ExecutorService in an uninterruptible fashion
+* Upgraded Kotlin extension to use Kotlin 1.3.50 (instead of 1.3.41)
 
 Changelog 4.0.0-rc1 (2019-07-15)
 --------------------------------
-* Upgraded Kotlin extension to use Kotlin 1.3.50 (instead of 1.3.11)
+* Upgraded Kotlin extension to use Kotlin 1.3.41 (instead of 1.3.11)
 * Better handling of InterruptedException using code from Guava (Uninterruptibles#sleepUninterruptibly) (issue 134)
 * Added org.awaitility.core.ConditionEvaluationLogger#conditionEvaluationLogger() methods. This is only useful for syntactic sugar to avoid having to write the "new" keyword in Java when using a ConditionEvaluationLogger. For example:
     await().with().conditionEvaluationListener(conditionEvaluationLogger()). ..
