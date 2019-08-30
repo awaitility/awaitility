@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 read -s -p "Bintray api key: " api_key
 echo
 read -p "Version to release: " version
@@ -8,7 +8,6 @@ mkdir -p "${tmpFolderRootName}"
 
 maven_awaitility_folder=$HOME/.m2/repository/org/awaitility
 project_names=(awaitility awaitility-groovy awaitility-kotlin awaitility-scala)
-artifact_name_suffixes=(javadoc sources)
 
 for project in ${project_names[*]} ; do
     folder="${maven_awaitility_folder}/${project}/${version}"
@@ -26,9 +25,6 @@ for zipFile in ${files_to_deploy}; do
   printf "\n"
 done
 
-#ls -A1 "${tmpFolderRootName}"
-
-
 read -p "Is this correct? [y/N]" -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
@@ -36,7 +32,7 @@ then
 	for file in ${files_to_deploy}; do
         absolute_path="${tmpFolderRootName}/${file}"
 		echo "Uploading ${absolute_path}"
-		curl -T ${absolute_path} -ujohanhaleby:${api_key} https://api.bintray.com/content/johanhaleby/generic/awaitility/${version}/
+		curl -T "${absolute_path}" -ujohanhaleby:"${api_key}" https://api.bintray.com/content/johanhaleby/generic/awaitility/"${version}"/
 	done
 echo "Awaitility $version was deployed to Bintray. Login to Bintray to publish the release."
 fi

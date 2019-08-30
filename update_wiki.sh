@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 read -p "Enter the old version: " oldVersion
 read -p "Enter the new version: " newVersion
 tmpFolderRootName=/tmp/$RANDOM
