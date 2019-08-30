@@ -19,6 +19,7 @@ import org.hamcrest.Matcher;
 
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.function.Consumer;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
@@ -38,37 +39,39 @@ class ConditionEvaluationHandler<T> {
         watch = new StopWatch();
     }
 
-    @SuppressWarnings("unchecked")
     void handleConditionResultMismatch(String mismatchMessage, T currentConditionValue, Duration pollInterval) {
-        ConditionEvaluationListener<T> listener = settings.getConditionEvaluationListener();
-        if (listener == null) {
-            return;
-        }
+        doWithListener(listener -> {
+            long elapsedTimeInMS = watch.getElapsedTimeInMS();
+            long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
+            try {
+                listener.conditionEvaluated(new EvaluatedCondition<T>(mismatchMessage, matcher, currentConditionValue, elapsedTimeInMS,
+                        remainingTimeInMS, false, settings.getAlias(), pollInterval));
+            } catch (ClassCastException e) {
+                throwClassCastExceptionBecauseConditionEvaluationListenerCouldNotBeApplied(e, listener);
+            }
+        });
+    }
 
-        long elapsedTimeInMS = watch.getElapsedTimeInMS();
-        long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
-        try {
-            listener.conditionEvaluated(new EvaluatedCondition<T>(mismatchMessage, matcher, currentConditionValue, elapsedTimeInMS,
-                    remainingTimeInMS, false, settings.getAlias(), pollInterval));
-        } catch (ClassCastException e) {
-            throwClassCastExceptionBecauseConditionEvaluationListenerCouldNotBeApplied(e, listener);
-        }
+    void handleConditionResultMatch(String matchMessage, T currentConditionValue, Duration pollInterval) {
+        doWithListener(listener -> {
+            long elapsedTimeInMS = watch.getElapsedTimeInMS();
+            long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
+            try {
+                listener.conditionEvaluated(new EvaluatedCondition<T>(matchMessage, matcher, currentConditionValue, elapsedTimeInMS,
+                        remainingTimeInMS, true, settings.getAlias(), pollInterval));
+            } catch (ClassCastException e) {
+                throwClassCastExceptionBecauseConditionEvaluationListenerCouldNotBeApplied(e, listener);
+            }
+        });
     }
 
     @SuppressWarnings("unchecked")
-    void handleConditionResultMatch(String matchMessage, T currentConditionValue, Duration pollInterval) {
+    private void doWithListener(Consumer<ConditionEvaluationListener<T>> consumer) {
         ConditionEvaluationListener<T> listener = settings.getConditionEvaluationListener();
         if (listener == null) {
             return;
         }
-        long elapsedTimeInMS = watch.getElapsedTimeInMS();
-        long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
-        try {
-            listener.conditionEvaluated(new EvaluatedCondition<T>(matchMessage, matcher, currentConditionValue, elapsedTimeInMS,
-                    remainingTimeInMS, true, settings.getAlias(), pollInterval));
-        } catch (ClassCastException e) {
-            throwClassCastExceptionBecauseConditionEvaluationListenerCouldNotBeApplied(e, listener);
-        }
+        consumer.accept(listener);
     }
 
     private long getRemainingTimeInMS(long elapsedTimeInMS, Duration maxWaitTime) {
