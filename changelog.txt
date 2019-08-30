@@ -1,7 +1,7 @@
 Changelog next version
 ----------------------
 * Added support for Adder's. For example: await().untilAdder(myLongAdder, equalTo(5L))
-* Added support for Accumulators's. For example: await().untilAdder(myLongAccumulator, equalTo(5L))
+* Added support for Accumulators's. For example: await().untilAccumulator(myLongAccumulator, equalTo(5L))
 * Better handling of InterruptedException for Future's by using code from Guava (code from Uninterruptibles)
 * Shutting down cleanup ExecutorService in an uninterruptible fashion
 
