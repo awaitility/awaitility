@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * Removed the dependency to objenesis since it's no longer required after requiring Java 8+
+* Fixed so that calculation of condition evaluation duration cannot be negative (thanks to Anders Asplund for pull request)
 
 Changelog 4.0.0 (2019-08-30)
 ---------------------------
