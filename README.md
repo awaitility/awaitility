@@ -18,9 +18,9 @@ public void updatesCustomerStatus() {
 ```
 
 ## News
+* 2019-09-06: Awaitility `4.0.1` is released and it fixes a regression issue in which the condition evaluation duration could be evaluated to negative number of nanoseconds on Windows. It also drops the dependency to [objenesis](http://objenesis.org/) since it's no longer used after moving to Java 8. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2019-08-30: Awaitility `4.0.0` is released! Java 8+ is now required which allows for both dependency and API updates. See [release notes](https://github.com/awaitility/awaitility/wiki/ReleaseNotes40) and [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2019-07-15: Awaitility `4.0.0-rc1` is released. This release requires Java 8 or above. Please try it out and provide feedback. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details and upgrade instructions.
-* 2019-01-25: Awaitility `3.1.6` is released with upgrades to the Kotlin DSL. It bumps the Kotlin dependency to 1.3.11 and enables the `has` function to be used by non-null data types. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 
 [Older news](https://github.com/awaitility/awaitility/wiki/OldNews)
 
@@ -29,7 +29,7 @@ public void updatesCustomerStatus() {
 * [Getting started](https://github.com/awaitility/awaitility/wiki/Getting_started)
 * [Usage Guide](https://github.com/awaitility/awaitility/wiki/Usage)
 * [Downloads](https://github.com/awaitility/awaitility/wiki/Downloads)
-* [Awaitility Javadoc](http://www.javadoc.io/doc/org.awaitility/awaitility/4.0.0)
+* [Awaitility Javadoc](http://www.javadoc.io/doc/org.awaitility/awaitility/4.0.1)
 
 ## Links
 * [Change log](https://github.com/awaitility/awaitility/raw/master/changelog.txt)
