@@ -32,12 +32,12 @@ class TemporalDuration implements TemporalAccessor {
 
     private static final DateTimeFormatter dtf = new DateTimeFormatterBuilder()
             .optionalStart().appendValue(YEAR).appendLiteral(" years ").optionalEnd()
-            .optionalStart().appendValue(MONTH_OF_YEAR).appendLiteral(" months ").optionalEnd()
-            .optionalStart().appendValue(DAY_OF_MONTH).appendLiteral(" days ").optionalEnd()
-            .optionalStart().appendValue(HOUR_OF_DAY).appendLiteral(" hours ").optionalEnd()
-            .optionalStart().appendValue(MINUTE_OF_HOUR).appendLiteral(" minutes ").optionalEnd()
-            .optionalStart().appendValue(SECOND_OF_MINUTE).appendLiteral(" seconds").optionalEnd()
-            .optionalStart().appendValue(MILLI_OF_SECOND).appendLiteral(" milliseconds").optionalEnd()
+            .optionalStart().appendLiteral(' ').appendValue(MONTH_OF_YEAR).appendLiteral(" months ").optionalEnd()
+            .optionalStart().appendLiteral(' ').appendValue(DAY_OF_MONTH).appendLiteral(" days ").optionalEnd()
+            .optionalStart().appendLiteral(' ').appendValue(HOUR_OF_DAY).appendLiteral(" hours ").optionalEnd()
+            .optionalStart().appendLiteral(' ').appendValue(MINUTE_OF_HOUR).appendLiteral(" minutes ").optionalEnd()
+            .optionalStart().appendLiteral(' ').appendValue(SECOND_OF_MINUTE).appendLiteral(" seconds").optionalEnd()
+            .optionalStart().appendLiteral(' ').appendValue(MILLI_OF_SECOND).appendLiteral(" milliseconds").optionalEnd()
             .toFormatter();
 
 

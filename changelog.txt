@@ -1,3 +1,7 @@
+Changelog next version
+----------------------
+* Improved formatting of elapsed time (or error and logging) for long time durations
+
 Changelog 4.0.1 (2019-09-06)
 ----------------------------
 * Removed the dependency to objenesis since it's no longer required after the move to Java 8+
