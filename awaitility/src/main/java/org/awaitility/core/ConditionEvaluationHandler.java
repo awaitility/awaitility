@@ -44,7 +44,7 @@ class ConditionEvaluationHandler<T> {
             long elapsedTimeInMS = watch.getElapsedTimeInMS();
             long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
             try {
-                listener.conditionEvaluated(new EvaluatedCondition<T>(mismatchMessage, matcher, currentConditionValue, elapsedTimeInMS,
+                listener.conditionEvaluated(new EvaluatedCondition<>(mismatchMessage, matcher, currentConditionValue, elapsedTimeInMS,
                         remainingTimeInMS, false, settings.getAlias(), pollInterval));
             } catch (ClassCastException e) {
                 throwClassCastExceptionBecauseConditionEvaluationListenerCouldNotBeApplied(e, listener);
@@ -57,7 +57,7 @@ class ConditionEvaluationHandler<T> {
             long elapsedTimeInMS = watch.getElapsedTimeInMS();
             long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
             try {
-                listener.conditionEvaluated(new EvaluatedCondition<T>(matchMessage, matcher, currentConditionValue, elapsedTimeInMS,
+                listener.conditionEvaluated(new EvaluatedCondition<>(matchMessage, matcher, currentConditionValue, elapsedTimeInMS,
                         remainingTimeInMS, true, settings.getAlias(), pollInterval));
             } catch (ClassCastException e) {
                 throwClassCastExceptionBecauseConditionEvaluationListenerCouldNotBeApplied(e, listener);
