@@ -23,14 +23,12 @@ public class Asynch {
 	}
 
 	public void perform() {
-		Thread thread = new Thread(new Runnable() {
-			public void run() {
-				try {
-					Thread.sleep(600);
-					repository.setValue(1);
-				} catch (InterruptedException e) {
-					throw new RuntimeException(e);
-				}
+		Thread thread = new Thread(() -> {
+			try {
+				Thread.sleep(600);
+				repository.setValue(1);
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
 			}
 		});
 		thread.start();
