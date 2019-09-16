@@ -74,6 +74,7 @@ public class FibonacciPollInterval implements PollInterval {
      * @param previousDuration The duration of the previously returned poll interval
      * @return The next duration in the fibonacci sequence.
      */
+    @Override
     public Duration next(int pollCount, Duration previousDuration) {
         return DurationFactory.of(fibonacci(offset + pollCount), unit);
     }
