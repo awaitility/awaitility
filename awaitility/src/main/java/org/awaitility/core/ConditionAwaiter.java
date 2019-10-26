@@ -99,7 +99,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 } else if (lastResult.isError()) {
                     firstSucceedSinceStarted = 0L;
                 }
-                if (lastResult.isSuccessful() && (System.nanoTime() - firstSucceedSinceStarted > holdPredicateWaitTime.toNanos() ) || lastResult.hasThrowable()) {
+                if (lastResult.isSuccessful() && (System.nanoTime() - firstSucceedSinceStarted >= holdPredicateWaitTime.toNanos() ) || lastResult.hasThrowable()) {
                     break;
                 }
                 pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
