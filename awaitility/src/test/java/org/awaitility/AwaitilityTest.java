@@ -428,6 +428,17 @@ public class AwaitilityTest {
                 });
     }
 
+    @Test(timeout = 2000L)
+    public void awaitDuringTimeOnCondition() {
+        await().atLeast(1, SECONDS)
+            .until(() -> {
+                await()
+                    .during(1, SECONDS)
+                    .until(() -> true);
+                return true;
+            });
+    }
+
     private Callable<Boolean> fakeRepositoryValueEqualsOne() {
         return new FakeRepositoryEqualsOne(fakeRepository);
     }
