@@ -15,7 +15,11 @@ public interface WaitConstraint {
 
     Duration getMinWaitTime();
 
+    Duration getHoldPredicateTime();
+
     WaitConstraint withMinWaitTime(Duration minWaitTime);
 
     WaitConstraint withMaxWaitTime(Duration maxWaitTime);
+
+    WaitConstraint withHoldPredicateTime(Duration holdConditionTime);
 }
