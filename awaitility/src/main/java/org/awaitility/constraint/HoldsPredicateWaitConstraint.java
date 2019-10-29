@@ -19,4 +19,15 @@ public class HoldsPredicateWaitConstraint extends IntervalWaitConstraint {
   public WaitConstraint withHoldPredicateTime(Duration holdConditionTime) {
     return new HoldsPredicateWaitConstraint(getMinWaitTime(), getMaxWaitTime(), holdConditionTime);
   }
+
+  @Override
+  public WaitConstraint withMaxWaitTime(Duration maxWaitTime) {
+    return new HoldsPredicateWaitConstraint(getMinWaitTime(), maxWaitTime, holdConditionTime);
+  }
+
+  @Override
+  public WaitConstraint withMinWaitTime(Duration minWaitTime) {
+    return new HoldsPredicateWaitConstraint(minWaitTime, getMaxWaitTime(), holdConditionTime);
+  }
+
 }

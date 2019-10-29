@@ -473,6 +473,20 @@ public class AwaitilityTest {
             .until(() -> (System.currentTimeMillis() - startTime) > 1000L);
     }
 
+    @Test(timeout = 2000L)
+    public void awaitDuringTimeOnConditionMessingAtLeastAtMost() throws Exception {
+        Duration duration = measureDuration(() ->
+            await()
+                .during(1, SECONDS)
+                .during(1, SECONDS)
+                .atLeast(1, SECONDS)
+                .atMost(2, SECONDS)
+                .until(() -> true)
+        );
+
+        assertThat(duration.toMillis(), greaterThan(1000L));
+    }
+
     private Callable<Boolean> fakeRepositoryValueEqualsOne() {
         return new FakeRepositoryEqualsOne(fakeRepository);
     }
