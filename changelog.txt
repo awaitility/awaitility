@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * Improved formatting of elapsed time (or error and logging) for long time durations
+* Implemented support for "during" (issue 124) (big thanks to Pablo Díaz-López for pull request)
 
 Changelog 4.0.1 (2019-09-06)
 ----------------------------
