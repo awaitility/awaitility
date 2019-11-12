@@ -89,6 +89,15 @@ public class ConditionSettings {
     }
 
     /**
+     * <p>Returning hold predicate wait time from field <code>waitConstraint</code>.</p>
+     *
+     * @return a {@link org.awaitility.Duration} object.
+     */
+    public Duration getHoldPredicateTime() {
+        return waitConstraint.getHoldPredicateTime();
+    }
+
+    /**
      * <p>Getter for the field <code>pollInterval</code>.</p>
      *
      * @return a {@link org.awaitility.Duration} object.

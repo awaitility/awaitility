@@ -24,11 +24,19 @@ public class AtMostWaitConstraint implements WaitConstraint {
         return Duration.ZERO;
     }
 
+    public Duration getHoldPredicateTime() {
+        return Duration.ZERO;
+    }
+
     public WaitConstraint withMinWaitTime(Duration minWaitTime) {
         return new IntervalWaitConstraint(minWaitTime, atMostDuration);
     }
 
     public WaitConstraint withMaxWaitTime(Duration maxWaitTime) {
         return new AtMostWaitConstraint(maxWaitTime);
+    }
+
+    public WaitConstraint withHoldPredicateTime(Duration holdConditionTime) {
+        return new HoldsPredicateWaitConstraint(getMinWaitTime(), atMostDuration, holdConditionTime);
     }
 }

@@ -148,6 +148,28 @@ public class ConditionFactory {
     }
 
     /**
+     * Await at the predicate holds during at least <code>timeout</code>
+     *
+     * @param timeout the timeout
+     * @return the condition factory
+     */
+    public ConditionFactory during(Duration timeout) {
+        return new ConditionFactory(alias, timeoutConstraint.withHoldPredicateTime(timeout), pollInterval, pollDelay,
+            catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+    }
+
+    /**
+     * Await at the predicate holds during at least <code>timeout</code>
+     *
+     * @param timeout the timeout
+     * @param unit    the unit
+     * @return the condition factory
+     */
+    public ConditionFactory during(long timeout, TimeUnit unit) {
+        return during(DurationFactory.of(timeout, unit));
+    }
+
+    /**
      * Set the alias
      *
      * @param alias alias

@@ -67,6 +67,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         final Duration pollDelay = conditionSettings.getPollDelay();
         final Duration maxWaitTime = conditionSettings.getMaxWaitTime();
         final Duration minWaitTime = conditionSettings.getMinWaitTime();
+        final Duration holdPredicateWaitTime = conditionSettings.getHoldPredicateTime();
 
         long pollingStartedNanos = System.nanoTime() - pollDelay.toMillis();
 
@@ -75,6 +76,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         ConditionEvaluationResult lastResult = null;
         Duration evaluationDuration = Duration.of(0, MILLIS);
         Future<ConditionEvaluationResult> currentConditionEvaluation = null;
+        long firstSucceedSinceStarted = 0L;
         try {
             if (executor.isShutdown() || executor.isTerminated()) {
                 throw new IllegalStateException("The executor service that Awaitility is instructed to use has been shutdown so condition evaluation cannot be performed. Is there something wrong the thread or executor configuration?");
@@ -92,7 +94,12 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 currentConditionEvaluation = executor.submit(new ConditionPoller(pollInterval));
                 // Wait for condition evaluation to complete with "maxWaitTimeForThisCondition" or else throw TimeoutException
                 lastResult = ChronoUnit.FOREVER.getDuration().equals(maxWaitTime) ? getUninterruptibly(currentConditionEvaluation) : getUninterruptibly(currentConditionEvaluation, maxWaitTimeForThisCondition);
-                if (lastResult.isSuccessful() || lastResult.hasThrowable()) {
+                if (lastResult.isSuccessful() && firstSucceedSinceStarted == 0L) {
+                    firstSucceedSinceStarted = System.nanoTime();
+                } else if (lastResult.isError()) {
+                    firstSucceedSinceStarted = 0L;
+                }
+                if (lastResult.isSuccessful() && (System.nanoTime() - firstSucceedSinceStarted >= holdPredicateWaitTime.toNanos() ) || lastResult.hasThrowable()) {
                     break;
                 }
                 pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);

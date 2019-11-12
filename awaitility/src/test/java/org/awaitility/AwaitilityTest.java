@@ -28,6 +28,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runners.model.TestTimedOutException;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -428,6 +429,64 @@ public class AwaitilityTest {
                 });
     }
 
+    @Test(timeout = 2000L)
+    public void awaitDuringTimeOnCondition() throws Exception {
+        Duration duration = measureDuration(() ->
+            await()
+                .during(1, SECONDS)
+                .until(() -> true)
+        );
+
+        assertThat(duration.toMillis(), greaterThan(1000L));
+    }
+
+    @Test(timeout = 2500L)
+    public void awaitDuringTimeWillWaitTheTimeStartingWhenTheConditionHolds() throws Exception {
+        long startTime = System.currentTimeMillis();
+
+        Duration duration = measureDuration(() ->
+            await()
+                .during(1000, MILLISECONDS)
+                .until(() ->
+                    (System.currentTimeMillis() - startTime) > 500L
+                )
+        );
+
+        assertThat(duration.toMillis(), greaterThan(1500L));
+    }
+
+    @Test(timeout = 2000L, expected = ConditionTimeoutException.class)
+    public void awaitDuringTimeWillThrowExceptionWhenTimeOut() {
+        await()
+            .atMost(1000, MILLISECONDS)
+            .during(200, MILLISECONDS)
+            .until(() -> false);
+    }
+
+    @Test(timeout = 2000L, expected = ConditionTimeoutException.class)
+    public void awaitDuringTimeWillThrowExceptionWhenTimeOutEvenIfConditionIsOkAtTheEndButNotDuringPeriod() {
+        long startTime = System.currentTimeMillis();
+
+        await()
+            .atMost(1500, MILLISECONDS)
+            .during(1000, MILLISECONDS)
+            .until(() -> (System.currentTimeMillis() - startTime) > 1000L);
+    }
+
+    @Test(timeout = 2000L)
+    public void awaitDuringTimeOnConditionMessingAtLeastAtMost() throws Exception {
+        Duration duration = measureDuration(() ->
+            await()
+                .during(1, SECONDS)
+                .during(1, SECONDS)
+                .atLeast(1, SECONDS)
+                .atMost(2, SECONDS)
+                .until(() -> true)
+        );
+
+        assertThat(duration.toMillis(), greaterThan(1000L));
+    }
+
     private Callable<Boolean> fakeRepositoryValueEqualsOne() {
         return new FakeRepositoryEqualsOne(fakeRepository);
     }
@@ -457,5 +516,17 @@ public class AwaitilityTest {
 
     private Callable<List<Integer>> valueAsList() {
         return () -> Collections.singletonList(fakeRepository.getValue());
+    }
+
+    @FunctionalInterface
+    interface ActionWithException {
+        void action() throws Exception;
+    }
+    private Duration measureDuration(ActionWithException a) throws Exception {
+        Instant init = Instant.now();
+
+        a.action();
+
+        return Duration.between(init, Instant.now());
     }
 }
