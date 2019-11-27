@@ -20,6 +20,7 @@ package org.awaitility.core;
  *
  * @param <T> The expected return type of the condition
  */
+@FunctionalInterface
 public interface ConditionEvaluationListener<T> {
 
     /**
@@ -28,4 +29,18 @@ public interface ConditionEvaluationListener<T> {
      * @param condition The condition evaluation result containing various properties of the result of evaluated condition
      */
     void conditionEvaluated(EvaluatedCondition<T> condition);
+
+    /**
+     * Handle the startEvaluationEvent. Method is default to keep the ConditionEvaluationListener backward compatible.
+     *
+     * @param startEvaluationEvent the event containing various properties of the condition evaluation to be started
+     */
+    default void beforeEvaluation(StartEvaluationEvent<T> startEvaluationEvent) {}
+
+    /**
+     * Handle the timeoutEvent. Method is default to keep the ConditionEvaluationListener backward compatible.
+     *
+     * @param timeoutEvent the event containing some properties about the condition evaluation timeout
+     */
+    default void onTimeout(TimeoutEvent timeoutEvent) {}
 }
