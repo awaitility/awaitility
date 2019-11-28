@@ -16,8 +16,11 @@
 package org.awaitility;
 
 import org.awaitility.classes.*;
+import org.awaitility.core.ConditionEvaluationListener;
 import org.awaitility.core.ConditionTimeoutException;
+import org.awaitility.core.EvaluatedCondition;
 import org.awaitility.core.ForeverDuration;
+import org.awaitility.core.TimeoutEvent;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -174,6 +177,22 @@ public class AwaitilityTest {
         new Asynch(fakeRepository).perform();
         await().atMost(200, TimeUnit.MILLISECONDS).until(value(), equalTo(1));
         assertEquals(1, fakeRepository.getValue());
+    }
+
+    @Test(timeout = 2000, expected = ConditionTimeoutException.class)
+    public void remainingTimeIsNegativeAfterDurationTimeouts() {
+        new Asynch(fakeRepository).perform();
+        ConditionEvaluationListener conditionEvaluationListener = new ConditionEvaluationListener() {
+            @Override
+            public void conditionEvaluated(EvaluatedCondition condition) {
+            }
+
+            @Override
+            public void onTimeout(TimeoutEvent timeoutEvent) {
+                assertTrue(timeoutEvent.getRemainingTimeInMS() < 0L);
+            }
+        };
+        await().conditionEvaluationListener(conditionEvaluationListener).atMost(200, TimeUnit.MILLISECONDS).until(value(), equalTo(1));
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)

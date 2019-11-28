@@ -17,11 +17,14 @@
 package org.awaitility;
 
 import org.awaitility.core.ConditionEvaluationListener;
+import org.awaitility.core.EvaluatedCondition;
+import org.awaitility.core.StartEvaluationEvent;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -196,6 +199,33 @@ public class ConditionEvaluationListenerTest {
 
         String expectedMatchMessage = String.format("%s reached its end value of <5>", CountDown.class.getName());
         assertThat(lastMatchMessage.value, is(equalTo(expectedMatchMessage)));
+    }
+
+    @Test(timeout = 2000)
+    public void beforeEvaluationCalledOnce() {
+        final ValueHolder<BigInteger> beforeEvaluation = new ValueHolder<>();
+        beforeEvaluation.value = BigInteger.ZERO;
+
+        final ValueHolder<String> lastMatchMessage = new ValueHolder<>();
+        ConditionEvaluationListener conditionEvaluationListener = new ConditionEvaluationListener() {
+            @Override
+            public void conditionEvaluated(EvaluatedCondition condition) {
+                lastMatchMessage.value = condition.getDescription();
+            }
+
+            @Override
+            public void beforeEvaluation(StartEvaluationEvent condition) {
+                beforeEvaluation.value = beforeEvaluation.value.add(BigInteger.ONE);
+            }
+        };
+
+        with()
+                .conditionEvaluationListener(conditionEvaluationListener)
+                .until(new CountDown(10), is(equalTo(5)));
+
+        String expectedMatchMessage = String.format("%s reached its end value of <5>", CountDown.class.getName());
+        assertThat(lastMatchMessage.value, is(equalTo(expectedMatchMessage)));
+        assertThat(beforeEvaluation.value, is(equalTo(BigInteger.ONE)));
     }
 
     @Test(timeout = 2000)
