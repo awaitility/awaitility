@@ -105,6 +105,15 @@ class ConditionEvaluationHandler<T> {
         }
     }
 
+    public void handleTrace(Throwable trace) {
+        ConditionEvaluationListener<T> listener = settings.getConditionEvaluationListener();
+        if (listener != null) {
+            long elapsedTimeInMS = watch.getElapsedTimeInMS();
+            long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
+            listener.exceptionIgnored(new IgnoredException(trace, elapsedTimeInMS, remainingTimeInMS, settings.getAlias()));
+        }
+    }
+
     private static class StopWatch {
         private long startTime;
 

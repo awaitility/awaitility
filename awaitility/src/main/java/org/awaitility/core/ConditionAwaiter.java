@@ -102,6 +102,10 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 if (lastResult.isSuccessful() && (System.nanoTime() - firstSucceedSinceStarted >= holdPredicateWaitTime.toNanos() ) || lastResult.hasThrowable()) {
                     break;
                 }
+                if (lastResult.hasTrace()) {
+                    conditionEvaluationHandler.handleTrace(lastResult.getTrace());
+                }
+
                 pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
                 sleepUninterruptibly(pollInterval.toNanos(), NANOSECONDS);
                 evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStartedNanos);

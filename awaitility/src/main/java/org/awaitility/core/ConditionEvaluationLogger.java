@@ -70,6 +70,11 @@ public class ConditionEvaluationLogger implements ConditionEvaluationListener<Ob
         System.out.printf("%s", timeoutEvent.getDescription());
     }
 
+    @Override
+    public void exceptionIgnored(IgnoredException ignoredException) {
+        System.out.printf("Exception %s has been ignored", ignoredException.getTrace().getMessage());
+    }
+
     /**
      * Syntactic sugar to avoid writing the <code>new</code> keyword in Java.
      * Uses {@link java.util.concurrent.TimeUnit#MILLISECONDS} as unit for elapsed and remaining time.

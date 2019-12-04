@@ -20,17 +20,23 @@ import org.awaitility.classes.Asynch;
 import org.awaitility.classes.FakeRepository;
 import org.awaitility.classes.FakeRepositoryImpl;
 import org.awaitility.classes.ThrowExceptionUnlessFakeRepositoryEqualsOne;
+import org.awaitility.core.ConditionEvaluationLogger;
+import org.awaitility.core.IgnoredException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.time.Duration;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class AwaitilityIgnoreExceptionsTest {
     private FakeRepository fakeRepository;
@@ -137,6 +143,48 @@ public class AwaitilityIgnoreExceptionsTest {
 
         new Asynch(fakeRepository).perform();
         await().atMost(1000, MILLISECONDS).with().until(conditionsThatIsThrowingAnExceptionForATime(RuntimeException.class));
+    }
+
+    @Test(timeout = 2000)
+    public void exceptionsDuringEvaluationAreIgnoredAndHandledUponRequest() {
+        new Asynch(fakeRepository).perform();
+
+        AtomicInteger exceptionCounter = new AtomicInteger(0);
+        ConditionEvaluationLogger conditionEvaluationLogger = new ConditionEvaluationLogger() {
+            @Override
+            public void exceptionIgnored(IgnoredException ignoredException) {
+                exceptionCounter.incrementAndGet();
+            }
+        };
+
+        await().atMost(1000, MILLISECONDS).and()
+                .pollInterval(Duration.ofMillis(250))
+                .ignoreExceptions()
+                .conditionEvaluationListener(conditionEvaluationLogger)
+                .until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
+
+        assertThat(exceptionCounter.get(),is(2));
+
+    }
+
+    @Test(timeout = 2000)
+    public void exceptionsDuringEvaluationAreNotHandledByDefault() {
+        exception.expect(RuntimeException.class);
+        exception.expectMessage(is("Repository value is not 1"));
+
+        new Asynch(fakeRepository).perform();
+
+        ConditionEvaluationLogger conditionEvaluationLogger = new ConditionEvaluationLogger() {
+            @Override
+            public void exceptionIgnored(IgnoredException ignoredException) {
+                fail("should not handle exception by default");
+            }
+        };
+
+        await().atMost(1000, MILLISECONDS).and()
+                .pollInterval(Duration.ofMillis(250))
+                .conditionEvaluationListener(conditionEvaluationLogger)
+                .until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
     }
 
     private Callable<Boolean> conditionsThatIsThrowingAnExceptionForATime(Class<? extends Throwable> throwable) {
