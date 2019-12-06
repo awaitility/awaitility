@@ -24,20 +24,18 @@ public class ExceptionThrowingAsynch {
     }
 
     public void perform() {
-        Thread thread = new Thread(new Runnable() {
-            public void run() {
-                try {
-                    Thread.sleep(600);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                if (throwable instanceof RuntimeException) {
-                    throw (RuntimeException) throwable;
-                } else if(throwable instanceof Error) {
-                    throw (Error) throwable;
-                }
-                throw new RuntimeException(throwable);
+        Thread thread = new Thread(() -> {
+            try {
+                Thread.sleep(600);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
+            if (throwable instanceof RuntimeException) {
+                throw (RuntimeException) throwable;
+            } else if(throwable instanceof Error) {
+                throw (Error) throwable;
+            }
+            throw new RuntimeException(throwable);
         });
 
         thread.start();

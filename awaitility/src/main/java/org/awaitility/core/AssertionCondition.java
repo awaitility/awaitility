@@ -46,7 +46,7 @@ public class AssertionCondition implements Condition<Void> {
             throw new IllegalArgumentException("You must specify a supplier (was null).");
         }
 
-        conditionEvaluationHandler = new ConditionEvaluationHandler<Object>(null, settings);
+        conditionEvaluationHandler = new ConditionEvaluationHandler<>(null, settings);
 
         final ConditionEvaluator callable = pollInterval -> {
             try {

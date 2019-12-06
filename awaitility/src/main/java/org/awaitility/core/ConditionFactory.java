@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static org.awaitility.core.FailsWithMatcher.failsWith;
 import static org.awaitility.core.ForeverDuration.isForever;
 import static org.awaitility.core.TemporalDuration.formatAsString;
 import static org.hamcrest.Matchers.anyOf;
@@ -155,7 +156,7 @@ public class ConditionFactory {
      */
     public ConditionFactory during(Duration timeout) {
         return new ConditionFactory(alias, timeoutConstraint.withHoldPredicateTime(timeout), pollInterval, pollDelay,
-            catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
     }
 
     /**
@@ -918,5 +919,15 @@ public class ConditionFactory {
             pollDelayToUse = pollDelay;
         }
         return pollDelayToUse;
+    }
+
+    public <T extends Throwable> T untilThrown(Class<T> type, Callable<?> condition) {
+        //noinspection unchecked
+        Callable<Callable<? super Object>> normalizedCallable = () -> (Callable<? super Object>) condition;
+
+        Matcher<Callable<Object>> callableMatcher = failsWith(type);
+
+        until(normalizedCallable, callableMatcher);
+        return ((FailsWithMatcher<T>) callableMatcher).getCaughtException();
     }
 }
