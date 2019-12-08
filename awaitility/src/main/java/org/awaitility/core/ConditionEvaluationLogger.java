@@ -72,7 +72,7 @@ public class ConditionEvaluationLogger implements ConditionEvaluationListener<Ob
 
     @Override
     public void exceptionIgnored(IgnoredException ignoredException) {
-        System.out.printf("Exception %s has been ignored", ignoredException.getTrace().getMessage());
+        System.out.printf("Exception %s has been ignored", ignoredException.getThrowable().getMessage());
     }
 
     /**

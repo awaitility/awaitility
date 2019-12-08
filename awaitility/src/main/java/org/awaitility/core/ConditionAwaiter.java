@@ -103,7 +103,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                     break;
                 }
                 if (lastResult.hasTrace()) {
-                    conditionEvaluationHandler.handleTrace(lastResult.getTrace());
+                    conditionEvaluationHandler.handleIgnoredException(lastResult.getTrace());
                 }
 
                 pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);

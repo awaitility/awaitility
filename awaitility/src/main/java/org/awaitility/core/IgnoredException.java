@@ -1,20 +1,20 @@
 package org.awaitility.core;
 
 public class IgnoredException {
-    private final Throwable trace;
+    private final Throwable throwable;
     private final long elapsedTimeInMS;
     private final long remainingTimeInMS;
     private final String alias;
 
-    public IgnoredException(Throwable trace, long elapsedTimeInMS, long remainingTimeInMS, String alias) {
-        this.trace = trace;
+    public IgnoredException(Throwable throwable, long elapsedTimeInMS, long remainingTimeInMS, String alias) {
+        this.throwable = throwable;
         this.elapsedTimeInMS = elapsedTimeInMS;
         this.remainingTimeInMS = remainingTimeInMS;
         this.alias = alias;
     }
 
-    public Throwable getTrace() {
-        return trace;
+    public Throwable getThrowable() {
+        return throwable;
     }
 
     public long getElapsedTimeInMS() {

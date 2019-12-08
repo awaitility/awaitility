@@ -105,12 +105,12 @@ class ConditionEvaluationHandler<T> {
         }
     }
 
-    public void handleTrace(Throwable trace) {
+    public void handleIgnoredException(Throwable throwable) {
         ConditionEvaluationListener<T> listener = settings.getConditionEvaluationListener();
         if (listener != null) {
             long elapsedTimeInMS = watch.getElapsedTimeInMS();
             long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
-            listener.exceptionIgnored(new IgnoredException(trace, elapsedTimeInMS, remainingTimeInMS, settings.getAlias()));
+            listener.exceptionIgnored(new IgnoredException(throwable, elapsedTimeInMS, remainingTimeInMS, settings.getAlias()));
         }
     }
 
