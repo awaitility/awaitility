@@ -43,4 +43,12 @@ public interface ConditionEvaluationListener<T> {
      * @param timeoutEvent the event containing some properties about the condition evaluation timeout
      */
     default void onTimeout(TimeoutEvent timeoutEvent) {}
+
+    /**
+     * Handle ignored exception that get thrown while condition evaluation.
+     * Method is default to keep the ConditionEvaluationListener backward compatible.
+     *
+     * @param ignoredException contains the ignored Throwable and various properties of the evaluation
+     */
+    default void exceptionIgnored(IgnoredException ignoredException) {}
 }
