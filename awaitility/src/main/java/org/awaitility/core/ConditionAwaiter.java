@@ -69,7 +69,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         final Duration minWaitTime = conditionSettings.getMinWaitTime();
         final Duration holdPredicateWaitTime = conditionSettings.getHoldPredicateTime();
 
-        long pollingStartedNanos = System.nanoTime() - pollDelay.toMillis();
+        long pollingStartedNanos = System.nanoTime() - pollDelay.toNanos();
 
         int pollCount = 0;
         boolean succeededBeforeTimeout = false;
