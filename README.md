@@ -18,9 +18,9 @@ public void updatesCustomerStatus() {
 ```
 
 ## News
+* 2020-01-03: Awaitility `4.0.2` is released. This release includes support for asserting that a condition is [maintained for specific duration](https://github.com/awaitility/awaitility/wiki/Usage#assert-that-a-value-is-maintained), improvments to [ConditionEvaluationListener](https://github.com/awaitility/awaitility/wiki/Usage#condition-evaluation-listener) as well as several bug fixes and other improvements. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details and upgrade instructions.
 * 2019-09-06: Awaitility `4.0.1` is released and it fixes a regression issue in which the condition evaluation duration could be evaluated to a negative number of nanoseconds on Windows. It also drops the dependency to [objenesis](http://objenesis.org/) since it's no longer used after moving to Java 8. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2019-08-30: Awaitility `4.0.0` is released! Java 8+ is now required which allows for both dependency and API updates. See [release notes](https://github.com/awaitility/awaitility/wiki/ReleaseNotes40) and [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
-* 2019-07-15: Awaitility `4.0.0-rc1` is released. This release requires Java 8 or above. Please try it out and provide feedback. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details and upgrade instructions.
 
 [Older news](https://github.com/awaitility/awaitility/wiki/OldNews)
 
