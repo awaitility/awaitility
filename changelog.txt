@@ -1,5 +1,5 @@
-Changelog next version
-----------------------
+Changelog 4.0.2 (2020-01-03)
+----------------------------
 * Improved formatting of elapsed time (or error and logging) for long time durations
 * Implemented support for "during" (issue 124) (big thanks to Pablo Díaz-López for pull request)
 * org.awaitility.core.ConditionEvaluationListener now has two additional hooks, "beforeEvaluation" and "onTimeout", which you can implement to get notified on these events. They are implemented as default methods to retain backward compatibility. (issue 149) (big thanks to Oliver Grof for pull request)
