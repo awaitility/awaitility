@@ -6,6 +6,7 @@ Changelog next version
 * Upgraded Kotlin extension to use Kotlin 1.3.61 (instead of 1.3.50)
 * Added "handleIgnoredException" to org.awaitility.core.ConditionEvaluationListener. This is a hook that let's you react to ignored exceptions caught when evaluating a condition (thanks to Oliver Grof for pull request)
 * Avoid hiding exceptions on the same thread (issue 152) (thanks to Oliver Grof for pull request)
+* Fixed condition timeout calculation units (issue 148) (thanks to Anthony Baker for pull request)
 
 Changelog 4.0.1 (2019-09-06)
 ----------------------------
