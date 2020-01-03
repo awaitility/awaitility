@@ -1,6 +1,10 @@
 
 package org.awaitility.core;
 
+import static org.awaitility.Awaitility.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -22,6 +26,17 @@ public class ConditionAwaiterTest {
 
         assertThat(duration.toNanos(), is(1L));
     }
+
+
+    @Test public void atLeastIncludesPollDelayWithPollInterval() {
+        long start = System.currentTimeMillis();
+        await()
+            .pollDelay(Duration.ofMillis(100))
+            .pollInterval(Duration.ofMillis(50))
+            .atLeast(Duration.ofMillis(1000))
+            .until(() -> System.currentTimeMillis() - start > 1050);
+    }
+}
 
     /**
      * Asserts that https://github.com/awaitility/awaitility/issues/152 is resolved
