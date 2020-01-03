@@ -5,6 +5,7 @@ Changelog next version
 * org.awaitility.core.ConditionEvaluationListener now has two additional hooks, "beforeEvaluation" and "onTimeout", which you can implement to get notified on these events. They are implemented as default methods to retain backward compatibility. (issue 149) (big thanks to Oliver Grof for pull request)
 * Upgraded Kotlin extension to use Kotlin 1.3.61 (instead of 1.3.50)
 * Added "handleIgnoredException" to org.awaitility.core.ConditionEvaluationListener. This is a hook that let's you react to ignored exceptions caught when evaluating a condition (thanks to Oliver Grof for pull request)
+* Avoid hiding exceptions on the same thread (issue 152) (thanks to Oliver Grof for pull request)
 
 Changelog 4.0.1 (2019-09-06)
 ----------------------------

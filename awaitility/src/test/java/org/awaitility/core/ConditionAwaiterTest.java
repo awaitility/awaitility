@@ -5,10 +5,14 @@ import static org.awaitility.Awaitility.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import org.junit.Test;
 
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Test;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 public class ConditionAwaiterTest {
 
@@ -23,6 +27,7 @@ public class ConditionAwaiterTest {
         assertThat(duration.toNanos(), is(1L));
     }
 
+
     @Test public void atLeastIncludesPollDelayWithPollInterval() {
         long start = System.currentTimeMillis();
         await()
@@ -30,5 +35,23 @@ public class ConditionAwaiterTest {
             .pollInterval(Duration.ofMillis(50))
             .atLeast(Duration.ofMillis(1000))
             .until(() -> System.currentTimeMillis() - start > 1050);
+    }
+}
+
+    /**
+     * Asserts that https://github.com/awaitility/awaitility/issues/152 is resolved
+     */
+    @Test
+    public void originalUncaughtExceptionHandlerIsSetBackAfterConditionEvaluation() {
+        Thread.UncaughtExceptionHandler originalUncaughtExceptionHandler = (t, e) -> {};
+        Thread.setDefaultUncaughtExceptionHandler(originalUncaughtExceptionHandler);
+
+        final AtomicInteger count = new AtomicInteger(0);
+        await().until(() -> {
+            count.incrementAndGet();
+            return count.get() > 1;
+        });
+
+        assertThat(Thread.getDefaultUncaughtExceptionHandler(), is(originalUncaughtExceptionHandler));
     }
 }
