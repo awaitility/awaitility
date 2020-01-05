@@ -35,3 +35,5 @@ public void updatesCustomerStatus() {
 * [Change log](https://github.com/awaitility/awaitility/raw/master/changelog.txt)
 * Awaitility on [Ohloh](https://www.ohloh.net/p/awaitility)
 * [Mailing list](http://groups.google.com/group/awaitility) for questions and support
+
+<a href="https://www.buymeacoffee.com/johanhaleby" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/arial-blue.png" alt="Buy Me A Coffee" style="height: 42px !important;width: 180px !important;" height="42px" width="180px"></a>
