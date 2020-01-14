@@ -1,3 +1,7 @@
+Changelog next version
+----------------------
+* Upgraded to Scala 2.13.1 from 2.13.0 (thanks to sullis for pull request)
+
 Changelog 4.0.2 (2020-01-03)
 ----------------------------
 * Improved formatting of elapsed time (or error and logging) for long time durations
