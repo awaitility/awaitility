@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * Upgraded to Scala 2.13.1 from 2.13.0 (thanks to sullis for pull request)
+* Upgraded Kotlin extension to use Kotlin 1.3.72 (instead of 1.3.61)
 
 Changelog 4.0.2 (2020-01-03)
 ----------------------------
