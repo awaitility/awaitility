@@ -16,15 +16,17 @@
 package org.awaitility.core;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
- * Simple implementation of {@link ConditionEvaluationListener} that prints the condition evaluation results to the console using <code>System.out.printf</code>.
- * It also prints the final value if applicable.
+ * Simple implementation of {@link ConditionEvaluationListener} that prints the condition evaluation results to the console using <code>System.out.println</code> by default.
+ * You can customize the how the results are written by providing a custom consumer that prints the results.
  */
 public class ConditionEvaluationLogger implements ConditionEvaluationListener<Object> {
 
+    private final Consumer<String> logPrinter;
     private final TimeUnit unit;
 
     /**
@@ -35,14 +37,31 @@ public class ConditionEvaluationLogger implements ConditionEvaluationListener<Ob
     }
 
     /**
+     * Specifies a consumer that is responsible for actually printing the logs
+     *
+     * @param logPrinter The logger to use
+     */
+    public ConditionEvaluationLogger(Consumer<String> logPrinter) {
+        this(logPrinter, MILLISECONDS);
+    }
+
+    /**
      * Specifies the {@link java.util.concurrent.TimeUnit} to use as unit for elapsed and remaining time.
      *
      * @param unit The time unit to use.
      */
     public ConditionEvaluationLogger(TimeUnit unit) {
+        this(System.out::println, unit);
+    }
+
+    public ConditionEvaluationLogger(Consumer<String> logPrinter, TimeUnit unit) {
+        if (logPrinter == null) {
+            throw new IllegalArgumentException("LogPrinter cannot be null");
+        }
         if (unit == null) {
             throw new IllegalArgumentException("TimeUnit cannot be null");
         }
+        this.logPrinter = logPrinter;
         this.unit = unit;
     }
 
@@ -51,29 +70,40 @@ public class ConditionEvaluationLogger implements ConditionEvaluationListener<Ob
         long elapsedTime = unit.convert(condition.getElapsedTimeInMS(), MILLISECONDS);
         long remainingTime = unit.convert(condition.getRemainingTimeInMS(), MILLISECONDS);
         String unitAsString = unit.toString().toLowerCase();
+        final String message;
         if (condition.isSatisfied()) {
-            System.out.printf("%s after %d %s (remaining time %d %s, last poll interval was %s)%n", description, elapsedTime, unitAsString, remainingTime, unitAsString,
-                    new TemporalDuration(condition.getPollInterval()).toString());
+            message = String.format("%s after %d %s (remaining time %d %s, last poll interval was %s)", description, elapsedTime, unitAsString, remainingTime, unitAsString, new TemporalDuration(condition.getPollInterval()).toString());
         } else {
-            System.out.printf("%s (elapsed time %d %s, remaining time %d %s (last poll interval was %s))%n", description, elapsedTime,
-                    unitAsString, remainingTime, unitAsString, new TemporalDuration(condition.getPollInterval()).toString());
+            message = String.format("%s (elapsed time %d %s, remaining time %d %s (last poll interval was %s))", description, elapsedTime, unitAsString, remainingTime, unitAsString, new TemporalDuration(condition.getPollInterval()).toString());
         }
+        logPrinter.accept(message);
     }
 
     @Override
     public void beforeEvaluation(StartEvaluationEvent<Object> condition) {
-        System.out.printf("%s", condition.getDescription());
+        logPrinter.accept(condition.getDescription());
     }
 
     @Override
     public void onTimeout(TimeoutEvent timeoutEvent) {
-        System.out.printf("%s", timeoutEvent.getDescription());
+        logPrinter.accept(String.format("%s", timeoutEvent.getDescription()));
     }
 
     @Override
     public void exceptionIgnored(IgnoredException ignoredException) {
-        System.out.printf("Exception %s has been ignored", ignoredException.getThrowable().getMessage());
+        logPrinter.accept(String.format("Exception %s has been ignored", ignoredException.getThrowable().getMessage()));
     }
+
+    /**
+     * Syntactic sugar to avoid writing the <code>new</code> keyword in Java.
+     * Uses {@link java.util.concurrent.TimeUnit#MILLISECONDS} as unit for elapsed and remaining time.
+     *
+     * @return A new instance of {@link ConditionEvaluationLogger}
+     */
+    public static ConditionEvaluationLogger conditionEvaluationLogger(Consumer<String> logger) {
+        return new ConditionEvaluationLogger(logger);
+    }
+
 
     /**
      * Syntactic sugar to avoid writing the <code>new</code> keyword in Java.
