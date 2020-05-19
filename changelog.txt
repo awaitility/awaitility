@@ -8,6 +8,7 @@ Changelog next version
 
   This will log using a the logger "log" instead of printing to the console.
 * Fixed problems with test dependencies in pom.xml
+* Upgraded Groovy from 2.5.7 to 3.0.3
 
 Changelog 4.0.2 (2020-01-03)
 ----------------------------
