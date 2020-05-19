@@ -26,7 +26,7 @@
     <description>Simplifies Awaitility usage from Scala</description>
 
     <properties>
-        <scala.version>2.13.1</scala.version>
+        <scala.version>2.13.2</scala.version>
     </properties>
 
     <dependencies>

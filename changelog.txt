@@ -1,6 +1,6 @@
 Changelog next version
 ----------------------
-* Upgraded to Scala 2.13.1 from 2.13.0 (thanks to sullis for pull request)
+* Upgraded to Scala 2.13.2 from 2.13.0 (thanks to sullis for pull request)
 * Upgraded Kotlin extension to use Kotlin 1.3.72 (instead of 1.3.61)
 * Improved org.awaitility.core.ConditionEvaluationLogger to accept a consumer that decides how the logs are printed. You can use this to for example log intermediary values using slf4j instead of System.out.println or log to to disk or a data structure such as CopyOnWriteArrayList. For example:
 
