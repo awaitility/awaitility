@@ -26,7 +26,7 @@
     <description>Simplifies Awaitility usage from Groovy</description>
 
     <properties>
-        <groovy.version>3.0.3</groovy.version>
+        <groovy.version>3.0.4</groovy.version>
         <spock.version>2.0-M2-groovy-3.0</spock.version>
         <gmaven.version>1.7.1</gmaven.version>
     </properties>
