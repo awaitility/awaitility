@@ -1,6 +1,6 @@
 Changelog next version
 ----------------------------
-* Upgraded to Scala 2.13.2 from 2.13.3 (thanks to sullis for pull request)
+* Upgraded to Scala 2.13.3 from 2.13.2 (thanks to sullis for pull request)
 
 Changelog 4.0.3 (2020-05-19)
 ----------------------------
