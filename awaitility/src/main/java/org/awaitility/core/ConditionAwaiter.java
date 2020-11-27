@@ -96,6 +96,12 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 pollCount = pollCount + 1;
                 // Only wait for the next condition evaluation for at most what's remaining of
                 Duration maxWaitTimeForThisCondition = maxWaitTime.minus(evaluationDuration);
+                Callable<Boolean> failFastCondition = conditionSettings.getFailFastCondition();
+                if (failFastCondition != null) {
+                    Boolean terminalFailureReached = failFastCondition.call();
+                    if (terminalFailureReached)
+                        throw new TerminalFailureException("Fail fast condition found!");
+                }
                 currentConditionEvaluation = executor.submit(new ConditionPoller(pollInterval));
                 // Wait for condition evaluation to complete with "maxWaitTimeForThisCondition" or else throw TimeoutException
                 lastResult = ChronoUnit.FOREVER.getDuration().equals(maxWaitTime) ? getUninterruptibly(currentConditionEvaluation) : getUninterruptibly(currentConditionEvaluation, maxWaitTimeForThisCondition);

@@ -23,6 +23,7 @@ import org.awaitility.pollinterval.PollInterval;
 import org.hamcrest.Matcher;
 
 import java.time.Duration;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -148,6 +149,11 @@ public class Awaitility {
      * Default condition evaluation executor service.
      */
     private static volatile ExecutorLifecycle defaultExecutorLifecycle = null;
+
+    /**
+     * If this condition if _ever_ false, indicates our condition will _never_ be true.
+     */
+    private static final Callable<Boolean> defaultFailFastCondition = null;
 
     /**
      * Instruct Awaitility to catch uncaught exceptions from other threads by
@@ -292,7 +298,7 @@ public class Awaitility {
     public static ConditionFactory await(String alias) {
         return new ConditionFactory(alias, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, defaultFailFastCondition);
     }
 
     /**
@@ -305,7 +311,7 @@ public class Awaitility {
     public static ConditionFactory catchUncaughtExceptions() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, defaultFailFastCondition);
     }
 
     /**
@@ -317,7 +323,7 @@ public class Awaitility {
     public static ConditionFactory dontCatchUncaughtExceptions() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 false, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, defaultFailFastCondition);
     }
 
     /**
@@ -332,7 +338,7 @@ public class Awaitility {
     public static ConditionFactory with() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, defaultFailFastCondition);
     }
 
     /**
@@ -347,7 +353,7 @@ public class Awaitility {
     public static ConditionFactory given() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, defaultFailFastCondition);
     }
 
     /**
@@ -360,7 +366,7 @@ public class Awaitility {
     public static ConditionFactory waitAtMost(Duration timeout) {
         return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(timeout), defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, defaultFailFastCondition);
     }
 
     /**
@@ -374,7 +380,7 @@ public class Awaitility {
     public static ConditionFactory waitAtMost(long value, TimeUnit unit) {
         return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(DurationFactory.of(value, unit)), defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, defaultFailFastCondition);
     }
 
     /**
