@@ -86,7 +86,7 @@ public class ConditionFactory {
     /**
      * If this condition if ever false, indicates our condition will never be true.
      */
-    private final Callable<Boolean> failFastCondition;
+    private final FailFastCondition failFastCondition;
 
     /**
      * Instantiates a new condition factory.
@@ -102,7 +102,7 @@ public class ConditionFactory {
      */
     public ConditionFactory(final String alias, WaitConstraint timeoutConstraint, PollInterval pollInterval, Duration pollDelay,
                             boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
-                            ConditionEvaluationListener conditionEvaluationListener, ExecutorLifecycle executorLifecycle, final Callable<Boolean> failFastCondition) {
+                            ConditionEvaluationListener conditionEvaluationListener, ExecutorLifecycle executorLifecycle, final FailFastCondition failFastCondition) {
         if (pollInterval == null) {
             throw new IllegalArgumentException("pollInterval cannot be null");
         }
@@ -570,14 +570,15 @@ public class ConditionFactory {
      * If the supplied Callable <i>ever</i> returns false, indicates our condition will <i>never</i> be true, and so fail the system immediately.
      *
      * @param failFastCondition the terminal failure condition Callable
+     * @param failureReason
      * @return the condition factory
      */
-    public ConditionFactory failFast(final Callable<Boolean> failFastCondition) {
+    public ConditionFactory failFast(final Callable<Boolean> failFastCondition, final Callable<Exception> failureReason) {
         if (failFastCondition == null) {
             throw new IllegalArgumentException("failFastCondition cannot be null");
         }
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
-                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
+                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, new FailFastCondition(failFastCondition, failureReason));
     }
 
     /**

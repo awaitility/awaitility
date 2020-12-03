@@ -30,11 +30,11 @@ public class ConditionSettings {
     private final ExceptionIgnorer ignoreExceptions;
     private final ConditionEvaluationListener conditionEvaluationListener;
     private final ExecutorLifecycle executorLifecycle;
-    private final Callable<Boolean> failFastCondition;
+    private final FailFastCondition failFastCondition;
 
     /**
      * <p>Constructor for ConditionSettings.</p>
-     *  @param alias                       a {@link String} object.
+     * @param alias                       a {@link String} object.
      * @param catchUncaughtExceptions     a boolean.
      * @param waitConstraint              a {@link WaitConstraint} object.
      * @param pollInterval                a {@link org.awaitility.Duration} object.
@@ -46,7 +46,7 @@ public class ConditionSettings {
      */
     ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
                       PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
-                      ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle, final Callable<Boolean> failFastCondition) {
+                      ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle, final FailFastCondition failFastCondition) {
         if (waitConstraint == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
@@ -162,7 +162,7 @@ public class ConditionSettings {
     /**
      * @return the fail fast {@link Callable}.
      */
-    public Callable<Boolean> getFailFastCondition() {
+    public FailFastCondition getFailFastCondition() {
         return this.failFastCondition;
     }
 }

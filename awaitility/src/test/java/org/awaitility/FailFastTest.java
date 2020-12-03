@@ -12,7 +12,10 @@ import static org.hamcrest.Matchers.equalTo;
 
 /**
  * Fast failure on terminal status #178
- * https://github.com/awaitility/awaitility/issues/178
+ * <p>
+ * Issue https://github.com/awaitility/awaitility/issues/178
+ * <p>
+ * PR https://github.com/awaitility/awaitility/pull/193
  */
 public class FailFastTest {
 
@@ -35,7 +38,7 @@ public class FailFastTest {
         Callable<Boolean> failFastCondition = () -> ai.get() >= 10;
 
         await().timeout(Duration.ofSeconds(5))
-                .failFast(failFastCondition).until(() ->
+                .failFast(failFastCondition, () -> new Exception("System crash")).until(() ->
                         ai.get(),
                 equalTo(-1) // will never be true
         );

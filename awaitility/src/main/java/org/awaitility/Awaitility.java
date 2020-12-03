@@ -153,7 +153,7 @@ public class Awaitility {
     /**
      * If this condition if _ever_ false, indicates our condition will _never_ be true.
      */
-    private static final Callable<Boolean> defaultFailFastCondition = null;
+    private static final FailFastCondition defaultFailFastCondition = null;
 
     /**
      * Instruct Awaitility to catch uncaught exceptions from other threads by
