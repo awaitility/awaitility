@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------------
 * Upgraded to Scala 2.13.3 from 2.13.2 (thanks to sullis for pull request)
+* Upgraded Kotlin from 1.3.72 to 1.4.20
 
 Changelog 4.0.3 (2020-05-19)
 ----------------------------
