@@ -14,7 +14,8 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.awaitility</groupId>
@@ -27,6 +28,7 @@
 
     <properties>
         <kotlin.version>1.4.20</kotlin.version>
+        <dokka.version>1.4.10.2</dokka.version>
     </properties>
 
     <dependencies>
@@ -65,7 +67,7 @@
                 <!-- See https://github.com/Kotlin/dokka#using-the-maven-plugin for more examples-->
                 <groupId>org.jetbrains.dokka</groupId>
                 <artifactId>dokka-maven-plugin</artifactId>
-                <version>0.9.16</version>
+                <version>${dokka.version}</version>
                 <executions>
                     <execution>
                         <phase>prepare-package</phase>
@@ -77,7 +79,13 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <outputFormat>javadoc</outputFormat>
+                    <dokkaPlugins>
+                        <plugin>
+                            <groupId>org.jetbrains.dokka</groupId>
+                            <artifactId>kotlin-as-java-plugin</artifactId>
+                            <version>${dokka.version}</version>
+                        </plugin>
+                    </dokkaPlugins>
                 </configuration>
             </plugin>
             <plugin>
