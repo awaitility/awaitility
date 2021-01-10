@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
 
@@ -292,7 +293,7 @@ public class Awaitility {
     public static ConditionFactory await(String alias) {
         return new ConditionFactory(alias, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, null);
     }
 
     /**
@@ -305,7 +306,7 @@ public class Awaitility {
     public static ConditionFactory catchUncaughtExceptions() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, null);
     }
 
     /**
@@ -317,7 +318,7 @@ public class Awaitility {
     public static ConditionFactory dontCatchUncaughtExceptions() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 false, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, null);
     }
 
     /**
@@ -332,7 +333,7 @@ public class Awaitility {
     public static ConditionFactory with() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, null);
     }
 
     /**
@@ -347,7 +348,7 @@ public class Awaitility {
     public static ConditionFactory given() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, null);
     }
 
     /**
@@ -360,7 +361,7 @@ public class Awaitility {
     public static ConditionFactory waitAtMost(Duration timeout) {
         return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(timeout), defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, null);
     }
 
     /**
@@ -374,7 +375,7 @@ public class Awaitility {
     public static ConditionFactory waitAtMost(long value, TimeUnit unit) {
         return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(DurationFactory.of(value, unit)), defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle);
+                defaultExecutorLifecycle, null);
     }
 
     /**
