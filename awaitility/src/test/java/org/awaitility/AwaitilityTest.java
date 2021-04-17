@@ -359,6 +359,15 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000)
+    public void awaitWithCustomTimeoutMessage() {
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage("This is a test message");
+
+        with().pollInterval(10, NANOSECONDS).timeoutMessage(() -> "This is a test message").await().atMost(120, NANOSECONDS).until(()->false);
+    }
+
+
+    @Test(timeout = 2000)
     public void awaitDisplaysSupplierAndMatcherMismatchMessageWhenConditionTimeoutExceptionOccurs() {
         exception.expect(ConditionTimeoutException.class);
         exception.expectMessage(FakeRepositoryValue.class.getName()

@@ -138,13 +138,17 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 throw lastResult.getThrowable();
             } else if (!succeededBeforeTimeout) {
                 final String message;
-                String timeoutMessage = getTimeoutMessage();
-                String durationAsString = formatAsString(maxWaitTime);
-                if (conditionSettings.hasAlias()) {
-                    message = String.format("Condition with alias '%s' didn't complete within %s because %s.",
-                            conditionSettings.getAlias(), durationAsString, decapitalize(timeoutMessage));
+                if (conditionSettings.getTimeoutMessage() != null) {
+                    message = conditionSettings.getTimeoutMessage().get();
                 } else {
-                    message = String.format("%s within %s.", timeoutMessage, durationAsString);
+                    String timeoutMessage = getTimeoutMessage();
+                    String durationAsString = formatAsString(maxWaitTime);
+                    if (conditionSettings.hasAlias()) {
+                        message = String.format("Condition with alias '%s' didn't complete within %s because %s.",
+                                conditionSettings.getAlias(), durationAsString, decapitalize(timeoutMessage));
+                    } else {
+                        message = String.format("%s within %s.", timeoutMessage, durationAsString);
+                    }
                 }
 
                 Throwable cause = lastResult != null && lastResult.hasTrace() ? lastResult.getTrace() : null;

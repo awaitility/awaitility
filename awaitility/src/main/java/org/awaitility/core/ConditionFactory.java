@@ -15,6 +15,7 @@
  */
 package org.awaitility.core;
 
+import org.awaitility.Awaitility;
 import org.awaitility.constraint.AtMostWaitConstraint;
 import org.awaitility.constraint.WaitConstraint;
 import org.awaitility.pollinterval.FixedPollInterval;
@@ -31,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static org.awaitility.core.ForeverDuration.isForever;
 import static org.awaitility.core.TemporalDuration.formatAsString;
@@ -84,6 +86,11 @@ public class ConditionFactory {
     private final ExecutorLifecycle executorLifecycle;
 
     /**
+     * Generator for a timeout message, or {@literal null}
+     */
+    private final Supplier<String> timeoutMessage;
+
+    /**
      * Instantiates a new condition factory.
      *
      * @param alias                         the alias
@@ -97,7 +104,7 @@ public class ConditionFactory {
      */
     public ConditionFactory(final String alias, WaitConstraint timeoutConstraint, PollInterval pollInterval, Duration pollDelay,
                             boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
-                            ConditionEvaluationListener conditionEvaluationListener, ExecutorLifecycle executorLifecycle) {
+                            ConditionEvaluationListener conditionEvaluationListener, ExecutorLifecycle executorLifecycle, Supplier<String> timeoutMessage) {
         if (pollInterval == null) {
             throw new IllegalArgumentException("pollInterval cannot be null");
         }
@@ -113,6 +120,7 @@ public class ConditionFactory {
         this.conditionEvaluationListener = conditionEvaluationListener;
         this.exceptionsIgnorer = exceptionsIgnorer;
         this.executorLifecycle = executorLifecycle;
+        this.timeoutMessage = timeoutMessage;
     }
 
     /**
@@ -123,7 +131,7 @@ public class ConditionFactory {
      */
     public ConditionFactory conditionEvaluationListener(ConditionEvaluationListener conditionEvaluationListener) {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
-                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -144,7 +152,7 @@ public class ConditionFactory {
      */
     public ConditionFactory atMost(Duration timeout) {
         return new ConditionFactory(alias, timeoutConstraint.withMaxWaitTime(timeout), pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -155,7 +163,7 @@ public class ConditionFactory {
      */
     public ConditionFactory during(Duration timeout) {
         return new ConditionFactory(alias, timeoutConstraint.withHoldPredicateTime(timeout), pollInterval, pollDelay,
-            catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+            catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -178,7 +186,7 @@ public class ConditionFactory {
      */
     public ConditionFactory alias(String alias) {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -189,7 +197,7 @@ public class ConditionFactory {
      */
     public ConditionFactory atLeast(Duration timeout) {
         return new ConditionFactory(alias, timeoutConstraint.withMinWaitTime(timeout), pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -236,7 +244,7 @@ public class ConditionFactory {
      */
     public ConditionFactory forever() {
         return new ConditionFactory(alias, AtMostWaitConstraint.FOREVER, pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -255,7 +263,7 @@ public class ConditionFactory {
      */
     public ConditionFactory pollInterval(Duration pollInterval) {
         return new ConditionFactory(alias, timeoutConstraint, new FixedPollInterval(pollInterval), pollDelay, catchUncaughtExceptions,
-                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -269,6 +277,19 @@ public class ConditionFactory {
         return atMost(timeout, unit);
     }
 
+
+    /**
+     * Use a custom error message if a timeout occurs
+     *
+     * @param timeoutMessage A {@link Supplier} that will generate a custom timeout message
+     * @return the condition factory
+     */
+    public ConditionFactory timeoutMessage(Supplier<String> timeoutMessage) {
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
+                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
+    }
+
+
     /**
      * Specify the delay that will be used before Awaitility starts polling for
      * the result the first time. If you don't specify a poll delay explicitly
@@ -280,7 +301,7 @@ public class ConditionFactory {
      */
     public ConditionFactory pollDelay(long delay, TimeUnit unit) {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, DurationFactory.of(delay, unit),
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -296,7 +317,7 @@ public class ConditionFactory {
             throw new IllegalArgumentException("pollDelay cannot be null");
         }
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
-                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -329,12 +350,12 @@ public class ConditionFactory {
     public ConditionFactory pollInterval(long pollInterval, TimeUnit unit) {
         PollInterval fixedPollInterval = new FixedPollInterval(DurationFactory.of(pollInterval, unit));
         return new ConditionFactory(alias, timeoutConstraint, fixedPollInterval, definePollDelay(pollDelay, fixedPollInterval),
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     public ConditionFactory pollInterval(PollInterval pollInterval) {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, definePollDelay(pollDelay, pollInterval), catchUncaughtExceptions,
-                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -347,7 +368,7 @@ public class ConditionFactory {
      */
     public ConditionFactory catchUncaughtExceptions() {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, true, exceptionsIgnorer,
-                conditionEvaluationListener, executorLifecycle);
+                conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -366,7 +387,7 @@ public class ConditionFactory {
         }
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
                 new PredicateExceptionIgnorer(e -> exceptionType.isAssignableFrom(e.getClass())),
-                conditionEvaluationListener, executorLifecycle);
+                conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -384,7 +405,7 @@ public class ConditionFactory {
         }
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
                 new PredicateExceptionIgnorer(e -> e.getClass().equals(exceptionType)),
-                conditionEvaluationListener, executorLifecycle);
+                conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -419,7 +440,7 @@ public class ConditionFactory {
      */
     public ConditionFactory ignoreExceptionsMatching(Matcher<? super Throwable> matcher) {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
-                new HamcrestExceptionIgnorer(matcher), conditionEvaluationListener, executorLifecycle);
+                new HamcrestExceptionIgnorer(matcher), conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -431,7 +452,7 @@ public class ConditionFactory {
      */
     public ConditionFactory ignoreExceptionsMatching(Predicate<? super Throwable> predicate) {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
-                new PredicateExceptionIgnorer(predicate), conditionEvaluationListener, executorLifecycle);
+                new PredicateExceptionIgnorer(predicate), conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -456,7 +477,7 @@ public class ConditionFactory {
      */
     public ConditionFactory await(String alias) {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
-                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -507,7 +528,7 @@ public class ConditionFactory {
      */
     public ConditionFactory dontCatchUncaughtExceptions() {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, false,
-                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle);
+                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, timeoutMessage);
     }
 
     /**
@@ -524,7 +545,7 @@ public class ConditionFactory {
             throw new IllegalArgumentException("Poll executor service cannot be an instance of " + ScheduledExecutorService.class.getName());
         }
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, false,
-                exceptionsIgnorer, conditionEvaluationListener, ExecutorLifecycle.withoutCleanup(executorService));
+                exceptionsIgnorer, conditionEvaluationListener, ExecutorLifecycle.withoutCleanup(executorService), timeoutMessage);
     }
 
     /**
@@ -537,7 +558,7 @@ public class ConditionFactory {
      */
     public ConditionFactory pollThread(final Function<Runnable, Thread> threadSupplier) {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, false,
-                exceptionsIgnorer, conditionEvaluationListener, ExecutorLifecycle.withNormalCleanupBehavior(() -> InternalExecutorServiceFactory.create(threadSupplier)));
+                exceptionsIgnorer, conditionEvaluationListener, ExecutorLifecycle.withNormalCleanupBehavior(() -> InternalExecutorServiceFactory.create(threadSupplier)), timeoutMessage);
     }
 
     /**
@@ -557,7 +578,7 @@ public class ConditionFactory {
      */
     public ConditionFactory pollInSameThread() {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, false,
-                exceptionsIgnorer, conditionEvaluationListener, ExecutorLifecycle.withNormalCleanupBehavior(InternalExecutorServiceFactory::sameThreadExecutorService));
+                exceptionsIgnorer, conditionEvaluationListener, ExecutorLifecycle.withNormalCleanupBehavior(InternalExecutorServiceFactory::sameThreadExecutorService), timeoutMessage);
     }
 
     /**
@@ -695,6 +716,7 @@ public class ConditionFactory {
      */
     public Integer untilAtomic(final AtomicInteger atomic, final Matcher<? super Integer> matcher) {
         return until(new CallableHamcrestCondition<>(new Callable<Integer>() {
+            @Override
             public Integer call() {
                 return atomic.get();
             }
@@ -888,7 +910,7 @@ public class ConditionFactory {
         }
 
         return new ConditionSettings(alias, catchUncaughtExceptions, timeoutConstraint, pollInterval, actualPollDelay,
-                conditionEvaluationListener, exceptionsIgnorer, executorLifecycle);
+                conditionEvaluationListener, exceptionsIgnorer, executorLifecycle, timeoutMessage);
     }
 
     private <T> T until(Condition<T> condition) {
@@ -919,4 +941,5 @@ public class ConditionFactory {
         }
         return pollDelayToUse;
     }
+
 }
