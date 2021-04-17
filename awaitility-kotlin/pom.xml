@@ -27,7 +27,7 @@
     <description>Simplifies Awaitility usage from Kotlin</description>
 
     <properties>
-        <kotlin.version>1.4.20</kotlin.version>
+        <kotlin.version>1.4.32</kotlin.version>
         <dokka.version>1.4.10.2</dokka.version>
     </properties>
 
