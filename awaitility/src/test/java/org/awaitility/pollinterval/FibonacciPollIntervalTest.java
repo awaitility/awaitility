@@ -16,6 +16,8 @@
 
 package org.awaitility.pollinterval;
 
+import java.time.Duration;
+import java.util.concurrent.ThreadLocalRandom;
 import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
@@ -46,4 +48,31 @@ public class FibonacciPollIntervalTest {
         // Then
         assertThat(fibonacci, is(428607904));
     }
+
+    @Test public void
+    next_default_offset() {
+        // Given
+        Duration unused = Duration.ofMillis(ThreadLocalRandom.current().nextLong());
+        FibonacciPollInterval pollInterval = new FibonacciPollInterval(TimeUnit.SECONDS);
+
+        // When
+        Duration next = pollInterval.next(1, unused);
+
+        // Then
+        assertThat(next, is(Duration.ofSeconds(1)));
+    }
+
+    @Test public void
+    next_negative_offset() {
+        // Given
+        Duration unused = Duration.ofMillis(ThreadLocalRandom.current().nextLong());
+        FibonacciPollInterval pollInterval = new FibonacciPollInterval(-1, TimeUnit.SECONDS);
+
+        // When
+        Duration next = pollInterval.next(1, unused);
+
+        // Then
+        assertThat(next, is(Duration.ofSeconds(0)));
+    }
+
 }
