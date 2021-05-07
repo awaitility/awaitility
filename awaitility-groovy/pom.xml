@@ -27,7 +27,7 @@
 
     <properties>
         <groovy.version>3.0.8</groovy.version>
-        <spock.version>2.0-M2-groovy-3.0</spock.version>
+        <spock.version>2.0-M5-groovy-3.0</spock.version>
         <gmaven.version>1.7.1</gmaven.version>
     </properties>
 
