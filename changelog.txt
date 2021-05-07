@@ -11,6 +11,7 @@ Changelog next version
 
   This will fail-fast if the state of order 1234 is ever equal to "PAID" during the 5 second evaluation of the condition specified in "until".
   (Thanks to Antony Stubbs for initial pull request) (issue 178)
+* Upgraded Groovy from version 3.0.4 to 3.0.8
 
 Changelog 4.0.3 (2020-05-19)
 ----------------------------
