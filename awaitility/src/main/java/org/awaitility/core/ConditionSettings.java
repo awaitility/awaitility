@@ -19,6 +19,7 @@ import org.awaitility.constraint.WaitConstraint;
 import org.awaitility.pollinterval.PollInterval;
 
 import java.time.Duration;
+import java.util.concurrent.Callable;
 
 public class ConditionSettings {
     private final String alias;
@@ -29,22 +30,23 @@ public class ConditionSettings {
     private final ExceptionIgnorer ignoreExceptions;
     private final ConditionEvaluationListener conditionEvaluationListener;
     private final ExecutorLifecycle executorLifecycle;
+    private final FailFastCondition failFastCondition;
 
     /**
      * <p>Constructor for ConditionSettings.</p>
-     *
-     * @param alias                       a {@link java.lang.String} object.
+     * @param alias                       a {@link String} object.
      * @param catchUncaughtExceptions     a boolean.
-     * @param waitConstraint              a {@link org.awaitility.constraint.WaitConstraint} object.
+     * @param waitConstraint              a {@link WaitConstraint} object.
      * @param pollInterval                a {@link org.awaitility.Duration} object.
      * @param pollDelay                   a {@link org.awaitility.Duration} object.
      * @param conditionEvaluationListener a {@link ConditionEvaluationListener} object.
      * @param ignoreExceptions            a {@link ExceptionIgnorer} object.
      * @param executorLifecycle           Responsible for performing executor service cleanup after each condition evaluation round
+     * @param failFastCondition           a Callable that if returns true, fails the test immediately
      */
     ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
                       PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
-                      ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle) {
+                      ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle, final FailFastCondition failFastCondition) {
         if (waitConstraint == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
@@ -59,6 +61,7 @@ public class ConditionSettings {
         this.catchUncaughtExceptions = catchUncaughtExceptions;
         this.conditionEvaluationListener = conditionEvaluationListener;
         this.ignoreExceptions = ignoreExceptions;
+        this.failFastCondition = failFastCondition;
     }
 
     /**
@@ -154,5 +157,12 @@ public class ConditionSettings {
      */
     public ExecutorLifecycle getExecutorLifecycle() {
         return executorLifecycle;
+    }
+
+    /**
+     * @return the fail fast {@link Callable}.
+     */
+    public FailFastCondition getFailFastCondition() {
+        return this.failFastCondition;
     }
 }
