@@ -90,15 +90,16 @@ public class ConditionFactory {
 
     /**
      * Instantiates a new condition factory.
-     * @param alias                         the alias
-     * @param timeoutConstraint             the timeout constraint
-     * @param pollInterval                  the poll interval
-     * @param pollDelay                     The poll delay
-     * @param catchUncaughtExceptions       the catch uncaught exceptions
-     * @param exceptionsIgnorer             Determine which exceptions that should ignored
-     * @param conditionEvaluationListener   Determine which exceptions that should ignored
-     * @param executorLifecycle             The executor service and the lifecycle of the executor service that'll be used to evaluate the condition during polling
-     * @param failFastCondition             If this condition if ever false, indicates our condition will never be true.
+     *
+     * @param alias                       the alias
+     * @param timeoutConstraint           the timeout constraint
+     * @param pollInterval                the poll interval
+     * @param pollDelay                   The poll delay
+     * @param catchUncaughtExceptions     the catch uncaught exceptions
+     * @param exceptionsIgnorer           Determine which exceptions that should ignored
+     * @param conditionEvaluationListener Determine which exceptions that should ignored
+     * @param executorLifecycle           The executor service and the lifecycle of the executor service that'll be used to evaluate the condition during polling
+     * @param failFastCondition           If this condition if ever false, indicates our condition will never be true.
      */
     public ConditionFactory(final String alias, WaitConstraint timeoutConstraint, PollInterval pollInterval, Duration pollDelay,
                             boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
@@ -161,7 +162,7 @@ public class ConditionFactory {
      */
     public ConditionFactory during(Duration timeout) {
         return new ConditionFactory(alias, timeoutConstraint.withHoldPredicateTime(timeout), pollInterval, pollDelay,
-            catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
     }
 
     /**
@@ -519,7 +520,7 @@ public class ConditionFactory {
     /**
      * Specify the executor service whose threads will be used to evaluate the poll condition in Awaitility.
      * Note that the executor service must be shutdown manually!
-     *
+     * <p>
      * This is an advanced feature and it should only be used sparingly.
      *
      * @param executorService The executor service that Awaitility will use when polling condition evaluations
@@ -552,13 +553,14 @@ public class ConditionFactory {
      * wait forever (or a long time) since Awaitility cannot interrupt the thread when it's using the same
      * thread as the test. For safety you should always combine tests using this feature with a test framework specific timeout,
      * for example in JUnit:
-     *<pre>
+     * <pre>
      * @Test(timeout = 2000L)
      * public void myTest() {
      *     Awaitility.pollInSameThread();
      *     await().forever().until(...);
      * }
-     *</pre>
+     * </pre>
+     *
      * @return the condition factory
      */
     public ConditionFactory pollInSameThread() {
@@ -567,18 +569,39 @@ public class ConditionFactory {
     }
 
     /**
-     * If the supplied Callable <i>ever</i> returns false, indicates our condition will <i>never</i> be true, and so fail the system immediately.
+     * If the supplied Callable <i>ever</i> returns false, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * Throws a {@link TerminalFailureException} if fail fast condition evaluates to <code>true</code>. If you want to specify a more descriptive error message
+     * then use {@link #failFast(String, Callable)}.
      *
-     * @param failFastCondition the terminal failure condition Callable
-     * @param failureReason
+     * @param failFastCondition The terminal failure condition
      * @return the condition factory
+     * @see #failFast(String, Callable)
      */
-    public ConditionFactory failFast(final Callable<Boolean> failFastCondition, final Callable<Exception> failureReason) {
+    public ConditionFactory failFast(Callable<Boolean> failFastCondition) {
         if (failFastCondition == null) {
             throw new IllegalArgumentException("failFastCondition cannot be null");
         }
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
-                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, new FailFastCondition(failFastCondition, failureReason));
+                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, new FailFastCondition(null, failFastCondition));
+    }
+
+    /**
+     * If the supplied Callable <i>ever</i> returns false, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * Throws a {@link TerminalFailureException} if fail fast condition evaluates to <code>true</code>.
+     *
+     * @param failFastCondition The terminal failure condition
+     * @param failFastFailureReason     A descriptive reason why the fail fast condition has failed, will be included in the {@link TerminalFailureException} thrown if <code>failFastCondition</code> evaluates to <code>true</code>.
+     * @return the condition factory
+     */
+    public ConditionFactory failFast(String failFastFailureReason, Callable<Boolean> failFastCondition) {
+        if (failFastCondition == null) {
+            throw new IllegalArgumentException("failFastCondition cannot be null");
+        } else if (failFastFailureReason == null) {
+            throw new IllegalArgumentException("failFastFailureReason cannot be null");
+        }
+
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
+                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, new FailFastCondition(failFastFailureReason, failFastCondition));
     }
 
     /**
@@ -629,11 +652,11 @@ public class ConditionFactory {
      * await().until(myRepository::count, cnt -> cnt == 2);
      * </pre>
      *
-     * @param supplier The supplier that returns the object that will be evaluated by the predicate.
+     * @param supplier  The supplier that returns the object that will be evaluated by the predicate.
      * @param predicate The predicate that must match
-     * @param <T> the generic type
-     * @since 3.1.1
+     * @param <T>       the generic type
      * @return a T object.
+     * @since 3.1.1
      */
     public <T> T until(final Callable<T> supplier, final Predicate<? super T> predicate) {
         return until(supplier, new TypeSafeMatcher<T>() {
@@ -784,7 +807,7 @@ public class ConditionFactory {
      * await().untilAdder(myLongAdder, is(greaterThan(2L)));
      * </pre>
      *
-     * @param adder  the {@link LongAdder} variable
+     * @param adder   the {@link LongAdder} variable
      * @param matcher the matcher The hamcrest matcher that checks whether the condition is fulfilled.
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
@@ -799,7 +822,7 @@ public class ConditionFactory {
      * await().untilAdder(myDoubleAdder, is(greaterThan(2.0d)));
      * </pre>
      *
-     * @param adder  the {@link DoubleAdder} variable
+     * @param adder   the {@link DoubleAdder} variable
      * @param matcher the matcher The hamcrest matcher that checks whether the condition is fulfilled.
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
@@ -815,7 +838,7 @@ public class ConditionFactory {
      * </pre>
      *
      * @param accumulator the {@link LongAccumulator} variable
-     * @param matcher the matcher The hamcrest matcher that checks whether the condition is fulfilled.
+     * @param matcher     the matcher The hamcrest matcher that checks whether the condition is fulfilled.
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAccumulator(final LongAccumulator accumulator, final Matcher<? super Long> matcher) {
@@ -829,8 +852,8 @@ public class ConditionFactory {
      * await().untilAccumulator(myDoubleAccumulator, is(greaterThan(2.0d)));
      * </pre>
      *
-     * @param accumulator  the {@link DoubleAccumulator} variable
-     * @param matcher the matcher The hamcrest matcher that checks whether the condition is fulfilled.
+     * @param accumulator the {@link DoubleAccumulator} variable
+     * @param matcher     the matcher The hamcrest matcher that checks whether the condition is fulfilled.
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAccumulator(final DoubleAccumulator accumulator, final Matcher<? super Double> matcher) {

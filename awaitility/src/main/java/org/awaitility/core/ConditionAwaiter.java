@@ -93,17 +93,10 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             }
             Duration pollInterval = pollDelay;
             while (maxWaitTime.compareTo(evaluationDuration) > 0) {
+                executeFailFastConditionIfDefined();
                 pollCount = pollCount + 1;
                 // Only wait for the next condition evaluation for at most what's remaining of
                 Duration maxWaitTimeForThisCondition = maxWaitTime.minus(evaluationDuration);
-                FailFastCondition failFastCondition = conditionSettings.getFailFastCondition();
-                if (failFastCondition != null) {
-                    Boolean terminalFailureReached = failFastCondition.getFailFastCondition().call();
-                    if (terminalFailureReached) {
-                        Exception cause = failFastCondition.getFailureReason().call();
-                        throw new TerminalFailureException("Fail fast condition found!", cause);
-                    }
-                }
                 currentConditionEvaluation = executor.submit(new ConditionPoller(pollInterval));
                 // Wait for condition evaluation to complete with "maxWaitTimeForThisCondition" or else throw TimeoutException
                 lastResult = ChronoUnit.FOREVER.getDuration().equals(maxWaitTime) ? getUninterruptibly(currentConditionEvaluation) : getUninterruptibly(currentConditionEvaluation, maxWaitTimeForThisCondition);
@@ -112,7 +105,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 } else if (lastResult.isError()) {
                     firstSucceedSinceStarted = 0L;
                 }
-                if (lastResult.isSuccessful() && (System.nanoTime() - firstSucceedSinceStarted >= holdPredicateWaitTime.toNanos() ) || lastResult.hasThrowable()) {
+                if (lastResult.isSuccessful() && (System.nanoTime() - firstSucceedSinceStarted >= holdPredicateWaitTime.toNanos()) || lastResult.hasThrowable()) {
                     break;
                 }
                 if (lastResult.hasTrace()) {
@@ -183,6 +176,17 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             Thread.setDefaultUncaughtExceptionHandler(originalDefaultUncaughtExceptionHandler);
             uncaughtThrowable.set(null);
             conditionSettings.getExecutorLifecycle().executeNormalCleanupBehavior(executor);
+        }
+    }
+
+    private void executeFailFastConditionIfDefined() throws Exception {
+        FailFastCondition failFastCondition = conditionSettings.getFailFastCondition();
+        if (failFastCondition != null) {
+            Boolean terminalFailureReached = failFastCondition.getFailFastCondition().call();
+            if (terminalFailureReached != null && terminalFailureReached) {
+                String failureReason = failFastCondition.getFailFastFailureReason();
+                throw new TerminalFailureException(failureReason);
+            }
         }
     }
 
