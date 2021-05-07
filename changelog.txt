@@ -1,7 +1,7 @@
 Changelog next version
 ----------------------------
 * Upgraded to Scala 2.13.3 from 2.13.5 (thanks to sullis for pull request)
-* Upgraded Kotlin from 1.3.72 to 1.4.32
+* Upgraded Kotlin from 1.3.72 to 1.5.0
 * Fixed a bug preventing you to specify "fib(-1)" when using the fibonacci poll interval (thanks to Björn Michael for pull request) (issue 201)
 
 Changelog 4.0.3 (2020-05-19)
