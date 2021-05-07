@@ -65,7 +65,7 @@ class KotlinTest {
     @Test
     fun assertionConditionFailsWithANiceErrorMessage() {
         exception.expect(ConditionTimeoutException::class.java)
-        exception.expectMessage(startsWith("Assertion condition defined in"))
+        exception.expectMessage(startsWith("Assertion condition defined"))
 
         Asynch(fakeRepository).perform()
         await().atMost(1, SECONDS).untilAsserted { assertEquals(2, fakeRepository.value) }
