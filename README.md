@@ -18,7 +18,7 @@ public void updatesCustomerStatus() {
 ```
 
 ## News
-* 2020-05-08: Awaitility `4.1.0` is released. This release includes [fail-fast conditions](https://github.com/awaitility/awaitility/wiki/Usage#fail-fast-conditions) as well as some bug fixes and dependency updates. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
+* 2021-05-08: Awaitility `4.1.0` is released. This release includes [fail-fast conditions](https://github.com/awaitility/awaitility/wiki/Usage#fail-fast-conditions) as well as some bug fixes and dependency updates. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2020-05-19: Awaitility `4.0.3` is released. This release includes updates to [ConditionEvaluationLogger](https://github.com/awaitility/awaitility/wiki/Usage#condition-evaluation-listener) as well as several depdency updates.
 If you're using the Groovy DSL beaware that Groovy has been upgraded from 2.x to 3.x. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2020-01-03: Awaitility `4.0.2` is released. This release includes support for asserting that a condition is [maintained for specific duration](https://github.com/awaitility/awaitility/wiki/Usage#assert-that-a-value-is-maintained), improvments to [ConditionEvaluationListener](https://github.com/awaitility/awaitility/wiki/Usage#condition-evaluation-listener) as well as several bug fixes and other improvements. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
