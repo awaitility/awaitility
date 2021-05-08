@@ -18,10 +18,10 @@ public void updatesCustomerStatus() {
 ```
 
 ## News
+* 2020-05-08: Awaitility `4.1.0` is released. This release includes [fail-fast conditions](https://github.com/awaitility/awaitility/wiki/Usage#fail-fast-conditions) as well as some bug fixes and dependency updates. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2020-05-19: Awaitility `4.0.3` is released. This release includes updates to [ConditionEvaluationLogger](https://github.com/awaitility/awaitility/wiki/Usage#condition-evaluation-listener) as well as several depdency updates.
 If you're using the Groovy DSL beaware that Groovy has been upgraded from 2.x to 3.x. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2020-01-03: Awaitility `4.0.2` is released. This release includes support for asserting that a condition is [maintained for specific duration](https://github.com/awaitility/awaitility/wiki/Usage#assert-that-a-value-is-maintained), improvments to [ConditionEvaluationListener](https://github.com/awaitility/awaitility/wiki/Usage#condition-evaluation-listener) as well as several bug fixes and other improvements. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
-* 2019-09-06: Awaitility `4.0.1` is released and it fixes a regression issue in which the condition evaluation duration could be evaluated to a negative number of nanoseconds on Windows. It also drops the dependency to [objenesis](http://objenesis.org/) since it's no longer used after moving to Java 8. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 
 [Older news](https://github.com/awaitility/awaitility/wiki/OldNews)
 
@@ -30,7 +30,7 @@ If you're using the Groovy DSL beaware that Groovy has been upgraded from 2.x to
 * [Getting started](https://github.com/awaitility/awaitility/wiki/Getting_started)
 * [Usage Guide](https://github.com/awaitility/awaitility/wiki/Usage)
 * [Downloads](https://github.com/awaitility/awaitility/wiki/Downloads)
-* [Awaitility Javadoc](http://www.javadoc.io/doc/org.awaitility/awaitility/4.0.3)
+* [Awaitility Javadoc](http://www.javadoc.io/doc/org.awaitility/awaitility/4.1.0)
 
 ## Links
 * [Change log](https://github.com/awaitility/awaitility/raw/master/changelog.txt)
