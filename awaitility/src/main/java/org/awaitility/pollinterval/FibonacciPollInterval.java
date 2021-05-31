@@ -57,7 +57,7 @@ public class FibonacciPollInterval implements PollInterval {
      * @param unit The time unit
      */
     public FibonacciPollInterval(int offset, TimeUnit unit) {
-        if (offset <= -1) {
+        if (offset < -1) {
             throw new IllegalArgumentException("Offset must be greater than or equal to -1");
         }
         if (unit == null) {
