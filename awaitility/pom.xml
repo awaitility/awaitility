@@ -26,7 +26,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>4.2.0</version>
+                <version>5.1.2</version>
                 <configuration>
                     <obrRepository>NONE</obrRepository>
                     <instructions>
