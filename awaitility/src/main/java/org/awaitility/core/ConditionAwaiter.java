@@ -36,8 +36,6 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
     private final AtomicReference<Throwable> uncaughtThrowable;
     private final ConditionSettings conditionSettings;
 
-    private final UncaughtExceptionHandler originalDefaultUncaughtExceptionHandler;
-
     /**
      * <p>Constructor for ConditionAwaiter.</p>
      *
@@ -52,7 +50,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             throw new IllegalArgumentException("You must specify the condition settings (was null).");
         }
         // in order to solve https://github.com/awaitility/awaitility/issues/152 the original handler will be set back at the end
-        originalDefaultUncaughtExceptionHandler = Thread.getDefaultUncaughtExceptionHandler();
+        OriginalDefaultUncaughtExceptionHandler.set(Thread.getDefaultUncaughtExceptionHandler());
 
         if (conditionSettings.shouldCatchUncaughtExceptions()) {
             Thread.setDefaultUncaughtExceptionHandler(this);
@@ -173,7 +171,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         } catch (Throwable e) {
             CheckedExceptionRethrower.safeRethrow(e);
         } finally {
-            Thread.setDefaultUncaughtExceptionHandler(originalDefaultUncaughtExceptionHandler);
+            Thread.setDefaultUncaughtExceptionHandler(OriginalDefaultUncaughtExceptionHandler.get());
             uncaughtThrowable.set(null);
             conditionSettings.getExecutorLifecycle().executeNormalCleanupBehavior(executor);
         }
