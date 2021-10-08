@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * Fixed a bug preventing you to specify "fib(-1)" when using the fibonacci poll interval (thanks to Björn Michael for pull request) (issue 201)
+* Avoid memory leak by caching only the original default uncaught exception handler globally (thanks to Oliver Grof for pull request (issue 221)
 
 Changelog 4.1.0 (2021-05-08)
 ----------------------------
