@@ -1,6 +1,6 @@
 ![Awaitility](resources/Awaitility_logo_red_small.png) 
 
-[![Build Status](https://travis-ci.com/awaitility/awaitility.svg?branch=master)](https://travis-ci.com/awaitility/awaitility)
+[![Build Status](https://github.com/awaitility/awaitility/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/awaitility/awaitility/actions/workflows/ci.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.awaitility/awaitility/badge.svg)](https://search.maven.org/#search%7Cgav%7C1%7Cg%3A"org.awaitility"%20AND%20a%3A"awaitility")
 [![Javadoc](https://javadoc-badge.appspot.com/org.awaitility/awaitility.svg)](http://www.javadoc.io/doc/org.awaitility/awaitility)
 

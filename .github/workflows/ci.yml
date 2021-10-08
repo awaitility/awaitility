@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+            - java: '8'
+              maven-profiles: '-P osgi-tests,kotlin'
+            - java: '11'
+              maven-profiles: ''
+
+    runs-on: 'ubuntu-latest'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        java-version: ${{ matrix.java }}
+        distribution: 'zulu'
+        cache: 'maven'
+    - name: Build
+      run: mvn --no-transfer-progress -B clean install ${{ matrix.maven-profiles }}
