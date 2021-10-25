@@ -23,6 +23,7 @@ import org.awaitility.Durations.*
 import org.awaitility.classes.Asynch
 import org.awaitility.classes.FakeRepository
 import org.awaitility.classes.FakeRepositoryImpl
+import org.awaitility.core.ConditionEvaluationListener
 import org.awaitility.core.ConditionTimeoutException
 import org.awaitility.pollinterval.FibonacciPollInterval.fibonacci
 import org.hamcrest.Matchers.*
@@ -112,6 +113,18 @@ class KotlinTest {
         await withPollInterval ONE_HUNDRED_MILLISECONDS ignoreException IllegalArgumentException::class untilAsserted {
             assertThat(fakeRepository.value).isEqualTo(1)
         }
+    }
+
+    @Test
+    fun untilAssertedWithConditionEvaluationListener() {
+        var value = false
+        Asynch(fakeRepository).perform()
+    
+        await withPollInterval ONE_HUNDRED_MILLISECONDS ignoreException IllegalArgumentException::class conditionEvaluationListener ConditionEvaluationListener<Unit> { value = true } untilAsserted {
+            assertThat(fakeRepository.value).isEqualTo(1)
+        }
+
+        assertThat(value).isTrue
     }
 
     @Test

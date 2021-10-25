@@ -7,6 +7,7 @@
 package org.awaitility.kotlin
 
 import org.awaitility.Awaitility
+import org.awaitility.core.ConditionEvaluationListener
 import org.awaitility.core.ConditionFactory
 import org.awaitility.pollinterval.PollInterval
 import org.hamcrest.Matcher
@@ -301,3 +302,12 @@ infix fun ConditionFactory.untilTrue(atomicBoolean: AtomicBoolean) = untilTrue(a
  * @since 3.1.2
  */
 infix fun ConditionFactory.untilFalse(atomicBoolean: AtomicBoolean) = untilFalse(atomicBoolean)
+
+/**
+ * Handle condition evaluation results each time evaluation of a condition occurs. Works only with a Hamcrest matcher-based condition.
+ *
+ * @param conditionEvaluationListener the condition evaluation listener
+ * @return the condition factory
+ * @since 4.1.1
+ */
+infix fun <T> ConditionFactory.conditionEvaluationListener(conditionEvaluationListener : ConditionEvaluationListener<T>) = conditionEvaluationListener(conditionEvaluationListener)
