@@ -1,7 +1,6 @@
-Changelog next version
-----------------------
+Changelog 4.1.1 (2021-10-25)
+----------------------------
 * Fixed a bug preventing you to specify "fib(-1)" when using the fibonacci poll interval (thanks to Björn Michael for pull request) (issue 201)
-* Upgraded to Scala from 2.13.5 to 2.13.6 (thanks to sullis for pull request)
 * Avoid memory leak by caching only the original default uncaught exception handler globally (thanks to Oliver Grof for pull request (issue 221)
 * Added "conditionEvaluationListener" to Kotlin DSL
 
