@@ -1,6 +1,7 @@
 
 package org.awaitility.core;
 
+import org.awaitility.Awaitility;
 import org.junit.Test;
 
 import java.time.Duration;
@@ -48,5 +49,10 @@ public class ConditionAwaiterTest {
         });
 
         assertThat(Thread.getDefaultUncaughtExceptionHandler(), is(originalUncaughtExceptionHandler));
+    }
+
+    @Test
+    public void shouldHandleImmediateResultWithAtMost(){
+        Awaitility.await().atMost(Duration.ofMillis(10)).pollInterval(Duration.ofMillis(5)).until(() -> true);
     }
 }
