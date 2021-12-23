@@ -112,9 +112,9 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
 
                 pollInterval = conditionSettings.getPollInterval().next(pollCount, pollInterval);
                 sleepUninterruptibly(pollInterval.toNanos(), NANOSECONDS);
-                evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStartedNanos);
+                evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStartedNanos, firstSucceedSinceStarted, minWaitTime, holdPredicateWaitTime);
             }
-            evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStartedNanos);
+            evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStartedNanos, firstSucceedSinceStarted, minWaitTime, holdPredicateWaitTime);
             succeededBeforeTimeout = maxWaitTime.compareTo(evaluationDuration) > 0;
         } catch (TimeoutException e) {
             lastResult = new ConditionEvaluationResult(false, null, e);
@@ -239,8 +239,12 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         }
     }
 
-    static Duration calculateConditionEvaluationDuration(Duration pollDelay, long pollingStarted) {
-        final long calculatedDuration = System.nanoTime() - pollingStarted - pollDelay.toNanos();
+    static Duration calculateConditionEvaluationDuration(Duration pollDelay, long pollingStarted, long firstSucceedSinceStarted, Duration minWaitTime, Duration holdPredicateWaitTime) {
+        final long now = System.nanoTime();
+        long calculatedDuration =  now - pollingStarted - pollDelay.toNanos();
+        if(firstSucceedSinceStarted > 0 && minWaitTime.isZero() && holdPredicateWaitTime.isZero()){
+            calculatedDuration = now - firstSucceedSinceStarted;
+        }
         final long potentiallyCompensatedDuration = Math.max(calculatedDuration, 1L);
         return Duration.of(potentiallyCompensatedDuration, NANOS);
     }
