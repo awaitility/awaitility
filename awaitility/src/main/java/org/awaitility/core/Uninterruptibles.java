@@ -128,7 +128,7 @@ class Uninterruptibles {
 
             while (true) {
                 try {
-                    if (!executor.awaitTermination(remainingNanos, unit)) {
+                    if (!executor.awaitTermination(timeout, unit)) {
                         executor.shutdownNow();
                     }
                     break;
