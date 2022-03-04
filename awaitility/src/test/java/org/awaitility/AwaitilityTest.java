@@ -16,12 +16,9 @@
 package org.awaitility;
 
 import org.awaitility.classes.*;
-import org.awaitility.core.ConditionEvaluationListener;
-import org.awaitility.core.ConditionTimeoutException;
-import org.awaitility.core.EvaluatedCondition;
-import org.awaitility.core.ForeverDuration;
-import org.awaitility.core.TimeoutEvent;
+import org.awaitility.core.*;
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.ComparisonFailure;
@@ -189,7 +186,7 @@ public class AwaitilityTest {
 
             @Override
             public void onTimeout(TimeoutEvent timeoutEvent) {
-                assertTrue(timeoutEvent.getRemainingTimeInMS() < 0L);
+                MatcherAssert.assertThat(timeoutEvent.getRemainingTimeInMS(), lessThan(0L));
             }
         };
         await().conditionEvaluationListener(conditionEvaluationListener).atMost(200, TimeUnit.MILLISECONDS).until(value(), equalTo(1));
