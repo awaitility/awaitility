@@ -2,7 +2,6 @@
 
 [![Build Status](https://github.com/awaitility/awaitility/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/awaitility/awaitility/actions/workflows/ci.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.awaitility/awaitility/badge.svg)](https://search.maven.org/#search%7Cgav%7C1%7Cg%3A"org.awaitility"%20AND%20a%3A"awaitility")
-[![Javadoc](https://javadoc-badge.appspot.com/org.awaitility/awaitility.svg)](http://www.javadoc.io/doc/org.awaitility/awaitility)
 
 Testing asynchronous systems is hard. Not only does it require handling threads, timeouts and concurrency issues, but the intent of the test code can be obscured by all these details. Awaitility is a DSL that allows you to express expectations of an asynchronous system in a concise and easy to read manner. For example:
 
@@ -30,7 +29,7 @@ If you're using the Groovy DSL beaware that Groovy has been upgraded from 2.x to
 * [Getting started](https://github.com/awaitility/awaitility/wiki/Getting_started)
 * [Usage Guide](https://github.com/awaitility/awaitility/wiki/Usage)
 * [Downloads](https://github.com/awaitility/awaitility/wiki/Downloads)
-* [Awaitility Javadoc](http://www.javadoc.io/doc/org.awaitility/awaitility/4.1.1)
+* [Awaitility Javadoc](http://www.javadoc.io/doc/org.awaitility/awaitility/4.2.0)
 
 ## Links
 * [Change log](https://github.com/awaitility/awaitility/raw/master/changelog.txt)
