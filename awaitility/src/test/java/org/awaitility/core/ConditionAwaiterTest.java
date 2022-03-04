@@ -18,7 +18,7 @@ public class ConditionAwaiterTest {
      */
     @Test public void
     calculates_a_duration_of_1_nano_when_system_nano_time_is_skewed() {
-        Duration duration = ConditionAwaiter.calculateConditionEvaluationDuration(Duration.ofNanos(10000000L), System.nanoTime());
+        Duration duration = ConditionAwaiter.calculateConditionEvaluationDuration(Duration.ofNanos(10000000L), System.nanoTime(), 0, Duration.ofNanos(0), Duration.ofNanos(0));
 
         assertThat(duration.toNanos(), is(1L));
     }
@@ -48,5 +48,10 @@ public class ConditionAwaiterTest {
         });
 
         assertThat(Thread.getDefaultUncaughtExceptionHandler(), is(originalUncaughtExceptionHandler));
+    }
+
+    @Test
+    public void shouldHandleImmediateResultWithAtMost(){
+        await().atMost(Duration.ofMillis(10)).pollInterval(Duration.ofMillis(5)).until(() -> true);
     }
 }
