@@ -28,7 +28,6 @@ If you're using the Groovy DSL beaware that Groovy has been upgraded from 2.x to
 
 * [Getting started](https://github.com/awaitility/awaitility/wiki/Getting_started)
 * [Usage Guide](https://github.com/awaitility/awaitility/wiki/Usage)
-* [Downloads](https://github.com/awaitility/awaitility/wiki/Downloads)
 * [Awaitility Javadoc](http://www.javadoc.io/doc/org.awaitility/awaitility/4.2.0)
 
 ## Links
