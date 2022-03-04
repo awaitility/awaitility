@@ -1,6 +1,9 @@
 Changelog next version
 ----------------------
-* Fixed a bug in the shutdown behavior of a polling thread. The wrong time unit was used causing executor shutdown to take way more time than expected in cases where it's stuck. Thanks to Claus Näveke for spotting this and for the initial PR!
+* Fixed a bug in the shutdown behavior of a polling thread. The wrong time unit was used causing executor shutdown to take way more time than expected in cases where it's stuck. Thanks to Claus Näveke for spotting this and for the initial PR.
+* Fixed a bug in which condition was not evaluated correctly with small intervals, such as:
+    await().atMost(Duration.ofMillis(10)).pollInterval(Duration.ofMillis(5)).until(..);
+  (issue 224). Thanks to Robby Decosemaeker for PR.
 
 Changelog 4.1.1 (2021-10-25)
 ----------------------------
