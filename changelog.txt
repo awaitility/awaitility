@@ -4,6 +4,7 @@ Changelog next version
 * Fixed a bug in which condition was not evaluated correctly with small intervals, such as:
     await().atMost(Duration.ofMillis(10)).pollInterval(Duration.ofMillis(5)).until(..);
   (issue 224). Thanks to Robby Decosemaeker for PR.
+* Upgraded the awaitility-kotlin module to use kotlin 1.6.10
 
 Changelog 4.1.1 (2021-10-25)
 ----------------------------
