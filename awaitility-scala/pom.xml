@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.awaitility</groupId>
         <artifactId>awaitility-parent</artifactId>
-        <version>4.2.0</version>
+        <version>4.2.1-SNAPSHOT</version>
     </parent>
     <artifactId>awaitility-scala</artifactId>
     <name>Awaitility support for Scala</name>
