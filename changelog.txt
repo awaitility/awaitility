@@ -1,3 +1,7 @@
+Changelog next version
+----------------------
+* Fixed a bug in the shutdown behavior of a polling thread. The wrong time unit was used causing executor shutdown to take way more time than expected in cases where it's stuck. Thanks to Claus Näveke for spotting this and for the initial PR!
+
 Changelog 4.1.1 (2021-10-25)
 ----------------------------
 * Fixed a bug preventing you to specify "fib(-1)" when using the fibonacci poll interval (thanks to Björn Michael for pull request) (issue 201)

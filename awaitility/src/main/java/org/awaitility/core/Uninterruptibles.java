@@ -112,10 +112,10 @@ class Uninterruptibles {
     }
 
     /**
-     * Shuts down an executor service uninterruptibly
+     * Shuts down an executor service uninterruptedly
      * Note that this method is created by Johan Haleby and is thus not covered by the Guava license
      *
-     * @param executor The executor service to shutdown
+     * @param executor The executor service to shut down
      * @param timeout The timeout amount
      * @param unit The time unit
      */
@@ -128,7 +128,7 @@ class Uninterruptibles {
 
             while (true) {
                 try {
-                    if (!executor.awaitTermination(remainingNanos, unit)) {
+                    if (!executor.awaitTermination(remainingNanos, NANOSECONDS)) {
                         executor.shutdownNow();
                     }
                     break;
