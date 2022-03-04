@@ -16,6 +16,9 @@
 package org.awaitility.core;
 
 
+import org.awaitility.core.FailFastCondition.CallableFailFastCondition;
+import org.awaitility.core.FailFastCondition.CallableFailFastCondition.FailFastAssertion;
+
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -177,13 +180,26 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         }
     }
 
-    private void executeFailFastConditionIfDefined() throws Exception {
+    private void executeFailFastConditionIfDefined() throws Throwable {
         FailFastCondition failFastCondition = conditionSettings.getFailFastCondition();
-        if (failFastCondition != null) {
-            Boolean terminalFailureReached = failFastCondition.getFailFastCondition().call();
+        if (failFastCondition == null) {
+            return;
+        }
+
+        if (failFastCondition instanceof CallableFailFastCondition) {
+            CallableFailFastCondition callableFailFastCondition = (CallableFailFastCondition) failFastCondition;
+            Boolean terminalFailureReached = callableFailFastCondition.getFailFastCondition().call();
             if (terminalFailureReached != null && terminalFailureReached) {
-                String failureReason = failFastCondition.getFailFastFailureReason();
+                String failureReason = callableFailFastCondition.getFailFastFailureReason();
                 throw new TerminalFailureException(failureReason);
+            }
+        } else if (failFastCondition instanceof FailFastAssertion) {
+            FailFastAssertion failFastAssertion = (FailFastAssertion) failFastCondition;
+            try {
+                failFastAssertion.getFailFastAssertion().run();
+            } catch (Throwable e) {
+                String failFastFailureReason = failFastAssertion.getFailFastFailureReason();
+                throw new TerminalFailureException(failFastFailureReason == null ? e.getMessage() : failFastFailureReason, e);
             }
         }
     }

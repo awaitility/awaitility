@@ -17,6 +17,8 @@ package org.awaitility.core;
 
 import org.awaitility.constraint.AtMostWaitConstraint;
 import org.awaitility.constraint.WaitConstraint;
+import org.awaitility.core.FailFastCondition.CallableFailFastCondition;
+import org.awaitility.core.FailFastCondition.CallableFailFastCondition.FailFastAssertion;
 import org.awaitility.pollinterval.FixedPollInterval;
 import org.awaitility.pollinterval.PollInterval;
 import org.hamcrest.Description;
@@ -38,8 +40,7 @@ import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.is;
 
 /**
- * A factory for creating {@link org.awaitility.core.Condition} objects. It's not recommended to
- * instantiate this class directly.
+ * A factory for creating {@link org.awaitility.core.Condition} objects. It's not recommended instantiating this class directly.
  */
 public class ConditionFactory {
 
@@ -582,15 +583,15 @@ public class ConditionFactory {
             throw new IllegalArgumentException("failFastCondition cannot be null");
         }
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
-                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, new FailFastCondition(null, failFastCondition));
+                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, new CallableFailFastCondition(null, failFastCondition));
     }
 
     /**
      * If the supplied Callable <i>ever</i> returns false, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
      * Throws a {@link TerminalFailureException} if fail fast condition evaluates to <code>true</code>.
      *
-     * @param failFastCondition The terminal failure condition
-     * @param failFastFailureReason     A descriptive reason why the fail fast condition has failed, will be included in the {@link TerminalFailureException} thrown if <code>failFastCondition</code> evaluates to <code>true</code>.
+     * @param failFastFailureReason A descriptive reason why the fail fast condition has failed, will be included in the {@link TerminalFailureException} thrown if <code>failFastCondition</code> evaluates to <code>true</code>.
+     * @param failFastCondition     The terminal failure condition
      * @return the condition factory
      */
     public ConditionFactory failFast(String failFastFailureReason, Callable<Boolean> failFastCondition) {
@@ -601,7 +602,52 @@ public class ConditionFactory {
         }
 
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
-                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, new FailFastCondition(failFastFailureReason, failFastCondition));
+                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, new CallableFailFastCondition(failFastFailureReason, failFastCondition));
+    }
+
+    /**
+     * If the supplied <code>failFastAssertion</code> <i>ever</i> returns throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * This allows you to use a more descriptive error message of why the fail-fast condition failed by doing e.g.:
+     *
+     * <pre>
+     * Workflow workflow = ..
+     * await()
+     *     .atMost(1, MINUTES)
+     *     .failFast(() ->  assertThat(workflow.get("phase")).describedAs("Workflow failed. Last known state:\n" + workflow.toPrettyString()).isNotEqualTo("Failed");
+     *     .untilAsserted(...);
+     * </pre>
+     *
+     * @param failFastAssertion The terminal failure assertion
+     * @return the condition factory
+     * @see #failFast(String, Callable)
+     */
+    public ConditionFactory failFast(final ThrowingRunnable failFastAssertion) {
+        return failFast(null, failFastAssertion);
+    }
+
+    /**
+     * If the supplied <code>failFastAssertion</code> <i>ever</i> returns throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * This allows you to use a more descriptive error message of why the fail-fast condition failed by doing e.g.:
+     *
+     * <pre>
+     * Workflow workflow = ..
+     * await()
+     *     .atMost(1, MINUTES)
+     *     .failFast("workflow failed", () ->  assertThat(workflow.get("phase")).describedAs("Workflow failed. Last known state:\n" + workflow.toPrettyString()).isNotEqualTo("Failed");
+     *     .untilAsserted(...);
+     * </pre>
+     *
+     * @param failFastFailureReason A descriptive reason why the fail fast condition has failed, will be included in the {@link TerminalFailureException} thrown if <code>failFastAssertion</code> throws an exception.
+     * @param failFastAssertion     The terminal failure assertion
+     * @return the condition factory
+     * @see #failFast(String, Callable)
+     */
+    public ConditionFactory failFast(String failFastFailureReason, final ThrowingRunnable failFastAssertion) {
+        if (failFastAssertion == null) {
+            throw new IllegalArgumentException("failFastAssertion cannot be null");
+        }
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
+                exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, new FailFastAssertion(failFastFailureReason, failFastAssertion));
     }
 
     /**

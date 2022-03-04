@@ -5,6 +5,11 @@ Changelog next version
     await().atMost(Duration.ofMillis(10)).pollInterval(Duration.ofMillis(5)).until(..);
   (issue 224). Thanks to Robby Decosemaeker for PR.
 * Upgraded the awaitility-kotlin module to use kotlin 1.6.10
+* Fail fast conditions can now be specified with assertions. For example:
+
+    await().failFast(() -> assertThat(state).isNotEqualTo("Failed")).until(..);
+
+  (issue 238)
 
 Changelog 4.1.1 (2021-10-25)
 ----------------------------

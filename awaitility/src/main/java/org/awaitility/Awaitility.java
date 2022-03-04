@@ -18,6 +18,8 @@ package org.awaitility;
 import org.awaitility.constraint.AtMostWaitConstraint;
 import org.awaitility.constraint.WaitConstraint;
 import org.awaitility.core.*;
+import org.awaitility.core.FailFastCondition.CallableFailFastCondition;
+import org.awaitility.core.FailFastCondition.CallableFailFastCondition.FailFastAssertion;
 import org.awaitility.pollinterval.FixedPollInterval;
 import org.awaitility.pollinterval.PollInterval;
 import org.hamcrest.Matcher;
@@ -481,7 +483,34 @@ public class Awaitility {
      * @see #setDefaultFailFastCondition(String, Callable)
      */
     public static void setDefaultFailFastCondition(Callable<Boolean> defaultFailFastCondition) {
-        Awaitility.defaultFailFastCondition = new FailFastCondition(null, defaultFailFastCondition);
+        Awaitility.defaultFailFastCondition = new CallableFailFastCondition(null, defaultFailFastCondition);
+    }
+
+    /**
+     * If the supplied <code>failFastAssertion</code> <i>ever</i> returns throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * This allows you to use a more descriptive error message of why the fail-fast condition failed instead of using {@link #setDefaultFailFastCondition(String, Callable)}.
+     *
+     * @param defaultFailFastAssertion The terminal failure assertion
+     * @return the condition factory
+     * @see #setDefaultFailFastCondition(Callable)
+     * @see ConditionFactory#failFast(ThrowingRunnable)
+     */
+    public static void setDefaultFailFastCondition(ThrowingRunnable defaultFailFastAssertion) {
+        setDefaultFailFastCondition(null, defaultFailFastAssertion);
+    }
+
+    /**
+     * If the supplied <code>failFastAssertion</code> <i>ever</i> returns throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * This allows you to use a more descriptive error message of why the fail-fast condition failed instead of using {@link #setDefaultFailFastCondition(String, Callable)}.
+     *
+     * @param failFastFailureReason    A descriptive reason why the fail fast condition has failed, will be included in the {@link TerminalFailureException} thrown if <code>failFastAssertion</code> throws an exception.
+     * @param defaultFailFastAssertion The terminal failure assertion
+     * @return the condition factory
+     * @see #setDefaultFailFastCondition(Callable)
+     * @see ConditionFactory#failFast(ThrowingRunnable)
+     */
+    public static void setDefaultFailFastCondition(String failFastFailureReason, ThrowingRunnable defaultFailFastAssertion) {
+        Awaitility.defaultFailFastCondition = new FailFastAssertion(failFastFailureReason, defaultFailFastAssertion);
     }
 
     /**
@@ -492,7 +521,7 @@ public class Awaitility {
      * @param failFastFailureReason    A descriptive reason why the fail fast condition has failed, will be included in the {@link TerminalFailureException} thrown if <code>failFastCondition</code> evaluates to <code>true</code>.
      */
     public static void setDefaultFailFastCondition(String failFastFailureReason, Callable<Boolean> defaultFailFastCondition) {
-        Awaitility.defaultFailFastCondition = new FailFastCondition(failFastFailureReason, defaultFailFastCondition);
+        Awaitility.defaultFailFastCondition = new CallableFailFastCondition(failFastFailureReason, defaultFailFastCondition);
     }
 
     /**
