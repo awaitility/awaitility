@@ -17,7 +17,7 @@ public void updatesCustomerStatus() {
 ```
 
 ## News
-* 2022-03-04: Awaitility `4.2.0` is released. It allows the use of assertion libaries such as Hamcrest of Assertj in [fail-fast conditions](https://github.com/awaitility/awaitility/wiki/Usage#fail-fast-conditions) as well as various improvements and bug fixes. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
+* 2022-03-04: Awaitility `4.2.0` is released. It allows the use of assertion libaries such as Hamcrest or Assertj in [fail-fast conditions](https://github.com/awaitility/awaitility/wiki/Usage#fail-fast-conditions) as well as various improvements and bug fixes. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2021-10-25: Awaitility `4.1.1` is released. This release includes some bug fixes and small improvements. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2021-05-08: Awaitility `4.1.0` is released. This release includes [fail-fast conditions](https://github.com/awaitility/awaitility/wiki/Usage#fail-fast-conditions) as well as some bug fixes and dependency updates. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 
