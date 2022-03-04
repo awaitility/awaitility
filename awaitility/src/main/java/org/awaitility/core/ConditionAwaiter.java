@@ -241,8 +241,8 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
 
     static Duration calculateConditionEvaluationDuration(Duration pollDelay, long pollingStarted, long firstSucceedSinceStarted, Duration minWaitTime, Duration holdPredicateWaitTime) {
         final long now = System.nanoTime();
-        long calculatedDuration =  now - pollingStarted - pollDelay.toNanos();
-        if(firstSucceedSinceStarted > 0 && minWaitTime.isZero() && holdPredicateWaitTime.isZero()){
+        long calculatedDuration = now - pollingStarted - pollDelay.toNanos();
+        if (firstSucceedSinceStarted > 0 && minWaitTime.isZero() && holdPredicateWaitTime.isZero()) {
             calculatedDuration = now - firstSucceedSinceStarted;
         }
         final long potentiallyCompensatedDuration = Math.max(calculatedDuration, 1L);
