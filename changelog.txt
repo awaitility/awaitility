@@ -1,3 +1,7 @@
+Changelog next version
+----------------------
+* Upgraded Kotlin to 1.6.20
+
 Changelog 4.2.0 (2022-03-04)
 ----------------------------
 * Fixed a bug in the shutdown behavior of a polling thread. The wrong time unit was used causing executor shutdown to take way more time than expected in cases where it's stuck. Thanks to Claus Näveke for spotting this and for the initial PR.
