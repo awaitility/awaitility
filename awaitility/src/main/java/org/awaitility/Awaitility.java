@@ -28,6 +28,7 @@ import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -266,6 +267,7 @@ public class Awaitility {
      * <li>Catch all uncaught exceptions - true</li>
      * <li>Do not ignore caught exceptions</li>
      * <li>Don't handle condition evaluation results</li>
+     * <li>Don't log anything</li>
      * <li>No fail fast condition</li>
      * </ul>
      */
@@ -472,6 +474,39 @@ public class Awaitility {
      */
     public static void setDefaultConditionEvaluationListener(ConditionEvaluationListener defaultConditionEvaluationListener) {
         Awaitility.defaultConditionEvaluationListener = defaultConditionEvaluationListener;
+    }
+
+    /**
+     * Sets the default logging condition evaluation listener that all await statements will use. Method could override
+     * result of usage {@link #setDefaultConditionEvaluationListener(ConditionEvaluationListener)}.
+     *
+     * @param loggingListener logging condition evaluation each time evaluation of a condition occurs.
+     * @see #setDefaultConditionEvaluationListener(ConditionEvaluationListener)
+     */
+    public static void setLoggingListener(ConditionEvaluationListener loggingListener) {
+        Awaitility.defaultConditionEvaluationListener = loggingListener;
+    }
+
+    /**
+     * Sets the default logging condition evaluation listener that all await statements will use. Method could override
+     * result of usage {@link #setDefaultConditionEvaluationListener(ConditionEvaluationListener)} with custom consumer.
+     *
+     * @param logPrinter consumer for condition logging
+     * @see #setDefaultConditionEvaluationListener(ConditionEvaluationListener)
+     */
+    public static void setLogging(Consumer<String> logPrinter) {
+        setLoggingListener(new ConditionEvaluationLogger(logPrinter));
+    }
+
+    /**
+     * Sets the default logging condition evaluation listener that all await statements will use. Method could override
+     * result of usage {@link #setDefaultConditionEvaluationListener(ConditionEvaluationListener)} with logging to
+     * System.out.
+     *
+     * @see #setDefaultConditionEvaluationListener(ConditionEvaluationListener)
+     */
+    public static void setDefaultLogging() {
+        setLoggingListener(new ConditionEvaluationLogger(System.out::println));
     }
 
     /**
