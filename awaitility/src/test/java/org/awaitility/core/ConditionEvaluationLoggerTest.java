@@ -130,10 +130,10 @@ public class ConditionEvaluationLoggerTest {
                 .until(stub::getAndIncrement, is(4));
 
         assertThat(
-                Arrays.asList(outputStreamCaptor.toString().split("\n")),
+                Arrays.asList(outputStreamCaptor.toString().replaceAll("\r", "").split("\n")),
                 everyItem(
                         anyOf(
-                                equalTo("Starting evaluation\r"),
+                                equalTo("Starting evaluation"),
                                 containsString("expected <4> but was"),
                                 containsString("reached its end value of <4>")
                         )
@@ -146,21 +146,21 @@ public class ConditionEvaluationLoggerTest {
      */
     @Test(timeout = 2000)
     public void it_is_possible_to_use_sout_logging_with_Awaitility_static_settings_via_condition_evaluation_logger() {
-        Awaitility.setDefaultLogging();
-
         final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStreamCaptor));
         final AtomicInteger stub = new AtomicInteger(0);
+
+        Awaitility.setDefaultLogging();
 
         await().with()
                 .pollInterval(ONE_HUNDRED_MILLISECONDS)
                 .until(stub::getAndIncrement, is(4));
 
         assertThat(
-                Arrays.asList(outputStreamCaptor.toString().split("\n")),
+                Arrays.asList(outputStreamCaptor.toString().replaceAll("\r", "").split("\n")),
                 everyItem(
                         anyOf(
-                                equalTo("Starting evaluation\r"),
+                                equalTo("Starting evaluation"),
                                 containsString("expected <4> but was"),
                                 containsString("reached its end value of <4>")
                         )
