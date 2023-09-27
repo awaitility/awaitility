@@ -57,7 +57,8 @@
         </developer>
     </developers>
 
-    <scm>
+    <scm child.scm.connection.inherit.append.path="false"
+         child.scm.developerConnection.inherit.append.path="false">
         <url>http://github.com/awaitility/awaitility/tree/${scm.branch}</url>
         <connection>scm:git:git://github.com/awaitility/awaitility.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/awaitility/awaitility.git</developerConnection>
@@ -75,6 +76,7 @@
     </prerequisites>
 
     <properties>
+        <bnd-maven-plugin.version>6.4.0</bnd-maven-plugin.version>
         <hamcrest.version>2.1</hamcrest.version>
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -87,6 +89,8 @@
         <surefire.reportFormat>plain</surefire.reportFormat>
         <surefire.useFile>false</surefire.useFile>
         <surefire.version>3.0.0-M7</surefire.version>
+        <!-- For reproducible builds -->
+        <project.build.outputTimestamp>0</project.build.outputTimestamp>
     </properties>
 
     <modules>
@@ -99,6 +103,11 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>biz.aQute.bnd</groupId>
+                    <artifactId>bnd-maven-plugin</artifactId>
+                    <version>${bnd-maven-plugin.version}</version>
+                </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.1</version>

@@ -22,22 +22,15 @@
 
     <build>
         <plugins>
-            <!-- Warning: maven bundle plugin runs before shade so we need to hand tune the manifest -->
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>4.2.1</version>
-                <configuration>
-                    <obrRepository>NONE</obrRepository>
-                    <instructions>
-                        <_include>-bnd.bnd</_include>
-                    </instructions>
-                </configuration>
+                <groupId>biz.aQute.bnd</groupId>
+                <artifactId>bnd-maven-plugin</artifactId>
+                <extensions>true</extensions>
                 <executions>
                     <execution>
-                        <phase>process-classes</phase>
+                        <id>default-jar</id>
                         <goals>
-                            <goal>manifest</goal>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -48,17 +41,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>default-jar</id>
-                        <configuration>
-                            <archive>
-                                <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-                            </archive>
-                        </configuration>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                    <execution>
+                        <id>default-test-jar</id>
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
