@@ -4,6 +4,32 @@ Changelog next version
 * Added extension property "forever" to the Kotlin extension. This allows you to do:
 
     await.forever until { .. }
+* Added shortcut for enabling logging. Before you had to do e.g.
+
+    await()
+        .with()
+        .conditionEvaluationListener(new ConditionEvaluationLogger(log::info))
+        .pollInterval(ONE_HUNDRED_MILLISECONDS)
+        .until(logs::size, is(4));
+
+    You can now instead use the "logging" shortcut:
+
+    await()
+        .with()
+        .logging(log::info)
+        .pollInterval(ONE_HUNDRED_MILLISECONDS)
+        .until(logs::size, is(4));
+
+    or simply ".logging()" for "System.out".
+
+    This shortcut has also been added globally:
+
+    Awaitility.setLogging(log::info);
+
+    or
+
+    Awaitility.setDefaultLogging();
+
 
 Changelog 4.2.0 (2022-03-04)
 ----------------------------
