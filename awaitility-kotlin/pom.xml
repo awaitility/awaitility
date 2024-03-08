@@ -27,7 +27,7 @@
 
     <properties>
         <kotlin.version>1.9.22</kotlin.version>
-        <dokka.version>1.9.22</dokka.version>
+        <dokka.version>1.9.20</dokka.version>
     </properties>
 
     <dependencies>

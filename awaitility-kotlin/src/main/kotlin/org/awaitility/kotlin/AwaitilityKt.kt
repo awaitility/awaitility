@@ -174,6 +174,18 @@ infix fun ConditionFactory.atMost(duration: Duration): ConditionFactory = atMost
 infix fun ConditionFactory.atLeast(timeout: Duration): ConditionFactory = atLeast(timeout)
 
 /**
+ * Await forever until the condition is satisfied. Caution: You can block
+ * subsequent tests and the entire build can hang indefinitely, it's
+ * recommended to always use a timeout.
+ *
+ * @return the condition factory
+ * @since 4.2.1
+ */
+
+val ConditionFactory.forever: ConditionFactory
+    get() = forever()
+
+/**
  * Start building a named await statement. This is useful is cases when you
  * have several awaits in your test and you need to tell them apart. If a
  * named await timeout's the <code>alias</code> will be displayed indicating
@@ -310,4 +322,4 @@ infix fun ConditionFactory.untilFalse(atomicBoolean: AtomicBoolean) = untilFalse
  * @return the condition factory
  * @since 4.1.1
  */
-infix fun <T> ConditionFactory.conditionEvaluationListener(conditionEvaluationListener : ConditionEvaluationListener<T>) = conditionEvaluationListener(conditionEvaluationListener)
+infix fun <T> ConditionFactory.conditionEvaluationListener(conditionEvaluationListener: ConditionEvaluationListener<T>) = conditionEvaluationListener(conditionEvaluationListener)

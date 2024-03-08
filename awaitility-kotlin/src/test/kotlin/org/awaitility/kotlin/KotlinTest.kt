@@ -58,6 +58,12 @@ class KotlinTest {
     }
 
     @Test
+    fun forever() {
+        Asynch(fakeRepository).perform()
+        await.forever until  { fakeRepository.value == 1 }
+    }
+
+    @Test
     fun assertionCondition() {
         Asynch(fakeRepository).perform()
         await().untilAsserted { assertEquals(1, fakeRepository.value) }

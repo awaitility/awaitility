@@ -1,6 +1,9 @@
 Changelog next version
 ----------------------
 * Upgraded Kotlin to 1.9.22
+* Added extension property "forever" to the Kotlin extension. This allows you to do:
+
+    await.forever until { .. }
 
 Changelog 4.2.0 (2022-03-04)
 ----------------------------
