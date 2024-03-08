@@ -31,6 +31,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -132,6 +133,26 @@ public class ConditionFactory {
     public ConditionFactory conditionEvaluationListener(ConditionEvaluationListener conditionEvaluationListener) {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
                 exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
+    }
+
+    /**
+     * Logging condition evaluation results each time evaluation of a condition occurs to System.out.
+     *
+     * @return the condition factory
+     */
+    public ConditionFactory logging() {
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
+                exceptionsIgnorer, new ConditionEvaluationLogger(), executorLifecycle, failFastCondition);
+    }
+
+    /**
+     * Logging condition evaluation results each time evaluation of a condition occurs to chosen consumer.
+     *
+     * @return the condition factory
+     */
+    public ConditionFactory logging(Consumer<String> logPrinter) {
+        return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
+                exceptionsIgnorer, new ConditionEvaluationLogger(logPrinter), executorLifecycle, failFastCondition);
     }
 
     /**
