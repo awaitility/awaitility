@@ -1,6 +1,6 @@
 Changelog next version
 ----------------------
-* Upgraded Kotlin to 1.6.20
+* Upgraded Kotlin to 1.9.22
 
 Changelog 4.2.0 (2022-03-04)
 ----------------------------
