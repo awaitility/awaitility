@@ -1,7 +1,7 @@
 Changelog next version
 ----------------------
 * Upgraded Kotlin to 1.9.22
-* Added extension property "forever" to the Kotlin extension. This allows you to do:
+* Added extension properties forever, then, and, given to the Kotlin extension. This allows you to do e.g.:
 
     await.forever until { .. }
 * Added shortcut for enabling logging. Before you had to do e.g.

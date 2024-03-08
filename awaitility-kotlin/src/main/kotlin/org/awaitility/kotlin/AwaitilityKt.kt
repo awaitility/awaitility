@@ -185,6 +185,47 @@ infix fun ConditionFactory.atLeast(timeout: Duration): ConditionFactory = atLeas
 val ConditionFactory.forever: ConditionFactory
     get() = forever()
 
+
+/**
+ * A method to increase the readability of the Awaitility DSL. It simply returns the same condition factory instance.
+ *
+ * @return the condition factory
+ * @since 4.2.1
+ */
+
+val ConditionFactory.with: ConditionFactory
+    get() = with()
+
+/**
+ * A method to increase the readability of the Awaitility DSL. It simply returns the same condition factory instance.
+ *
+ * @return the condition factory
+ * @since 4.2.1
+ */
+
+val ConditionFactory.given: ConditionFactory
+    get() = given()
+
+/**
+ * A method to increase the readability of the Awaitility DSL. It simply returns the same condition factory instance.
+ *
+ * @return the condition factory
+ * @since 4.2.1
+ */
+
+val ConditionFactory.then: ConditionFactory
+    get() = then()
+
+/**
+ * A method to increase the readability of the Awaitility DSL. It simply returns the same condition factory instance.
+ *
+ * @return the condition factory
+ * @since 4.2.1
+ */
+
+val ConditionFactory.and: ConditionFactory
+    get() = and()
+
 /**
  * Start building a named await statement. This is useful is cases when you
  * have several awaits in your test and you need to tell them apart. If a
@@ -323,3 +364,11 @@ infix fun ConditionFactory.untilFalse(atomicBoolean: AtomicBoolean) = untilFalse
  * @since 4.1.1
  */
 infix fun <T> ConditionFactory.conditionEvaluationListener(conditionEvaluationListener: ConditionEvaluationListener<T>) = conditionEvaluationListener(conditionEvaluationListener)
+
+/**
+ * Logging condition evaluation results each time evaluation of a condition occurs to chosen consumer.
+ *
+ * @return the condition factory
+ * @since 4.2.1
+ */
+infix fun ConditionFactory.logging(logPrinter: (String) -> Unit) = logging(logPrinter)
