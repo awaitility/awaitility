@@ -29,7 +29,8 @@ Changelog next version
     or
 
     Awaitility.setDefaultLogging();
-
+* Improved lambda detection for Java 17 and Java 21
+* Upgraded Groovy to 
 
 Changelog 4.2.0 (2022-03-04)
 ----------------------------
