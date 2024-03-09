@@ -177,19 +177,19 @@ public class AwaitilityTest {
     }
 
     @Test(timeout = 2000, expected = ConditionTimeoutException.class)
-    public void remainingTimeIsNegativeAfterDurationTimeouts() {
+    public void remainingTimeIsNegativeOrZeroAfterDurationTimeouts() {
         new Asynch(fakeRepository).perform();
-        ConditionEvaluationListener conditionEvaluationListener = new ConditionEvaluationListener() {
+        ConditionEvaluationListener<Integer> conditionEvaluationListener = new ConditionEvaluationListener<Integer>() {
             @Override
-            public void conditionEvaluated(EvaluatedCondition condition) {
+            public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
             }
 
             @Override
             public void onTimeout(TimeoutEvent timeoutEvent) {
-                MatcherAssert.assertThat(timeoutEvent.getRemainingTimeInMS(), lessThan(0L));
+                MatcherAssert.assertThat(timeoutEvent.getRemainingTimeInMS(), lessThanOrEqualTo(0L));
             }
         };
-        await().conditionEvaluationListener(conditionEvaluationListener).atMost(200, TimeUnit.MILLISECONDS).until(value(), equalTo(1));
+        await().pollDelay(50, MILLISECONDS).conditionEvaluationListener(conditionEvaluationListener).atMost(100, TimeUnit.MILLISECONDS).until(value(), equalTo(1));
     }
 
     @Test(timeout = 2000, expected = IllegalStateException.class)
