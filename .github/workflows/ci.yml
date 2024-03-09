@@ -17,8 +17,6 @@ jobs:
               maven-profiles: '-P osgi-tests,kotlin'
             - java: '11'
               maven-profiles: ''
-            - java: '21'
-              maven-profiles: ''
 
     runs-on: 'ubuntu-latest'
     steps:
