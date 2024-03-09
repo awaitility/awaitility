@@ -18,9 +18,9 @@ jobs:
             - java: '11'
               maven-profiles: ''
             - java: '17'
-              maven-profiles: ''
+              maven-profiles: '-P modern-jvm'
             - java: '21'
-              maven-profiles: ''
+              maven-profiles: '-P modern-jvm'
 
     runs-on: 'ubuntu-latest'
     steps:
