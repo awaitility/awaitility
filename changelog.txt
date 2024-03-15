@@ -1,5 +1,5 @@
-Changelog next version
-----------------------
+Changelog 4.2.1 (2024-03-15)
+----------------------------
 * Upgraded Kotlin to 1.9.22
 * Added extension properties forever, then, and, given to the Kotlin extension. This allows you to do e.g.:
 
