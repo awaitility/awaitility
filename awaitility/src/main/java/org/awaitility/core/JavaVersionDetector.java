@@ -14,6 +14,8 @@ public final class JavaVersionDetector {
             normalizedJavaVersion = "8";
         } else if (javaVersion.startsWith("1.")) {
             normalizedJavaVersion = javaVersion.substring(2, 3);
+        } else if (javaVersion.endsWith("-ea")) {
+            normalizedJavaVersion = javaVersion.substring(0, javaVersion.length() - 3);
         } else {
             int dot = javaVersion.indexOf(".");
             if (dot != -1) {
