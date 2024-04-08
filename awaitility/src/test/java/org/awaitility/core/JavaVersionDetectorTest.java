@@ -3,7 +3,7 @@ package org.awaitility.core;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 
 public class JavaVersionDetectorTest {
 
@@ -69,7 +69,18 @@ public class JavaVersionDetectorTest {
 
     @Test
     public void javaVersionFor23ea() {
+        /*
+        OpenJDK EA reports java.version with ea suffix
+         */
         assertThat(JavaVersionDetector.getJavaMajorVersion("23-ea"), equalTo(23));
+    }
+
+    @Test
+    public void javaVersionFor23beta() {
+        /*
+        Temurin JDK EA reports java.version with beta suffix
+         */
+        assertThat(JavaVersionDetector.getJavaMajorVersion("23-beta"), equalTo(23));
     }
 
 }
