@@ -1,3 +1,7 @@
+Changelog 4.2.2 (2024-08-07)
+----------------------------
+* Support JDK EA builds in JavaVersionDetector (thanks to Oleg Estekhin for pull request)
+
 Changelog 4.2.1 (2024-03-15)
 ----------------------------
 * Upgraded Kotlin to 1.9.22
