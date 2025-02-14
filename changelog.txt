@@ -1,3 +1,7 @@
+Changelog next version
+----------------------
+* Support for kotlin.time.Duration in Kotlin DSL (thanks to Ivo Šmíd for PR)
+
 Changelog 4.2.2 (2024-08-07)
 ----------------------------
 * Support JDK EA builds in JavaVersionDetector (thanks to Oleg Estekhin for pull request)
