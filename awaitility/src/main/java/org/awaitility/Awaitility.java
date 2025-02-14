@@ -390,6 +390,15 @@ public class Awaitility {
     }
 
     /**
+     * Gets the default poll interval that all await statements will use
+     *
+     * @return the poll interval
+     */
+    public static PollInterval getDefaultPollInterval() {
+        return defaultPollInterval;
+    }
+
+    /**
      * Sets the default poll interval that all await statements will use.
      *
      * @param pollInterval the poll interval
@@ -397,38 +406,6 @@ public class Awaitility {
      */
     public static void setDefaultPollInterval(long pollInterval, TimeUnit unit) {
         defaultPollInterval = new FixedPollInterval(DurationFactory.of(pollInterval, unit));
-    }
-
-    /**
-     * Sets the default poll delay all await statements will use.
-     *
-     * @param pollDelay the poll delay
-     * @param unit      the unit
-     */
-    public static void setDefaultPollDelay(long pollDelay, TimeUnit unit) {
-        defaultPollDelay = DurationFactory.of(pollDelay, unit);
-    }
-
-    /**
-     * Sets the default timeout all await statements will use.
-     *
-     * @param timeout the timeout
-     * @param unit    the unit
-     */
-    public static void setDefaultTimeout(long timeout, TimeUnit unit) {
-        defaultWaitConstraint = defaultWaitConstraint.withMaxWaitTime(DurationFactory.of(timeout, unit));
-    }
-
-    /**
-     * Sets the default poll interval that all await statements will use.
-     *
-     * @param pollInterval the new default poll interval
-     */
-    public static void setDefaultPollInterval(Duration pollInterval) {
-        if (pollInterval == null) {
-            throw new IllegalArgumentException("You must specify a poll interval (was null).");
-        }
-        defaultPollInterval = new FixedPollInterval(pollInterval);
     }
 
     /**
@@ -444,6 +421,37 @@ public class Awaitility {
     }
 
     /**
+     * Sets the default poll interval that all await statements will use.
+     *
+     * @param pollInterval the new default poll interval
+     */
+    public static void setDefaultPollInterval(Duration pollInterval) {
+        if (pollInterval == null) {
+            throw new IllegalArgumentException("You must specify a poll interval (was null).");
+        }
+        defaultPollInterval = new FixedPollInterval(pollInterval);
+    }
+
+    /**
+     * Gets the default poll delay all await statements will use.
+     *
+     * @return the poll delay
+     */
+    public Duration getDefaultPollDelay() {
+        return defaultPollDelay;
+    }
+
+    /**
+     * Sets the default poll delay all await statements will use.
+     *
+     * @param pollDelay the poll delay
+     * @param unit      the unit
+     */
+    public static void setDefaultPollDelay(long pollDelay, TimeUnit unit) {
+        defaultPollDelay = DurationFactory.of(pollDelay, unit);
+    }
+
+    /**
      * Sets the default poll delay that all await statements will use.
      *
      * @param pollDelay the new default poll delay
@@ -453,6 +461,25 @@ public class Awaitility {
             throw new IllegalArgumentException("You must specify a poll delay (was null).");
         }
         defaultPollDelay = pollDelay;
+    }
+
+    /**
+     * Gets the default timeout all await statements will use.
+     *
+     * @return the timeout
+     */
+    public WaitConstraint getDefaultTimeout() {
+        return defaultWaitConstraint;
+    }
+
+    /**
+     * Sets the default timeout all await statements will use.
+     *
+     * @param timeout the timeout
+     * @param unit    the unit
+     */
+    public static void setDefaultTimeout(long timeout, TimeUnit unit) {
+        defaultWaitConstraint = defaultWaitConstraint.withMaxWaitTime(DurationFactory.of(timeout, unit));
     }
 
     /**
