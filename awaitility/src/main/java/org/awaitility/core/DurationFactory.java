@@ -49,6 +49,18 @@ public class DurationFactory {
             default:
                 throw new IllegalStateException("Cannot convert " + TimeUnit.class.getSimpleName() + " to a " + ChronoUnit.class.getSimpleName());
         }
-        return Duration.of(amount, chronoUnit);
+
+        Duration duration = Duration.of(amount, chronoUnit);
+        checkThatDurationCanBeConvertedToNanos(duration, amount, timeUnit);
+        return duration;
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private static void checkThatDurationCanBeConvertedToNanos(Duration timeout, long amount, TimeUnit timeUnit) {
+        try {
+            timeout.toNanos();
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException(String.format("Cannot convert %s %s to nanoseconds, as required by Awaitility, because this value is too large", amount, timeUnit), e);
+        }
     }
 }

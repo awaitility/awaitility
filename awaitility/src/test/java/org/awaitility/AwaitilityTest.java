@@ -503,6 +503,15 @@ public class AwaitilityTest {
         assertThat(duration.toMillis(), greaterThan(1000L));
     }
 
+    @Test
+    public void throwsIAEWhenTimeoutIsTooLargeForTheUnit() {
+        int timeoutMinutes = Integer.MAX_VALUE;
+        exception.expect(IllegalArgumentException.class);
+        exception.expectMessage("Cannot convert " + timeoutMinutes + " MINUTES to nanoseconds, as required by Awaitility, because this value is too large");
+
+        Awaitility.await().atMost(timeoutMinutes, TimeUnit.MINUTES).until(() -> true);
+    }
+
     private Callable<Boolean> fakeRepositoryValueEqualsOne() {
         return new FakeRepositoryEqualsOne(fakeRepository);
     }
