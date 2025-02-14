@@ -1,6 +1,7 @@
 Changelog next version
 ----------------------
 * Support for kotlin.time.Duration in Kotlin DSL (thanks to Ivo Šmíd for PR)
+* Upgraded kotlin version in the awaitility-kotlin module to 2.1.10
 
 Changelog 4.2.2 (2024-08-07)
 ----------------------------
