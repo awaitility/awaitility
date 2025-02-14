@@ -17,6 +17,7 @@ import java.time.Duration
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KClass
+import kotlin.time.toJavaDuration
 
 /**
  * This is typically the starting point of the Kotlin "DSL". Allows you to write `await` instead of `await()`. For example:
@@ -165,6 +166,15 @@ infix fun ConditionFactory.untilAsserted(fn: () -> Unit): Unit = untilAsserted(f
 infix fun ConditionFactory.atMost(duration: Duration): ConditionFactory = atMost(duration)
 
 /**
+ * Await at most `timeout` before throwing a timeout exception.
+ *
+ * @param duration the duration
+ * @return the condition factory
+ * @since 4.2.3
+ */
+infix fun ConditionFactory.atMost(duration: kotlin.time.Duration): ConditionFactory = atMost(duration.toJavaDuration())
+
+/**
  * Condition has to be evaluated not earlier than `timeout` before throwing a timeout exception.
  *
  * @param timeout the timeout
@@ -172,6 +182,15 @@ infix fun ConditionFactory.atMost(duration: Duration): ConditionFactory = atMost
  * @since 3.1.2
  */
 infix fun ConditionFactory.atLeast(timeout: Duration): ConditionFactory = atLeast(timeout)
+
+/**
+ * Condition has to be evaluated not earlier than `timeout` before throwing a timeout exception.
+ *
+ * @param timeout the timeout
+ * @return the condition factory
+ * @since 4.2.3
+ */
+infix fun ConditionFactory.atLeast(timeout: kotlin.time.Duration): ConditionFactory = atLeast(timeout.toJavaDuration())
 
 /**
  * Await forever until the condition is satisfied. Caution: You can block
@@ -250,6 +269,17 @@ infix fun ConditionFactory.withAlias(alias: String): ConditionFactory = alias(al
 infix fun ConditionFactory.withPollDelay(pollDelay: Duration): ConditionFactory = pollDelay(pollDelay)
 
 /**
+ * Specify the delay that will be used before Awaitility starts polling for
+ * the result the first time. If you don't specify a poll delay explicitly
+ * it'll be the same as the poll interval.
+ *
+ * @param pollDelay the poll delay
+ * @return the condition factory
+ * @since 4.2.3
+ */
+infix fun ConditionFactory.withPollDelay(pollDelay: kotlin.time.Duration): ConditionFactory = withPollDelay(pollDelay.toJavaDuration())
+
+/**
  * Specify the polling interval Awaitility will use for this await
  * statement. This means the frequency in which the condition is checked for
  * completion.
@@ -260,6 +290,18 @@ infix fun ConditionFactory.withPollDelay(pollDelay: Duration): ConditionFactory 
  * @see [ConditionFactory.pollInterval]
  */
 infix fun ConditionFactory.withPollInterval(pollInterval: Duration): ConditionFactory = pollInterval(pollInterval)
+
+/**
+ * Specify the polling interval Awaitility will use for this await
+ * statement. This means the frequency in which the condition is checked for
+ * completion.
+ *
+ * @param pollInterval the poll interval
+ * @return the condition factory
+ * @since 4.2.3
+ * @see [ConditionFactory.pollInterval]
+ */
+infix fun ConditionFactory.withPollInterval(pollInterval: kotlin.time.Duration): ConditionFactory = withPollInterval(pollInterval.toJavaDuration())
 
 /**
  * Specify the polling interval Awaitility will use for this await
@@ -372,3 +414,21 @@ infix fun <T> ConditionFactory.conditionEvaluationListener(conditionEvaluationLi
  * @since 4.2.1
  */
 infix fun ConditionFactory.logging(logPrinter: (String) -> Unit) = logging(logPrinter)
+
+/**
+ * Await at the predicate holds during at least <code>timeout</code>
+ *
+ * @param timeout the timeout
+ * @return the condition factory
+ * @since 4.2.3
+ */
+infix fun ConditionFactory.during(duration: Duration): ConditionFactory = during(duration)
+
+/**
+ * Await at the predicate holds during at least <code>timeout</code>
+ *
+ * @param timeout the timeout
+ * @return the condition factory
+ * @since 4.2.3
+ */
+infix fun ConditionFactory.during(duration: kotlin.time.Duration): ConditionFactory = during(duration.toJavaDuration())

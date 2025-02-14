@@ -35,6 +35,11 @@ import org.junit.rules.ExpectedException
 import java.time.Duration
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.system.measureTimeMillis
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class KotlinTest {
 
@@ -125,7 +130,7 @@ class KotlinTest {
     fun untilAssertedWithConditionEvaluationListener() {
         var value = false
         Asynch(fakeRepository).perform()
-    
+
         await withPollInterval ONE_HUNDRED_MILLISECONDS ignoreException IllegalArgumentException::class conditionEvaluationListener ConditionEvaluationListener<Unit> { value = true } untilAsserted {
             assertThat(fakeRepository.value).isEqualTo(1)
         }
@@ -181,6 +186,56 @@ class KotlinTest {
             state == "After"
         }
         assertThat(data.state).isEqualTo("After")
+    }
+
+    @Test
+    fun atMostWithKotlinDuration() {
+        await() atMost 1.seconds untilNull { null }
+    }
+
+    @Test
+    fun atLeastWithKotlinDuration() {
+        await() atLeast 1.seconds untilNull {
+            Thread.sleep((1.seconds + 500.milliseconds).inWholeMilliseconds)
+            null
+        }
+    }
+
+    @Test
+    fun withPollDelayAndWithPollIntervalWithKotlinDuration() {
+        val ref = AtomicReference("value")
+
+        Thread() {
+            Thread.sleep((1.seconds + 500.milliseconds).inWholeMilliseconds)
+            ref.set(null)
+        }.start()
+
+        val count = AtomicInteger()
+        await() withPollDelay 1.seconds withPollInterval 100.milliseconds untilNull {
+            count.incrementAndGet()
+            ref.get()
+        }
+        // Mathematically we have 100ms in 500ms 5 times,
+        // invocation count should be 5 times -> safe assertion interval of invocation is [4, 6] times
+        assertThat(count).hasValueBetween(4, 6)
+    }
+
+    @Test(timeout = 2000)
+    fun awaitDuringTimeOnCondition() {
+        val duration = measureTimeMillis {
+            await() during ONE_SECOND until { true }
+        }
+
+        assertThat(duration).isGreaterThan(1000)
+    }
+
+    @Test(timeout = 2000)
+    fun awaitDuringTimeOnConditionWithKotlinDuration() {
+        val duration = measureTimeMillis {
+            await() during 1.seconds until { true }
+        }
+
+        assertThat(duration).isGreaterThan(1000)
     }
 }
 
