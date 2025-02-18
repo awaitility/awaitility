@@ -26,7 +26,7 @@
     <groupId>org.awaitility</groupId>
     <artifactId>awaitility-parent</artifactId>
     <packaging>pom</packaging>
-    <version>4.2.1-SNAPSHOT</version>
+    <version>4.2.3-SNAPSHOT</version>
 
     <url>http://github.com/awaitility/awaitility</url>
     <name>Awaitility Parent POM</name>
@@ -88,7 +88,7 @@
         <slf4j.version>1.8.0-beta4</slf4j.version>
         <surefire.reportFormat>plain</surefire.reportFormat>
         <surefire.useFile>false</surefire.useFile>
-        <surefire.version>3.0.0-M7</surefire.version>
+        <surefire.version>3.2.5</surefire.version>
         <!-- For reproducible builds -->
         <project.build.outputTimestamp>0</project.build.outputTimestamp>
     </properties>
@@ -244,6 +244,23 @@
             <modules>
                 <module>awaitility-osgi-test</module>
             </modules>
+        </profile>
+        <profile>
+            <id>modern-jvm</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>${surefire.version}</version>
+                        <configuration>
+                            <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+
+
         </profile>
         <profile>
             <id>release</id>

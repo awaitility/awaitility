@@ -18,10 +18,7 @@ package org.awaitility;
 import org.awaitility.core.ForeverDuration;
 
 import java.time.Duration;
-
-import static java.time.temporal.ChronoUnit.MILLIS;
-import static java.time.temporal.ChronoUnit.SECONDS;
-
+import java.time.temporal.ChronoUnit;
 
 /**
  * <p>Duration class.</p>
@@ -31,56 +28,56 @@ public final class Durations {
     /**
      * Constant <code>FOREVER</code>
      */
-    public static final Duration FOREVER = ForeverDuration.FOREVER;
+    public static final Duration FOREVER = ChronoUnit.FOREVER.getDuration();
 
     /**
      * Constant <code>ONE_MILLISECOND</code>
      */
-    public static final Duration ONE_MILLISECOND = Duration.of(1, MILLIS);
+    public static final Duration ONE_MILLISECOND = Duration.ofMillis(1);
 
     /**
      * Constant <code>ONE_HUNDRED_MILLISECONDS</code>
      */
-    public static final Duration ONE_HUNDRED_MILLISECONDS = Duration.of(100, MILLIS);
+    public static final Duration ONE_HUNDRED_MILLISECONDS = Duration.ofMillis(100);
     /**
      * Constant <code>TWO_HUNDRED_MILLISECONDS</code>
      */
-    public static final Duration TWO_HUNDRED_MILLISECONDS = Duration.of(200, MILLIS);
+    public static final Duration TWO_HUNDRED_MILLISECONDS = Duration.ofMillis(200);
     /**
      * Constant <code>FIVE_HUNDRED_MILLISECONDS</code>
      */
-    public static final Duration FIVE_HUNDRED_MILLISECONDS = Duration.of(500, MILLIS);
+    public static final Duration FIVE_HUNDRED_MILLISECONDS = Duration.ofMillis(500);
     /**
      * Constant <code>ONE_SECOND</code>
      */
-    public static final Duration ONE_SECOND = Duration.of(1, SECONDS);
+    public static final Duration ONE_SECOND = Duration.ofSeconds(1);
     /**
      * Constant <code>TWO_SECONDS</code>
      */
-    public static final Duration TWO_SECONDS = Duration.of(2, SECONDS);
+    public static final Duration TWO_SECONDS = Duration.ofSeconds(2);
     /**
      * Constant <code>FIVE_SECONDS</code>
      */
-    public static final Duration FIVE_SECONDS = Duration.of(5, SECONDS);
+    public static final Duration FIVE_SECONDS = Duration.ofSeconds(5);
     /**
      * Constant <code>TEN_SECONDS</code>
      */
-    public static final Duration TEN_SECONDS = Duration.of(10, SECONDS);
+    public static final Duration TEN_SECONDS = Duration.ofSeconds(10);
     /**
      * Constant <code>ONE_MINUTE</code>
      */
-    public static final Duration ONE_MINUTE = Duration.of(60, SECONDS);
+    public static final Duration ONE_MINUTE = Duration.ofMinutes(1);
     /**
      * Constant <code>TWO_MINUTES</code>
      */
-    public static final Duration TWO_MINUTES = Duration.of(120, SECONDS);
+    public static final Duration TWO_MINUTES = Duration.ofMinutes(2);
     /**
      * Constant <code>FIVE_MINUTES</code>
      */
-    public static final Duration FIVE_MINUTES = Duration.of(300, SECONDS);
+    public static final Duration FIVE_MINUTES = Duration.ofMinutes(5);
     /**
      * Constant <code>TEN_MINUTES</code>
      */
-    public static final Duration TEN_MINUTES = Duration.of(600, SECONDS);
+    public static final Duration TEN_MINUTES = Duration.ofMinutes(10);
 
 }

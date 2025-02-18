@@ -22,17 +22,19 @@ import java.lang.reflect.Method;
  */
 class LambdaErrorMessageGenerator {
 
-    private static final String LAMBDA_CLASS_NAME = "$$Lambda$";
+    private static final String BEFORE_JAVA_21_LAMBDA_CLASS_NAME = "$$Lambda$";
+    private static final String JAVA_21_LAMBDA_CLASS_NAME = "$$Lambda/";
     private static final String LAMBDA_METHOD_NAME = "$Lambda";
 
-
     static boolean isLambdaClass(Class<?> cls) {
-        return cls.getSimpleName().contains(LAMBDA_CLASS_NAME);
+        String lambdaDetectionClassName = getLambdaDetectionClassName();
+        return cls.getSimpleName().contains(lambdaDetectionClassName);
     }
 
     static String generateLambdaErrorMessagePrefix(Class<?> lambdaClass, boolean firstLetterLowerCaseAndEndWithColon) {
         String name = lambdaClass.getName();
-        int indexOfLambda = name.indexOf(LAMBDA_CLASS_NAME);
+        String lambdaDetectionClassName = getLambdaDetectionClassName();
+        int indexOfLambda = name.indexOf(lambdaDetectionClassName);
         String nameWithoutLambda = name.substring(0, indexOfLambda);
         nameWithoutLambda = addLambdaDetailsIfFound(lambdaClass, nameWithoutLambda, firstLetterLowerCaseAndEndWithColon);
         return nameWithoutLambda;
@@ -48,7 +50,10 @@ class LambdaErrorMessageGenerator {
                 break;
             }
         }
-        if (lambdaMethod != null) {
+
+        if (lambdaMethod == null) {
+            nameToReturn = "Lambda expression in " + nameWithoutLambda;
+        } else {
             Class<?>[] lambdaParams = lambdaMethod.getParameterTypes();
             if (lambdaParams.length > 0) {
                 StringBuilder nameToReturnBuilder = new StringBuilder(firstLetterUpperCaseAndEndWithColon ? "L" : "l")
@@ -75,5 +80,14 @@ class LambdaErrorMessageGenerator {
             }
         }
         return nameToReturn;
+    }
+
+    private static String getLambdaDetectionClassName() {
+        int javaVersion = JavaVersionDetector.getJavaMajorVersion();
+        if (javaVersion >= 21) {
+            return JAVA_21_LAMBDA_CLASS_NAME;
+        } else {
+            return BEFORE_JAVA_21_LAMBDA_CLASS_NAME;
+        }
     }
 }

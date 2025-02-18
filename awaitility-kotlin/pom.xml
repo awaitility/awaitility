@@ -19,15 +19,15 @@
     <parent>
         <groupId>org.awaitility</groupId>
         <artifactId>awaitility-parent</artifactId>
-        <version>4.2.1-SNAPSHOT</version>
+        <version>4.2.3-SNAPSHOT</version>
     </parent>
     <artifactId>awaitility-kotlin</artifactId>
     <name>Awaitility support for Kotlin</name>
     <description>Simplifies Awaitility usage from Kotlin</description>
 
     <properties>
-        <kotlin.version>1.6.20</kotlin.version>
-        <dokka.version>1.6.10</dokka.version>
+        <kotlin.version>2.1.10</kotlin.version>
+        <dokka.version>2.0.0</dokka.version>
     </properties>
 
     <dependencies>

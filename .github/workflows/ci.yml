@@ -17,12 +17,16 @@ jobs:
               maven-profiles: '-P osgi-tests,kotlin'
             - java: '11'
               maven-profiles: ''
+            - java: '17'
+              maven-profiles: '-P modern-jvm'
+            - java: '21'
+              maven-profiles: '-P modern-jvm'
 
     runs-on: 'ubuntu-latest'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@main
     - name: Set up JDK
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@main
       with:
         java-version: ${{ matrix.java }}
         distribution: 'zulu'

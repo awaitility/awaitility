@@ -1,6 +1,46 @@
 Changelog next version
 ----------------------
-* Upgraded Kotlin to 1.6.20
+* Support for kotlin.time.Duration in Kotlin DSL (thanks to Ivo Šmíd for PR)
+* Upgraded kotlin version in the awaitility-kotlin module to 2.1.10
+* Using a more descriptive error message when using VERY long wait conditions or poll durations (issue 290)
+
+Changelog 4.2.2 (2024-08-07)
+----------------------------
+* Support JDK EA builds in JavaVersionDetector (thanks to Oleg Estekhin for pull request)
+
+Changelog 4.2.1 (2024-03-15)
+----------------------------
+* Upgraded Kotlin to 1.9.22
+* Added extension properties forever, then, and, given to the Kotlin extension. This allows you to do e.g.:
+
+    await.forever until { .. }
+* Added shortcut for enabling logging. Before you had to do e.g.
+
+    await()
+        .with()
+        .conditionEvaluationListener(new ConditionEvaluationLogger(log::info))
+        .pollInterval(ONE_HUNDRED_MILLISECONDS)
+        .until(logs::size, is(4));
+
+    You can now instead use the "logging" shortcut:
+
+    await()
+        .with()
+        .logging(log::info)
+        .pollInterval(ONE_HUNDRED_MILLISECONDS)
+        .until(logs::size, is(4));
+
+    or simply ".logging()" for "System.out".
+
+    This shortcut has also been added globally:
+
+    Awaitility.setLogging(log::info);
+
+    or
+
+    Awaitility.setDefaultLogging();
+* Improved lambda detection for Java 17 and Java 21
+* Upgraded Groovy to 4.0.19
 
 Changelog 4.2.0 (2022-03-04)
 ----------------------------
