@@ -1,2 +1,5 @@
-Export-Package: \
-	org.awaitility.*
+Export-Package: org.awaitility.*
+# Use `maven-bundle-plugin` naming convention:
+Bundle-SymbolicName: org.awaitility
+# Add JPMS auto-generated module descriptor to JAR
+-jpms-module-info: $[Bundle-SymbolicName];access=0
