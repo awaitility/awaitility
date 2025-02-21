@@ -79,14 +79,14 @@
         <java.version>1.8</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
         <maven.version>3.5.0</maven.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scm.branch>master</scm.branch>
-        <slf4j.version>1.8.0-beta4</slf4j.version>
+        <slf4j.version>2.0.16</slf4j.version>
         <surefire.reportFormat>plain</surefire.reportFormat>
         <surefire.useFile>false</surefire.useFile>
-        <surefire.version>3.2.5</surefire.version>
+        <surefire.version>3.5.2</surefire.version>
     </properties>
 
     <modules>
@@ -101,7 +101,7 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.14.0</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
@@ -121,7 +121,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5</version>
+                <version>3.1.1</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
@@ -161,7 +161,7 @@
 
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.8.1</version>
             </plugin>
             <plugin>
                 <artifactId>maven-help-plugin</artifactId>
@@ -170,7 +170,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.18.0</version>
             </plugin>
 
         </plugins>
