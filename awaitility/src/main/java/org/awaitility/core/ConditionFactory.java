@@ -805,11 +805,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public Integer untilAtomic(final AtomicInteger atomic, final Matcher<? super Integer> matcher) {
-        return until(new CallableHamcrestCondition<>(new Callable<Integer>() {
-            public Integer call() {
-                return atomic.get();
-            }
-        }, matcher, generateConditionSettings()));
+        return until(new CallableHamcrestCondition<>(() -> (Integer) atomic.get(), matcher, generateConditionSettings()));
     }
 
     /**
@@ -827,7 +823,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public Long untilAtomic(final AtomicLong atomic, final Matcher<? super Long> matcher) {
-        return until(new CallableHamcrestCondition<>(atomic::get, matcher, generateConditionSettings()));
+        return until(new CallableHamcrestCondition<>(() -> (Long) atomic.get(), matcher, generateConditionSettings()));
     }
 
     /**
@@ -844,7 +840,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAtomic(final AtomicBoolean atomic, final Matcher<? super Boolean> matcher) {
-        until(new CallableHamcrestCondition<>(atomic::get, matcher, generateConditionSettings()));
+        until(new CallableHamcrestCondition<>(() -> (Boolean) atomic.get(), matcher, generateConditionSettings()));
     }
 
     /**
@@ -879,7 +875,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAdder(final LongAdder adder, final Matcher<? super Long> matcher) {
-        until(new CallableHamcrestCondition<>(adder::longValue, matcher, generateConditionSettings()));
+        until(new CallableHamcrestCondition<>(() -> (Long) adder.longValue(), matcher, generateConditionSettings()));
     }
 
     /**
@@ -894,7 +890,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAdder(final DoubleAdder adder, final Matcher<? super Double> matcher) {
-        until(new CallableHamcrestCondition<>(adder::doubleValue, matcher, generateConditionSettings()));
+        until(new CallableHamcrestCondition<>(() -> (Double) adder.doubleValue(), matcher, generateConditionSettings()));
     }
 
     /**
@@ -909,7 +905,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAccumulator(final LongAccumulator accumulator, final Matcher<? super Long> matcher) {
-        until(new CallableHamcrestCondition<>(accumulator::longValue, matcher, generateConditionSettings()));
+        until(new CallableHamcrestCondition<>(() -> (Long) accumulator.longValue(), matcher, generateConditionSettings()));
     }
 
     /**
@@ -924,7 +920,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAccumulator(final DoubleAccumulator accumulator, final Matcher<? super Double> matcher) {
-        until(new CallableHamcrestCondition<>(accumulator::doubleValue, matcher, generateConditionSettings()));
+        until(new CallableHamcrestCondition<>(() -> (Double) accumulator.doubleValue(), matcher, generateConditionSettings()));
     }
 
     /**
