@@ -21,6 +21,7 @@ import org.junit.Test;
 import java.util.concurrent.atomic.DoubleAdder;
 import java.util.concurrent.atomic.LongAdder;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -47,6 +48,26 @@ public class AwaitilityAdderTest {
     }
 
     @Test(timeout = 2000)
+    public void awaitilityCanWaitForLongAddersWithConsumerMatcher() {
+        // Given
+        LongAdder accumulator = new LongAdder();
+
+        // When
+        new Thread(() -> {
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            accumulator.add(5);
+        }).start();
+
+        // Then
+        await().untilAdder(accumulator, value -> assertThat(value).isEqualTo(5L));
+    }
+
+    @Test(timeout = 2000)
     public void awaitilityCanWaitForDoubleAdders() {
         // Given
         DoubleAdder accumulator = new DoubleAdder();
@@ -64,5 +85,25 @@ public class AwaitilityAdderTest {
 
         // Then
         await().untilAdder(accumulator, equalTo(5.5d));
+    }
+
+    @Test(timeout = 2000)
+    public void awaitilityCanWaitForDoubleAddersWithConsumerMatcher() {
+        // Given
+        DoubleAdder accumulator = new DoubleAdder();
+
+        // When
+        new Thread(() -> {
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            accumulator.add(5.5d);
+        }).start();
+
+        // Then
+        await().untilAdder(accumulator, value -> assertThat(value).isEqualTo(5.5d));
     }
 }

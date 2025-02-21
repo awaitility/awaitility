@@ -3,6 +3,20 @@ Changelog next version
 * Support for kotlin.time.Duration in Kotlin DSL (thanks to Ivo Šmíd for PR)
 * Upgraded kotlin version in the awaitility-kotlin module to 2.1.10
 * Using a more descriptive error message when using VERY long wait conditions or poll durations (issue 290)
+* Added an overloaded method of untilAsserted(..) that takes a supplier and a consumer. Example lets say you have a class like this:
+    public class MyClass {
+      public String myFunction() {
+           // Imagine stuff being executed in asynchrinously here and the result of this
+           // operation is a string called "my value"
+          return "my value"
+      }
+    }
+
+    // Then in your test you can wait for the "myFunction" to be asserted by a "consumer" that uses
+    // assertj to make sure that "myFunction" returns ""my value"
+    await().untilAsserted(myClass::myFunction, value -> Assertions.assertThat(value).isEqualTo("my value"));
+
+  This has also been implemented for all atomic, adder, and accumulator methods.
 
 Changelog 4.2.2 (2024-08-07)
 ----------------------------

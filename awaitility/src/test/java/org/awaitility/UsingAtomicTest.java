@@ -30,6 +30,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -50,6 +52,13 @@ public class UsingAtomicTest {
     }
 
     @Test(timeout = 2000)
+    public void usingAtomicIntegerWithConsumerMatcher() {
+        AtomicInteger atomic = new AtomicInteger(0);
+        new Asynch(new FakeRepositoryWithAtomicInteger(atomic)).perform();
+        await().untilAtomic(atomic, value -> assertThat(value).isEqualTo(1));
+    }
+
+    @Test(timeout = 2000)
     public void usingAtomicIntegerAndTimeout() {
         exception.expect(ConditionTimeoutException.class);
         exception.expectMessage("expected <1> but was <0> within 200 milliseconds.");
@@ -62,6 +71,13 @@ public class UsingAtomicTest {
         AtomicBoolean atomic = new AtomicBoolean(false);
         new Asynch(new FakeRepositoryWithAtomicBoolean(atomic)).perform();
         await().untilAtomic(atomic, equalTo(true));
+    }
+
+    @Test(timeout = 2000)
+    public void usingAtomicBooleanWithConsumerMatcher() {
+        AtomicBoolean atomic = new AtomicBoolean(false);
+        new Asynch(new FakeRepositoryWithAtomicBoolean(atomic)).perform();
+        await().untilAtomic(atomic, value -> assertThat(value).isTrue());
     }
 
     @Test(timeout = 2000)
@@ -80,6 +96,13 @@ public class UsingAtomicTest {
     }
 
     @Test(timeout = 2000)
+    public void usingAtomicLongWithConsumerMatcher() {
+        AtomicLong atomic = new AtomicLong(0);
+        new Asynch(new FakeRepositoryWithAtomicLong(atomic)).perform();
+        await().untilAtomic(atomic, value -> assertThat(value).isEqualTo(1L));
+    }
+
+    @Test(timeout = 2000)
     public void usingAtomicLongAndTimeout() {
         exception.expect(ConditionTimeoutException.class);
         String message = JavaVersionDetector.getJavaMajorVersion() < 17 ?
@@ -95,6 +118,13 @@ public class UsingAtomicTest {
         AtomicReference<String> atomic = new AtomicReference<>("0");
         new Asynch(new FakeRepositoryWithAtomicReference(atomic)).perform();
         await().untilAtomic(atomic, equalTo("1"));
+    }
+
+    @Test(timeout = 2000)
+    public void usingAtomicReferenceWithConsumerMatcher() {
+        AtomicReference<String> atomic = new AtomicReference<>("0");
+        new Asynch(new FakeRepositoryWithAtomicReference(atomic)).perform();
+        await().untilAtomic(atomic, value -> assertThat(value).isEqualTo("1"));
     }
 
     @Test(timeout = 2000)

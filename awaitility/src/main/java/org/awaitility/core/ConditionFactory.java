@@ -791,6 +791,35 @@ public class ConditionFactory {
     }
 
     /**
+     * Await until a callable returns a value that when passed to a {@link java.util.function.Consumer} ends without throwing an exception. E.g. with Java 8:
+     * <p>&nbsp;</p>
+     * <pre>
+     * public class MyBean {
+     *
+     *     public String myFunction() {
+     *          // Imagine stuff being executed in asynchrinously here and the result of this
+     *          // operation is a string called "my value"
+     *         return "my value"
+     *     }
+     * }
+     *
+     * // Then in your test you can wait for the "myFunction" to return "my value"
+     * await().untilAsserted(myBean::myFunction, value -&gt;  Assertions.assertThat(value).isEqualTo("my value"));
+     * </pre>
+     *
+     * @param supplier       the supplier that is responsible for executing the assertion and throwing AssertionError on failure.
+     * @param assertConsumer The consumer that will assert that the supplied value is correct, or throw an exception.
+     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     * @since 4.3.2
+     */
+    public <T> void untilAsserted(final Callable<T> supplier, final Consumer<? super T> assertConsumer) {
+        untilAsserted(() -> {
+            T value = supplier.call();
+            assertConsumer.accept(value);
+        });
+    }
+
+    /**
      * Await until a Atomic variable has a value matching the specified
      * {@link org.hamcrest.Matcher}. E.g.
      * <p>&nbsp;</p>
@@ -805,7 +834,23 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public Integer untilAtomic(final AtomicInteger atomic, final Matcher<? super Integer> matcher) {
-        return until(new CallableHamcrestCondition<>(() -> (Integer) atomic.get(), matcher, generateConditionSettings()));
+        return until(new CallableHamcrestCondition<>(atomic::get, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a Atomic integer is asserted by the {@code matcher} consumer
+     * E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilAtomic(myAtomic, value -&gt; Assertions.assertThat(value).isEqualTo(123));
+     * </pre>
+     *
+     * @param atomic  the atomic variable
+     * @param matcher the matcher The consumer that validates that the atomic reference value is correct, or throws an exception
+     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     */
+    public void untilAtomic(final AtomicInteger atomic, final Consumer<? super Integer> matcher) {
+        untilAsserted(atomic::get, matcher);
     }
 
     /**
@@ -823,7 +868,23 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public Long untilAtomic(final AtomicLong atomic, final Matcher<? super Long> matcher) {
-        return until(new CallableHamcrestCondition<>(() -> (Long) atomic.get(), matcher, generateConditionSettings()));
+        return until(new CallableHamcrestCondition<>(atomic::get, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a Atomic long is asserted by the {@code matcher} consumer
+     * E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilAtomic(myAtomic, value -&gt; Assertions.assertThat(value).isEqualTo(123L));
+     * </pre>
+     *
+     * @param atomic  the atomic variable
+     * @param matcher the matcher The consumer that validates that the atomic reference value is correct, or throws an exception
+     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     */
+    public void untilAtomic(final AtomicLong atomic, final Consumer<? super Long> matcher) {
+        untilAsserted(atomic::get, matcher);
     }
 
     /**
@@ -840,7 +901,23 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAtomic(final AtomicBoolean atomic, final Matcher<? super Boolean> matcher) {
-        until(new CallableHamcrestCondition<>(() -> (Boolean) atomic.get(), matcher, generateConditionSettings()));
+        until(new CallableHamcrestCondition<>(atomic::get, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a AtomicBoolean is asserted by the {@code matcher} consumer
+     * E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilAtomic(myAtomicBoolean, value -&gt; Assertions.assertThat(value).isTrue());
+     * </pre>
+     *
+     * @param atomic  the atomic variable
+     * @param matcher the matcher The consumer that validates that the atomic boolean value is correct, or throws an exception
+     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     */
+    public void untilAtomic(final AtomicBoolean atomic, final Consumer<? super Boolean> matcher) {
+        untilAsserted(atomic::get, matcher);
     }
 
     /**
@@ -875,7 +952,23 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAdder(final LongAdder adder, final Matcher<? super Long> matcher) {
-        until(new CallableHamcrestCondition<>(() -> (Long) adder.longValue(), matcher, generateConditionSettings()));
+        until(new CallableHamcrestCondition<>(adder::longValue, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a LongAdder is asserted by the {@code matcher} consumer
+     * E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilAdder(myAdder, value -&gt; Assertions.assertThat(value).isEqualTo(123L));
+     * </pre>
+     *
+     * @param adder   the atomic variable
+     * @param matcher the matcher The consumer that validates that the atomic reference value is correct, or throws an exception
+     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     */
+    public void untilAdder(final LongAdder adder, final Consumer<? super Long> matcher) {
+        untilAsserted(adder::longValue, matcher);
     }
 
     /**
@@ -890,7 +983,23 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAdder(final DoubleAdder adder, final Matcher<? super Double> matcher) {
-        until(new CallableHamcrestCondition<>(() -> (Double) adder.doubleValue(), matcher, generateConditionSettings()));
+        until(new CallableHamcrestCondition<>(adder::doubleValue, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a DoubleAdder is asserted by the {@code matcher} consumer
+     * E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilAdder(myAdder, value -&gt; Assertions.assertThat(value).isEqualTo(12.3d));
+     * </pre>
+     *
+     * @param adder   the atomic variable
+     * @param matcher the matcher The consumer that validates that the atomic reference value is correct, or throws an exception
+     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     */
+    public void untilAdder(final DoubleAdder adder, final Consumer<? super Double> matcher) {
+        untilAsserted(adder::doubleValue, matcher);
     }
 
     /**
@@ -905,7 +1014,23 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAccumulator(final LongAccumulator accumulator, final Matcher<? super Long> matcher) {
-        until(new CallableHamcrestCondition<>(() -> (Long) accumulator.longValue(), matcher, generateConditionSettings()));
+        until(new CallableHamcrestCondition<>(accumulator::longValue, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a LongAccumulator is asserted by the {@code matcher} consumer
+     * E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilAccumulator(myAdder, value -&gt; Assertions.assertThat(value).isEqualTo(123L));
+     * </pre>
+     *
+     * @param accumulator the atomic variable
+     * @param matcher     the matcher The consumer that validates that the atomic reference value is correct, or throws an exception
+     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     */
+    public void untilAccumulator(final LongAccumulator accumulator, final Consumer<? super Long> matcher) {
+        untilAsserted(accumulator::longValue, matcher);
     }
 
     /**
@@ -920,7 +1045,23 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAccumulator(final DoubleAccumulator accumulator, final Matcher<? super Double> matcher) {
-        until(new CallableHamcrestCondition<>(() -> (Double) accumulator.doubleValue(), matcher, generateConditionSettings()));
+        until(new CallableHamcrestCondition<>(accumulator::doubleValue, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a DoubleAccumulator is asserted by the {@code matcher} consumer
+     * E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilAccumulator(myAdder, value -&gt; Assertions.assertThat(value).isEqualTo(12.3d));
+     * </pre>
+     *
+     * @param accumulator the atomic variable
+     * @param matcher     the matcher The consumer that validates that the atomic reference value is correct, or throws an exception
+     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     */
+    public void untilAccumulator(final DoubleAccumulator accumulator, final Consumer<? super Double> matcher) {
+        untilAsserted(accumulator::doubleValue, matcher);
     }
 
     /**
@@ -940,6 +1081,23 @@ public class ConditionFactory {
      */
     public <V> V untilAtomic(final AtomicReference<V> atomic, final Matcher<? super V> matcher) {
         return until(new CallableHamcrestCondition<>(atomic::get, matcher, generateConditionSettings()));
+    }
+
+    /**
+     * Await until a Atomic variable is asserted by the {@code matcher} consumer
+     * E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * await().untilAtomic(myAtomic, value -&gt; Assertions.assertThat(value).isEqualTo("something"));
+     * </pre>
+     *
+     * @param atomic  the atomic variable
+     * @param matcher the matcher The consumer that validates that the atomic reference value is correct, or throws an exception
+     * @param <V>     a V object.
+     * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
+     */
+    public <V> void untilAtomic(final AtomicReference<V> atomic, final Consumer<? super V> matcher) {
+        untilAsserted(atomic::get, matcher);
     }
 
     /**
@@ -1026,5 +1184,4 @@ public class ConditionFactory {
         }
         return pollDelayToUse;
     }
-
 }

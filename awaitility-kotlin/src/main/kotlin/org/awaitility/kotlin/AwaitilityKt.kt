@@ -16,6 +16,7 @@ import org.hamcrest.Matchers.nullValue
 import java.time.Duration
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.function.Predicate
 import kotlin.reflect.KClass
 import kotlin.time.toJavaDuration
 
@@ -51,7 +52,7 @@ data class AwaitilityKtUntilFunCondition<out T> internal constructor(internal va
  * @param pred The predicate that determines whether or not the condition is fulfilled.
  */
 @Suppress("HasPlatformType")
-infix fun <T> AwaitilityKtUntilFunCondition<T?>.matches(pred: (T?) -> Boolean) = factory.until(fn, pred)
+infix fun <T> AwaitilityKtUntilFunCondition<T?>.matches(pred: (T?) -> Boolean): T? = factory.until(fn, Predicate { pred.invoke(it) })
 
 
 /**
@@ -74,13 +75,13 @@ infix fun <T> AwaitilityKtUntilFunCondition<T?>.matches(pred: (T?) -> Boolean) =
  * @param pred The predicate that determines whether or not the condition is fulfilled.
  * @since 3.1.5
  */
-infix fun <T> AwaitilityKtUntilFunCondition<T?>.has(pred: T.() -> Boolean) = factory.until(fn) { t: T? ->
+infix fun <T> AwaitilityKtUntilFunCondition<T?>.has(pred: T.() -> Boolean): T = factory.until(fn, Predicate { t: T? ->
     if (t == null) {
         false
     } else {
         pred(t)
     }
-}!!
+})!!
 
 /**
  * An extension function to `ConditionFactory` that allows you do write conditions such as:

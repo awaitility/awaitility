@@ -15,6 +15,7 @@
  */
 package org.awaitility;
 
+import org.assertj.core.api.Assertions;
 import org.awaitility.classes.*;
 import org.awaitility.core.*;
 import org.hamcrest.Matcher;
@@ -40,6 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static java.util.concurrent.TimeUnit.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.awaitility.Awaitility.*;
 import static org.awaitility.Durations.*;
 import static org.hamcrest.Matchers.*;
@@ -63,6 +65,12 @@ public class AwaitilityTest {
         new Asynch(fakeRepository).perform();
         await().until(fakeRepositoryValueEqualsOne());
         assertEquals(1, fakeRepository.getValue());
+    }
+
+    @Test(timeout = 2000)
+    public void awaitOperationWithConsumerMatcher() {
+        new Asynch(fakeRepository).perform();
+        await().untilAsserted(fakeRepository::getValue, value -> Assertions.assertThat(value).isEqualTo(1));
     }
 
     @Test(timeout = 2000)
@@ -399,7 +407,7 @@ public class AwaitilityTest {
     @Test(timeout = 2000)
     public void awaitDisplaysMethodDeclaringTheSupplierWhenSupplierIsAnonymousClassAndConditionTimeoutExceptionOccursWhenUsingNanos() {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage(anyOf(Stream.of(equalTo(0).toString(), "null")
+        exception.expectMessage(Matchers.anyOf(Stream.of(equalTo(0).toString(), "null")
                 .map(s -> String.format("%s.valueAsAnonymous Callable expected %s but was %s within 120 nanoseconds.", AwaitilityTest.class.getName(), equalTo(2).toString(), s))
                 .map(Matchers::containsString)
                 .toArray(Matcher[]::new)));

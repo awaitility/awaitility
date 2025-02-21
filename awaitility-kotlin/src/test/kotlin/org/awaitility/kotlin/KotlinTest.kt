@@ -32,6 +32,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
+import java.lang.Thread.sleep
 import java.time.Duration
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
@@ -65,7 +66,7 @@ class KotlinTest {
     @Test
     fun forever() {
         Asynch(fakeRepository).perform()
-        await.forever until  { fakeRepository.value == 1 }
+        await.forever until { fakeRepository.value == 1 }
     }
 
     @Test
@@ -127,6 +128,28 @@ class KotlinTest {
     }
 
     @Test
+    fun untilAssertedWithConsumerMatcher() {
+        Asynch(fakeRepository).perform()
+
+        await.untilAsserted(fakeRepository::getValue) {
+            assertThat(it).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun untilAtomicAssertedWhenReferenceIsNullByDefault() {
+        val atomicReference = AtomicReference<String>()
+        Thread {
+            sleep(500)
+            atomicReference.set("world")
+        }.start()
+
+        await.untilAtomic(atomicReference) { string ->
+            assertThat(string).isEqualTo("world")
+        }
+    }
+
+    @Test
     fun untilAssertedWithConditionEvaluationListener() {
         var value = false
         Asynch(fakeRepository).perform()
@@ -182,7 +205,7 @@ class KotlinTest {
         val fakeObjectRepository = FakeGenericRepository(Data("Before"))
         AsynchObject(fakeObjectRepository, Data("After")).perform()
 
-        val data : Data = await untilCallTo { fakeObjectRepository.data } has {
+        val data: Data = await untilCallTo { fakeObjectRepository.data } has {
             state == "After"
         }
         assertThat(data.state).isEqualTo("After")

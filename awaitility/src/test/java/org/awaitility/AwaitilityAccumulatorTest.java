@@ -21,6 +21,7 @@ import org.junit.Test;
 import java.util.concurrent.atomic.DoubleAccumulator;
 import java.util.concurrent.atomic.LongAccumulator;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -47,6 +48,26 @@ public class AwaitilityAccumulatorTest {
     }
 
     @Test(timeout = 2000)
+    public void awaitilityCanWaitForLongAccumulatorsWithConsumerMatcher() {
+        // Given
+        LongAccumulator accumulator = new LongAccumulator((x, y) -> x * y * 2, 3);
+
+        // When
+        new Thread(() -> {
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            accumulator.accumulate(5);
+        }).start();
+
+        // Then
+        await().untilAccumulator(accumulator, value -> assertThat(value).isEqualTo(30L));
+    }
+
+    @Test(timeout = 2000)
     public void awaitilityCanWaitForDoubleAccumulators() {
         // Given
         DoubleAccumulator accumulator = new DoubleAccumulator((x, y) -> x * y * 2, 3.2d);
@@ -64,5 +85,25 @@ public class AwaitilityAccumulatorTest {
 
         // Then
         await().untilAccumulator(accumulator, equalTo(35.2d));
+    }
+
+    @Test(timeout = 2000)
+    public void awaitilityCanWaitForDoubleAccumulatorsWithConsumerMatcher() {
+        // Given
+        DoubleAccumulator accumulator = new DoubleAccumulator((x, y) -> x * y * 2, 3.2d);
+
+        // When
+        new Thread(() -> {
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            accumulator.accumulate(5.5d);
+        }).start();
+
+        // Then
+        await().untilAccumulator(accumulator, value -> assertThat(value).isEqualTo(35.2d));
     }
 }
