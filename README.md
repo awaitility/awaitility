@@ -11,7 +11,7 @@ public void updatesCustomerStatus() {
     // Publish an asynchronous message to a broker (e.g. RabbitMQ):
     messageBroker.publishMessage(updateCustomerStatusMessage);
     // Awaitility lets you wait until the asynchronous operation completes:
-    await().atMost(5, SECONDS).until(customerStatusIsUpdated());
+    await().atMost(Duration.ofSeconds(5)).until(customerStatusIsUpdated());
     ...
 }
 ```
