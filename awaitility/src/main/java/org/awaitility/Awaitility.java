@@ -25,6 +25,7 @@ import org.awaitility.pollinterval.PollInterval;
 import org.hamcrest.Matcher;
 
 import java.time.Duration;
+import java.time.format.DateTimeParseException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -33,6 +34,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
+import static org.awaitility.Durations.TEN_SECONDS;
 
 /**
  * Awaitility is a small Java DSL for synchronizing (waiting for) asynchronous
@@ -76,6 +78,12 @@ import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
  * Awaitility.setDefaultPollInterval(..)
  * Awaitility.setDefaultPollDelay(..)
  * </pre>
+ * or by setting system properties in ISO-8601 duration format, for example:
+ * <pre>
+ * awaitility.defaultTimeout=PT10S
+ * awaitility.defaultPollInterval=PT0.1S
+ * awaitility.defaultPollDelay=PT0.005S
+ * </pre>
  * <p/>
  * You can also reset to the default values using {@link org.awaitility.Awaitility#reset()}.
  * In order to use Awaitility effectively it's recommended to statically import
@@ -114,22 +122,47 @@ import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
  */
 public class Awaitility {
 
-    private static final Duration DEFAULT_POLL_DELAY = null;
+    private static final Duration DEFAULT_POLL_DELAY;
 
-    private static final PollInterval DEFAULT_POLL_INTERVAL = new FixedPollInterval(ONE_HUNDRED_MILLISECONDS);
+    private static final PollInterval DEFAULT_POLL_INTERVAL;
+
+    private static final WaitConstraint DEFAULT_WAIT_CONSTRAINT;
+
+    static {
+        DEFAULT_POLL_DELAY = getDurationFromSystemProperty("awaitility.defaultPollDelay", null);
+
+        Duration pollIntervalValue = getDurationFromSystemProperty("awaitility.defaultPollInterval", ONE_HUNDRED_MILLISECONDS);
+        DEFAULT_POLL_INTERVAL = new FixedPollInterval(pollIntervalValue);
+
+        Duration timeoutValue = getDurationFromSystemProperty("awaitility.defaultTimeout", TEN_SECONDS);
+        DEFAULT_WAIT_CONSTRAINT = AtMostWaitConstraint.TEN_SECONDS.withMaxWaitTime(timeoutValue);
+    }
+
+    private static Duration getDurationFromSystemProperty(String propertyName, Duration defaultValue) {
+        Duration value = defaultValue;
+        String property = System.getProperty(propertyName);
+        if (property != null) {
+            try {
+                value = Duration.parse(property);
+            } catch (DateTimeParseException e) {
+                // ignored; just use the default then
+            }
+        }
+        return value;
+    }
 
     /**
-     * The default poll interval (fixed 100 ms).
+     * The default poll interval (fixed 100 ms or set via system property).
      */
     private static volatile PollInterval defaultPollInterval = DEFAULT_POLL_INTERVAL;
 
     /**
-     * The default wait constraint (10 seconds).
+     * The default wait constraint (10 seconds or set via system property).
      */
-    private static volatile WaitConstraint defaultWaitConstraint = AtMostWaitConstraint.TEN_SECONDS;
+    private static volatile WaitConstraint defaultWaitConstraint = DEFAULT_WAIT_CONSTRAINT;
 
     /**
-     * The default poll delay
+     * The default poll delay (<tt>null</tt> or set via system property).
      */
     private static volatile Duration defaultPollDelay = DEFAULT_POLL_DELAY;
 
@@ -274,7 +307,7 @@ public class Awaitility {
     public static void reset() {
         defaultPollInterval = DEFAULT_POLL_INTERVAL;
         defaultPollDelay = DEFAULT_POLL_DELAY;
-        defaultWaitConstraint = AtMostWaitConstraint.TEN_SECONDS;
+        defaultWaitConstraint = DEFAULT_WAIT_CONSTRAINT;
         defaultCatchUncaughtExceptions = true;
         defaultConditionEvaluationListener = null;
         defaultExecutorLifecycle = null;
