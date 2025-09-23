@@ -16,19 +16,19 @@
 
 package org.awaitility.pollinterval;
 
+import org.junit.jupiter.api.Test;
+
 import java.time.Duration;
 import java.util.concurrent.ThreadLocalRandom;
-import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
-public class FibonacciPollIntervalTest {
+class FibonacciPollIntervalTest {
 
-    @Test public void
-    fibonacci_small_number() {
+    @Test void fibonacci_small_number() {
         // Given
 
         // When
@@ -38,8 +38,7 @@ public class FibonacciPollIntervalTest {
         assertThat(fibonacci, is(55));
     }
 
-    @Test public void
-    fibonacci_large_number() {
+    @Test void fibonacci_large_number() {
         // Given
 
         // When
@@ -49,8 +48,7 @@ public class FibonacciPollIntervalTest {
         assertThat(fibonacci, is(428607904));
     }
 
-    @Test public void
-    next_default_offset() {
+    @Test void next_default_offset() {
         // Given
         Duration unused = Duration.ofMillis(ThreadLocalRandom.current().nextLong());
         FibonacciPollInterval pollInterval = new FibonacciPollInterval(TimeUnit.SECONDS);
@@ -62,8 +60,7 @@ public class FibonacciPollIntervalTest {
         assertThat(next, is(Duration.ofSeconds(1)));
     }
 
-    @Test public void
-    next_negative_offset() {
+    @Test void next_negative_offset() {
         // Given
         Duration unused = Duration.ofMillis(ThreadLocalRandom.current().nextLong());
         FibonacciPollInterval pollInterval = new FibonacciPollInterval(-1, TimeUnit.SECONDS);

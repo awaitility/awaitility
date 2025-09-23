@@ -576,8 +576,9 @@ public class ConditionFactory {
      * thread as the test. For safety you should always combine tests using this feature with a test framework specific timeout,
      * for example in JUnit:
      * <pre>
-     * @Test(timeout = 2000L)
-     * public void myTest() {
+     * @Timeout(value = 2000, unit = MILLISECONDS)
+     * @Test
+     * void myTest() {
      *     Awaitility.pollInSameThread();
      *     await().forever().until(...);
      * }

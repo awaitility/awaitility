@@ -16,49 +16,56 @@
 
 package org.awaitility;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Durations.FIVE_SECONDS;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
-public class WaitForAtomicBooleanTest {
+class WaitForAtomicBooleanTest {
     private AtomicBoolean wasAdded;
     private AtomicBoolean wasAddedWithDefaultValue;
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         wasAdded = new AtomicBoolean(false);
         wasAddedWithDefaultValue = new AtomicBoolean();
     }
 
-    @Test(timeout = 2000L)
-    public void atomicBooleanExample() {
+    @Test
+    @Timeout(value = 2000L, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void atomicBooleanExample() {
         new WasAddedModifier().start();
 
         await().atMost(FIVE_SECONDS).until(wasAdded(), equalTo(true));
     }
 
-    @Test(timeout = 2000L)
-    public void atomicBooleanWithUntilTrueWhenBooleanUsesDefaultValue() {
+    @Test
+    @Timeout(value = 2000L, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void atomicBooleanWithUntilTrueWhenBooleanUsesDefaultValue() {
         new WasAddedWithDefaultValue().start();
 
         await().atMost(FIVE_SECONDS).untilTrue(wasAddedWithDefaultValue);
     }
 
-    @Test(timeout = 2000L)
-    public void atomicBooleanWithUntilTrue() {
+    @Test
+    @Timeout(value = 2000L, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void atomicBooleanWithUntilTrue() {
         new WasAddedModifier().start();
 
         await().atMost(FIVE_SECONDS).untilTrue(wasAdded);
     }
 
-    @Test(timeout = 2000L)
-    public void atomicBooleanWithUntilFalse() {
+    @Test
+    @Timeout(value = 2000L, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void atomicBooleanWithUntilFalse() {
         wasAdded.set(true);
         new WasAddedModifier().start();
 

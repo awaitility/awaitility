@@ -1,24 +1,24 @@
 package org.awaitility.core;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-public class JavaVersionDetectorTest {
+class JavaVersionDetectorTest {
 
     @Test
-    public void nullJavaVersionDefaultsTo8() {
+    void nullJavaVersionDefaultsTo8() {
         assertThat(JavaVersionDetector.getJavaMajorVersion(null), equalTo(8));
     }
 
     @Test
-    public void emptyJavaVersionDefaultsTo8() {
+    void emptyJavaVersionDefaultsTo8() {
         assertThat(JavaVersionDetector.getJavaMajorVersion(""), equalTo(8));
     }
 
     @Test
-    public void javaVersionFor8() {
+    void javaVersionFor8() {
         /*
         docker run --rm -it eclipse-temurin:8-jdk bash
         echo 'class Scratch {
@@ -33,7 +33,7 @@ public class JavaVersionDetectorTest {
     }
 
     @Test
-    public void javaVersionFor11WithDot() {
+    void javaVersionFor11WithDot() {
         /*
         docker run --rm -it eclipse-temurin:11-jdk jshell
         System.getProperty("java.version")
@@ -42,7 +42,7 @@ public class JavaVersionDetectorTest {
     }
 
     @Test
-    public void javaVersionFor17WithDot() {
+    void javaVersionFor17WithDot() {
         /*
         docker run --rm -it eclipse-temurin:17-jdk jshell
         System.getProperty("java.version")
@@ -51,7 +51,7 @@ public class JavaVersionDetectorTest {
     }
 
     @Test
-    public void javaVersionFor21WithoutDot() {
+    void javaVersionFor21WithoutDot() {
         /*
         Until there is a first patch release, java.version reports a single number without dots.
          */
@@ -59,7 +59,7 @@ public class JavaVersionDetectorTest {
     }
 
     @Test
-    public void javaVersionFor21WithDot() {
+    void javaVersionFor21WithDot() {
         /*
         docker run --rm -it eclipse-temurin:21-jdk jshell
         System.getProperty("java.version")
@@ -68,7 +68,7 @@ public class JavaVersionDetectorTest {
     }
 
     @Test
-    public void javaVersionFor23ea() {
+    void javaVersionFor23ea() {
         /*
         OpenJDK EA reports java.version with ea suffix
          */
@@ -76,7 +76,7 @@ public class JavaVersionDetectorTest {
     }
 
     @Test
-    public void javaVersionFor23beta() {
+    void javaVersionFor23beta() {
         /*
         Temurin JDK EA reports java.version with beta suffix
          */

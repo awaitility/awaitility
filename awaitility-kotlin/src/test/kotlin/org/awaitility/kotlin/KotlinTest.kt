@@ -27,11 +27,11 @@ import org.awaitility.core.ConditionEvaluationListener
 import org.awaitility.core.ConditionTimeoutException
 import org.awaitility.pollinterval.FibonacciPollInterval.fibonacci
 import org.hamcrest.Matchers.*
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.ExpectedException
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Timeout
 import java.lang.Thread.sleep
 import java.time.Duration
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -44,14 +44,10 @@ import kotlin.time.Duration.Companion.seconds
 
 class KotlinTest {
 
-    @Rule
-    @JvmField
-    val exception: ExpectedException = ExpectedException.none()
-
     private lateinit var asynch: Asynch
     private lateinit var fakeRepository: FakeRepository
 
-    @Before
+    @BeforeEach
     fun setup() {
         fakeRepository = FakeRepositoryImpl()
         asynch = Asynch(fakeRepository)
@@ -77,20 +73,20 @@ class KotlinTest {
 
     @Test
     fun assertionConditionFailsWithANiceErrorMessage() {
-        exception.expect(ConditionTimeoutException::class.java)
-        exception.expectMessage(startsWith("Assertion condition defined"))
-
         Asynch(fakeRepository).perform()
-        await().atMost(1, SECONDS).untilAsserted { assertEquals(2, fakeRepository.value) }
+        val exception = assertThrows(ConditionTimeoutException::class.java, {
+            await().atMost(1, SECONDS).untilAsserted { assertEquals(2, fakeRepository.value) }
+        })
+        assertThat(exception.message).startsWith("Assertion condition defined")
     }
 
     @Test
     fun booleanConditionFailsWithANiceErrorMessage() {
-        exception.expect(ConditionTimeoutException::class.java)
-        exception.expectMessage(allOf(startsWith("Condition"), endsWith("was not fulfilled within 1 seconds.")))
-
         Asynch(fakeRepository).perform()
-        await().atMost(1, SECONDS).until { fakeRepository.value == 2 }
+        val exception = assertThrows(ConditionTimeoutException::class.java, {
+            await().atMost(1, SECONDS).until { fakeRepository.value == 2 }
+        })
+        assertThat(exception.message).startsWith("Condition").endsWith("was not fulfilled within 1 seconds.")
     }
 
     @Test
@@ -243,7 +239,8 @@ class KotlinTest {
         assertThat(count).hasValueBetween(4, 6)
     }
 
-    @Test(timeout = 2000)
+    @Test
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun awaitDuringTimeOnCondition() {
         val duration = measureTimeMillis {
             await() during ONE_SECOND until { true }
@@ -252,7 +249,8 @@ class KotlinTest {
         assertThat(duration).isGreaterThan(1000)
     }
 
-    @Test(timeout = 2000)
+    @Test
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun awaitDuringTimeOnConditionWithKotlinDuration() {
         val duration = measureTimeMillis {
             await() during 1.seconds until { true }

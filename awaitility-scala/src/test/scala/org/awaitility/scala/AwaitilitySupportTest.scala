@@ -20,14 +20,14 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 import org.awaitility.Awaitility._
 import org.awaitility.core.ConditionTimeoutException
 import org.hamcrest.CoreMatchers.is
+import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.{containsString, endsWith, startsWith}
 import org.hamcrest.{CoreMatchers, Matchers}
-import org.junit.Assert._
-import org.junit._
+import org.junit.jupiter.api.Assertions._
+import org.junit.jupiter.api._
 
 import scala.language.postfixOps
 
-@Test
 class AwaitilitySupportTest extends AwaitilitySupport {
 
   @Test
@@ -40,9 +40,15 @@ class AwaitilitySupportTest extends AwaitilitySupport {
     await until isDone
   }
 
-  @Test(expected = classOf[ConditionTimeoutException])
+  @Test
   def timeout(): Unit = {
-    await atMost(500, MILLISECONDS) until { 2 == 1 }
+    try {
+      await atMost(500, MILLISECONDS) until { 2 == 1 }
+      fail("Expected timeout exception")
+    } catch {
+      case e : ConditionTimeoutException =>
+        assertEquals("Condition was not fulfilled within 500 milliseconds.", e getMessage)
+    }
   }
 
   @Test

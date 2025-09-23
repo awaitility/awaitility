@@ -15,30 +15,30 @@
  */
 package org.awaitility.core;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class HamcrestToStringFilterTest {
+class HamcrestToStringFilterTest {
 
-	@Test
-	public void removesIsFromToString() throws Exception {
+    @Test
+    void removesIsFromToString() throws Exception {
 		assertEquals("<4>", HamcrestToStringFilter.filter(is(equalTo(4))));
 	}
 
-	@Test
-	public void removesNotNotFromToString() throws Exception {
+    @Test
+    void removesNotNotFromToString() throws Exception {
 		assertEquals("<4>", HamcrestToStringFilter.filter(not(not((equalTo(4))))));
 	}
 
-	@Test
-	public void removesAllNotNotsFromToString() throws Exception {
+    @Test
+    void removesAllNotNotsFromToString() throws Exception {
 		assertEquals("<4>", HamcrestToStringFilter.filter(not(not(not(not((equalTo(4))))))));
 	}
 
-	@Test
-	public void removesNotNotButKeepsRemainingNotFromToString() throws Exception {
+    @Test
+    void removesNotNotButKeepsRemainingNotFromToString() throws Exception {
 		assertEquals("not <4>", HamcrestToStringFilter.filter(not(not(not((equalTo(4)))))));
 	}
 }

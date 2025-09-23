@@ -1,7 +1,7 @@
 
 package org.awaitility.core;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -10,21 +10,18 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class ConditionAwaiterTest {
-
+class ConditionAwaiterTest {
 
     /**
      * Asserts that https://github.com/awaitility/awaitility/issues/95 is resolved
      */
-    @Test public void
-    calculates_a_duration_of_1_nano_when_system_nano_time_is_skewed() {
+    @Test void calculates_a_duration_of_1_nano_when_system_nano_time_is_skewed() {
         Duration duration = ConditionAwaiter.calculateConditionEvaluationDuration(Duration.ofNanos(10000000L), System.nanoTime(), 0, Duration.ofNanos(0), Duration.ofNanos(0));
 
         assertThat(duration.toNanos(), is(1L));
     }
 
-
-    @Test public void atLeastIncludesPollDelayWithPollInterval() {
+    @Test void atLeastIncludesPollDelayWithPollInterval() {
         long start = System.currentTimeMillis();
         await()
                 .pollDelay(Duration.ofMillis(100))
@@ -36,8 +33,7 @@ public class ConditionAwaiterTest {
     /**
      * Asserts that https://github.com/awaitility/awaitility/issues/152 is resolved
      */
-    @Test public void
-    originalUncaughtExceptionHandlerIsSetBackAfterConditionEvaluation() {
+    @Test void originalUncaughtExceptionHandlerIsSetBackAfterConditionEvaluation() {
         Thread.UncaughtExceptionHandler originalUncaughtExceptionHandler = (t, e) -> {};
         Thread.setDefaultUncaughtExceptionHandler(originalUncaughtExceptionHandler);
 
@@ -50,8 +46,7 @@ public class ConditionAwaiterTest {
         assertThat(Thread.getDefaultUncaughtExceptionHandler(), is(originalUncaughtExceptionHandler));
     }
 
-    @Test
-    public void shouldHandleImmediateResultWithAtMost(){
+    @Test void shouldHandleImmediateResultWithAtMost(){
         await().atMost(Duration.ofMillis(10)).pollInterval(Duration.ofMillis(5)).until(() -> true);
     }
 }

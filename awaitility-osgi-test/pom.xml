@@ -10,6 +10,7 @@
     <properties>
         <animal.sniffer.skip>true</animal.sniffer.skip>
         <pax-exam.version>4.13.4</pax-exam.version>
+        <junit.version>4.13.2</junit.version>
     </properties>
 
     <dependencies>
@@ -22,6 +23,12 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-atinject_1.0_spec</artifactId>
             <version>1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

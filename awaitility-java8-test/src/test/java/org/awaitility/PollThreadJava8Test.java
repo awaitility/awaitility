@@ -22,12 +22,13 @@ import org.awaitility.classes.FakeRepository;
 import org.awaitility.classes.FakeRepositoryImpl;
 import org.awaitility.core.ConditionTimeoutException;
 import org.awaitility.core.InternalExecutorServiceFactory;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runners.model.TestTimedOutException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.junit.platform.commons.JUnitException;
+import org.opentest4j.AssertionFailedError;
 
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -40,22 +41,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.given;
 import static org.awaitility.Awaitility.with;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
 @SuppressWarnings("Duplicates")
-public class PollThreadJava8Test {
+class PollThreadJava8Test {
     private FakeRepository fakeRepository;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         fakeRepository = new FakeRepositoryImpl();
         Awaitility.reset();
     }
 
-    @Test(timeout = 2000)
-    public void canRunConditionEvaluationsInTheSameThreadAsTheTestThread() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void canRunConditionEvaluationsInTheSameThreadAsTheTestThread() {
         new Asynch(fakeRepository).perform();
         AtomicReference<Thread> threadAtomicReference = new AtomicReference<>();
 
@@ -65,8 +68,9 @@ public class PollThreadJava8Test {
         assertThat(threadAtomicReference.get()).isEqualTo(Thread.currentThread());
     }
 
-    @Test(timeout = 2000)
-    public void canRunConditionEvaluationsInTheSameThreadAsTheTestThreadWhenConfiguredStatically() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void canRunConditionEvaluationsInTheSameThreadAsTheTestThreadWhenConfiguredStatically() {
         new Asynch(fakeRepository).perform();
         AtomicReference<Thread> threadAtomicReference = new AtomicReference<>();
 
@@ -78,23 +82,29 @@ public class PollThreadJava8Test {
         assertThat(threadAtomicReference.get()).isEqualTo(Thread.currentThread());
     }
 
-    @Test(timeout = 700)
-    public void uncaughtExceptionsArePropagatedToAwaitingThreadButCannotBreakForeverBlockWhenConditionIsEvaluatedFromTheTestThread() throws Exception {
-        exception.expect(TestTimedOutException.class);
+    @Test
+    void uncaughtExceptionsArePropagatedToAwaitingThreadButCannotBreakForeverBlockWhenConditionIsEvaluatedFromTheTestThread() throws Exception {
         new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
-        given().catchUncaughtExceptions().and().pollInSameThread().await().forever().until(() -> fakeRepository.getValue() == 1);
+        AssertionFailedError error = assertThrows(AssertionFailedError.class,
+                () -> assertTimeoutPreemptively(Duration.ofMillis(700),
+                    () -> given().catchUncaughtExceptions().and().pollInSameThread().await().forever().until(() -> fakeRepository.getValue() == 1)
+            )
+        );
+        assertInstanceOf(JUnitException.class, error.getCause());
     }
 
-    @Test(timeout = 2000)
-    public void canTimeoutWhenPollingInSameThreadAsTest() throws Exception {
-        exception.expect(ConditionTimeoutException.class);
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void canTimeoutWhenPollingInSameThreadAsTest() throws Exception {
         new Asynch(fakeRepository).perform();
 
-        given().pollInSameThread().await().atMost(300, MILLISECONDS).until(() -> fakeRepository.getValue() == 1);
+        assertThrows(ConditionTimeoutException.class,
+                () -> given().pollInSameThread().await().atMost(300, MILLISECONDS).until(() -> fakeRepository.getValue() == 1));
     }
 
-    @Test(timeout = 2000)
-    public void canRunConditionEvaluationsCustomTestWithoutAliasThreadUsingJava8MethodReference() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void canRunConditionEvaluationsCustomTestWithoutAliasThreadUsingJava8MethodReference() {
         new Asynch(fakeRepository).perform();
         AtomicReference<Thread> threadAtomicReference = new AtomicReference<>();
 
@@ -104,8 +114,9 @@ public class PollThreadJava8Test {
         assertThat(threadAtomicReference.get()).isNotEqualTo(Thread.currentThread());
     }
 
-    @Test(timeout = 2000)
-    public void pollThreadSupplierIsCalledOncePerTest() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void pollThreadSupplierIsCalledOncePerTest() {
         new Asynch(fakeRepository).perform();
         List<Thread> conditionThreads = new CopyOnWriteArrayList<>();
 
@@ -115,8 +126,9 @@ public class PollThreadJava8Test {
         assertThat(new HashSet<>(conditionThreads)).doesNotContain(Thread.currentThread()).hasSize(1);
     }
 
-    @Test(timeout = 2000)
-    public void canRunConditionEvaluationsInCustomThread() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void canRunConditionEvaluationsInCustomThread() {
         new Asynch(fakeRepository).perform();
         AtomicReference<Thread> expectedThread = new AtomicReference<>();
         AtomicReference<Thread> actualThread = new AtomicReference<>();
@@ -131,8 +143,9 @@ public class PollThreadJava8Test {
         assertThat(actualThread.get()).isNotEqualTo(Thread.currentThread()).isEqualTo(expectedThread.get());
     }
 
-    @Test(timeout = 2000)
-    public void canRunConditionEvaluationsInCustomThreadWhenConfiguredStatically() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void canRunConditionEvaluationsInCustomThreadWhenConfiguredStatically() {
         new Asynch(fakeRepository).perform();
         AtomicReference<Thread> expectedThread = new AtomicReference<>();
         AtomicReference<Thread> actualThread = new AtomicReference<>();
@@ -149,8 +162,9 @@ public class PollThreadJava8Test {
         assertThat(actualThread.get()).isNotEqualTo(Thread.currentThread()).isEqualTo(expectedThread.get());
     }
 
-    @Test(timeout = 2000)
-    public void canRunConditionInSpecificExecutorService() throws ExecutionException, InterruptedException {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void canRunConditionInSpecificExecutorService() throws ExecutionException, InterruptedException {
         ExecutorService executorService = InternalExecutorServiceFactory.create(Thread::new);
         FakeRepository threadLocalRepo = executorService.submit(() -> new FakeRepository() {
             ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
@@ -180,8 +194,9 @@ public class PollThreadJava8Test {
         given().pollExecutorService(executorService).await().atMost(1000, MILLISECONDS).until(() -> threadLocalRepo.getValue() == 1);
     }
 
-    @Test(timeout = 2000)
-    public void canRunConditionInSpecificExecutorServiceWhenExecutorServiceIsConfiguredStatically() throws ExecutionException, InterruptedException {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void canRunConditionInSpecificExecutorServiceWhenExecutorServiceIsConfiguredStatically() throws ExecutionException, InterruptedException {
 
         ExecutorService executorService = InternalExecutorServiceFactory.create(Thread::new);
         Awaitility.pollExecutorService(executorService);
@@ -213,8 +228,9 @@ public class PollThreadJava8Test {
         await().atMost(1000, MILLISECONDS).until(() -> threadLocalRepo.getValue() == 1);
     }
 
-    @Test(timeout = 2000)
-    public void awaitilityPollThreadIsGivenANameEqualToAwaitilityThreadWhenNotUsingAnAlias() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void awaitilityPollThreadIsGivenANameEqualToAwaitilityThreadWhenNotUsingAnAlias() {
         new Asynch(fakeRepository).perform();
         AtomicReference<Thread> thread = new AtomicReference<>();
 
@@ -224,8 +240,9 @@ public class PollThreadJava8Test {
         assertThat(thread.get().getName()).isEqualTo("awaitility-thread");
     }
 
-    @Test(timeout = 2000)
-    public void awaitilityPollThreadIsGivenANameIncludingAliasWhenUsingAnAlias() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void awaitilityPollThreadIsGivenANameIncludingAliasWhenUsingAnAlias() {
         new Asynch(fakeRepository).perform();
         AtomicReference<Thread> thread = new AtomicReference<>();
 

@@ -18,53 +18,59 @@ package org.awaitility;
 import org.awaitility.classes.*;
 import org.awaitility.core.ConditionTimeoutException;
 import org.awaitility.reflect.exception.FieldNotFoundException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+
+import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.fieldIn;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
-public class UsingFieldSupplierTest {
+class UsingFieldSupplierTest {
     private FakeRepository fakeRepository;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         fakeRepository = new FakeRepositoryImpl();
         Awaitility.reset();
     }
 
-    
-    @Test(timeout = 2000)
-    public void ofTypeAndName() throws Exception {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void ofTypeAndName() throws Exception {
         new Asynch(fakeRepository).perform();
         await().until(fieldIn(fakeRepository).ofType(int.class).andWithName("value"), equalTo(1));
         assertEquals(1, fakeRepository.getValue());
     }
-    @Test(timeout = 2000)
-    public void typeOnly() throws Exception {
+
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void typeOnly() throws Exception {
         new Asynch(fakeRepository).perform();
         await().until(fieldIn(fakeRepository).ofType(int.class), equalTo(1));
         assertEquals(1, fakeRepository.getValue());
     }
 
-    @Test(timeout = 2000)
-    public void typeAndAnnotation() throws Exception {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void typeAndAnnotation() throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         await().until(fieldIn(repository).ofType(int.class).andAnnotatedWith(ExampleAnnotation.class), equalTo(1));
         assertEquals(1, repository.getValue());
     }
 
-    @Test(timeout = 2000)
-    public void typeAndNameAndAnnotation() throws Exception {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void typeAndNameAndAnnotation() throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         await().until(
@@ -73,8 +79,9 @@ public class UsingFieldSupplierTest {
         assertEquals(1, repository.getValue());
     }
 
-    @Test(timeout = 2000)
-    public void typeAndAnnotationAndName() throws Exception {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void typeAndAnnotationAndName() throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         await().until(
@@ -83,8 +90,9 @@ public class UsingFieldSupplierTest {
         assertEquals(1, repository.getValue());
     }
 
-    @Test(timeout = 2000)
-    public void givenStaticFieldAndUsingOfTypeAndName() throws Exception {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void givenStaticFieldAndUsingOfTypeAndName() throws Exception {
         FakeRepositoryWithStaticFieldAndAnnotation repository = new FakeRepositoryWithStaticFieldAndAnnotation();
         new Asynch(repository).perform();
         await().until(fieldIn(FakeRepositoryWithStaticFieldAndAnnotation.class).ofType(int.class).andWithName("value"),
@@ -92,131 +100,130 @@ public class UsingFieldSupplierTest {
         assertEquals(1, repository.getValue());
     }
 
-    @Test(timeout = 2000, expected = FieldNotFoundException.class)
-    public void givenStaticFieldAndUsingOfTypeAndNameThrowsFieldNotFoundExceptionWhenUsingInstance() throws Exception {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void givenStaticFieldAndUsingOfTypeAndNameThrowsFieldNotFoundExceptionWhenUsingInstance() throws Exception {
         FakeRepositoryWithStaticFieldAndAnnotation repository = new FakeRepositoryWithStaticFieldAndAnnotation();
         new Asynch(repository).perform();
-        await().until(fieldIn(repository).ofType(int.class).andWithName("value"), equalTo(1));
-        assertEquals(1, repository.getValue());
+        assertThrows(FieldNotFoundException.class, () -> await().until(fieldIn(repository).ofType(int.class).andWithName("value"), equalTo(1)));
     }
 
-    @Test(timeout = 2000, expected = FieldNotFoundException.class)
-    public void givenTypeAndNameWhenNameMatchButTypeDoesntThenFieldNotFoundExceptionIsThrown() throws Exception {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void givenTypeAndNameWhenNameMatchButTypeDoesntThenFieldNotFoundExceptionIsThrown() throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         byte one = (byte) 1;
-        await().until(fieldIn(repository).ofType(byte.class).andWithName("value"), equalTo(one));
-        assertEquals(1, repository.getValue());
+        assertThrows(FieldNotFoundException.class, () -> await().until(fieldIn(repository).ofType(byte.class).andWithName("value"), equalTo(one)));
     }
 
-    @Test(timeout = 2000, expected = FieldNotFoundException.class)
-    public void givenTypeAndNameWhenTypeMatchButNameDoesntThenFieldNotFoundExceptionIsThrown() throws Exception {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void givenTypeAndNameWhenTypeMatchButNameDoesntThenFieldNotFoundExceptionIsThrown() throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
-        await().until(fieldIn(repository).ofType(int.class).andWithName("value2"), equalTo(1));
-        assertEquals(1, repository.getValue());
+        assertThrows(FieldNotFoundException.class, () -> await().until(fieldIn(repository).ofType(int.class).andWithName("value2"), equalTo(1)));
     }
 
-    @Test(timeout = 2000, expected = FieldNotFoundException.class)
-    public void givenTypeAndNameAndAnnotationWhenNameAndTypeMatchButAnnotationNotFoundThenFieldNotFoundExceptionIsThrown()
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void givenTypeAndNameAndAnnotationWhenNameAndTypeMatchButAnnotationNotFoundThenFieldNotFoundExceptionIsThrown()
             throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
-        await().until(
-                fieldIn(repository).ofType(int.class).andWithName("value").andAnnotatedWith(ExampleAnnotation2.class),
-                equalTo(1));
-        assertEquals(1, repository.getValue());
+        assertThrows(FieldNotFoundException.class, () ->await().until(
+                    fieldIn(repository).ofType(int.class).andWithName("value").andAnnotatedWith(ExampleAnnotation2.class),
+                    equalTo(1)));
     }
 
-    @Test(timeout = 2000, expected = FieldNotFoundException.class)
-    public void givenTypeAndNameAndAnnotationWhenNameAndAnnotationMatchButTypeNotFoundThenFieldNotFoundExceptionIsThrown()
-            throws Exception {
-        FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
-        new Asynch(repository).perform();
-        byte one = (byte) 1;
-        await().until(fieldIn(repository).ofType(byte.class).andWithName("value").andAnnotatedWith(ExampleAnnotation.class),
-                equalTo(one));
-        assertEquals(1, repository.getValue());
-    }
-
-    @Test(timeout = 2000, expected = FieldNotFoundException.class)
-    public void givenTypeAndAnnotationAndNameWhenNameAndTypeMatchButAnnotationNotFoundThenFieldNotFoundExceptionIsThrown()
-            throws Exception {
-        FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
-        new Asynch(repository).perform();
-        await().until(
-                fieldIn(repository).ofType(int.class).andAnnotatedWith(ExampleAnnotation2.class).andWithName("value"),
-                equalTo(1));
-        assertEquals(1, repository.getValue());
-    }
-
-    @Test(timeout = 2000, expected = FieldNotFoundException.class)
-    public void givenTypeAndAnnotationAndNameWhenNameAndAnnotationMatchButTypeNotFoundThenFieldNotFoundExceptionIsThrown()
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void givenTypeAndNameAndAnnotationWhenNameAndAnnotationMatchButTypeNotFoundThenFieldNotFoundExceptionIsThrown()
             throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         byte one = (byte) 1;
-        await().until(fieldIn(repository).ofType(byte.class).andAnnotatedWith(ExampleAnnotation.class).andWithName("value"),
-                equalTo(one));
-        assertEquals(1, repository.getValue());
+        assertThrows(FieldNotFoundException.class, () -> await().until(fieldIn(repository).ofType(byte.class).andWithName("value").andAnnotatedWith(ExampleAnnotation.class),
+                    equalTo(one)));
     }
 
-    @Test(timeout = 2000, expected = FieldNotFoundException.class)
-    public void givenAnnotationAndTypeWhenAnnotationMatchButTypeDoesntThenFieldNotFoundExceptionIsThrown()
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void givenTypeAndAnnotationAndNameWhenNameAndTypeMatchButAnnotationNotFoundThenFieldNotFoundExceptionIsThrown()
+            throws Exception {
+        FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
+        new Asynch(repository).perform();
+        assertThrows(FieldNotFoundException.class, () -> await().until(
+                    fieldIn(repository).ofType(int.class).andAnnotatedWith(ExampleAnnotation2.class).andWithName("value"),
+                    equalTo(1)));
+    }
+
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void givenTypeAndAnnotationAndNameWhenNameAndAnnotationMatchButTypeNotFoundThenFieldNotFoundExceptionIsThrown()
             throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
         byte one = (byte) 1;
-        await().until(fieldIn(repository).ofType(byte.class).andAnnotatedWith(ExampleAnnotation.class), equalTo(one));
-        assertEquals(1, repository.getValue());
+        assertThrows(FieldNotFoundException.class, () -> await().until(fieldIn(repository).ofType(byte.class).andAnnotatedWith(ExampleAnnotation.class).andWithName("value"),
+                    equalTo(one)));
     }
 
-    @Test(timeout = 2000, expected = FieldNotFoundException.class)
-    public void givenAnnotationAndTypeWhenTypeMatchButAnnotationDoesntThenFieldNotFoundExceptionIsThrown()
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void givenAnnotationAndTypeWhenAnnotationMatchButTypeDoesntThenFieldNotFoundExceptionIsThrown()
             throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
-        await().until(fieldIn(repository).ofType(int.class).andAnnotatedWith(ExampleAnnotation2.class), equalTo(1));
-        assertEquals(1, repository.getValue());
+        byte one = (byte) 1;
+        assertThrows(FieldNotFoundException.class, () -> await().until(fieldIn(repository).ofType(byte.class).andAnnotatedWith(ExampleAnnotation.class), equalTo(one)));
     }
 
     @Test
-    public void showsErrorMessageContainingClassAndTypeWhenOnlyTypeSpecifiedWhenTimeout() throws Exception {
-        exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage("Field in org.awaitility.classes.FakeRepositoryWithAnnotation of type int expected <1> but was <0> within 200 milliseconds.");
-
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void givenAnnotationAndTypeWhenTypeMatchButAnnotationDoesntThenFieldNotFoundExceptionIsThrown()
+            throws Exception {
         FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
         new Asynch(repository).perform();
-        await().atMost(200, MILLISECONDS).until(fieldIn(repository).ofType(int.class), equalTo(1));
     }
 
     @Test
-    public void showsErrorMessageContainingClassAndTypeAndFieldNameWhenTypeAndNameSpecifiedWhenTimeout() throws Exception {
-        exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage("Field private volatile int org.awaitility.classes.FakeRepositoryWithAnnotation.value expected <1> but was <0> within 200 milliseconds.");
-
-        FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
-        new Asynch(repository).perform();
-        await().atMost(200, MILLISECONDS).until(fieldIn(repository).ofType(int.class).andWithName("value"), equalTo(1));
+    void showsErrorMessageContainingClassAndTypeWhenOnlyTypeSpecifiedWhenTimeout() {
+        Throwable exception = assertThrows(ConditionTimeoutException.class, () -> {
+            FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
+            new Asynch(repository).perform();
+            await().atMost(200, MILLISECONDS).until(fieldIn(repository).ofType(int.class), equalTo(1));
+        });
+        assertThat(exception.getMessage(), containsString("Field in org.awaitility.classes.FakeRepositoryWithAnnotation of type int expected <1> but was <0> within 200 milliseconds."));
     }
 
     @Test
-    public void showsErrorMessageContainingClassAndTypeAndFieldNameAndAnnotationWhenTypeAndNameAndAnnotationTypeSpecifiedWhenTimeout() throws Exception {
-        exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage("Field private volatile int org.awaitility.classes.FakeRepositoryWithAnnotation.value expected <1> but was <0> within 200 milliseconds.");
-
-        FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
-        new Asynch(repository).perform();
-        await().atMost(200, MILLISECONDS).until(fieldIn(repository).ofType(int.class).andWithName("value").andAnnotatedWith(ExampleAnnotation.class), equalTo(1));
+    void showsErrorMessageContainingClassAndTypeAndFieldNameWhenTypeAndNameSpecifiedWhenTimeout() {
+        Throwable exception = assertThrows(ConditionTimeoutException.class, () -> {
+            FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
+            new Asynch(repository).perform();
+            await().atMost(200, MILLISECONDS).until(fieldIn(repository).ofType(int.class).andWithName("value"), equalTo(1));
+        });
+        assertThat(exception.getMessage(), containsString("Field private volatile int org.awaitility.classes.FakeRepositoryWithAnnotation.value expected <1> but was <0> within 200 milliseconds."));
     }
 
     @Test
-    public void showsErrorMessageContainingClassAndTypeAndAnnotationWhenTypeAndAnnotationTypeSpecifiedWhenTimeout() throws Exception {
-        exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage("Field in org.awaitility.classes.FakeRepositoryWithAnnotation annotated with org.awaitility.classes.ExampleAnnotation and of type int expected <1> but was <0> within 200 milliseconds.");
+    void showsErrorMessageContainingClassAndTypeAndFieldNameAndAnnotationWhenTypeAndNameAndAnnotationTypeSpecifiedWhenTimeout() {
+        Throwable exception = assertThrows(ConditionTimeoutException.class, () -> {
+            FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
+            new Asynch(repository).perform();
+            await().atMost(200, MILLISECONDS).until(fieldIn(repository).ofType(int.class).andWithName("value").andAnnotatedWith(ExampleAnnotation.class), equalTo(1));
+        });
+        assertThat(exception.getMessage(), containsString("Field private volatile int org.awaitility.classes.FakeRepositoryWithAnnotation.value expected <1> but was <0> within 200 milliseconds."));
+    }
 
-        FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
-        new Asynch(repository).perform();
-        await().atMost(200, MILLISECONDS).until(fieldIn(repository).ofType(int.class).andAnnotatedWith(ExampleAnnotation.class), equalTo(1));
+    @Test
+    void showsErrorMessageContainingClassAndTypeAndAnnotationWhenTypeAndAnnotationTypeSpecifiedWhenTimeout() {
+        Throwable exception = assertThrows(ConditionTimeoutException.class, () -> {
+            FakeRepositoryWithAnnotation repository = new FakeRepositoryWithAnnotation();
+            new Asynch(repository).perform();
+            await().atMost(200, MILLISECONDS).until(fieldIn(repository).ofType(int.class).andAnnotatedWith(ExampleAnnotation.class), equalTo(1));
+        });
+        assertThat(exception.getMessage(), containsString("Field in org.awaitility.classes.FakeRepositoryWithAnnotation annotated with org.awaitility.classes.ExampleAnnotation and of type int expected <1> but was <0> within 200 milliseconds."));
     }
 }

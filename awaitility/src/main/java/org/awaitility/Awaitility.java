@@ -82,14 +82,14 @@ import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
  * the following methods from the Awaitility framework:
  * <p>&nbsp;</p>
  * <ul>
- * <li>org.awaitility.Awaitlity.*</li>
+ * <li>org.awaitility.Awaitility.*</li>
  * <li>org.awaitility.Durations.*</li>
  * </ul>
  * It may also be useful to import these methods:
  * <ul>
  * <li>java.util.concurrent.TimeUnit.*</li>
  * <li>org.hamcrest.Matchers.*</li>
- * <li>org.junit.Assert.*</li>
+ * <li>org.junit.jupiter.api.Assertions.*</li>
  * </ul>
  * <p>&nbsp;</p>
  * A word on poll interval and poll delay: Awaitility starts to check the
@@ -219,7 +219,8 @@ public class Awaitility {
      * thread as the test. For safety you should always combine tests using this feature with a test framework specific timeout,
      * for example in JUnit:
      * <pre>
-     * @Test(timeout = 2000L)
+     *     @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
      * public void myTest() {
      *     Awaitility.pollInSameThread();
      *     await().forever().until(...);

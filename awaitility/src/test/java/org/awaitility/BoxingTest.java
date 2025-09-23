@@ -16,7 +16,7 @@
 
 package org.awaitility;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -24,10 +24,10 @@ import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.greaterThan;
 
 @SuppressWarnings("UnnecessaryBoxing")
-public class BoxingTest {
+class BoxingTest {
 
     @Test
-    public void non_primitive_numbers_are_successfully_matched_against_their_primitive_counter_parts() {
+    void non_primitive_numbers_are_successfully_matched_against_their_primitive_counter_parts() {
         AtomicInteger ai = new AtomicInteger(0);
 
         new Thread(() -> {

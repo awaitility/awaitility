@@ -18,20 +18,26 @@ package org.awaitility;
 
 import org.awaitility.core.ConditionTimeoutException;
 import org.awaitility.core.DeadlockException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Durations.ONE_SECOND;
 import static org.awaitility.Durations.TWO_HUNDRED_MILLISECONDS;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
-public class DeadlockDetectionTest {
+class DeadlockDetectionTest {
 
-    @Test(timeout = 2000L)
-    public void deadlockTest() {
+    @Test
+    @Timeout(value = 2000L, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void deadlockTest() {
         final ReentrantLock lock1 = new ReentrantLock();
         final ReentrantLock lock2 = new ReentrantLock();
 
