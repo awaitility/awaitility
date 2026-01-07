@@ -31,6 +31,7 @@ public class ConditionSettings {
     private final ConditionEvaluationListener conditionEvaluationListener;
     private final ExecutorLifecycle executorLifecycle;
     private final FailFastCondition failFastCondition;
+    private final boolean ignoreConditionTimeout;
 
     /**
      * <p>Constructor for ConditionSettings.</p>
@@ -43,10 +44,12 @@ public class ConditionSettings {
      * @param ignoreExceptions            a {@link ExceptionIgnorer} object.
      * @param executorLifecycle           Responsible for performing executor service cleanup after each condition evaluation round
      * @param failFastCondition           a Callable that if returns true, fails the test immediately
+     * @param ignoreConditionTimeout      whether to throw a {@link ConditionTimeoutException} when a condition was not fulfilled within the specified threshold.
      */
     ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
                       PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
-                      ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle, final FailFastCondition failFastCondition) {
+                      ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle, final FailFastCondition failFastCondition,
+                      boolean ignoreConditionTimeout) {
         if (waitConstraint == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
@@ -62,6 +65,7 @@ public class ConditionSettings {
         this.conditionEvaluationListener = conditionEvaluationListener;
         this.ignoreExceptions = ignoreExceptions;
         this.failFastCondition = failFastCondition;
+        this.ignoreConditionTimeout = ignoreConditionTimeout;
     }
 
     /**
@@ -164,5 +168,12 @@ public class ConditionSettings {
      */
     public FailFastCondition getFailFastCondition() {
         return this.failFastCondition;
+    }
+
+    /**
+     * @return whether to throw a {@link ConditionTimeoutException} when a condition was not fulfilled within the specified threshold.
+     */
+    public boolean shouldIgnoreConditionTimeout() {
+        return ignoreConditionTimeout;
     }
 }

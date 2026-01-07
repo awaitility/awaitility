@@ -520,6 +520,50 @@ public class AwaitilityTest {
         Awaitility.await().atMost(timeoutMinutes, TimeUnit.MINUTES).until(() -> true);
     }
 
+    @Test(timeout = 2000)
+    public void ignoredConditionTimeoutShouldPreventConditionTimeoutExceptionWhenDoneLaterThanAtMostConstraint() {
+        await().ignoreConditionTimeout().atMost(200, TimeUnit.MILLISECONDS).until(() -> false);
+    }
+
+    @Test(timeout = 2000, expected = ConditionTimeoutException.class)
+    public void unIgnoredConditionTimeoutShouldNotPreventConditionTimeoutExceptionWhenDoneLaterThanAtMostConstraint() {
+        await().dontIgnoreConditionTimeout().atMost(200, TimeUnit.MILLISECONDS).until(() -> false);
+    }
+
+    @Test(timeout = 2000)
+    public void ignoredConditionTimeoutByDefaultShouldPreventConditionTimeoutExceptionWhenDoneLaterThanAtMostConstraint() {
+        ignoreConditionTimeoutByDefault();
+        await().atMost(200, TimeUnit.MILLISECONDS).until(() -> false);
+    }
+
+    @Test(timeout = 2000, expected = ConditionTimeoutException.class)
+    public void unIgnoredConditionTimeoutByDefaultShouldNotPreventConditionTimeoutExceptionWhenDoneLaterThanAtMostConstraint() {
+        doNotIgnoreConditionTimeoutByDefault();
+        await().atMost(200, TimeUnit.MILLISECONDS).until(() -> false);
+    }
+
+    @Test(timeout = 3000)
+    public void ignoredConditionTimeoutShouldPreventConditionTimeoutExceptionWhenDoneEarlierThanAtLeastConstraint() {
+        await().ignoreConditionTimeout().atLeast(1, SECONDS).and().atMost(2, SECONDS).until(() -> true);
+    }
+
+    @Test(timeout = 3000, expected = ConditionTimeoutException.class)
+    public void unIgnoredConditionTimeoutShouldNotPreventConditionTimeoutExceptionWhenDoneEarlierThanAtLeastConstraint() {
+        await().dontIgnoreConditionTimeout().atLeast(1, SECONDS).and().atMost(2, SECONDS).until(() -> true);
+    }
+
+    @Test(timeout = 3000)
+    public void ignoredConditionTimeoutByDefaultShouldPreventConditionTimeoutExceptionWhenDoneEarlierThanAtLeastConstraint() {
+        ignoreConditionTimeoutByDefault();
+        await().atLeast(1, SECONDS).and().atMost(2, SECONDS).until(() -> true);
+    }
+
+    @Test(timeout = 3000, expected = ConditionTimeoutException.class)
+    public void unIgnoredConditionTimeoutByDefaultShouldNotPreventConditionTimeoutExceptionWhenDoneEarlierThanAtLeastConstraint() {
+        doNotIgnoreConditionTimeoutByDefault();
+        await().atLeast(1, SECONDS).and().atMost(2, SECONDS).until(() -> true);
+    }
+
     private Callable<Boolean> fakeRepositoryValueEqualsOne() {
         return new FakeRepositoryEqualsOne(fakeRepository);
     }

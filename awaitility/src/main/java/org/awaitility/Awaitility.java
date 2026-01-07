@@ -159,6 +159,12 @@ public class Awaitility {
     private static volatile FailFastCondition defaultFailFastCondition = null;
 
     /**
+     * Throw a {@link ConditionTimeoutException}
+     * when a condition was not fulfilled within the specified threshold.
+     */
+    private static volatile boolean defaultIgnoreConditionTimeout = false;
+
+    /**
      * Instruct Awaitility to catch uncaught exceptions from other threads by
      * default. This is useful in multi-threaded systems when you want your test
      * to fail regardless of which thread throwing the exception. Default is
@@ -257,7 +263,28 @@ public class Awaitility {
     }
 
     /**
-     * Reset the timeout, poll interval, poll delay, uncaught exception handling
+     * Instruct Awaitility to not throw a {@link ConditionTimeoutException}
+     * when a condition was not fulfilled within the specified threshold.
+     * This is not the default behavior,
+     * the default behavior is throwing an exception.
+     * @since 4.4.0
+     */
+    public static void ignoreConditionTimeoutByDefault() {
+        defaultIgnoreConditionTimeout = true;
+    }
+
+    /**
+     * Instruct Awaitility to throw a {@link ConditionTimeoutException}
+     * when a condition was not fulfilled within the specified threshold.
+     * This is the default behavior.
+     * @since 4.4.0
+     */
+    public static void doNotIgnoreConditionTimeoutByDefault() {
+        defaultIgnoreConditionTimeout = false;
+    }
+
+    /**
+     * Reset the timeout, poll interval, poll delay, uncaught exception handling, etc.
      * to their default values:
      * <p>&nbsp;</p>
      * <ul>
@@ -269,6 +296,8 @@ public class Awaitility {
      * <li>Don't handle condition evaluation results</li>
      * <li>Don't log anything</li>
      * <li>No fail fast condition</li>
+     * <li>Throw a {@link ConditionTimeoutException}
+     * when a condition was not fulfilled within the specified threshold</li>
      * </ul>
      */
     public static void reset() {
@@ -281,6 +310,7 @@ public class Awaitility {
         defaultExceptionIgnorer = new PredicateExceptionIgnorer(e -> false);
         defaultFailFastCondition = null;
         Thread.setDefaultUncaughtExceptionHandler(null);
+        defaultIgnoreConditionTimeout = false;
     }
 
     /**
@@ -304,7 +334,7 @@ public class Awaitility {
     public static ConditionFactory await(String alias) {
         return new ConditionFactory(alias, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle, defaultFailFastCondition);
+                defaultExecutorLifecycle, defaultFailFastCondition, defaultIgnoreConditionTimeout);
     }
 
     /**
@@ -317,7 +347,7 @@ public class Awaitility {
     public static ConditionFactory catchUncaughtExceptions() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle, defaultFailFastCondition);
+                defaultExecutorLifecycle, defaultFailFastCondition, defaultIgnoreConditionTimeout);
     }
 
     /**
@@ -329,7 +359,7 @@ public class Awaitility {
     public static ConditionFactory dontCatchUncaughtExceptions() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 false, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle, defaultFailFastCondition);
+                defaultExecutorLifecycle, defaultFailFastCondition, defaultIgnoreConditionTimeout);
     }
 
     /**
@@ -344,7 +374,7 @@ public class Awaitility {
     public static ConditionFactory with() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle, defaultFailFastCondition);
+                defaultExecutorLifecycle, defaultFailFastCondition, defaultIgnoreConditionTimeout);
     }
 
     /**
@@ -359,7 +389,7 @@ public class Awaitility {
     public static ConditionFactory given() {
         return new ConditionFactory(null, defaultWaitConstraint, defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle, defaultFailFastCondition);
+                defaultExecutorLifecycle, defaultFailFastCondition, defaultIgnoreConditionTimeout);
     }
 
     /**
@@ -372,7 +402,7 @@ public class Awaitility {
     public static ConditionFactory waitAtMost(Duration timeout) {
         return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(timeout), defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle, defaultFailFastCondition);
+                defaultExecutorLifecycle, defaultFailFastCondition, defaultIgnoreConditionTimeout);
     }
 
     /**
@@ -386,7 +416,7 @@ public class Awaitility {
     public static ConditionFactory waitAtMost(long value, TimeUnit unit) {
         return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(DurationFactory.of(value, unit)), defaultPollInterval, defaultPollDelay,
                 defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle, defaultFailFastCondition);
+                defaultExecutorLifecycle, defaultFailFastCondition, defaultIgnoreConditionTimeout);
     }
 
     /**
