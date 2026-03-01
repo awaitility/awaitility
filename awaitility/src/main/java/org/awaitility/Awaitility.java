@@ -154,7 +154,7 @@ public class Awaitility {
     private static volatile ExecutorLifecycle defaultExecutorLifecycle = null;
 
     /**
-     * If this condition if _ever_ false, indicates our condition will _never_ be true.
+     * If this condition is _ever_ true, indicates our condition will _never_ be true.
      */
     private static volatile FailFastCondition defaultFailFastCondition = null;
 
@@ -510,7 +510,7 @@ public class Awaitility {
     }
 
     /**
-     * If the supplied Callable <i>ever</i> returns false, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * If the supplied Callable <i>ever</i> returns true, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
      * Throws a {@link TerminalFailureException} if fail fast condition evaluates to <code>true</code>. If you want to specify a more descriptive error message
      * then use {@link #setDefaultFailFastCondition(String, Callable)}.
      *
@@ -522,11 +522,10 @@ public class Awaitility {
     }
 
     /**
-     * If the supplied <code>failFastAssertion</code> <i>ever</i> returns throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * If the supplied <code>failFastAssertion</code> <i>ever</i> throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
      * This allows you to use a more descriptive error message of why the fail-fast condition failed instead of using {@link #setDefaultFailFastCondition(String, Callable)}.
      *
      * @param defaultFailFastAssertion The terminal failure assertion
-     * @return the condition factory
      * @see #setDefaultFailFastCondition(Callable)
      * @see ConditionFactory#failFast(ThrowingRunnable)
      */
@@ -535,12 +534,11 @@ public class Awaitility {
     }
 
     /**
-     * If the supplied <code>failFastAssertion</code> <i>ever</i> returns throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * If the supplied <code>failFastAssertion</code> <i>ever</i> throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
      * This allows you to use a more descriptive error message of why the fail-fast condition failed instead of using {@link #setDefaultFailFastCondition(String, Callable)}.
      *
      * @param failFastFailureReason    A descriptive reason why the fail fast condition has failed, will be included in the {@link TerminalFailureException} thrown if <code>failFastAssertion</code> throws an exception.
      * @param defaultFailFastAssertion The terminal failure assertion
-     * @return the condition factory
      * @see #setDefaultFailFastCondition(Callable)
      * @see ConditionFactory#failFast(ThrowingRunnable)
      */
@@ -549,7 +547,7 @@ public class Awaitility {
     }
 
     /**
-     * If the supplied Callable <i>ever</i> returns false, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * If the supplied Callable <i>ever</i> returns true, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
      * Throws a {@link TerminalFailureException} if fail fast condition evaluates to <code>true</code>.
      *
      * @param defaultFailFastCondition The terminal failure condition
