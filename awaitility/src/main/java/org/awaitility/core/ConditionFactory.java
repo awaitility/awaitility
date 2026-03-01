@@ -101,7 +101,7 @@ public class ConditionFactory {
      * @param exceptionsIgnorer           Determine which exceptions that should ignored
      * @param conditionEvaluationListener Determine which exceptions that should ignored
      * @param executorLifecycle           The executor service and the lifecycle of the executor service that'll be used to evaluate the condition during polling
-     * @param failFastCondition           If this condition if ever false, indicates our condition will never be true.
+     * @param failFastCondition           If this condition is ever true, indicates our condition will never be true.
      */
     public ConditionFactory(final String alias, WaitConstraint timeoutConstraint, PollInterval pollInterval, Duration pollDelay,
                             boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
@@ -608,7 +608,7 @@ public class ConditionFactory {
     }
 
     /**
-     * If the supplied Callable <i>ever</i> returns false, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * If the supplied Callable <i>ever</i> returns true, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
      * Throws a {@link TerminalFailureException} if fail fast condition evaluates to <code>true</code>.
      *
      * @param failFastFailureReason A descriptive reason why the fail fast condition has failed, will be included in the {@link TerminalFailureException} thrown if <code>failFastCondition</code> evaluates to <code>true</code>.
@@ -627,14 +627,14 @@ public class ConditionFactory {
     }
 
     /**
-     * If the supplied <code>failFastAssertion</code> <i>ever</i> returns throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * If the supplied <code>failFastAssertion</code> <i>ever</i> throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
      * This allows you to use a more descriptive error message of why the fail-fast condition failed by doing e.g.:
      *
      * <pre>
      * Workflow workflow = ..
      * await()
      *     .atMost(1, MINUTES)
-     *     .failFast(() ->  assertThat(workflow.get("phase")).describedAs("Workflow failed. Last known state:\n" + workflow.toPrettyString()).isNotEqualTo("Failed");
+     *     .failFast(() ->  assertThat(workflow.get("phase")).describedAs("Workflow failed. Last known state:\n" + workflow.toPrettyString()).isNotEqualTo("Failed"))
      *     .untilAsserted(...);
      * </pre>
      *
@@ -647,14 +647,14 @@ public class ConditionFactory {
     }
 
     /**
-     * If the supplied <code>failFastAssertion</code> <i>ever</i> returns throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * If the supplied <code>failFastAssertion</code> <i>ever</i> throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
      * This allows you to use a more descriptive error message of why the fail-fast condition failed by doing e.g.:
      *
      * <pre>
      * Workflow workflow = ..
      * await()
      *     .atMost(1, MINUTES)
-     *     .failFast("workflow failed", () ->  assertThat(workflow.get("phase")).describedAs("Workflow failed. Last known state:\n" + workflow.toPrettyString()).isNotEqualTo("Failed");
+     *     .failFast("workflow failed", () ->  assertThat(workflow.get("phase")).describedAs("Workflow failed. Last known state:\n" + workflow.toPrettyString()).isNotEqualTo("Failed"))
      *     .untilAsserted(...);
      * </pre>
      *
