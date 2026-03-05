@@ -26,7 +26,9 @@ import org.awaitility.classes.FakeRepositoryImpl
 import org.awaitility.core.ConditionEvaluationListener
 import org.awaitility.core.ConditionTimeoutException
 import org.awaitility.pollinterval.FibonacciPollInterval.fibonacci
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.allOf
+import org.hamcrest.Matchers.endsWith
+import org.hamcrest.Matchers.startsWith
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -144,9 +146,9 @@ class KotlinTest {
             atomicReference.set("world")
         }.start()
 
-        await.untilAtomic(atomicReference) { string ->
+        await.untilAtomic(atomicReference, java.util.function.Consumer { string ->
             assertThat(string).isEqualTo("world")
-        }
+        })
     }
 
     @Test
@@ -169,7 +171,7 @@ class KotlinTest {
             await() atMost Duration.ofSeconds(1) untilCallTo { fakeRepository.value } matches { it == 2 }
         }
 
-        assertThat(throwable).isExactlyInstanceOf(ConditionTimeoutException::class.java).hasMessageEndingWith("expected the predicate to return <true> but it returned <false> for input of <1> within 1 seconds.")
+        assertThat(throwable).isExactlyInstanceOf(ConditionTimeoutException::class.java).hasMessageEndingWith("returned a value not matching the predicate: <1> within 1 seconds.")
     }
 
     @Test

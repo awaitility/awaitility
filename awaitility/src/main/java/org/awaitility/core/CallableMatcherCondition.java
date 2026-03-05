@@ -16,7 +16,6 @@
 package org.awaitility.core;
 
 import org.awaitility.reflect.WhiteboxImpl;
-import org.hamcrest.Matcher;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -26,17 +25,17 @@ import java.util.concurrent.Callable;
 import static org.awaitility.core.LambdaErrorMessageGenerator.generateLambdaErrorMessagePrefix;
 import static org.awaitility.core.LambdaErrorMessageGenerator.isLambdaClass;
 
-class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
+class CallableMatcherCondition<T> extends AbstractMatcherCondition<T> {
 
 
     /**
-     * <p>Constructor for CallableHamcrestCondition.</p>
+     * <p>Constructor for CallableMatcherCondition.</p>
      *
      * @param supplier a {@link java.util.concurrent.Callable} object.
-     * @param matcher a {@link org.hamcrest.Matcher} object.
+     * @param matcher a {@link org.awaitility.core.Matcher} object.
      * @param settings a {@link org.awaitility.core.ConditionSettings} object.
      */
-    public CallableHamcrestCondition(final Callable<T> supplier, final Matcher<? super T> matcher, ConditionSettings settings) {
+    public CallableMatcherCondition(final Callable<T> supplier, final Matcher<? super T> matcher, ConditionSettings settings) {
         super(supplier, matcher, settings);
     }
 

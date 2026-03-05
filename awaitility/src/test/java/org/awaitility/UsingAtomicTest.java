@@ -30,10 +30,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.equalTo;
+import static org.awaitility.core.Matchers.equalTo;
 
 public class UsingAtomicTest {
     @Rule
@@ -55,7 +54,7 @@ public class UsingAtomicTest {
     public void usingAtomicIntegerWithConsumerMatcher() {
         AtomicInteger atomic = new AtomicInteger(0);
         new Asynch(new FakeRepositoryWithAtomicInteger(atomic)).perform();
-        await().untilAtomic(atomic, value -> assertThat(value).isEqualTo(1));
+        await().untilAtomic(atomic, value -> { assertThat(value).isEqualTo(1); });
     }
 
     @Test(timeout = 2000)
@@ -77,7 +76,7 @@ public class UsingAtomicTest {
     public void usingAtomicBooleanWithConsumerMatcher() {
         AtomicBoolean atomic = new AtomicBoolean(false);
         new Asynch(new FakeRepositoryWithAtomicBoolean(atomic)).perform();
-        await().untilAtomic(atomic, value -> assertThat(value).isTrue());
+        await().untilAtomic(atomic, value -> { assertThat(value).isTrue(); });
     }
 
     @Test(timeout = 2000)
@@ -99,7 +98,7 @@ public class UsingAtomicTest {
     public void usingAtomicLongWithConsumerMatcher() {
         AtomicLong atomic = new AtomicLong(0);
         new Asynch(new FakeRepositoryWithAtomicLong(atomic)).perform();
-        await().untilAtomic(atomic, value -> assertThat(value).isEqualTo(1L));
+        await().untilAtomic(atomic, value -> { assertThat(value).isEqualTo(1L); });
     }
 
     @Test(timeout = 2000)
@@ -124,7 +123,7 @@ public class UsingAtomicTest {
     public void usingAtomicReferenceWithConsumerMatcher() {
         AtomicReference<String> atomic = new AtomicReference<>("0");
         new Asynch(new FakeRepositoryWithAtomicReference(atomic)).perform();
-        await().untilAtomic(atomic, value -> assertThat(value).isEqualTo("1"));
+        await().untilAtomic(atomic, value -> { assertThat(value).isEqualTo("1"); });
     }
 
     @Test(timeout = 2000)

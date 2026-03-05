@@ -27,8 +27,8 @@ import java.util.concurrent.Callable;
 
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.fieldIn;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
+import static org.awaitility.core.Matchers.equalTo;
+import static org.awaitility.core.Matchers.greaterThan;
 import static org.junit.Assert.assertEquals;
 
 public class AwaitilityReturnValuesTest {

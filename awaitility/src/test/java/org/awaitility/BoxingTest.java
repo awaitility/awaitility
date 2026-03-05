@@ -21,7 +21,7 @@ import org.junit.Test;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.greaterThan;
+import static org.awaitility.core.Matchers.greaterThan;
 
 @SuppressWarnings("UnnecessaryBoxing")
 public class BoxingTest {

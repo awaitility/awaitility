@@ -33,7 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.instanceOf;
+import static org.awaitility.core.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -126,13 +126,13 @@ public class AwaitilityIgnoreExceptionsTest {
     @Test(timeout = 2000)
     public void exceptionIgnoringWorksForPredicates() {
         new Asynch(fakeRepository).perform();
-        await().atMost(1000, MILLISECONDS).with().ignoreExceptionsMatching(RuntimeException.class::isInstance).until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
+        await().atMost(1000, MILLISECONDS).with().ignoreExceptionsMatching((java.util.function.Predicate<Throwable>) RuntimeException.class::isInstance).until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
     }
 
     @Test(timeout = 2000)
     public void exceptionIgnoringWorksForPredicatesStatically() {
         new Asynch(fakeRepository).perform();
-        Awaitility.ignoreExceptionsByDefaultMatching(RuntimeException.class::isInstance);
+        Awaitility.ignoreExceptionsByDefaultMatching((java.util.function.Predicate<Throwable>) RuntimeException.class::isInstance);
         await().atMost(1000, MILLISECONDS).until(conditionsThatIsThrowingAnExceptionForATime(IllegalArgumentException.class));
     }
 

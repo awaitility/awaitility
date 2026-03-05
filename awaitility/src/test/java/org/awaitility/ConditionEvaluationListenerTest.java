@@ -18,25 +18,34 @@ package org.awaitility;
 
 import org.awaitility.core.ConditionEvaluationListener;
 import org.awaitility.core.EvaluatedCondition;
+import org.awaitility.core.Matcher;
 import org.awaitility.core.StartEvaluationEvent;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.setDefaultConditionEvaluationListener;
 import static org.awaitility.Awaitility.with;
 import static org.awaitility.Durations.ONE_SECOND;
 import static org.awaitility.Durations.TEN_SECONDS;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.awaitility.core.Matchers.equalTo;
+import static org.awaitility.core.Matchers.is;
 
 public class ConditionEvaluationListenerTest {
     @Rule
@@ -73,10 +82,10 @@ public class ConditionEvaluationListenerTest {
         Awaitility.setDefaultConditionEvaluationListener(defaultConditionEvaluationListener);
 
         with().until(new CountDown(5), is(equalTo(0)));
-        assertThat(globalCountDown.get(), is(equalTo(15)));
+        assertThat(globalCountDown.get()).isEqualTo(15);
 
         with().until(new CountDown(5), is(equalTo(0)));
-        assertThat(globalCountDown.get(), is(equalTo(10)));
+        assertThat(globalCountDown.get()).isEqualTo(10);
     }
 
     @Test(timeout = 2000)
@@ -95,15 +104,15 @@ public class ConditionEvaluationListenerTest {
         setDefaultConditionEvaluationListener(defaultConditionEvaluationListener);
 
         with().until(new CountDown(5), is(equalTo(0)));
-        assertThat(globalCountDown.get(), is(equalTo(15)));
+        assertThat(globalCountDown.get()).isEqualTo(15);
 
         with()
                 .conditionEvaluationListener(null)
                 .until(new CountDown(5), is(equalTo(0)));
-        assertThat(globalCountDown.get(), is(equalTo(15)));
+        assertThat(globalCountDown.get()).isEqualTo(15);
 
         with().until(new CountDown(5), is(equalTo(0)));
-        assertThat(globalCountDown.get(), is(equalTo(10)));
+        assertThat(globalCountDown.get()).isEqualTo(10);
     }
 
     @Test(timeout = 2000)
@@ -121,12 +130,12 @@ public class ConditionEvaluationListenerTest {
         setDefaultConditionEvaluationListener(defaultConditionEvaluationListener);
 
         with().until(new CountDown(5), is(equalTo(0)));
-        assertThat(globalCountDown.get(), is(equalTo(15)));
+        assertThat(globalCountDown.get()).isEqualTo(15);
 
         Awaitility.reset();
 
         with().until(new CountDown(5), is(equalTo(0)));
-        assertThat(globalCountDown.get(), is(equalTo(15)));
+        assertThat(globalCountDown.get()).isEqualTo(15);
     }
 
     @Test(timeout = 10000)
@@ -154,7 +163,7 @@ public class ConditionEvaluationListenerTest {
                 })
                 .until(new CountDown(5), is(equalTo(0)));
 
-        assertThat(buffer.size(), is(equalTo(5 + 1)));
+        assertThat(buffer.size()).isEqualTo(5 + 1);
     }
 
 
@@ -170,7 +179,7 @@ public class ConditionEvaluationListenerTest {
                 .until(new CountDownProvider(new CountDownBean(10, 20)), samePropertyValuesAs(new CountDownBean(10, 10)));
 
         String expectedMismatchMessage = String.format("%s expected same property values as CountDownBean [countDown: <10>, secondCountDown: <10>] but secondCountDown was <11>", CountDownProvider.class.getName());
-        assertThat(lastMismatchMessage.value, is(equalTo(expectedMismatchMessage)));
+        assertThat(lastMismatchMessage.value).isEqualTo(expectedMismatchMessage);
 
     }
 
@@ -186,7 +195,7 @@ public class ConditionEvaluationListenerTest {
                 .until(new CountDown(10), is(equalTo(5)));
 
         String expectedMismatchMessage = String.format("%s expected <5> but was <6>", CountDown.class.getName());
-        assertThat(lastMismatchMessage.value, is(equalTo(expectedMismatchMessage)));
+        assertThat(lastMismatchMessage.value).isEqualTo(expectedMismatchMessage);
 
     }
 
@@ -198,7 +207,7 @@ public class ConditionEvaluationListenerTest {
                 .until(new CountDown(10), is(equalTo(5)));
 
         String expectedMatchMessage = String.format("%s reached its end value of <5>", CountDown.class.getName());
-        assertThat(lastMatchMessage.value, is(equalTo(expectedMatchMessage)));
+        assertThat(lastMatchMessage.value).isEqualTo(expectedMatchMessage);
     }
 
     @Test(timeout = 2000)
@@ -224,8 +233,8 @@ public class ConditionEvaluationListenerTest {
                 .until(new CountDown(10), is(equalTo(5)));
 
         String expectedMatchMessage = String.format("%s reached its end value of <5>", CountDown.class.getName());
-        assertThat(lastMatchMessage.value, is(equalTo(expectedMatchMessage)));
-        assertThat(beforeEvaluation.value, is(equalTo(BigInteger.ONE)));
+        assertThat(lastMatchMessage.value).isEqualTo(expectedMatchMessage);
+        assertThat(beforeEvaluation.value).isEqualTo(BigInteger.ONE);
     }
 
     @Test(timeout = 2000)
@@ -240,8 +249,111 @@ public class ConditionEvaluationListenerTest {
                 .forever()
                 .until(new CountDown(10), is(equalTo(5)));
 
-        assertThat(remainingTimes, everyItem(is(Long.MAX_VALUE)));
-        assertThat(elapsedTimes, everyItem(is(not(Long.MAX_VALUE))));
+        assertThat(remainingTimes).allSatisfy(v -> assertThat(v).isEqualTo(Long.MAX_VALUE));
+        assertThat(elapsedTimes).allSatisfy(v -> assertThat(v).isNotEqualTo(Long.MAX_VALUE));
+    }
+
+    @Test(timeout = 2000)
+    public void evaluatedConditionGetMatcherReturnsTheMatcherUsedInCondition() {
+        final AtomicReference<Matcher<? super Integer>> capturedMatcher = new AtomicReference<>();
+        Matcher<? super Integer> expectedMatcher = is(equalTo(5));
+
+        with()
+                .conditionEvaluationListener(condition -> {
+                    if (condition.isMatcherCondition()) {
+                        capturedMatcher.set(condition.getMatcher());
+                    }
+                })
+                .until(new CountDown(10), expectedMatcher);
+
+        assertThat(capturedMatcher.get()).isNotNull();
+        assertThat(capturedMatcher.get()).isSameAs(expectedMatcher);
+    }
+
+    @Test(timeout = 2000)
+    public void startEvaluationEventGetMatcherReturnsTheMatcherUsedInCondition() {
+        final AtomicReference<Matcher<? super Integer>> capturedMatcher = new AtomicReference<>();
+        Matcher<? super Integer> expectedMatcher = is(equalTo(5));
+
+        ConditionEvaluationListener<Integer> listener = new ConditionEvaluationListener<Integer>() {
+            @Override
+            public void conditionEvaluated(EvaluatedCondition<Integer> condition) {
+            }
+
+            @Override
+            public void beforeEvaluation(StartEvaluationEvent<Integer> startEvaluationEvent) {
+                capturedMatcher.set(startEvaluationEvent.getMatcher());
+            }
+        };
+
+        with()
+                .conditionEvaluationListener(listener)
+                .until(new CountDown(10), expectedMatcher);
+
+        assertThat(capturedMatcher.get()).isNotNull();
+        assertThat(capturedMatcher.get()).isSameAs(expectedMatcher);
+    }
+
+    private static <T> Matcher<T> samePropertyValuesAs(T expected) {
+        return new Matcher<T>() {
+            @Override
+            public boolean matches(T value) {
+                if (value == null || expected == null) return value == expected;
+                try {
+                    BeanInfo beanInfo = Introspector.getBeanInfo(expected.getClass(), Object.class);
+                    for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
+                        Method getter = pd.getReadMethod();
+                        if (getter == null) continue;
+                        Object expectedVal = getter.invoke(expected);
+                        Object actualVal = getter.invoke(value);
+                        if (!Objects.equals(expectedVal, actualVal)) return false;
+                    }
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+
+            @Override
+            public String describe() {
+                return "same property values as " + beanDescription(expected);
+            }
+
+            @Override
+            public String describeMismatch(T value) {
+                if (value == null) return "was null";
+                try {
+                    BeanInfo beanInfo = Introspector.getBeanInfo(expected.getClass(), Object.class);
+                    for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
+                        Method getter = pd.getReadMethod();
+                        if (getter == null) continue;
+                        Object expectedVal = getter.invoke(expected);
+                        Object actualVal = getter.invoke(value);
+                        if (!Objects.equals(expectedVal, actualVal)) {
+                            return pd.getName() + " was <" + actualVal + ">";
+                        }
+                    }
+                } catch (Exception e) {
+                    return "was <" + value + ">";
+                }
+                return "was <" + value + ">";
+            }
+
+            private String beanDescription(Object bean) {
+                try {
+                    BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass(), Object.class);
+                    StringJoiner joiner = new StringJoiner(", ");
+                    for (PropertyDescriptor pd : beanInfo.getPropertyDescriptors()) {
+                        Method getter = pd.getReadMethod();
+                        if (getter == null) continue;
+                        joiner.add(pd.getName() + ": <" + getter.invoke(bean) + ">");
+                    }
+                    return bean.getClass().getSimpleName() + " [" + joiner + "]";
+                } catch (Exception e) {
+                    return bean.toString();
+                }
+            }
+        };
     }
 
     private static class CountDown implements Callable<Integer> {

@@ -16,8 +16,6 @@
 
 package org.awaitility.core;
 
-import org.hamcrest.Matcher;
-
 import java.time.Duration;
 
 /**
@@ -27,7 +25,7 @@ import java.time.Duration;
  */
 public class EvaluatedCondition<T> {
     private final String description;
-    private final Matcher<? super T> matcher;
+    private final Object matcher;
     private final T currentConditionValue;
     private final long elapsedTimeInMS;
     private final Duration pollInterval;
@@ -38,13 +36,13 @@ public class EvaluatedCondition<T> {
     /**
      * @param description           A descriptive match message or mismatch message of the matcher. If <code>isConditionSatisfied</code> is <code>true</code> then it
      *                              describes a match message, if <code>false</code> then it describes a mismatch message.
-     * @param matcher               The Hamcrest matcher used in the condition
+     * @param matcher               The matcher used in the condition (may be {@code null} for non-matcher conditions)
      * @param currentConditionValue The current value of the condition.
      * @param elapsedTimeInMS       elapsed time in milliseconds.
      * @param remainingTimeInMS     remaining time to wait in milliseconds; <code>Long.MAX_VALUE</code>, if no timeout defined, i.e., running forever.
-     * @param isConditionSatisfied  <code>true</code> if the condition is satisfied (i.e. hamcrest matcher matches the value), <code>false</code> otherwise (i.e. an intermediate value).
+     * @param isConditionSatisfied  <code>true</code> if the condition is satisfied (i.e. matcher matches the value), <code>false</code> otherwise (i.e. an intermediate value).
      */
-    EvaluatedCondition(String description, Matcher<? super T> matcher, T currentConditionValue, long elapsedTimeInMS, long remainingTimeInMS,
+    EvaluatedCondition(String description, Object matcher, T currentConditionValue, long elapsedTimeInMS, long remainingTimeInMS,
                        boolean isConditionSatisfied, String alias, Duration pollInterval) {
         this.description = description;
         this.matcher = matcher;
@@ -57,25 +55,26 @@ public class EvaluatedCondition<T> {
     }
 
     /**
-     * @return Descriptive message of the Hamcrest matcher.
+     * @return Descriptive message of the matcher.
      */
     public String getDescription() {
         return description;
     }
 
     /**
-     * @return <code>true</code> if the condition has a matcher (i.e. it's a Hamcrest Based condition) which means that {@link #getMatcher()} will return a non-null value.
+     * @return <code>true</code> if the condition has a matcher which means that {@link #getMatcher()} will return a non-null value.
      */
-    public boolean isHamcrestCondition() {
+    public boolean isMatcherCondition() {
         return matcher != null;
     }
 
     /**
-     * @return The Hamcrest matcher used in the condition if this condition is a Hamcrest condition
-     * @see #isHamcrestCondition()
+     * @return The matcher used in the condition if this condition is a matcher-based condition
+     * @see #isMatcherCondition()
      */
+    @SuppressWarnings("unchecked")
     public Matcher<? super T> getMatcher() {
-        return matcher;
+        return (Matcher<? super T>) matcher;
     }
 
     /**
@@ -107,7 +106,7 @@ public class EvaluatedCondition<T> {
     }
 
     /**
-     * @return <code>true</code> if the condition is satisfied (i.e. hamcrest matcher matches the value), <code>false</code> otherwise (i.e. an intermediate value).
+     * @return <code>true</code> if the condition is satisfied (i.e. matcher matches the value), <code>false</code> otherwise (i.e. an intermediate value).
      */
     public boolean isSatisfied() {
         return conditionIsFulfilled;

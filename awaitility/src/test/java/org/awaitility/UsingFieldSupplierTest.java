@@ -15,7 +15,13 @@
  */
 package org.awaitility;
 
-import org.awaitility.classes.*;
+import org.awaitility.classes.Asynch;
+import org.awaitility.classes.ExampleAnnotation;
+import org.awaitility.classes.ExampleAnnotation2;
+import org.awaitility.classes.FakeRepository;
+import org.awaitility.classes.FakeRepositoryImpl;
+import org.awaitility.classes.FakeRepositoryWithAnnotation;
+import org.awaitility.classes.FakeRepositoryWithStaticFieldAndAnnotation;
 import org.awaitility.core.ConditionTimeoutException;
 import org.awaitility.reflect.exception.FieldNotFoundException;
 import org.junit.Before;
@@ -26,7 +32,7 @@ import org.junit.rules.ExpectedException;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.fieldIn;
-import static org.hamcrest.Matchers.equalTo;
+import static org.awaitility.core.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
 public class UsingFieldSupplierTest {

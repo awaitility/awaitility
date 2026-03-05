@@ -18,8 +18,6 @@ package org.awaitility;
 
 import org.awaitility.core.TerminalFailureException;
 import org.awaitility.core.ThrowingRunnable;
-import org.hamcrest.Matcher;
-import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,8 +28,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.awaitility.Awaitility.await;
+import static org.awaitility.core.Matchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThan;
 
 /**
  * Fast failure on terminal status #178
@@ -53,7 +53,7 @@ public class FailFastTest {
     @Test
     public void fail_fast_throws_terminal_failure_exception_with_the_supplied_failure_reason() {
         exception.expect(TerminalFailureException.class);
-        exception.expectMessage(equalTo("System crash"));
+        exception.expectMessage("System crash");
 
         AtomicInteger ai = new AtomicInteger(0);
 
@@ -79,7 +79,7 @@ public class FailFastTest {
     @Test
     public void fail_fast_throws_terminal_failure_exception_with_the_default_failure_reason_when_no_failure_reason_is_specified() {
         exception.expect(TerminalFailureException.class);
-        exception.expectMessage(equalTo("Fail fast condition triggered"));
+        exception.expectMessage("Fail fast condition triggered");
 
         AtomicInteger ai = new AtomicInteger(0);
 
@@ -105,7 +105,7 @@ public class FailFastTest {
     @Test
     public void statically_configured_fail_fast_condition_without_failure_reason() {
         exception.expect(TerminalFailureException.class);
-        exception.expectMessage(equalTo("Fail fast condition triggered"));
+        exception.expectMessage("Fail fast condition triggered");
 
         AtomicInteger ai = new AtomicInteger(0);
 
@@ -131,7 +131,7 @@ public class FailFastTest {
     @Test
     public void statically_configured_fail_fast_condition_with_failure_reason() {
         exception.expect(TerminalFailureException.class);
-        exception.expectMessage(equalTo("System crash"));
+        exception.expectMessage("System crash");
 
         AtomicInteger ai = new AtomicInteger(0);
 
@@ -210,7 +210,7 @@ public class FailFastTest {
     public void fail_fast_throws_terminal_failure_exception_without_reason_when_using_assertions_with_explicit_reason() {
         exception.expect(TerminalFailureException.class);
         exception.expectMessage("fail fast reason");
-        exception.expectCause(instanceOf(AssertionError.class));
+        exception.expectCause(org.hamcrest.CoreMatchers.instanceOf(AssertionError.class));
 
         AtomicInteger ai = new AtomicInteger(0);
 
@@ -237,7 +237,7 @@ public class FailFastTest {
     public void fail_fast_throws_terminal_failure_exception_without_reason_when_using_default_assertions_with_explicit_reason() {
         exception.expect(TerminalFailureException.class);
         exception.expectMessage("fail fast reason");
-        exception.expectCause(instanceOf(AssertionError.class));
+        exception.expectCause(org.hamcrest.CoreMatchers.instanceOf(AssertionError.class));
 
         AtomicInteger ai = new AtomicInteger(0);
 

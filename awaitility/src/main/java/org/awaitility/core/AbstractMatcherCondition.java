@@ -15,13 +15,9 @@
  */
 package org.awaitility.core;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.StringDescription;
-
 import java.util.concurrent.Callable;
 
-public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
+public abstract class AbstractMatcherCondition<T> implements Condition<T> {
 
     private ConditionAwaiter conditionAwaiter;
 
@@ -29,13 +25,13 @@ public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
     private final ConditionEvaluationHandler<T> conditionEvaluationHandler;
 
     /**
-     * <p>Constructor for AbstractHamcrestCondition.</p>
+     * <p>Constructor for AbstractMatcherCondition.</p>
      *
      * @param supplier a {@link java.util.concurrent.Callable} object.
-     * @param matcher  a {@link org.hamcrest.Matcher} object.
+     * @param matcher  a {@link org.awaitility.core.Matcher} object.
      * @param settings a {@link org.awaitility.core.ConditionSettings} object.
      */
-    protected AbstractHamcrestCondition(final Callable<T> supplier, final Matcher<? super T> matcher, final ConditionSettings settings) {
+    protected AbstractMatcherCondition(final Callable<T> supplier, final Matcher<? super T> matcher, final ConditionSettings settings) {
         if (supplier == null) {
             throw new IllegalArgumentException("You must specify a supplier (was null).");
         }
@@ -65,16 +61,12 @@ public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
 
 
     private String getMatchMessage(Callable<T> supplier, Matcher<? super T> matcher) {
-        return String.format("%s reached its end value of %s", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher));
+        return String.format("%s reached its end value of %s", getCallableDescription(supplier), matcher.describe());
     }
 
     private String getMismatchMessage(Callable<T> supplier, Matcher<? super T> matcher) {
-        Description mismatchDescription = new StringDescription();
-        matcher.describeMismatch(lastResult, mismatchDescription);
-        if (mismatchDescription.toString() != null && mismatchDescription.toString().isEmpty()) {
-            mismatchDescription.appendText("was ").appendValue(lastResult);
-        }
-        return String.format("%s expected %s but %s", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher), mismatchDescription);
+        String mismatchDescription = matcher.describeMismatch(lastResult);
+        return String.format("%s expected %s but %s", getCallableDescription(supplier), matcher.describe(), mismatchDescription);
     }
 
     /**

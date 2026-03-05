@@ -21,24 +21,25 @@ import org.awaitility.core.FailFastCondition.CallableFailFastCondition;
 import org.awaitility.core.FailFastCondition.CallableFailFastCondition.FailFastAssertion;
 import org.awaitility.pollinterval.FixedPollInterval;
 import org.awaitility.pollinterval.PollInterval;
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
-
 import java.time.Duration;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.DoubleAccumulator;
+import java.util.concurrent.atomic.DoubleAdder;
+import java.util.concurrent.atomic.LongAccumulator;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static org.awaitility.core.ForeverDuration.isForever;
 import static org.awaitility.core.TemporalDuration.formatAsString;
-import static org.hamcrest.Matchers.anyOf;
-import static org.hamcrest.Matchers.is;
 
 /**
  * A factory for creating {@link org.awaitility.core.Condition} objects. It's not recommended instantiating this class directly.
@@ -125,7 +126,7 @@ public class ConditionFactory {
     }
 
     /**
-     * Handle condition evaluation results each time evaluation of a condition occurs. Works only with a Hamcrest matcher-based condition.
+     * Handle condition evaluation results each time evaluation of a condition occurs. Works only with a matcher-based condition.
      *
      * @param conditionEvaluationListener the condition evaluation listener
      * @return the condition factory
@@ -425,7 +426,7 @@ public class ConditionFactory {
      * @return the condition factory.
      */
     public ConditionFactory ignoreExceptions() {
-        return ignoreExceptionsMatching(e -> true);
+        return ignoreExceptionsMatching((Predicate<Throwable>) e -> true);
     }
 
     /**
@@ -436,11 +437,11 @@ public class ConditionFactory {
      * @return the condition factory.
      */
     public ConditionFactory ignoreNoExceptions() {
-        return ignoreExceptionsMatching(e -> false);
+        return ignoreExceptionsMatching((Predicate<Throwable>) e -> false);
     }
 
     /**
-     * Instruct Awaitility to ignore exceptions that occur during evaluation and matches the supplied Hamcrest matcher.
+     * Instruct Awaitility to ignore exceptions that occur during evaluation and matches the supplied matcher.
      * Exceptions will be treated as evaluating to
      * <code>false</code>. This is useful in situations where the evaluated conditions may temporarily throw exceptions.
      *
@@ -448,7 +449,7 @@ public class ConditionFactory {
      */
     public ConditionFactory ignoreExceptionsMatching(Matcher<? super Throwable> matcher) {
         return new ConditionFactory(alias, timeoutConstraint, pollInterval, pollDelay, catchUncaughtExceptions,
-                new HamcrestExceptionIgnorer(matcher), conditionEvaluationListener, executorLifecycle, failFastCondition);
+                new MatcherExceptionIgnorer(matcher), conditionEvaluationListener, executorLifecycle, failFastCondition);
     }
 
     /**
@@ -673,7 +674,7 @@ public class ConditionFactory {
 
     /**
      * Await until a {@link java.util.concurrent.Callable} supplies a value matching the specified
-     * {@link org.hamcrest.Matcher}. E.g.
+     * {@link org.awaitility.core.Matcher}. E.g.
      * <p>&nbsp;</p>
      * <pre>
      * await().until(numberOfPersons(), is(greaterThan(2)));
@@ -703,13 +704,12 @@ public class ConditionFactory {
      * @param <T>      the generic type
      * @param supplier the supplier that is responsible for getting the value that
      *                 should be matched.
-     * @param matcher  the matcher The hamcrest matcher that checks whether the
-     *                 condition is fulfilled.
+     * @param matcher  the matcher
      * @return a T object.
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public <T> T until(final Callable<T> supplier, final Matcher<? super T> matcher) {
-        return until(new CallableHamcrestCondition<>(supplier, matcher, generateConditionSettings()));
+        return until(new CallableMatcherCondition<>(supplier, matcher, generateConditionSettings()));
     }
 
     /**
@@ -726,22 +726,7 @@ public class ConditionFactory {
      * @since 3.1.1
      */
     public <T> T until(final Callable<T> supplier, final Predicate<? super T> predicate) {
-        return until(supplier, new TypeSafeMatcher<T>() {
-            @Override
-            protected void describeMismatchSafely(T item, Description description) {
-                description.appendText("it returned <false> for input of ").appendValue(item);
-            }
-
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("the predicate to return <true>");
-            }
-
-            @Override
-            protected boolean matchesSafely(T item) {
-                return predicate.test(item);
-            }
-        });
+        return new PredicateCondition<>(supplier, predicate, generateConditionSettings()).await();
     }
 
     /**
@@ -821,20 +806,19 @@ public class ConditionFactory {
 
     /**
      * Await until a Atomic variable has a value matching the specified
-     * {@link org.hamcrest.Matcher}. E.g.
+     * {@link org.awaitility.core.Matcher}. E.g.
      * <p>&nbsp;</p>
      * <pre>
      * await().untilAtomic(myAtomic, is(greaterThan(2)));
      * </pre>
      *
      * @param atomic  the atomic variable
-     * @param matcher the matcher The hamcrest matcher that checks whether the
-     *                condition is fulfilled.
+     * @param matcher the matcher
      * @return a {@link java.lang.Integer} object.
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public Integer untilAtomic(final AtomicInteger atomic, final Matcher<? super Integer> matcher) {
-        return until(new CallableHamcrestCondition<>(atomic::get, matcher, generateConditionSettings()));
+        return until(new CallableMatcherCondition<>(atomic::get, matcher, generateConditionSettings()));
     }
 
     /**
@@ -855,20 +839,19 @@ public class ConditionFactory {
 
     /**
      * Await until a Atomic variable has a value matching the specified
-     * {@link org.hamcrest.Matcher}. E.g.
+     * {@link org.awaitility.core.Matcher}. E.g.
      * <p>&nbsp;</p>
      * <pre>
      * await().untilAtomic(myAtomic, is(greaterThan(2)));
      * </pre>
      *
      * @param atomic  the atomic variable
-     * @param matcher the matcher The hamcrest matcher that checks whether the
-     *                condition is fulfilled.
+     * @param matcher the matcher
      * @return a {@link java.lang.Long} object.
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public Long untilAtomic(final AtomicLong atomic, final Matcher<? super Long> matcher) {
-        return until(new CallableHamcrestCondition<>(atomic::get, matcher, generateConditionSettings()));
+        return until(new CallableMatcherCondition<>(atomic::get, matcher, generateConditionSettings()));
     }
 
     /**
@@ -889,19 +872,18 @@ public class ConditionFactory {
 
     /**
      * Await until a Atomic variable has a value matching the specified
-     * {@link org.hamcrest.Matcher}. E.g.
+     * {@link org.awaitility.core.Matcher}. E.g.
      * <p>&nbsp;</p>
      * <pre>
      * await().untilAtomic(myAtomic, is(greaterThan(2)));
      * </pre>
      *
      * @param atomic  the atomic variable
-     * @param matcher the matcher The hamcrest matcher that checks whether the
-     *                condition is fulfilled.
+     * @param matcher the matcher
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAtomic(final AtomicBoolean atomic, final Matcher<? super Boolean> matcher) {
-        until(new CallableHamcrestCondition<>(atomic::get, matcher, generateConditionSettings()));
+        until(new CallableMatcherCondition<>(atomic::get, matcher, generateConditionSettings()));
     }
 
     /**
@@ -927,7 +909,7 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilTrue(final AtomicBoolean atomic) {
-        untilAtomic(atomic, anyOf(is(Boolean.TRUE), is(true)));
+        until(atomic::get, (Predicate<Boolean>) Boolean.TRUE::equals);
     }
 
     /**
@@ -937,22 +919,22 @@ public class ConditionFactory {
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilFalse(final AtomicBoolean atomic) {
-        untilAtomic(atomic, anyOf(is(Boolean.FALSE), is(false)));
+        until(atomic::get, (Predicate<Boolean>) Boolean.FALSE::equals);
     }
 
     /**
-     * Await until a {@link LongAdder} has a value matching the specified {@link org.hamcrest.Matcher}. E.g.
+     * Await until a {@link LongAdder} has a value matching the specified {@link org.awaitility.core.Matcher}. E.g.
      * <p>&nbsp;</p>
      * <pre>
      * await().untilAdder(myLongAdder, is(greaterThan(2L)));
      * </pre>
      *
      * @param adder   the {@link LongAdder} variable
-     * @param matcher the matcher The hamcrest matcher that checks whether the condition is fulfilled.
+     * @param matcher the matcher
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAdder(final LongAdder adder, final Matcher<? super Long> matcher) {
-        until(new CallableHamcrestCondition<>(adder::longValue, matcher, generateConditionSettings()));
+        until(new CallableMatcherCondition<>(adder::longValue, matcher, generateConditionSettings()));
     }
 
     /**
@@ -972,18 +954,18 @@ public class ConditionFactory {
     }
 
     /**
-     * Await until a {@link DoubleAdder} has a value matching the specified {@link org.hamcrest.Matcher}. E.g.
+     * Await until a {@link DoubleAdder} has a value matching the specified {@link org.awaitility.core.Matcher}. E.g.
      * <p>&nbsp;</p>
      * <pre>
      * await().untilAdder(myDoubleAdder, is(greaterThan(2.0d)));
      * </pre>
      *
      * @param adder   the {@link DoubleAdder} variable
-     * @param matcher the matcher The hamcrest matcher that checks whether the condition is fulfilled.
+     * @param matcher the matcher
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAdder(final DoubleAdder adder, final Matcher<? super Double> matcher) {
-        until(new CallableHamcrestCondition<>(adder::doubleValue, matcher, generateConditionSettings()));
+        until(new CallableMatcherCondition<>(adder::doubleValue, matcher, generateConditionSettings()));
     }
 
     /**
@@ -1003,18 +985,18 @@ public class ConditionFactory {
     }
 
     /**
-     * Await until a {@link LongAccumulator} has a value matching the specified {@link org.hamcrest.Matcher}. E.g.
+     * Await until a {@link LongAccumulator} has a value matching the specified {@link org.awaitility.core.Matcher}. E.g.
      * <p>&nbsp;</p>
      * <pre>
      * await().untilAccumulator(myLongAccumulator, is(greaterThan(2L)));
      * </pre>
      *
      * @param accumulator the {@link LongAccumulator} variable
-     * @param matcher     the matcher The hamcrest matcher that checks whether the condition is fulfilled.
+     * @param matcher     the matcher
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAccumulator(final LongAccumulator accumulator, final Matcher<? super Long> matcher) {
-        until(new CallableHamcrestCondition<>(accumulator::longValue, matcher, generateConditionSettings()));
+        until(new CallableMatcherCondition<>(accumulator::longValue, matcher, generateConditionSettings()));
     }
 
     /**
@@ -1034,18 +1016,18 @@ public class ConditionFactory {
     }
 
     /**
-     * Await until a {@link DoubleAccumulator} has a value matching the specified {@link org.hamcrest.Matcher}. E.g.
+     * Await until a {@link DoubleAccumulator} has a value matching the specified {@link org.awaitility.core.Matcher}. E.g.
      * <p>&nbsp;</p>
      * <pre>
      * await().untilAccumulator(myDoubleAccumulator, is(greaterThan(2.0d)));
      * </pre>
      *
      * @param accumulator the {@link DoubleAccumulator} variable
-     * @param matcher     the matcher The hamcrest matcher that checks whether the condition is fulfilled.
+     * @param matcher     the matcher
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public void untilAccumulator(final DoubleAccumulator accumulator, final Matcher<? super Double> matcher) {
-        until(new CallableHamcrestCondition<>(accumulator::doubleValue, matcher, generateConditionSettings()));
+        until(new CallableMatcherCondition<>(accumulator::doubleValue, matcher, generateConditionSettings()));
     }
 
     /**
@@ -1066,21 +1048,20 @@ public class ConditionFactory {
 
     /**
      * Await until a Atomic variable has a value matching the specified
-     * {@link org.hamcrest.Matcher}. E.g.
+     * {@link org.awaitility.core.Matcher}. E.g.
      * <p>&nbsp;</p>
      * <pre>
      * await().untilAtomic(myAtomic, is(greaterThan(2)));
      * </pre>
      *
      * @param atomic  the atomic variable
-     * @param matcher the matcher The hamcrest matcher that checks whether the
-     *                condition is fulfilled.
+     * @param matcher the matcher
      * @param <V>     a V object.
      * @return a V object.
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
      */
     public <V> V untilAtomic(final AtomicReference<V> atomic, final Matcher<? super V> matcher) {
-        return until(new CallableHamcrestCondition<>(atomic::get, matcher, generateConditionSettings()));
+        return until(new CallableMatcherCondition<>(atomic::get, matcher, generateConditionSettings()));
     }
 
     /**

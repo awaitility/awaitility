@@ -17,12 +17,23 @@ package org.awaitility;
 
 import org.awaitility.constraint.AtMostWaitConstraint;
 import org.awaitility.constraint.WaitConstraint;
-import org.awaitility.core.*;
+import org.awaitility.core.ConditionEvaluationListener;
+import org.awaitility.core.ConditionEvaluationLogger;
+import org.awaitility.core.ConditionFactory;
+import org.awaitility.core.DurationFactory;
+import org.awaitility.core.ExceptionIgnorer;
+import org.awaitility.core.ExecutorLifecycle;
+import org.awaitility.core.FailFastCondition;
 import org.awaitility.core.FailFastCondition.CallableFailFastCondition;
 import org.awaitility.core.FailFastCondition.CallableFailFastCondition.FailFastAssertion;
+import org.awaitility.core.FieldSupplierBuilder;
+import org.awaitility.core.InternalExecutorServiceFactory;
+import org.awaitility.core.Matcher;
+import org.awaitility.core.MatcherExceptionIgnorer;
+import org.awaitility.core.PredicateExceptionIgnorer;
+import org.awaitility.core.ThrowingRunnable;
 import org.awaitility.pollinterval.FixedPollInterval;
 import org.awaitility.pollinterval.PollInterval;
-import org.hamcrest.Matcher;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
@@ -88,7 +99,7 @@ import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
  * It may also be useful to import these methods:
  * <ul>
  * <li>java.util.concurrent.TimeUnit.*</li>
- * <li>org.hamcrest.Matchers.*</li>
+ * <li>org.awaitility.core.Matcher.*</li>
  * <li>org.junit.Assert.*</li>
  * </ul>
  * <p>&nbsp;</p>
@@ -209,7 +220,7 @@ public class Awaitility {
      * upon an exception matching the supplied exception type, unless it times out.
      */
     public static void ignoreExceptionsByDefaultMatching(Matcher<? super Throwable> matcher) {
-        defaultExceptionIgnorer = new HamcrestExceptionIgnorer(matcher);
+        defaultExceptionIgnorer = new MatcherExceptionIgnorer(matcher);
     }
 
     /**
@@ -470,7 +481,7 @@ public class Awaitility {
     /**
      * Sets the default condition evaluation listener that all await statements will use.
      *
-     * @param defaultConditionEvaluationListener handles condition evaluation each time evaluation of a condition occurs. Works only with Hamcrest matcher-based conditions.
+     * @param defaultConditionEvaluationListener handles condition evaluation each time evaluation of a condition occurs. Works only with matcher-based conditions.
      */
     public static void setDefaultConditionEvaluationListener(ConditionEvaluationListener defaultConditionEvaluationListener) {
         Awaitility.defaultConditionEvaluationListener = defaultConditionEvaluationListener;

@@ -16,9 +16,19 @@
 package org.awaitility;
 
 import org.assertj.core.api.Assertions;
-import org.awaitility.classes.*;
-import org.awaitility.core.*;
-import org.hamcrest.Matcher;
+import org.awaitility.classes.AssertExceptionThrownInAnotherThreadButNeverCaughtByAnyThreadTest;
+import org.awaitility.classes.Asynch;
+import org.awaitility.classes.ExceptionThrowingAsynch;
+import org.awaitility.classes.ExceptionThrowingFakeRepository;
+import org.awaitility.classes.FakeRepository;
+import org.awaitility.classes.FakeRepositoryEqualsOne;
+import org.awaitility.classes.FakeRepositoryImpl;
+import org.awaitility.classes.FakeRepositoryValue;
+import org.awaitility.core.ConditionEvaluationListener;
+import org.awaitility.core.ConditionTimeoutException;
+import org.awaitility.core.EvaluatedCondition;
+import org.awaitility.core.ForeverDuration;
+import org.awaitility.core.TimeoutEvent;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -40,12 +50,30 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import static java.util.concurrent.TimeUnit.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.awaitility.Awaitility.*;
-import static org.awaitility.Durations.*;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static java.util.concurrent.TimeUnit.DAYS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.Assert.assertThat;
+import static org.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.catchUncaughtExceptions;
+import static org.awaitility.Awaitility.catchUncaughtExceptionsByDefault;
+import static org.awaitility.Awaitility.dontCatchUncaughtExceptions;
+import static org.awaitility.Awaitility.given;
+import static org.awaitility.Awaitility.with;
+import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
+import static org.awaitility.Durations.ONE_SECOND;
+import static org.awaitility.Durations.TWO_HUNDRED_MILLISECONDS;
+import static org.awaitility.core.Matchers.equalTo;
+import static org.awaitility.core.Matchers.greaterThan;
+import static org.awaitility.core.Matchers.hasItem;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class AwaitilityTest {
 
@@ -398,7 +426,7 @@ public class AwaitilityTest {
         exception
                 .expectMessage(String
                         .format("%s.valueAsAnonymous Callable expected %s but was <0> within 120 milliseconds.",
-                                AwaitilityTest.class.getName(), equalTo(2).toString()));
+                                AwaitilityTest.class.getName(), Matchers.equalTo(2).toString()));
 
         with().pollInterval(10, MILLISECONDS).await().atMost(120, MILLISECONDS).until(valueAsAnonymous(), equalTo(2));
     }
@@ -407,10 +435,10 @@ public class AwaitilityTest {
     @Test(timeout = 2000)
     public void awaitDisplaysMethodDeclaringTheSupplierWhenSupplierIsAnonymousClassAndConditionTimeoutExceptionOccursWhenUsingNanos() {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage(Matchers.anyOf(Stream.of(equalTo(0).toString(), "null")
-                .map(s -> String.format("%s.valueAsAnonymous Callable expected %s but was %s within 120 nanoseconds.", AwaitilityTest.class.getName(), equalTo(2).toString(), s))
+        exception.expectMessage(Matchers.anyOf(Stream.of(Matchers.equalTo(0).toString(), "null")
+                .map(s -> String.format("%s.valueAsAnonymous Callable expected %s but was %s within 120 nanoseconds.", AwaitilityTest.class.getName(), Matchers.equalTo(2).toString(), s))
                 .map(Matchers::containsString)
-                .toArray(Matcher[]::new)));
+                .toArray(org.hamcrest.Matcher[]::new)));
 
         with().pollInterval(10, NANOSECONDS).await().atMost(120, NANOSECONDS).until(valueAsAnonymous(), equalTo(2));
     }
@@ -461,7 +489,7 @@ public class AwaitilityTest {
                 .until(() -> true)
         );
 
-        assertThat(duration.toMillis(), greaterThan(1000L));
+        assertThat(duration.toMillis(), Matchers.greaterThan(1000L));
     }
 
     @Test(timeout = 2500L)
@@ -476,7 +504,7 @@ public class AwaitilityTest {
                 )
         );
 
-        assertThat(duration.toMillis(), greaterThan(1500L));
+        assertThat(duration.toMillis(), Matchers.greaterThan(1500L));
     }
 
     @Test(timeout = 2000L, expected = ConditionTimeoutException.class)
@@ -508,7 +536,7 @@ public class AwaitilityTest {
                 .until(() -> true)
         );
 
-        assertThat(duration.toMillis(), greaterThan(1000L));
+        assertThat(duration.toMillis(), Matchers.greaterThan(1000L));
     }
 
     @Test

@@ -22,7 +22,11 @@ import org.awaitility.core.FailFastCondition.CallableFailFastCondition.FailFastA
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
@@ -127,7 +131,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             lastResult = new ConditionEvaluationResult(false, e, null);
         } finally {
             if (currentConditionEvaluation != null) {
-                // Cancelling future in order to avoid race-condition with last result for Hamcrest matchers
+                // Cancelling future in order to avoid race-condition with last result for matchers
                 // See https://github.com/awaitility/awaitility/issues/109
                 currentConditionEvaluation.cancel(true);
             }

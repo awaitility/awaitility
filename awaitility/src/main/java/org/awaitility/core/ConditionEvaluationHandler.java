@@ -15,8 +15,6 @@
  */
 package org.awaitility.core;
 
-import org.hamcrest.Matcher;
-
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Consumer;
@@ -29,11 +27,11 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
  */
 class ConditionEvaluationHandler<T> {
 
-    private final Matcher<? super T> matcher;
+    private final Object matcher;
     private final ConditionSettings settings;
     private final StopWatch watch;
 
-    ConditionEvaluationHandler(Matcher<? super T> matcher, ConditionSettings settings) {
+    ConditionEvaluationHandler(Object matcher, ConditionSettings settings) {
         this.matcher = matcher;
         this.settings = settings;
         watch = new StopWatch();

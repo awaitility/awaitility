@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
 
 import org.awaitility.Awaitility._
 import org.awaitility.core.ConditionTimeoutException
+import org.awaitility.core.{Matchers => AwaitilityMatchers}
 import org.hamcrest.CoreMatchers.is
 import org.hamcrest.Matchers.{containsString, endsWith, startsWith}
 import org.hamcrest.{CoreMatchers, Matchers}
@@ -61,15 +62,15 @@ class AwaitilitySupportTest extends AwaitilitySupport {
     val c1 = new Counter()
     val c2 = new Counter()
 
-    await until (c1.count() + c2.count(),  is(6))
-    await until (isDone(), is(java.lang.Boolean.TRUE))
-    await until (isDone, Matchers is java.lang.Boolean.TRUE )
+    await until (c1.count() + c2.count(),  AwaitilityMatchers.is(6))
+    await until (isDone(), AwaitilityMatchers.is(java.lang.Boolean.TRUE))
+    await until (isDone, AwaitilityMatchers.is(java.lang.Boolean.TRUE))
   }
 
   @Test
   def awaitWithAliasSupplierAndMatcher(): Unit = {
     try {
-      await("scala") atMost(500, MILLISECONDS) until (2 == 1, is(java.lang.Boolean.TRUE))
+      await("scala") atMost(500, MILLISECONDS) until (2 == 1, AwaitilityMatchers.is(java.lang.Boolean.TRUE))
       fail("Expected timeout exception")
     } catch {
         case e : ConditionTimeoutException =>

@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Durations.FIVE_SECONDS;
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.awaitility.core.Matchers.equalTo;
 
 public class WaitForAtomicBooleanTest {
     private AtomicBoolean wasAdded;

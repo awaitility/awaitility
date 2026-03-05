@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.LongAccumulator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.equalTo;
+import static org.awaitility.core.Matchers.equalTo;
 
 public class AwaitilityAccumulatorTest {
 
@@ -64,7 +64,7 @@ public class AwaitilityAccumulatorTest {
         }).start();
 
         // Then
-        await().untilAccumulator(accumulator, value -> assertThat(value).isEqualTo(30L));
+        await().untilAccumulator(accumulator, value -> { assertThat(value).isEqualTo(30L); });
     }
 
     @Test(timeout = 2000)
@@ -104,6 +104,6 @@ public class AwaitilityAccumulatorTest {
         }).start();
 
         // Then
-        await().untilAccumulator(accumulator, value -> assertThat(value).isEqualTo(35.2d));
+        await().untilAccumulator(accumulator, value -> { assertThat(value).isEqualTo(35.2d); });
     }
 }

@@ -15,15 +15,13 @@
  */
 package org.awaitility.core;
 
-import org.hamcrest.Matcher;
-
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * The Class HamcrestToStringFilter.
+ * The Class MatcherToStringFilter.
  */
-class HamcrestToStringFilter {
+class MatcherToStringFilter {
 	private static final List<String> wordsToRemove = new LinkedList<String>();
 	static {
 		wordsToRemove.add("not not ");
@@ -31,18 +29,18 @@ class HamcrestToStringFilter {
 	}
 
 	/**
-	 * Filter words from the <code>matcher.toString()</code> so it looks nicer
+	 * Filter words from the matcher description so it looks nicer
 	 * when printed out. E.g. "not not" is removed and "is" are removed.
-	 * 
-	 * @param matcher
-	 *            the matcher
-	 * @return A filtered version of the {@link Matcher#toString()}.
+	 *
+	 * @param matcherDescription
+	 *            the matcher description string
+	 * @return A filtered version of the description.
 	 */
-	static String filter(Matcher<?> matcher) {
-		String matcherToString = matcher.toString();
+	static String filter(String matcherDescription) {
+		String result = matcherDescription;
 		for (String wordToRemove : wordsToRemove) {
-			matcherToString = matcherToString.replaceAll(wordToRemove, "");
+			result = result.replaceAll(wordToRemove, "");
 		}
-		return matcherToString;
+		return result;
 	}
 }

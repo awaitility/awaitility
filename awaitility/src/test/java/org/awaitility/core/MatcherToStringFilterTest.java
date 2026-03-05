@@ -17,28 +17,30 @@ package org.awaitility.core;
 
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 
-public class HamcrestToStringFilterTest {
+public class MatcherToStringFilterTest {
 
 	@Test
 	public void removesIsFromToString() throws Exception {
-		assertEquals("<4>", HamcrestToStringFilter.filter(is(equalTo(4))));
+		assertEquals("<4>", MatcherToStringFilter.filter(is(equalTo(4)).toString()));
 	}
 
 	@Test
 	public void removesNotNotFromToString() throws Exception {
-		assertEquals("<4>", HamcrestToStringFilter.filter(not(not((equalTo(4))))));
+		assertEquals("<4>", MatcherToStringFilter.filter(not(not((equalTo(4)))).toString()));
 	}
 
 	@Test
 	public void removesAllNotNotsFromToString() throws Exception {
-		assertEquals("<4>", HamcrestToStringFilter.filter(not(not(not(not((equalTo(4))))))));
+		assertEquals("<4>", MatcherToStringFilter.filter(not(not(not(not((equalTo(4)))))).toString()));
 	}
 
 	@Test
 	public void removesNotNotButKeepsRemainingNotFromToString() throws Exception {
-		assertEquals("not <4>", HamcrestToStringFilter.filter(not(not(not((equalTo(4)))))));
+		assertEquals("not <4>", MatcherToStringFilter.filter(not(not(not((equalTo(4))))).toString()));
 	}
 }

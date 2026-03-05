@@ -75,7 +75,7 @@ public class AssertionCondition implements Condition<Void> {
 
     private String getMismatchMessage(ThrowingRunnable supplier, String exceptionMessage, String conditionAlias, boolean includeAliasIfDefined) {
         if (exceptionMessage != null && exceptionMessage.endsWith(".")) {
-            // Remove the "." of the Hamcrest match description since Awaitility adds more
+            // Remove the "." of the match description since Awaitility adds more
             exceptionMessage = exceptionMessage.substring(0, exceptionMessage.length() - 1);
         }
         return generateDescriptionPrefix(supplier, conditionAlias, includeAliasIfDefined) + " " + exceptionMessage;

@@ -16,22 +16,20 @@
 
 package org.awaitility.core;
 
-import org.hamcrest.Matcher;
-
 public class StartEvaluationEvent<T> {
     private final String description;
-    private final Matcher<? super T> matcher;
+    private final Object matcher;
     private final long elapsedTimeInMS;
     private final long remainingTimeInMS;
     private final String alias;
 
     /**
      * @param description           description message of the event
-     * @param matcher               The Hamcrest matcher used in the condition
+     * @param matcher               The matcher used in the condition (may be {@code null} for non-matcher conditions)
      * @param elapsedTimeInMS       elapsed time in milliseconds.
      * @param remainingTimeInMS     remaining time to wait in milliseconds; <code>Long.MAX_VALUE</code>, if no timeout defined, i.e., running forever.
      */
-    StartEvaluationEvent(String description, Matcher<? super T> matcher, long elapsedTimeInMS, long remainingTimeInMS,
+    StartEvaluationEvent(String description, Object matcher, long elapsedTimeInMS, long remainingTimeInMS,
                          String alias) {
         this.description = description;
         this.matcher = matcher;
@@ -44,8 +42,9 @@ public class StartEvaluationEvent<T> {
         return description;
     }
 
+    @SuppressWarnings("unchecked")
     public Matcher<? super T> getMatcher() {
-        return matcher;
+        return (Matcher<? super T>) matcher;
     }
 
     public long getElapsedTimeInMS() {

@@ -16,13 +16,11 @@
 
 package org.awaitility.core;
 
-import org.hamcrest.Matcher;
-
-public class HamcrestExceptionIgnorer implements ExceptionIgnorer {
+public class MatcherExceptionIgnorer implements ExceptionIgnorer {
 
     private final Matcher<? super Throwable> matcher;
 
-    public HamcrestExceptionIgnorer(Matcher<? super Throwable> matcher) {
+    public MatcherExceptionIgnorer(Matcher<? super Throwable> matcher) {
         if (matcher == null) {
             throw new IllegalArgumentException("matcher cannot be null");
         }

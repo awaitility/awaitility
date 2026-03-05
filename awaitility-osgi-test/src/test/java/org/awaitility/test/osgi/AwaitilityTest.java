@@ -44,11 +44,10 @@ public class AwaitilityTest {
                         systemProperty(EXAM_FAIL_ON_UNRESOLVED_KEY).value("true"),
                         systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),
 
-                        /* Hamcrest & JUnit bundles */
+                        /* JUnit bundles */
                         junitBundles(),
 
                         /* Deps */
-                        mavenBundle().groupId("org.hamcrest").artifactId("hamcrest").versionAsInProject(),
                         mavenBundle("org.awaitility", "awaitility").versionAsInProject(),
                         // CoreOptions.vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")
                 };

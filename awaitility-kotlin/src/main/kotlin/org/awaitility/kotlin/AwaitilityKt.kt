@@ -10,9 +10,7 @@ import org.awaitility.Awaitility
 import org.awaitility.core.ConditionEvaluationListener
 import org.awaitility.core.ConditionFactory
 import org.awaitility.pollinterval.PollInterval
-import org.hamcrest.Matcher
-import org.hamcrest.Matchers.not
-import org.hamcrest.Matchers.nullValue
+import org.awaitility.core.Matcher
 import java.time.Duration
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.atomic.AtomicBoolean
@@ -108,7 +106,7 @@ infix fun <T> ConditionFactory.untilCallTo(fn: () -> T) = AwaitilityKtUntilFunCo
  *
  * @since 3.1.4
  */
-infix fun <T> ConditionFactory.untilNotNull(fn: () -> T?) = (until(fn, not(nullValue())))!!
+infix fun <T> ConditionFactory.untilNotNull(fn: () -> T?) = until(fn, java.util.function.Predicate { it != null })!!
 
 /**
  * An extension function to `ConditionFactory` that allows you do write conditions such as:
@@ -122,7 +120,7 @@ infix fun <T> ConditionFactory.untilNotNull(fn: () -> T?) = (until(fn, not(nullV
  * @since 3.1.5
  */
 infix fun <T> ConditionFactory.untilNull(fn: () -> T?) {
-    until(fn, nullValue())
+    until(fn, java.util.function.Predicate { it == null })
 }
 
 /**
@@ -337,18 +335,18 @@ infix fun ConditionFactory.ignoreExceptionsInstanceOf(exceptionType: KClass<out 
 infix fun ConditionFactory.ignoreException(exceptionType: KClass<out Throwable>): ConditionFactory = ignoreException(exceptionType.javaObjectType)
 
 /**
- * Instruct Awaitility to ignore exceptions that occur during evaluation and matches the supplied Hamcrest matcher.
+ * Instruct Awaitility to ignore exceptions that occur during evaluation and matches the supplied matcher.
  * Exceptions will be treated as evaluating to `false`. This is useful in situations where the evaluated
  * conditions may temporarily throw exceptions.
  *
- * @param matcher The Hamcrest matcher
+ * @param matcher The matcher
  * @return the condition factory.
  * @since 3.1.2
  */
 infix fun ConditionFactory.ignoreExceptionsMatching(matcher: Matcher<in Throwable>): ConditionFactory = ignoreExceptionsMatching(matcher)
 
 /**
- * Instruct Awaitility to ignore exceptions that occur during evaluation and matches the supplied Hamcrest matcher.
+ * Instruct Awaitility to ignore exceptions that occur during evaluation and matches the supplied matcher.
  * Exceptions will be treated as evaluating to `false`. This is useful in situations where the evaluated
  * conditions may temporarily throw exceptions.
  *
@@ -356,7 +354,7 @@ infix fun ConditionFactory.ignoreExceptionsMatching(matcher: Matcher<in Throwabl
  * @return the condition factory.
  * @since 3.1.2
  */
-infix fun ConditionFactory.ignoreExceptionsMatching(matcher: (Throwable) -> Boolean): ConditionFactory = ignoreExceptionsMatching(matcher)
+infix fun ConditionFactory.ignoreExceptionsMatching(matcher: (Throwable) -> Boolean): ConditionFactory = ignoreExceptionsMatching(java.util.function.Predicate<Throwable> { matcher(it) })
 
 /**
  * Specify the executor service whose threads will be used to evaluate the poll condition in Awaitility.
@@ -400,7 +398,7 @@ infix fun ConditionFactory.untilTrue(atomicBoolean: AtomicBoolean) = untilTrue(a
 infix fun ConditionFactory.untilFalse(atomicBoolean: AtomicBoolean) = untilFalse(atomicBoolean)
 
 /**
- * Handle condition evaluation results each time evaluation of a condition occurs. Works only with a Hamcrest matcher-based condition.
+ * Handle condition evaluation results each time evaluation of a condition occurs. Works only with a matcher-based condition.
  *
  * @param conditionEvaluationListener the condition evaluation listener
  * @return the condition factory

@@ -26,9 +26,9 @@
     <description>Simplifies Awaitility usage from Groovy</description>
 
     <properties>
-        <groovy.version>4.0.19</groovy.version>
-        <spock.version>2.4-M2-groovy-4.0</spock.version>
-        <gmaven.version>1.7.1</gmaven.version>
+        <groovy.version>4.0.30</groovy.version>
+        <spock.version>2.4-groovy-4.0</spock.version>
+
     </properties>
 
     <dependencies>
@@ -151,7 +151,7 @@
             <plugin>
                 <groupId>org.codehaus.gmavenplus</groupId>
                 <artifactId>gmavenplus-plugin</artifactId>
-                <version>${gmaven.version}</version>
+                <version>${gmavenplus-plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>

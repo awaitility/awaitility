@@ -29,8 +29,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
 import static org.awaitility.core.ConditionEvaluationLogger.conditionEvaluationLogger;
+import static org.awaitility.core.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.everyItem;
 
 public class ConditionEvaluationLoggerTest {
 
@@ -178,7 +182,7 @@ public class ConditionEvaluationLoggerTest {
 
         assertThat(logs, everyItem(anyOf(equalTo("Starting evaluation"), containsString("expected <4> but was"), containsString("reached its end value of <4>"))));
     }
-    
+
     @Test(timeout = 2000)
     public void it_is_possible_to_override_the_way_condition_evaluation_logger_logs_the_results_when_using_static_method_to_create_the_condition_evaluation_logger() {
         CopyOnWriteArrayList<String> logs = new CopyOnWriteArrayList<>();
