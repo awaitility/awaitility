@@ -18,34 +18,33 @@ package org.awaitility;
 import org.awaitility.classes.Asynch;
 import org.awaitility.classes.FakeRepository;
 import org.awaitility.classes.FakeRepositoryImpl;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.fieldIn;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
-public class AwaitilityReturnValuesTest {
+class AwaitilityReturnValuesTest {
 
     private FakeRepository fakeRepository;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         fakeRepository = new FakeRepositoryImpl();
         Awaitility.reset();
     }
 
-    @Test(timeout = 2000)
-    public void returnsResultAfterSupplier() throws Exception {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void returnsResultAfterSupplier() throws Exception {
         new Asynch(fakeRepository).perform();
         int value = await().until(new Callable<Integer>() {
             public Integer call() throws Exception {
@@ -55,8 +54,9 @@ public class AwaitilityReturnValuesTest {
         assertEquals(1, value);
     }
 
-    @Test(timeout = 2000)
-    public void returnsResultAfterFieldInSupplier() throws Exception {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void returnsResultAfterFieldInSupplier() throws Exception {
         new Asynch(fakeRepository).perform();
         int value = await().until(fieldIn(fakeRepository).ofType(int.class).andWithName("value"), equalTo(1));
         assertEquals(1, value);

@@ -20,18 +20,18 @@ import org.awaitility.classes.Asynch;
 import org.awaitility.classes.FakeRepository;
 import org.awaitility.classes.FakeRepositoryImpl;
 import org.awaitility.classes.ThrowExceptionUnlessFakeRepositoryEqualsOne;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-public class ExceptionsInSetupAreIgnoredWhenIgnoreExceptionsIsActiveTest {
+class ExceptionsInSetupAreIgnoredWhenIgnoreExceptionsIsActiveTest {
 
     private static FakeRepository fakeRepository = new FakeRepositoryImpl();
 
-    @BeforeClass
-    public static void exceptionThrowingSetupStep() {
+    @BeforeAll
+    static void exceptionThrowingSetupStep() {
         new Asynch(fakeRepository).perform();
         Awaitility
                 .with().ignoreExceptions()
@@ -45,7 +45,7 @@ public class ExceptionsInSetupAreIgnoredWhenIgnoreExceptionsIsActiveTest {
     }
 
     @Test
-    public void exceptionsInTestSetupAreIgnoredWhenIgnoringExceptions() {
+    void exceptionsInTestSetupAreIgnoredWhenIgnoringExceptions() {
         // nothing here, test logic sits in @BeforeClass method
     }
 }

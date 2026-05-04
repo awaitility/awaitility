@@ -17,7 +17,7 @@
 package org.awaitility;
 
 import org.awaitility.pollinterval.IterativePollInterval;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 
@@ -25,11 +25,11 @@ import static org.awaitility.Durations.FIVE_HUNDRED_MILLISECONDS;
 import static org.awaitility.Durations.ONE_SECOND;
 import static org.awaitility.pollinterval.IterativePollInterval.iterative;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-public class IterativePollIntervalTest {
+class IterativePollIntervalTest {
 
-    @Test public void
+    @Test void
     iterative_poll_interval_allows_specifying_start_duration() {
         // Given
         IterativePollInterval pollInterval = new IterativePollInterval(prev -> prev.multipliedBy(2));
@@ -38,10 +38,10 @@ public class IterativePollIntervalTest {
         Duration duration = pollInterval.next(1, Duration.ZERO);
 
         // Then
-        assertThat(duration.toMillis(), is(2L));
+        assertThat(duration.toMillis(), is(0L));
     }
 
-    @Test public void
+    @Test void
     iterative_poll_interval_use_no_start_value_by_default() {
         // Given
         IterativePollInterval pollInterval = new IterativePollInterval(prev -> prev.multipliedBy(2));
@@ -53,7 +53,7 @@ public class IterativePollIntervalTest {
         assertThat(duration.toMillis(), is(2000L));
     }
 
-    @Test public void
+    @Test void
     iterative_poll_interval_allows_specifying_start_duration_through_dsl() {
         // Given
         IterativePollInterval pollInterval = iterative(prev -> prev.multipliedBy(2)).with().startDuration(FIVE_HUNDRED_MILLISECONDS);

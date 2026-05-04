@@ -19,124 +19,141 @@ import org.awaitility.classes.Asynch;
 import org.awaitility.classes.FakeRepository;
 import org.awaitility.core.ConditionTimeoutException;
 import org.awaitility.core.JavaVersionDetector;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
-public class UsingAtomicTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
+class UsingAtomicTest {
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         Awaitility.reset();
     }
 
-    @Test(timeout = 2000)
-    public void usingAtomicInteger() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void usingAtomicInteger() {
         AtomicInteger atomic = new AtomicInteger(0);
         new Asynch(new FakeRepositoryWithAtomicInteger(atomic)).perform();
         await().untilAtomic(atomic, equalTo(1));
     }
 
-    @Test(timeout = 2000)
-    public void usingAtomicIntegerWithConsumerMatcher() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void usingAtomicIntegerWithConsumerMatcher() {
         AtomicInteger atomic = new AtomicInteger(0);
         new Asynch(new FakeRepositoryWithAtomicInteger(atomic)).perform();
         await().untilAtomic(atomic, value -> assertThat(value).isEqualTo(1));
     }
 
-    @Test(timeout = 2000)
-    public void usingAtomicIntegerAndTimeout() {
-        exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage("expected <1> but was <0> within 200 milliseconds.");
-        AtomicInteger atomic = new AtomicInteger(0);
-        await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo(1));
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void usingAtomicIntegerAndTimeout() {
+        Throwable exception = assertThrows(ConditionTimeoutException.class, () -> {
+            AtomicInteger atomic = new AtomicInteger(0);
+            await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo(1));
+        });
+        assertThat(exception.getMessage(), containsString("expected <1> but was <0> within 200 milliseconds."));
     }
 
-    @Test(timeout = 2000)
-    public void usingAtomicBoolean() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void usingAtomicBoolean() {
         AtomicBoolean atomic = new AtomicBoolean(false);
         new Asynch(new FakeRepositoryWithAtomicBoolean(atomic)).perform();
         await().untilAtomic(atomic, equalTo(true));
     }
 
-    @Test(timeout = 2000)
-    public void usingAtomicBooleanWithConsumerMatcher() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void usingAtomicBooleanWithConsumerMatcher() {
         AtomicBoolean atomic = new AtomicBoolean(false);
         new Asynch(new FakeRepositoryWithAtomicBoolean(atomic)).perform();
         await().untilAtomic(atomic, value -> assertThat(value).isTrue());
     }
 
-    @Test(timeout = 2000)
-    public void usingAtomicBooleanAndTimeout() {
-        exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage("expected <true> but was <false> within 200 milliseconds.");
-        AtomicBoolean atomic = new AtomicBoolean(false);
-        await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo(true));
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void usingAtomicBooleanAndTimeout() {
+        Throwable exception = assertThrows(ConditionTimeoutException.class, () -> {
+            AtomicBoolean atomic = new AtomicBoolean(false);
+            await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo(true));
+        });
+        assertThat(exception.getMessage(), containsString("expected <true> but was <false> within 200 milliseconds."));
     }
 
-    @Test(timeout = 2000)
-    public void usingAtomicLong() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void usingAtomicLong() {
         AtomicLong atomic = new AtomicLong(0);
         new Asynch(new FakeRepositoryWithAtomicLong(atomic)).perform();
         await().untilAtomic(atomic, equalTo(1L));
     }
 
-    @Test(timeout = 2000)
-    public void usingAtomicLongWithConsumerMatcher() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void usingAtomicLongWithConsumerMatcher() {
         AtomicLong atomic = new AtomicLong(0);
         new Asynch(new FakeRepositoryWithAtomicLong(atomic)).perform();
         await().untilAtomic(atomic, value -> assertThat(value).isEqualTo(1L));
     }
 
-    @Test(timeout = 2000)
-    public void usingAtomicLongAndTimeout() {
-        exception.expect(ConditionTimeoutException.class);
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void usingAtomicLongAndTimeout() {
         String message = JavaVersionDetector.getJavaMajorVersion() < 17 ?
                 "Lambda expression in org.awaitility.core.ConditionFactory that uses java.util.concurrent.atomic.AtomicLong: expected <1L> but was <0L> within 200 milliseconds."
                 : "Lambda expression in org.awaitility.core.ConditionFactory expected <1L> but was <0L> within 200 milliseconds.";
-        exception.expectMessage(message);
-        AtomicLong atomic = new AtomicLong(0);
-        await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo(1L));
+        Throwable exception = assertThrows(ConditionTimeoutException.class, () -> {
+            AtomicLong atomic = new AtomicLong(0);
+            await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo(1L));
+        });
+        assertThat(exception.getMessage(), containsString(message));
     }
 
-    @Test(timeout = 2000)
-    public void usingAtomicReference() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void usingAtomicReference() {
         AtomicReference<String> atomic = new AtomicReference<>("0");
         new Asynch(new FakeRepositoryWithAtomicReference(atomic)).perform();
         await().untilAtomic(atomic, equalTo("1"));
     }
 
-    @Test(timeout = 2000)
-    public void usingAtomicReferenceWithConsumerMatcher() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void usingAtomicReferenceWithConsumerMatcher() {
         AtomicReference<String> atomic = new AtomicReference<>("0");
         new Asynch(new FakeRepositoryWithAtomicReference(atomic)).perform();
         await().untilAtomic(atomic, value -> assertThat(value).isEqualTo("1"));
     }
 
-    @Test(timeout = 2000)
-    public void usingAtomicReferenceAndTimeout() {
-        exception.expect(ConditionTimeoutException.class);
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void usingAtomicReferenceAndTimeout() {
         String message = JavaVersionDetector.getJavaMajorVersion() < 17 ?
                 "Lambda expression in org.awaitility.core.ConditionFactory that uses java.util.concurrent.atomic.AtomicReference: expected \"1\" but was \"0\" within 200 milliseconds."
                 : "Lambda expression in org.awaitility.core.ConditionFactory expected \"1\" but was \"0\" within 200 milliseconds.";
+        Throwable exception = assertThrows(ConditionTimeoutException.class, () -> {
+            AtomicReference<String> atomic = new AtomicReference<>("0");
+            await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo("1"));
+        });
 
-        exception.expectMessage(message);
-        AtomicReference<String> atomic = new AtomicReference<>("0");
-        await().atMost(200, MILLISECONDS).untilAtomic(atomic, equalTo("1"));
+        assertThat(exception.getMessage(), containsString(message));
     }
 }
 

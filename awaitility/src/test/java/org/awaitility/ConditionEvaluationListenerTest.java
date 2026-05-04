@@ -19,10 +19,9 @@ package org.awaitility;
 import org.awaitility.core.ConditionEvaluationListener;
 import org.awaitility.core.EvaluatedCondition;
 import org.awaitility.core.StartEvaluationEvent;
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -30,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.setDefaultConditionEvaluationListener;
 import static org.awaitility.Awaitility.with;
@@ -37,28 +37,30 @@ import static org.awaitility.Durations.ONE_SECOND;
 import static org.awaitility.Durations.TEN_SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
-public class ConditionEvaluationListenerTest {
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
+class ConditionEvaluationListenerTest {
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         Awaitility.reset();
     }
 
-    @Test(expected = RuntimeException.class)
-    public void listenerExceptionsAreNotCaught() {
-        with()
-                .catchUncaughtExceptions()
-                .conditionEvaluationListener(condition -> {
-                    throw new RuntimeException();
-                })
-                .until(new CountDown(10), is(equalTo(0)));
+    @Test
+    void listenerExceptionsAreNotCaught() {
+        assertThrows(RuntimeException.class, () ->
+            with()
+                    .catchUncaughtExceptions()
+                    .conditionEvaluationListener(condition -> {
+                        throw new RuntimeException();
+                    })
+                    .until(new CountDown(10), is(equalTo(0))));
     }
 
-    @Test(timeout = 2000)
-    public void settingDefaultHandlerWillImpactAllAwaitStatements() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void settingDefaultHandlerWillImpactAllAwaitStatements() {
 
         final CountDown globalCountDown = new CountDown(20);
 
@@ -79,8 +81,9 @@ public class ConditionEvaluationListenerTest {
         assertThat(globalCountDown.get(), is(equalTo(10)));
     }
 
-    @Test(timeout = 2000)
-    public void defaultHandlerCanBeDisabledPerAwaitStatement() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void defaultHandlerCanBeDisabledPerAwaitStatement() {
 
         final CountDown globalCountDown = new CountDown(20);
 
@@ -106,8 +109,9 @@ public class ConditionEvaluationListenerTest {
         assertThat(globalCountDown.get(), is(equalTo(10)));
     }
 
-    @Test(timeout = 2000)
-    public void afterAwaitilityResetNoDefaultHandlerIsSet() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void afterAwaitilityResetNoDefaultHandlerIsSet() {
         final CountDown globalCountDown = new CountDown(20);
 
         ConditionEvaluationListener defaultConditionEvaluationListener = condition -> {
@@ -129,8 +133,9 @@ public class ConditionEvaluationListenerTest {
         assertThat(globalCountDown.get(), is(equalTo(15)));
     }
 
-    @Test(timeout = 10000)
-    public void conditionResultsCanBeLoggedToSystemOut() {
+    @Test
+    @Timeout(value = 10000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void conditionResultsCanBeLoggedToSystemOut() {
         with()
                 .conditionEvaluationListener(condition -> {
                     if (condition.isSatisfied()) {
@@ -144,8 +149,9 @@ public class ConditionEvaluationListenerTest {
                 .until(new CountDown(5), is(equalTo(0)));
     }
 
-    @Test(timeout = 2000)
-    public void conditionResultsCanBeBuffered() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void conditionResultsCanBeBuffered() {
         final List<String> buffer = new ArrayList<>();
         with()
                 .conditionEvaluationListener(condition -> {
@@ -158,8 +164,9 @@ public class ConditionEvaluationListenerTest {
     }
 
 
-    @Test(timeout = 2000)
-    public void expectedMismatchMessageForComplexMatchers() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void expectedMismatchMessageForComplexMatchers() {
         final ValueHolder<String> lastMismatchMessage = new ValueHolder<>();
         with()
                 .conditionEvaluationListener((ConditionEvaluationListener<CountDownBean>) condition -> {
@@ -174,8 +181,9 @@ public class ConditionEvaluationListenerTest {
 
     }
 
-    @Test(timeout = 2000)
-    public void expectedMismatchMessage() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void expectedMismatchMessage() {
         final ValueHolder<String> lastMismatchMessage = new ValueHolder<>();
         with()
                 .conditionEvaluationListener(condition -> {
@@ -190,8 +198,9 @@ public class ConditionEvaluationListenerTest {
 
     }
 
-    @Test(timeout = 2000)
-    public void expectedMatchMessage() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void expectedMatchMessage() {
         final ValueHolder<String> lastMatchMessage = new ValueHolder<>();
         with()
                 .conditionEvaluationListener(condition -> lastMatchMessage.value = condition.getDescription())
@@ -201,8 +210,9 @@ public class ConditionEvaluationListenerTest {
         assertThat(lastMatchMessage.value, is(equalTo(expectedMatchMessage)));
     }
 
-    @Test(timeout = 2000)
-    public void beforeEvaluationCalledOnce() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void beforeEvaluationCalledOnce() {
         final ValueHolder<BigInteger> beforeEvaluation = new ValueHolder<>();
         beforeEvaluation.value = BigInteger.ZERO;
 
@@ -228,8 +238,9 @@ public class ConditionEvaluationListenerTest {
         assertThat(beforeEvaluation.value, is(equalTo(BigInteger.ONE)));
     }
 
-    @Test(timeout = 2000)
-    public void awaitingForeverReturnsLongMaxValueAsRemainingTime() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void awaitingForeverReturnsLongMaxValueAsRemainingTime() {
         final Set<Long> remainingTimes = new HashSet<>();
         final Set<Long> elapsedTimes = new HashSet<>();
         with()

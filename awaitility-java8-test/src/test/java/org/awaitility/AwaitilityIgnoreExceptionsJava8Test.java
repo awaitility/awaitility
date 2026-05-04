@@ -21,10 +21,9 @@ import org.awaitility.classes.FakeRepository;
 import org.awaitility.classes.FakeRepositoryImpl;
 import org.awaitility.core.CheckedExceptionRethrower;
 import org.awaitility.core.ConditionTimeoutException;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,21 +32,21 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.given;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
-public class AwaitilityIgnoreExceptionsJava8Test {
+class AwaitilityIgnoreExceptionsJava8Test {
     private FakeRepository fakeRepository;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         fakeRepository = new FakeRepositoryImpl();
         Awaitility.reset();
     }
 
-    @Test(timeout = 2000)
-    public void exceptionIgnoringWorksWithPredicates() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void exceptionIgnoringWorksWithPredicates() {
         new Asynch(fakeRepository).perform();
         await().atMost(1000, MILLISECONDS).and().ignoreExceptionsMatching(e -> e.getMessage().endsWith("is not 1")).until(() -> {
             if (fakeRepository.getValue() != 1) {
@@ -57,8 +56,9 @@ public class AwaitilityIgnoreExceptionsJava8Test {
         });
     }
 
-    @Test(timeout = 2000)
-    public void exceptionIgnoringWorksWithPredicatesStatically() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void exceptionIgnoringWorksWithPredicatesStatically() {
         new Asynch(fakeRepository).perform();
         Awaitility.ignoreExceptionsByDefaultMatching(e -> e instanceof RuntimeException);
         await().atMost(1000, MILLISECONDS).until(() -> {
@@ -69,8 +69,9 @@ public class AwaitilityIgnoreExceptionsJava8Test {
         });
     }
 
-    @Test(timeout = 2000L)
-    public void untilAssertedCanIgnoreThrowable() throws Exception {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void untilAssertedCanIgnoreThrowable() throws Exception {
         new Asynch(fakeRepository).perform();
         AtomicInteger counter = new AtomicInteger(0);
 
@@ -89,13 +90,16 @@ public class AwaitilityIgnoreExceptionsJava8Test {
      * the condition was fulfilled even though an exception is thrown later in the condition?
      * Or perhaps this behavior is correct?
      */
-    @Test(timeout = 2000L, expected = ConditionTimeoutException.class)
-    public void cannotHandleExceptionsThrownAfterAStatementIsFulfilled() throws Exception {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void cannotHandleExceptionsThrownAfterAStatementIsFulfilled() throws Exception {
         new Asynch(fakeRepository).perform();
 
-        given().ignoreExceptionsMatching(Objects::nonNull).await().atMost(800, MILLISECONDS).untilAsserted(() -> {
-            assertThat(fakeRepository.getValue()).isEqualTo(1);
-            CheckedExceptionRethrower.safeRethrow(new Throwable("Test"));
-        });
+        assertThrows(ConditionTimeoutException.class, () ->
+            given().ignoreExceptionsMatching(Objects::nonNull).await().atMost(800, MILLISECONDS).untilAsserted(() -> {
+                assertThat(fakeRepository.getValue()).isEqualTo(1);
+                CheckedExceptionRethrower.safeRethrow(new Throwable("Test"));
+            })
+        );
     }
 }

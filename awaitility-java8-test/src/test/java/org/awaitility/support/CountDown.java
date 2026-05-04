@@ -16,11 +16,8 @@
 
 package org.awaitility.support;
 
-import org.junit.Ignore;
-
 import java.util.concurrent.Callable;
 
-@Ignore("Not a test")
 public class CountDown implements Callable<Integer> {
 
     private int countDown;

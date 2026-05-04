@@ -17,32 +17,28 @@ package org.awaitility.groovy
 
 import org.awaitility.core.ConditionTimeoutException
 import org.awaitility.groovy.classes.Asynch
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.ExpectedException
+import org.junit.jupiter.api.Test
 
 import java.util.concurrent.Callable
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS
 import static org.awaitility.Awaitility.await
 import static org.hamcrest.Matchers.equalTo
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertThat
+import static org.junit.jupiter.api.Assertions.assertEquals
+import static org.hamcrest.MatcherAssert.assertThat
+import static org.junit.jupiter.api.Assertions.assertThrows
 
 class AwaitilityExtensionModuleTest {
 
-  @Rule
-  public def ExpectedException exception = ExpectedException.none()
-
   @Test
-  def void groovyBooleanClosureSupport() {
+  void groovyBooleanClosureSupport() {
     def asynch = new Asynch().perform()
 
     await().until { asynch.getValue() == 1 }
   }
 
   @Test
-  def void groovyNonBooleanClosureSupport() {
+  void groovyNonBooleanClosureSupport() {
     int calls = 0
     // using "false" to detect a buggy implementation making use of toBoolean(): "false".toBoolean() returns false
     Closure<String> stringClosure = { ++calls > 1 ? "false" : null }
@@ -53,7 +49,7 @@ class AwaitilityExtensionModuleTest {
   }
 
   @Test
-  def void groovyRunnableSupport() {
+  void groovyRunnableSupport() {
     def asynch = new Asynch().perform()
 
     await().until(new Runnable() {
@@ -65,7 +61,7 @@ class AwaitilityExtensionModuleTest {
   }
 
   @Test
-  def void groovyBooleanCallableSupport() {
+  void groovyBooleanCallableSupport() {
     def asynch = new Asynch().perform()
 
     await().until(new Callable<Boolean>() {
@@ -77,37 +73,38 @@ class AwaitilityExtensionModuleTest {
   }
 
   @Test
-  def void timeoutMessagesDoesntContainAnonymousClassDetails() {
-    exception.expect ConditionTimeoutException
-    exception.expectMessage "Condition was not fulfilled within 500 milliseconds"
+  void timeoutMessagesDoesntContainAnonymousClassDetails() {
+    def message = "Condition was not fulfilled within 500 milliseconds."
 
     def asynch = new Asynch().perform()
 
-    await().atMost(500, MILLISECONDS).until { asynch.getValue() == 2 }
+    ConditionTimeoutException ex = assertThrows(ConditionTimeoutException.class,
+              () -> await().atMost(500, MILLISECONDS).until { asynch.getValue() == 2 })
+    assertEquals(message, ex.getMessage())
   }
 
   @Test
-  def void awaitWithAlias() {
-    exception.expect ConditionTimeoutException
-    exception.expectMessage "Condition with alias 'groovy' didn't complete within 500 milliseconds"
+  void awaitWithAlias() {
+    def message =  "Condition with alias 'groovy' didn't complete within 500 milliseconds because condition was not fulfilled."
 
     def asynch = new Asynch().perform()
 
-    await("groovy").atMost(500, MILLISECONDS).until { asynch.getValue() == 2 }
+    ConditionTimeoutException ex = assertThrows(ConditionTimeoutException.class,
+              () -> await("groovy").atMost(500, MILLISECONDS).until { asynch.getValue() == 2 })
+    assertEquals(message, ex.getMessage())
   }
 
   @Test
-  def void untilAssertedTest() {
+  void untilAssertedTest() {
     def asynch = new Asynch().perform()
 
     await("groovy").atMost(2000, MILLISECONDS).untilAsserted { assertEquals(1, asynch.getValue()) }
   }
 
   @Test
-  def void untilWithAssertionThrowsException() {
-    exception.expect AssertionError
-
+  void untilWithAssertionThrowsException() {
     def asynch = new Asynch().perform()
-    await("groovy").atMost(2000, MILLISECONDS).until { assertEquals(2, asynch.getValue()) }
+
+    assertThrows(AssertionError.class, () -> await("groovy").atMost(2000, MILLISECONDS).until { assertEquals(2, asynch.getValue()) })
   }
 }

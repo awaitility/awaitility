@@ -16,19 +16,23 @@
 
 package org.awaitility;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.DoubleAdder;
 import java.util.concurrent.atomic.LongAdder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
-public class AwaitilityAdderTest {
+class AwaitilityAdderTest {
 
-    @Test(timeout = 2000)
-    public void awaitilityCanWaitForLongAdders() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void awaitilityCanWaitForLongAdders() {
         // Given
         LongAdder accumulator = new LongAdder();
 
@@ -47,8 +51,9 @@ public class AwaitilityAdderTest {
         await().untilAdder(accumulator, equalTo(5L));
     }
 
-    @Test(timeout = 2000)
-    public void awaitilityCanWaitForLongAddersWithConsumerMatcher() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void awaitilityCanWaitForLongAddersWithConsumerMatcher() {
         // Given
         LongAdder accumulator = new LongAdder();
 
@@ -67,8 +72,9 @@ public class AwaitilityAdderTest {
         await().untilAdder(accumulator, value -> assertThat(value).isEqualTo(5L));
     }
 
-    @Test(timeout = 2000)
-    public void awaitilityCanWaitForDoubleAdders() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void awaitilityCanWaitForDoubleAdders() {
         // Given
         DoubleAdder accumulator = new DoubleAdder();
 
@@ -87,8 +93,9 @@ public class AwaitilityAdderTest {
         await().untilAdder(accumulator, equalTo(5.5d));
     }
 
-    @Test(timeout = 2000)
-    public void awaitilityCanWaitForDoubleAddersWithConsumerMatcher() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void awaitilityCanWaitForDoubleAddersWithConsumerMatcher() {
         // Given
         DoubleAdder accumulator = new DoubleAdder();
 

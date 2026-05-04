@@ -17,13 +17,15 @@
 package org.awaitility.core;
 
 import org.awaitility.Awaitility;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.awaitility.Awaitility.await;
@@ -31,14 +33,15 @@ import static org.awaitility.Durations.ONE_HUNDRED_MILLISECONDS;
 import static org.awaitility.core.ConditionEvaluationLogger.conditionEvaluationLogger;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
-public class ConditionEvaluationLoggerTest {
+class ConditionEvaluationLoggerTest {
 
     private final PrintStream standardOut = System.out;
 
-    @After
+    @AfterEach
     @SuppressWarnings("unused")
-    public void resetDefaultSystemOut() {
+    void resetDefaultSystemOut() {
         System.setOut(standardOut);
         Awaitility.reset();
     }
@@ -46,8 +49,9 @@ public class ConditionEvaluationLoggerTest {
     /**
      * Test should check that await.logging(Consumer) properly logging data to Consumer
      */
-    @Test(timeout = 2000)
-    public void it_is_possible_to_use_logging_with_syntactic_sugar_via_condition_evaluation_logger_by_consumer() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void it_is_possible_to_use_logging_with_syntactic_sugar_via_condition_evaluation_logger_by_consumer() {
         CopyOnWriteArrayList<String> logs = new CopyOnWriteArrayList<>();
 
         await().with()
@@ -70,8 +74,9 @@ public class ConditionEvaluationLoggerTest {
     /**
      * Test should check that Awaitility.setLoggingListener(new ConditionEvaluationLogger(Consumer)) properly logging data to Consumer
      */
-    @Test(timeout = 2000)
-    public void it_is_possible_to_use_logging_with_Awaitlity_static_settings_via_condition_evaluation_logger_by_consumer() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void it_is_possible_to_use_logging_with_Awaitlity_static_settings_via_condition_evaluation_logger_by_consumer() {
         CopyOnWriteArrayList<String> logs = new CopyOnWriteArrayList<>();
         Awaitility.setLoggingListener(new ConditionEvaluationLogger(logs::add));
 
@@ -94,8 +99,9 @@ public class ConditionEvaluationLoggerTest {
     /**
      * Test should check that Awaitility.setLogging(new ConditionEvaluationLogger(Consumer)) properly logging data to Consumer
      */
-    @Test(timeout = 2000)
-    public void it_is_possible_to_use_logging_with_Awaitlity_static_settings_via_consumer() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void it_is_possible_to_use_logging_with_Awaitlity_static_settings_via_consumer() {
         CopyOnWriteArrayList<String> logs = new CopyOnWriteArrayList<>();
         Awaitility.setLogging(logs::add);
 
@@ -118,8 +124,9 @@ public class ConditionEvaluationLoggerTest {
     /**
      * Test should check that await.logging() properly logging data to System.out
      */
-    @Test(timeout = 2000)
-    public void it_is_possible_to_use_sout_logging_with_syntactic_sugar_via_condition_evaluation_logger() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void it_is_possible_to_use_sout_logging_with_syntactic_sugar_via_condition_evaluation_logger() {
         final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStreamCaptor));
         final AtomicInteger stub = new AtomicInteger(0);
@@ -144,8 +151,9 @@ public class ConditionEvaluationLoggerTest {
     /**
      * Test should check that Awaitility.setDefaultLogging() properly logging data to System.out
      */
-    @Test(timeout = 2000)
-    public void it_is_possible_to_use_sout_logging_with_Awaitility_static_settings_via_condition_evaluation_logger() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void it_is_possible_to_use_sout_logging_with_Awaitility_static_settings_via_condition_evaluation_logger() {
         final ByteArrayOutputStream outputStreamCaptor = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outputStreamCaptor));
         final AtomicInteger stub = new AtomicInteger(0);
@@ -168,8 +176,9 @@ public class ConditionEvaluationLoggerTest {
         );
     }
 
-    @Test(timeout = 2000)
-    public void it_is_possible_to_override_the_way_condition_evaluation_logger_logs_the_results_when_using_ctor_to_create_the_condition_evaluation_logger() {
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void it_is_possible_to_override_the_way_condition_evaluation_logger_logs_the_results_when_using_ctor_to_create_the_condition_evaluation_logger() {
         CopyOnWriteArrayList<String> logs = new CopyOnWriteArrayList<>();
 
         await().with().conditionEvaluationListener(new ConditionEvaluationLogger(logs::add)).
@@ -178,9 +187,10 @@ public class ConditionEvaluationLoggerTest {
 
         assertThat(logs, everyItem(anyOf(equalTo("Starting evaluation"), containsString("expected <4> but was"), containsString("reached its end value of <4>"))));
     }
-    
-    @Test(timeout = 2000)
-    public void it_is_possible_to_override_the_way_condition_evaluation_logger_logs_the_results_when_using_static_method_to_create_the_condition_evaluation_logger() {
+
+    @Test
+    @Timeout(value = 2000, unit = TimeUnit.MILLISECONDS, threadMode = SEPARATE_THREAD)
+    void it_is_possible_to_override_the_way_condition_evaluation_logger_logs_the_results_when_using_static_method_to_create_the_condition_evaluation_logger() {
         CopyOnWriteArrayList<String> logs = new CopyOnWriteArrayList<>();
 
         await().with().conditionEvaluationListener(conditionEvaluationLogger(logs::add)).

@@ -21,10 +21,9 @@ import org.awaitility.classes.FakeRepository;
 import org.awaitility.classes.FakeRepositoryImpl;
 import org.awaitility.core.ConditionEvaluationLogger;
 import org.awaitility.pollinterval.FibonacciPollInterval;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +34,7 @@ import static org.awaitility.core.ConditionEvaluationLogger.conditionEvaluationL
 import static org.awaitility.pollinterval.FibonacciPollInterval.fibonacci;
 import static org.awaitility.pollinterval.FixedPollInterval.fixed;
 import static org.awaitility.pollinterval.IterativePollInterval.iterative;
+import static org.junit.jupiter.api.Timeout.ThreadMode.SEPARATE_THREAD;
 
 /**
  * Tests for await().until(Runnable) using AssertionCondition.
@@ -42,51 +42,53 @@ import static org.awaitility.pollinterval.IterativePollInterval.iterative;
  * @author Marcin Zajączkowski, 2014-03-28
  * @author Johan Haleby
  */
-public class PollIntervalTest {
+class PollIntervalTest {
 
     private FakeRepository fakeRepository;
 
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
-
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         fakeRepository = new FakeRepositoryImpl();
         Awaitility.reset();
     }
 
-    @Test(timeout = 2000)
-    public void fibonacciPollInterval() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void fibonacciPollInterval() {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).pollInterval(new FibonacciPollInterval()).untilAsserted(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
-    @Test(timeout = 2000)
-    public void fibonacciPollIntervalStaticallyImported() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void fibonacciPollIntervalStaticallyImported() {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(conditionEvaluationLogger()).
                 pollInterval(fibonacci().with().offset(10).and().unit(MILLISECONDS)).
                 untilAsserted(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
-    @Test(timeout = 2000)
-    public void inlinePollInterval() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void inlinePollInterval() {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
                 pollInterval((__, previous) -> previous.multipliedBy(2).plusMillis(1)).
                 untilAsserted(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
-    @Test(timeout = 2000)
-    public void iterativePollInterval() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void iterativePollInterval() {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
                 pollInterval(iterative(duration -> duration.multipliedBy(2), FIVE_HUNDRED_MILLISECONDS)).
                 untilAsserted(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
     }
 
-    @Test(timeout = 2000)
-    public void fixedPollInterval() {
+    @Timeout(value = 2000, unit = MILLISECONDS, threadMode = SEPARATE_THREAD)
+    @Test
+    void fixedPollInterval() {
         new Asynch(fakeRepository).perform();
         await().with().conditionEvaluationListener(new ConditionEvaluationLogger()).
                 pollInterval(fixed(TWO_HUNDRED_MILLISECONDS)).

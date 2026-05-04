@@ -15,8 +15,8 @@
  */
 package org.awaitility;
 
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
@@ -32,14 +32,14 @@ import static org.awaitility.Awaitility.with;
 /**
  * Fixes issue <a href="https://github.com/awaitility/awaitility/issues/101">101</a>
  */
-public class AwaitilityCustomThreadMultipleWaitTest {
+class AwaitilityCustomThreadMultipleWaitTest {
 
-    @After public void
+    @AfterEach void
     reset_awaitility_after_each_test() {
         Awaitility.reset();
     }
 
-    @Test public void
+    @Test void
     custom_poll_thread_function_is_called_for_each_await_statement_when_using_static_configuration() {
         CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<>();
 
@@ -67,7 +67,7 @@ public class AwaitilityCustomThreadMultipleWaitTest {
         assertThat(firstCalled).doesNotHaveValue(secondCalled.get());
 	}
 
-	@Test public void
+	@Test void
     custom_poll_thread_function_is_called_for_each_await_statement_when_using_instance_configuration() {
         CopyOnWriteArrayList<Thread> threads = new CopyOnWriteArrayList<>();
 
@@ -95,7 +95,7 @@ public class AwaitilityCustomThreadMultipleWaitTest {
         assertThat(firstCalled).doesNotHaveValue(secondCalled.get());
     }
 
-    @Test public void
+    @Test void
     custom_executor_service_is_not_shutdown_between_tests_when_using_static_configuration() throws ExecutionException, InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(3);
 
@@ -120,7 +120,7 @@ public class AwaitilityCustomThreadMultipleWaitTest {
         assertThat(firstCalled).hasValue(createdExecutorServiceThreadGroupName.get()).hasValue(secondCalled.get());
 	}
 	
-    @Test public void
+    @Test void
     custom_executor_service_is_not_shutdown_between_tests_when_using_instance_configuration() throws ExecutionException, InterruptedException {
         ExecutorService executorService = Executors.newFixedThreadPool(1);
 
