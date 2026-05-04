@@ -12,11 +12,16 @@
     <parent>
         <groupId>org.awaitility</groupId>
         <artifactId>awaitility-parent</artifactId>
-        <version>4.3.1-SNAPSHOT</version>
+        <version>3.4.2-SNAPSHOT</version>
     </parent>
     <artifactId>awaitility-test-support</artifactId>
     <packaging>jar</packaging>
     <url>http://awaitility.org</url>
     <name>Awaitility Test Support</name>
     <description>Contains shared classes that is used for test purposes</description>
+
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+    </properties>
 </project>

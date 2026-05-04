@@ -14,13 +14,15 @@ jobs:
       matrix:
         include:
             - java: '8'
-              maven-profiles: '-P osgi-tests,kotlin'
+              maven-args: '-P osgi-tests,kotlin'
             - java: '11'
-              maven-profiles: ''
+              maven-args: ''
             - java: '17'
-              maven-profiles: '-P modern-jvm'
+              maven-args: '-P modern-jvm'
             - java: '21'
-              maven-profiles: '-P modern-jvm'
+              maven-args: '-P modern-jvm'
+            - java: '25'
+              maven-args: "-P modern-jvm -pl '!awaitility-groovy'"
 
     runs-on: 'ubuntu-latest'
     steps:
@@ -32,4 +34,4 @@ jobs:
         distribution: 'zulu'
         cache: 'maven'
     - name: Build
-      run: mvn --no-transfer-progress -B clean install ${{ matrix.maven-profiles }}
+      run: mvn --no-transfer-progress -B clean install ${{ matrix.maven-args }}

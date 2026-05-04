@@ -26,7 +26,7 @@
     <groupId>org.awaitility</groupId>
     <artifactId>awaitility-parent</artifactId>
     <packaging>pom</packaging>
-    <version>4.3.1-SNAPSHOT</version>
+    <version>3.4.2-SNAPSHOT</version>
 
     <url>http://github.com/awaitility/awaitility</url>
     <name>Awaitility Parent POM</name>
@@ -84,10 +84,24 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scm.branch>master</scm.branch>
         <slf4j.version>2.0.16</slf4j.version>
+        <sonatype.nexus.staging.serverId>sonatype-awaitility-nexus-staging</sonatype.nexus.staging.serverId>
+        <sonatype.nexus.staging.url>https://ossrh-staging-api.central.sonatype.com</sonatype.nexus.staging.url>
+        <sonatype.central.snapshots.url>https://central.sonatype.com/repository/maven-snapshots/</sonatype.central.snapshots.url>
         <surefire.reportFormat>plain</surefire.reportFormat>
         <surefire.useFile>false</surefire.useFile>
         <surefire.version>3.5.2</surefire.version>
     </properties>
+
+    <distributionManagement>
+        <repository>
+            <id>${sonatype.nexus.staging.serverId}</id>
+            <url>${sonatype.nexus.staging.url}/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>${sonatype.nexus.staging.serverId}</id>
+            <url>${sonatype.central.snapshots.url}</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <modules>
         <module>awaitility</module>
@@ -124,6 +138,19 @@
                 <version>3.1.1</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.13</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>${sonatype.nexus.staging.serverId}</serverId>
+                    <nexusUrl>${sonatype.nexus.staging.url}</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <!-- Keep the staging repo so close/promotion can be retried from the UI. -->
+                    <keepStagingRepositoryOnCloseRuleFailure>true</keepStagingRepositoryOnCloseRuleFailure>
                 </configuration>
             </plugin>
             <plugin>
@@ -218,7 +245,7 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.21.0</version>
+                <version>3.27.7</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

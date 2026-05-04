@@ -1,3 +1,14 @@
+Changelog 4.3.1 (2026-04-17)
+----------------------------
+* Upgraded assertj-core to 3.27.7 (thanks to Ian Hundere for pull request).
+* Updated the README example to use the Duration overload in await().atMost(..) (thanks to Kurt Alfred Kluever for pull request).
+* Added support for configuring the default timeout, poll interval and poll delay using ISO-8601 system properties. For example:
+
+    -Dawaitility.defaultTimeout=PT5S -Dawaitility.defaultPollInterval=PT0.1S -Dawaitility.defaultPollDelay=PT0.2S
+
+  (thanks to Henning Hoefer for pull request).
+* Clarified fail-fast documentation so that it correctly states that terminal failure happens when the fail-fast condition evaluates to true, and cleaned up related Javadocs (thanks to Mustafa Ulu for pull request).
+
 Changelog 4.3.0 (2025-02-21)
 ----------------------------
 * Support for kotlin.time.Duration in Kotlin DSL (thanks to Ivo Šmíd for PR)

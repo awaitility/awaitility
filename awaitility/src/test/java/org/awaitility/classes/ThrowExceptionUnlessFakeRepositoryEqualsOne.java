@@ -35,9 +35,7 @@ public class ThrowExceptionUnlessFakeRepositoryEqualsOne implements Callable<Boo
         if (repository.getValue() != 1) {
             Throwable throwable;
             try {
-                Constructor<? extends Throwable> constructor = this.throwable.getDeclaredConstructor(String.class);
-                constructor.setAccessible(true);
-                throwable = constructor.newInstance("Repository value is not 1");
+                throwable = createThrowable(this.throwable, "Repository value is not 1");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -45,5 +43,20 @@ public class ThrowExceptionUnlessFakeRepositoryEqualsOne implements Callable<Boo
         }
         return true;
     }
-}
 
+    private static Throwable createThrowable(Class<? extends Throwable> type, String message) throws Exception {
+        try {
+            Constructor<? extends Throwable> constructor = type.getConstructor(String.class);
+            return constructor.newInstance(message);
+        } catch (NoSuchMethodException ignored) {
+        }
+
+        try {
+            Constructor<? extends Throwable> constructor = type.getConstructor(Object.class);
+            return constructor.newInstance(message);
+        } catch (NoSuchMethodException ignored) {
+        }
+
+        return type.getConstructor().newInstance();
+    }
+}

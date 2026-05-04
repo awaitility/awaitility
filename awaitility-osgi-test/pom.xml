@@ -3,14 +3,16 @@
     <parent>
         <groupId>org.awaitility</groupId>
         <artifactId>awaitility-parent</artifactId>
-        <version>4.3.1-SNAPSHOT</version>
+        <version>3.4.2-SNAPSHOT</version>
     </parent>
     <artifactId>awaitility-osgi-test</artifactId>
 
     <properties>
         <animal.sniffer.skip>true</animal.sniffer.skip>
+        <maven.deploy.skip>true</maven.deploy.skip>
         <pax-exam.version>4.13.4</pax-exam.version>
         <junit.version>4.13.2</junit.version>
+        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
     </properties>
 
     <dependencies>

@@ -27,6 +27,11 @@
     <description>Tests Awaitility with Java 8</description>
     <packaging>jar</packaging>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
