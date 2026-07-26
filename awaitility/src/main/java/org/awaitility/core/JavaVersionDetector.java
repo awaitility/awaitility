@@ -16,7 +16,11 @@ public final class JavaVersionDetector {
             return Integer.parseInt(javaVersion.substring(2, 3));
         }
         int end = 0;
-        while (end < javaVersion.length() && Character.isDigit(javaVersion.charAt(end))) {
+        while (end < javaVersion.length()) {
+            char c = javaVersion.charAt(end);
+            if (c < '0' || c > '9') {
+                break;
+            }
             end++;
         }
         if (end == 0) {
