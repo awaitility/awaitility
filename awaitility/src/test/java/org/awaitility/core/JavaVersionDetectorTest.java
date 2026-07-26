@@ -83,4 +83,14 @@ public class JavaVersionDetectorTest {
         assertThat(JavaVersionDetector.getJavaMajorVersion("23-beta"), equalTo(23));
     }
 
+    @Test
+    public void javaVersionFor25beta() {
+        assertThat(JavaVersionDetector.getJavaMajorVersion("25-beta"), equalTo(25));
+    }
+
+    @Test
+    public void javaVersionFor25ea() {
+        assertThat(JavaVersionDetector.getJavaMajorVersion("25-ea"), equalTo(25));
+    }
+
 }
