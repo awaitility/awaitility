@@ -83,4 +83,20 @@ public class JavaVersionDetectorTest {
         assertThat(JavaVersionDetector.getJavaMajorVersion("23-beta"), equalTo(23));
     }
 
+    @Test
+    public void javaVersionFor25WithPlusBuild() {
+        /*
+        Some EA / early builds report java.version with a +build suffix (e.g. 25+36).
+         */
+        assertThat(JavaVersionDetector.getJavaMajorVersion("25+36"), equalTo(25));
+    }
+
+    @Test
+    public void javaVersionFor25WithPlusBuildAndEa() {
+        /*
+        OpenJDK EA can combine +build with an -ea suffix (e.g. 25+36-ea).
+         */
+        assertThat(JavaVersionDetector.getJavaMajorVersion("25+36-ea"), equalTo(25));
+    }
+
 }
