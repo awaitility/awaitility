@@ -177,9 +177,14 @@ public class ConditionFactory {
     }
 
     /**
-     * Await at the predicate holds during at least <code>timeout</code>
+     * Await until the predicate holds during at least <code>timeout</code>.
+     * <p>
+     * If the configured {@link #atMost(Duration) atMost} timeout is not large enough for the
+     * condition to remain true for the entire {@code during} period (taking the poll delay into
+     * account), the overall timeout is extended automatically so that an always-true condition
+     * can complete. See <a href="https://github.com/awaitility/awaitility/issues/264">issue 264</a>.
      *
-     * @param timeout the timeout
+     * @param timeout the period the condition must remain true
      * @return the condition factory
      */
     public ConditionFactory during(Duration timeout) {
@@ -188,9 +193,14 @@ public class ConditionFactory {
     }
 
     /**
-     * Await at the predicate holds during at least <code>timeout</code>
+     * Await until the predicate holds during at least <code>timeout</code>.
+     * <p>
+     * If the configured {@link #atMost(long, TimeUnit) atMost} timeout is not large enough for the
+     * condition to remain true for the entire {@code during} period (taking the poll delay into
+     * account), the overall timeout is extended automatically so that an always-true condition
+     * can complete. See <a href="https://github.com/awaitility/awaitility/issues/264">issue 264</a>.
      *
-     * @param timeout the timeout
+     * @param timeout the period the condition must remain true
      * @param unit    the unit
      * @return the condition factory
      */
@@ -1136,7 +1146,8 @@ public class ConditionFactory {
             throw new IllegalArgumentException("Cannot delay polling forever");
         }
 
-        Duration timeout = timeoutConstraint.getMaxWaitTime();
+        WaitConstraint effectiveTimeoutConstraint = ensureTimeoutAllowsDuringPeriod(timeoutConstraint, actualPollDelay, pollInterval);
+        Duration timeout = effectiveTimeoutConstraint.getMaxWaitTime();
         if (!isForever(timeout) && timeout.toNanos() <= actualPollDelay.toNanos()) {
             throw new IllegalArgumentException(String.format("Timeout (%s) must be greater than the poll delay (%s).",
                     formatAsString(timeout), formatAsString(actualPollDelay)));
@@ -1152,8 +1163,38 @@ public class ConditionFactory {
             executorLifecycle = this.executorLifecycle;
         }
 
-        return new ConditionSettings(alias, catchUncaughtExceptions, timeoutConstraint, pollInterval, actualPollDelay,
+        return new ConditionSettings(alias, catchUncaughtExceptions, effectiveTimeoutConstraint, pollInterval, actualPollDelay,
                 conditionEvaluationListener, exceptionsIgnorer, executorLifecycle, failFastCondition);
+    }
+
+    /**
+     * When {@link #during(Duration)} is used, the condition must remain true for the hold period
+     * <em>after</em> the first successful evaluation. That first evaluation is itself delayed by
+     * the poll delay, and the hold is only re-checked after each poll interval. If the configured
+     * timeout is not large enough (for example {@code await().during(10, SECONDS)} with the
+     * default 10 second timeout), automatically extend it so that a condition that is always true
+     * can complete (see <a href="https://github.com/awaitility/awaitility/issues/264">issue 264</a>).
+     */
+    private static WaitConstraint ensureTimeoutAllowsDuringPeriod(WaitConstraint timeoutConstraint,
+                                                                  Duration actualPollDelay,
+                                                                  PollInterval pollInterval) {
+        Duration holdPredicateTime = timeoutConstraint.getHoldPredicateTime();
+        Duration timeout = timeoutConstraint.getMaxWaitTime();
+        if (isForever(timeout) || isForever(holdPredicateTime) || holdPredicateTime.isZero()) {
+            return timeoutConstraint;
+        }
+        // Worst case: first success after pollDelay, then almost one full poll interval after the
+        // hold period has elapsed before the next evaluation observes that the hold is complete.
+        Duration onePollInterval = pollInterval.next(1, actualPollDelay);
+        if (onePollInterval.isZero() || isForever(onePollInterval)) {
+            onePollInterval = Duration.ofMillis(1);
+        }
+        // +1ms so maxWaitTime stays strictly greater than evaluationDuration when the hold ends
+        Duration minimumTimeout = actualPollDelay.plus(holdPredicateTime).plus(onePollInterval).plusMillis(1);
+        if (timeout.compareTo(minimumTimeout) < 0) {
+            return timeoutConstraint.withMaxWaitTime(minimumTimeout);
+        }
+        return timeoutConstraint;
     }
 
     private <T> T until(Condition<T> condition) {

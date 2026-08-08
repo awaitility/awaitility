@@ -139,15 +139,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             } else if (lastResult != null && lastResult.hasThrowable()) {
                 throw lastResult.getThrowable();
             } else if (!succeededBeforeTimeout) {
-                final String message;
-                String timeoutMessage = getTimeoutMessage();
-                String durationAsString = formatAsString(maxWaitTime);
-                if (conditionSettings.hasAlias()) {
-                    message = String.format("Condition with alias '%s' didn't complete within %s because %s.",
-                            conditionSettings.getAlias(), durationAsString, decapitalize(timeoutMessage));
-                } else {
-                    message = String.format("%s within %s.", timeoutMessage, durationAsString);
-                }
+                final String message = createTimeoutMessage(lastResult, maxWaitTime, holdPredicateWaitTime);
 
                 Throwable cause = lastResult != null && lastResult.hasTrace() ? lastResult.getTrace() : null;
                 // Not all systems support deadlock detection so ignore if ThreadMXBean & ManagementFactory is not in classpath
@@ -202,6 +194,42 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 throw new TerminalFailureException(failFastFailureReason == null ? e.getMessage() : failFastFailureReason, e);
             }
         }
+    }
+
+    private String createTimeoutMessage(ConditionEvaluationResult lastResult, Duration maxWaitTime, Duration holdPredicateWaitTime) {
+        String durationAsString = formatAsString(maxWaitTime);
+        boolean holding = holdPredicateWaitTime != null
+                && !holdPredicateWaitTime.isZero()
+                && !ChronoUnit.FOREVER.getDuration().equals(holdPredicateWaitTime);
+        boolean conditionCurrentlyFulfilled = lastResult != null && lastResult.isSuccessful();
+
+        if (holding) {
+            String holdAsString = formatAsString(holdPredicateWaitTime);
+            // during() checks that the condition *remains* true; "fulfilled within" is misleading
+            // (https://github.com/awaitility/awaitility/issues/264)
+            if (conditionCurrentlyFulfilled) {
+                // Avoid Hamcrest-style "expected X but was X" when the value matched but did not hold long enough
+                if (conditionSettings.hasAlias()) {
+                    return String.format("Condition with alias '%s' was fulfilled but did not remain fulfilled for %s within %s.",
+                            conditionSettings.getAlias(), holdAsString, durationAsString);
+                }
+                return String.format("Condition was fulfilled but did not remain fulfilled for %s within %s.",
+                        holdAsString, durationAsString);
+            }
+            String timeoutMessage = getTimeoutMessage();
+            if (conditionSettings.hasAlias()) {
+                return String.format("Condition with alias '%s' did not remain fulfilled for %s within %s because %s.",
+                        conditionSettings.getAlias(), holdAsString, durationAsString, decapitalize(timeoutMessage));
+            }
+            return String.format("%s during %s within %s.", timeoutMessage, holdAsString, durationAsString);
+        }
+
+        String timeoutMessage = getTimeoutMessage();
+        if (conditionSettings.hasAlias()) {
+            return String.format("Condition with alias '%s' didn't complete within %s because %s.",
+                    conditionSettings.getAlias(), durationAsString, decapitalize(timeoutMessage));
+        }
+        return String.format("%s within %s.", timeoutMessage, durationAsString);
     }
 
     private static String decapitalize(String str) {
