@@ -511,6 +511,74 @@ public class AwaitilityTest {
         assertThat(duration.toMillis(), greaterThan(1000L));
     }
 
+    /**
+     * Regression for <a href="https://github.com/awaitility/awaitility/issues/264">issue 264</a>:
+     * when {@code during} is equal to {@code atMost}, the hold period cannot finish within the
+     * timeout once the poll delay is taken into account. Timeout should be extended automatically
+     * so an always-true condition succeeds.
+     */
+    @Test(timeout = 2000L)
+    public void awaitDuringEqualToAtMostAutomaticallyExtendsTimeoutWhenConditionAlwaysTrue() throws Exception {
+        Duration duration = measureDuration(() ->
+            await()
+                .atMost(500, MILLISECONDS)
+                .during(500, MILLISECONDS)
+                .until(() -> true)
+        );
+
+        assertThat(duration.toMillis(), greaterThanOrEqualTo(500L));
+    }
+
+    /**
+     * Same as above with an explicit zero poll delay — still need {@code atMost > during}
+     * because the deadline is exclusive ({@code maxWaitTime > evaluationDuration}).
+     */
+    @Test(timeout = 2000L)
+    public void awaitDuringEqualToAtMostWithZeroPollDelaySucceedsWhenConditionAlwaysTrue() throws Exception {
+        Duration duration = measureDuration(() ->
+            await()
+                .pollDelay(Duration.ZERO)
+                .pollInterval(50, MILLISECONDS)
+                .atMost(400, MILLISECONDS)
+                .during(400, MILLISECONDS)
+                .until(() -> true)
+        );
+
+        assertThat(duration.toMillis(), greaterThanOrEqualTo(400L));
+    }
+
+    @Test(timeout = 2000L)
+    public void awaitDuringTimeoutMessageMentionsDuringPeriodWhenConditionNeverTrue() {
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage(containsString("during 200 milliseconds"));
+        exception.expectMessage(containsString("within"));
+
+        await()
+            .atMost(500, MILLISECONDS)
+            .during(200, MILLISECONDS)
+            .pollDelay(Duration.ZERO)
+            .pollInterval(50, MILLISECONDS)
+            .until(() -> false);
+    }
+
+    @Test(timeout = 2000L)
+    public void awaitDuringTimeoutMessageWhenConditionBecomesTrueTooLateToHoldForDuringPeriod() {
+        // Condition turns true at ~200ms; during requires 400ms hold ⇒ needs ~600ms total,
+        // but atMost is 500ms. At timeout the condition is still true, so the message must
+        // not claim a value mismatch ("expected X but was X").
+        long start = System.currentTimeMillis();
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage(containsString("did not remain fulfilled for 400 milliseconds"));
+        exception.expectMessage(containsString("within 500 milliseconds"));
+
+        await()
+            .atMost(500, MILLISECONDS)
+            .during(400, MILLISECONDS)
+            .pollDelay(Duration.ZERO)
+            .pollInterval(50, MILLISECONDS)
+            .until(() -> System.currentTimeMillis() - start > 200L);
+    }
+
     @Test
     public void throwsIAEWhenTimeoutIsTooLargeForTheUnit() {
         int timeoutMinutes = Integer.MAX_VALUE;
