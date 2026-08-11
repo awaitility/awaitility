@@ -122,6 +122,85 @@ public class ConditionFactory {
     }
 
     /**
+     * Specify a callback that is invoked once when the condition evaluation times out.
+     * This is a convenience alternative to implementing
+     * {@link ConditionEvaluationListener#onTimeout(TimeoutEvent)} with a full
+     * {@link ConditionEvaluationListener}.
+     * <p>
+     * If a {@link ConditionEvaluationListener} is already configured on this factory,
+     * its callbacks are preserved and the given callback is invoked after the previous
+     * listener's {@code onTimeout} method, even if that method throws. If both throw,
+     * the previous listener's failure is propagated. If the callback's failure is a
+     * distinct instance, it is added as a suppressed exception to the previous failure
+     * when possible. If only the callback throws, its failure is propagated normally.
+     * </p>
+     * <p>
+     * Example usage:
+     * </p>
+     * <pre>
+     * await()
+     *     .atMost(10, SECONDS)
+     *     .onFailure(() -&gt; env.printErrors())
+     *     .untilAsserted(() -&gt; assertThat(runQuery()).containsExactly("expected"));
+     * </pre>
+     *
+     * @param onTimeoutCallback the callback to run when the condition times out (must not be {@code null})
+     * @return the condition factory
+     * @since 4.4.0
+     */
+    public ConditionFactory onFailure(final Runnable onTimeoutCallback) {
+        if (onTimeoutCallback == null) {
+            throw new IllegalArgumentException("onTimeoutCallback cannot be null");
+        }
+        final ConditionEvaluationListener previous = settings.getConditionEvaluationListener();
+        return conditionEvaluationListener(new ConditionEvaluationListener() {
+            @Override
+            public void conditionEvaluated(EvaluatedCondition condition) {
+                if (previous != null) {
+                    previous.conditionEvaluated(condition);
+                }
+            }
+
+            @Override
+            public void beforeEvaluation(StartEvaluationEvent startEvaluationEvent) {
+                if (previous != null) {
+                    previous.beforeEvaluation(startEvaluationEvent);
+                }
+            }
+
+            @Override
+            public void onTimeout(TimeoutEvent timeoutEvent) {
+                try {
+                    if (previous != null) {
+                        previous.onTimeout(timeoutEvent);
+                    }
+                } catch (Throwable previousFailure) {
+                    try {
+                        onTimeoutCallback.run();
+                    } catch (Throwable callbackFailure) {
+                        if (callbackFailure != previousFailure) {
+                            try {
+                                previousFailure.addSuppressed(callbackFailure);
+                            } catch (Throwable ignored) {
+                                // Preserve the previous listener's failure if suppression fails.
+                            }
+                        }
+                    }
+                    throw previousFailure;
+                }
+                onTimeoutCallback.run();
+            }
+
+            @Override
+            public void exceptionIgnored(IgnoredException ignoredException) {
+                if (previous != null) {
+                    previous.exceptionIgnored(ignoredException);
+                }
+            }
+        });
+    }
+
+    /**
      * Await at most <code>timeout</code> before throwing a timeout exception.
      *
      * @param timeout the timeout

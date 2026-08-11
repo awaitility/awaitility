@@ -17,8 +17,10 @@
 package org.awaitility;
 
 import org.awaitility.core.ConditionEvaluationListener;
+import org.awaitility.core.ConditionTimeoutException;
 import org.awaitility.core.EvaluatedCondition;
 import org.awaitility.core.StartEvaluationEvent;
+import org.awaitility.core.TimeoutEvent;
 import org.awaitility.pollinterval.FibonacciPollInterval;
 import org.junit.After;
 import org.junit.Rule;
@@ -33,8 +35,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.setDefaultConditionEvaluationListener;
 import static org.awaitility.Awaitility.with;
 import static org.awaitility.Durations.ONE_SECOND;
@@ -330,6 +335,221 @@ public class ConditionEvaluationListenerTest {
                 capturedEvent.set(startEvaluationEvent);
             }
         };
+    }
+
+    @Test(timeout = 2000)
+    public void onFailureIsInvokedOnceWhenConditionTimesOut() {
+        final AtomicInteger failureCount = new AtomicInteger();
+
+        try {
+            await().pollDelay(20, TimeUnit.MILLISECONDS)
+                    .pollInterval(20, TimeUnit.MILLISECONDS)
+                    .atMost(100, TimeUnit.MILLISECONDS)
+                    .onFailure(() -> failureCount.incrementAndGet())
+                    .until(() -> false);
+            throw new AssertionError("Expected ConditionTimeoutException");
+        } catch (ConditionTimeoutException expected) {
+            assertThat(failureCount.get(), is(1));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void onFailureIsNotInvokedWhenConditionIsSatisfied() {
+        final AtomicBoolean failed = new AtomicBoolean(false);
+
+        await().atMost(ONE_SECOND)
+                .onFailure(() -> failed.set(true))
+                .until(new CountDown(3), is(equalTo(0)));
+
+        assertThat(failed.get(), is(false));
+    }
+
+    @Test(timeout = 2000)
+    public void onFailureComposesWithExistingConditionEvaluationListener() {
+        final List<String> timeoutCallbacks = new ArrayList<>();
+
+        ConditionEvaluationListener previous = new ConditionEvaluationListener() {
+            @Override
+            public void conditionEvaluated(EvaluatedCondition condition) {
+            }
+
+            @Override
+            public void onTimeout(TimeoutEvent timeoutEvent) {
+                timeoutCallbacks.add("previous");
+            }
+        };
+
+        try {
+            await().pollDelay(20, TimeUnit.MILLISECONDS)
+                    .pollInterval(20, TimeUnit.MILLISECONDS)
+                    .atMost(100, TimeUnit.MILLISECONDS)
+                    .conditionEvaluationListener(previous)
+                    .onFailure(() -> timeoutCallbacks.add("onFailure"))
+                    .until(() -> false);
+            throw new AssertionError("Expected ConditionTimeoutException");
+        } catch (ConditionTimeoutException expected) {
+            assertThat(timeoutCallbacks, contains("previous", "onFailure"));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void onFailurePreservesExistingStartListenerAndPollDelay() {
+        final AtomicReference<StartEvaluationEvent<Integer>> capturedEvent = new AtomicReference<>();
+
+        with()
+                .conditionEvaluationListener(capturingStartEventListener(capturedEvent))
+                .onFailure(() -> { throw new AssertionError("Unexpected timeout"); })
+                .pollDelay(75, TimeUnit.MILLISECONDS)
+                .until(new CountDown(0), is(equalTo(0)));
+
+        assertThat(capturedEvent.get(), is(notNullValue()));
+        assertThat(capturedEvent.get().getPollDelay(), is(Duration.ofMillis(75)));
+    }
+
+    @Test(timeout = 2000)
+    public void onFailureRunsWhenThePreviousTimeoutListenerThrows() {
+        final RuntimeException previousFailure = new IllegalStateException("previous");
+        final AtomicInteger failureCount = new AtomicInteger();
+        ConditionEvaluationListener previous = new ConditionEvaluationListener() {
+            @Override
+            public void conditionEvaluated(EvaluatedCondition condition) {
+            }
+
+            @Override
+            public void onTimeout(TimeoutEvent timeoutEvent) {
+                throw previousFailure;
+            }
+        };
+
+        try {
+            await().pollDelay(20, TimeUnit.MILLISECONDS)
+                    .pollInterval(20, TimeUnit.MILLISECONDS)
+                    .atMost(100, TimeUnit.MILLISECONDS)
+                    .conditionEvaluationListener(previous)
+                    .onFailure(() -> failureCount.incrementAndGet())
+                    .until(() -> false);
+            throw new AssertionError("Expected previous listener exception");
+        } catch (RuntimeException actual) {
+            assertThat(actual, sameInstance(previousFailure));
+            assertThat(failureCount.get(), is(1));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void onFailurePreservesPreviousExceptionWhenBothCallbacksThrow() {
+        final RuntimeException previousFailure = new IllegalStateException("previous");
+        final RuntimeException callbackFailure = new IllegalArgumentException("callback");
+        ConditionEvaluationListener previous = new ConditionEvaluationListener() {
+            @Override
+            public void conditionEvaluated(EvaluatedCondition condition) {
+            }
+
+            @Override
+            public void onTimeout(TimeoutEvent timeoutEvent) {
+                throw previousFailure;
+            }
+        };
+
+        try {
+            await().pollDelay(20, TimeUnit.MILLISECONDS)
+                    .pollInterval(20, TimeUnit.MILLISECONDS)
+                    .atMost(100, TimeUnit.MILLISECONDS)
+                    .conditionEvaluationListener(previous)
+                    .onFailure(() -> { throw callbackFailure; })
+                    .until(() -> false);
+            throw new AssertionError("Expected previous listener exception");
+        } catch (RuntimeException actual) {
+            assertThat(actual, sameInstance(previousFailure));
+            assertThat(actual.getSuppressed(), arrayContaining(callbackFailure));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void onFailureRunsOnceWhenAnAssertionTimesOut() {
+        final AtomicInteger failureCount = new AtomicInteger();
+
+        try {
+            await().pollDelay(20, TimeUnit.MILLISECONDS)
+                    .pollInterval(20, TimeUnit.MILLISECONDS)
+                    .atMost(100, TimeUnit.MILLISECONDS)
+                    .onFailure(() -> failureCount.incrementAndGet())
+                    .untilAsserted(() -> { throw new AssertionError("not ready"); });
+            throw new AssertionError("Expected ConditionTimeoutException");
+        } catch (ConditionTimeoutException expected) {
+            assertThat(failureCount.get(), is(1));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void onFailureDoesNotSuppressTheSameExceptionOnItself() {
+        final RuntimeException failure = new IllegalStateException("same instance");
+        ConditionEvaluationListener previous = new ConditionEvaluationListener() {
+            @Override
+            public void conditionEvaluated(EvaluatedCondition condition) {
+            }
+
+            @Override
+            public void onTimeout(TimeoutEvent timeoutEvent) {
+                throw failure;
+            }
+        };
+
+        try {
+            await().pollDelay(20, TimeUnit.MILLISECONDS)
+                    .pollInterval(20, TimeUnit.MILLISECONDS)
+                    .atMost(100, TimeUnit.MILLISECONDS)
+                    .conditionEvaluationListener(previous)
+                    .onFailure(() -> { throw failure; })
+                    .until(() -> false);
+            throw new AssertionError("Expected previous listener exception");
+        } catch (RuntimeException actual) {
+            assertThat(actual, sameInstance(failure));
+            assertThat(actual.getSuppressed().length, is(0));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void onFailurePreservesPreviousExceptionWhenSuppressionIsDisabled() {
+        final RuntimeException previousFailure = new RuntimeException("previous", null, false, true) { };
+        final RuntimeException callbackFailure = new IllegalArgumentException("callback");
+        ConditionEvaluationListener previous = new ConditionEvaluationListener() {
+            @Override
+            public void conditionEvaluated(EvaluatedCondition condition) {
+            }
+
+            @Override
+            public void onTimeout(TimeoutEvent timeoutEvent) {
+                throw previousFailure;
+            }
+        };
+
+        try {
+            await().pollDelay(20, TimeUnit.MILLISECONDS)
+                    .pollInterval(20, TimeUnit.MILLISECONDS)
+                    .atMost(100, TimeUnit.MILLISECONDS)
+                    .conditionEvaluationListener(previous)
+                    .onFailure(() -> { throw callbackFailure; })
+                    .until(() -> false);
+            throw new AssertionError("Expected previous listener exception");
+        } catch (RuntimeException actual) {
+            assertThat(actual, sameInstance(previousFailure));
+            assertThat(actual.getSuppressed().length, is(0));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void onFailurePropagatesCallbackFailure() {
+        final RuntimeException callbackFailure = new IllegalStateException("callback");
+        try {
+            await().pollDelay(20, TimeUnit.MILLISECONDS)
+                    .pollInterval(20, TimeUnit.MILLISECONDS)
+                    .atMost(100, TimeUnit.MILLISECONDS)
+                    .onFailure(() -> { throw callbackFailure; })
+                    .until(() -> false);
+            throw new AssertionError("Expected callback exception");
+        } catch (RuntimeException actual) {
+            assertThat(actual, sameInstance(callbackFailure));
+        }
     }
 
     private static class CountDown implements Callable<Integer> {
