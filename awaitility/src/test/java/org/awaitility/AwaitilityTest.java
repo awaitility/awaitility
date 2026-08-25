@@ -292,6 +292,24 @@ public class AwaitilityTest {
         }
     }
 
+    @Test(timeout = 2000)
+    public void timeoutDuringConditionEvaluationRetainsLastFailedAssertionAsCause() {
+        AtomicInteger evaluations = new AtomicInteger();
+
+        try {
+            await().pollDelay(Duration.ZERO).pollInterval(10, MILLISECONDS).atMost(100, MILLISECONDS).untilAsserted(() -> {
+                if (evaluations.incrementAndGet() == 1) {
+                    assertThat("last assertion", is("expected"));
+                }
+                Thread.sleep(200);
+            });
+            org.junit.Assert.fail("ConditionTimeoutException expected.");
+        } catch (ConditionTimeoutException e) {
+            assertThat(e.getCause(), instanceOf(AssertionError.class));
+            assertThat(e.getCause().getMessage(), containsString("last assertion"));
+        }
+    }
+
     @Test(timeout = 2000, expected = IllegalStateException.class)
     public void uncaughtExceptionsArePropagatedToAwaitingThreadAndBreaksForeverBlockWhenCatchingAllUncaughtExceptions() {
         new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();

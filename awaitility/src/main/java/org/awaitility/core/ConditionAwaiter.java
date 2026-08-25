@@ -120,7 +120,9 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStartedNanos, firstSucceedSinceStarted, minWaitTime, holdPredicateWaitTime);
             succeededBeforeTimeout = maxWaitTime.compareTo(evaluationDuration) > 0;
         } catch (TimeoutException e) {
-            lastResult = new ConditionEvaluationResult(false, null, e);
+            if (lastResult == null || !lastResult.hasTrace()) {
+                lastResult = new ConditionEvaluationResult(false, null, e);
+            }
         } catch (ExecutionException e) {
             lastResult = new ConditionEvaluationResult(false, e.getCause(), null);
         } catch (Throwable e) {
