@@ -32,6 +32,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -518,6 +519,12 @@ public class AwaitilityTest {
         exception.expectMessage("Cannot convert " + timeoutMinutes + " MINUTES to nanoseconds, as required by Awaitility, because this value is too large");
 
         Awaitility.await().atMost(timeoutMinutes, TimeUnit.MINUTES).until(() -> true);
+    }
+
+    @Test(timeout = 2000)
+    public void untilCallableWithPredicateMatchesWhenSupplierReturnsNull() {
+        String result = await().until(() -> null, Objects::isNull);
+        assertNull(result);
     }
 
     private Callable<Boolean> fakeRepositoryValueEqualsOne() {
