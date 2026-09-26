@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -289,6 +290,48 @@ public class AwaitilityTest {
         } catch (ConditionTimeoutException e) {
             assertNotNull(e.getCause());
             assertEquals("Nested", e.getCause().getMessage());
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void timeoutDuringConditionEvaluationRetainsLastFailedAssertionAsCause() {
+        AtomicInteger evaluations = new AtomicInteger();
+
+        try {
+            await().pollDelay(Duration.ZERO).pollInterval(10, MILLISECONDS).atMost(100, MILLISECONDS).untilAsserted(() -> {
+                if (evaluations.incrementAndGet() == 1) {
+                    assertThat("last assertion", is("expected"));
+                }
+                Thread.sleep(200);
+            });
+            org.junit.Assert.fail("ConditionTimeoutException expected.");
+        } catch (ConditionTimeoutException e) {
+            assertEquals(2, evaluations.get());
+            assertThat(e.getCause(), instanceOf(AssertionError.class));
+            assertThat(e.getCause().getMessage(), containsString("last assertion"));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void timeoutFromFailFastConditionIsNotMaskedByPreviousAssertion() {
+        AtomicInteger evaluations = new AtomicInteger();
+        AtomicInteger failFastInvocations = new AtomicInteger();
+        TimeoutException failFastFailure = new TimeoutException("fail-fast I/O timeout");
+
+        try {
+            await().pollDelay(Duration.ZERO).pollInterval(10, MILLISECONDS).atMost(200, MILLISECONDS).failFast(() -> {
+                if (failFastInvocations.incrementAndGet() > 1) {
+                    throw failFastFailure;
+                }
+                return false;
+            }).untilAsserted(() -> {
+                if (evaluations.incrementAndGet() == 1) {
+                    assertThat("previous assertion", is("expected"));
+                }
+            });
+            org.junit.Assert.fail("ConditionTimeoutException expected.");
+        } catch (ConditionTimeoutException e) {
+            assertThat(e.getCause(), sameInstance(failFastFailure));
         }
     }
 

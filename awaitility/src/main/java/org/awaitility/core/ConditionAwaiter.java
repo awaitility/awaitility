@@ -83,6 +83,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         Duration evaluationDuration = Duration.of(0, MILLIS);
         Future<ConditionEvaluationResult> currentConditionEvaluation = null;
         long firstSucceedSinceStarted = 0L;
+        boolean timedOutWhileWaitingForCondition = false;
         try {
             if (executor.isShutdown() || executor.isTerminated()) {
                 throw new IllegalStateException("The executor service that Awaitility is instructed to use has been shutdown so condition evaluation cannot be performed. Is there something wrong the thread or executor configuration?");
@@ -100,7 +101,9 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 Duration maxWaitTimeForThisCondition = maxWaitTime.minus(evaluationDuration);
                 currentConditionEvaluation = executor.submit(new ConditionPoller(pollInterval));
                 // Wait for condition evaluation to complete with "maxWaitTimeForThisCondition" or else throw TimeoutException
+                timedOutWhileWaitingForCondition = true;
                 lastResult = ChronoUnit.FOREVER.getDuration().equals(maxWaitTime) ? getUninterruptibly(currentConditionEvaluation) : getUninterruptibly(currentConditionEvaluation, maxWaitTimeForThisCondition);
+                timedOutWhileWaitingForCondition = false;
                 if (lastResult.isSuccessful() && firstSucceedSinceStarted == 0L) {
                     firstSucceedSinceStarted = System.nanoTime();
                 } else if (lastResult.isError()) {
@@ -120,7 +123,9 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStartedNanos, firstSucceedSinceStarted, minWaitTime, holdPredicateWaitTime);
             succeededBeforeTimeout = maxWaitTime.compareTo(evaluationDuration) > 0;
         } catch (TimeoutException e) {
-            lastResult = new ConditionEvaluationResult(false, null, e);
+            if (!timedOutWhileWaitingForCondition || lastResult == null || !lastResult.hasTrace()) {
+                lastResult = new ConditionEvaluationResult(false, null, e);
+            }
         } catch (ExecutionException e) {
             lastResult = new ConditionEvaluationResult(false, e.getCause(), null);
         } catch (Throwable e) {
