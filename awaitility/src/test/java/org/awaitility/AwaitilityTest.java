@@ -157,6 +157,25 @@ public class AwaitilityTest {
         assertEquals(1, fakeRepository.getValue());
     }
 
+    @Test(timeout = 2000, expected = ConditionTimeoutException.class)
+    public void foreverPreservesAtLeastConstraint() {
+        await().pollDelay(Duration.ZERO).atLeast(1, DAYS).forever().until(() -> true);
+    }
+
+    @Test(timeout = 2000)
+    public void foreverPreservesDuringConstraint() throws Exception {
+        Duration duration = measureDuration(() ->
+            await()
+                .pollDelay(Duration.ZERO)
+                .pollInterval(10, MILLISECONDS)
+                .during(100, MILLISECONDS)
+                .forever()
+                .until(() -> true)
+        );
+
+        assertThat(duration.toMillis(), greaterThanOrEqualTo(100L));
+    }
+
     @Test(timeout = 3000, expected = ConditionTimeoutException.class)
     public void throwsTimeoutExceptionWhenDoneEarlierThanAtLeastConstraint() {
         new Asynch(fakeRepository).perform();
