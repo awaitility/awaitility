@@ -16,6 +16,21 @@ public void updatesCustomerStatus() {
 }
 ```
 
+## Bounded exponential polling
+
+Use a starting interval that doubles until it reaches a maximum:
+
+```java
+import static org.awaitility.pollinterval.ExponentialBackoffPollInterval.exponential;
+
+await().pollInterval(exponential(Duration.ofMillis(500), Duration.ofSeconds(5)))
+       .until(customerStatusIsUpdated());
+```
+
+The intervals are 500ms, 1s, 2s, 4s, 5s, 5s, and so on. Both durations must be
+positive and finite, and the maximum must be at least the start. An explicitly
+configured poll delay still occurs before the first interval; existing polling defaults are unchanged.
+
 ## News
 * 2026-04-17: Awaitility `4.3.1` is released with [configurable default timeout/poll settings](https://github.com/awaitility/awaitility/wiki/Usage#defaults) via system properties, documentation updates, and dependency/build improvements. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2025-02-21: Awaitility `4.3.0` is released with better Kotlin time support and a new way of using [untilAsserted](https://github.com/awaitility/awaitility/wiki/Usage#using-assertj-or-fest-assert). See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details. 
