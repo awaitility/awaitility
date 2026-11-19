@@ -11,6 +11,7 @@ Changelog 4.4.0 (not released yet)
 * fieldIn(..) error messages now work for fields declared in a superclass. Before, the timeout message said "Internal error" (issue 247, thanks to Jaya Dileep for pull request).
 * JavaVersionDetector now reads the major version from java.version strings like "25+36" and "25+36-ea" instead of throwing (issue 296, thanks to arimu1 for pull request).
 * Clarified in the Javadoc that during(..) needs the condition to hold continuously, not for a total of that time (issue 298, thanks to Jaya Dileep for pull request).
+* When an await times out while a condition evaluation is still running, ConditionTimeoutException.getCause() is now the assertion error from the previous evaluation, if that evaluation failed with one, instead of a java.util.concurrent.TimeoutException. If you check getCause() for a TimeoutException in this case, you need to update that check (issue 286, thanks to DragonFSKY for pull request).
 
 Changelog 4.3.0 (2025-02-21)
 ----------------------------
