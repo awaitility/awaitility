@@ -2,6 +2,7 @@ package org.awaitility;
 
 import org.awaitility.core.ConditionEvaluationLogger;
 import org.awaitility.core.ConditionTimeoutException;
+import org.awaitility.core.JavaVersionDetector;
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,6 +34,6 @@ public class AwaitilityEvaluationConditionCancellationTest {
         });
 
         assertThat(throwable).isExactlyInstanceOf(ConditionTimeoutException.class).
-                hasMessage("Condition with alias 'Hello' didn't complete within 999 milliseconds because lambda expression in " + this.getClass().getName() + " that uses java.util.concurrent.atomic.AtomicInteger: expected <100> but was <-1>.");
+                hasMessage("Condition with alias 'Hello' didn't complete within 999 milliseconds because lambda expression in " + this.getClass().getName() + (JavaVersionDetector.getJavaMajorVersion() < 17 ? " that uses java.util.concurrent.atomic.AtomicInteger:" : "") + " expected <100> but was <-1>.");
     }
 }
