@@ -17,7 +17,6 @@ public void updatesCustomerStatus() {
 ```
 
 ## News
-* 2026-04-17: Awaitility `4.3.1` is released with [configurable default timeout/poll settings](https://github.com/awaitility/awaitility/wiki/Usage#defaults) via system properties, documentation updates, and dependency/build improvements. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2025-02-21: Awaitility `4.3.0` is released with better Kotlin time support and a new way of using [untilAsserted](https://github.com/awaitility/awaitility/wiki/Usage#using-assertj-or-fest-assert). See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details. 
 * 2024-08-07: Awaitility `4.2.2` is released with support for "ea" JVM versions. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
   
@@ -27,7 +26,7 @@ public void updatesCustomerStatus() {
 
 * [Getting started](https://github.com/awaitility/awaitility/wiki/Getting_started)
 * [Usage Guide](https://github.com/awaitility/awaitility/wiki/Usage)
-* [Awaitility Javadoc](http://www.javadoc.io/doc/org.awaitility/awaitility/4.3.1)
+* [Awaitility Javadoc](http://www.javadoc.io/doc/org.awaitility/awaitility/4.3.0)
 
 ## Links
 * [Change log](https://github.com/awaitility/awaitility/raw/master/changelog.txt)

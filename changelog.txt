@@ -1,5 +1,5 @@
-Changelog 4.3.1 (2026-04-17)
-----------------------------
+Changelog 4.4.0 (not released yet)
+-----------------------------------
 * Upgraded assertj-core to 3.27.7 (thanks to Ian Hundere for pull request).
 * Updated the README example to use the Duration overload in await().atMost(..) (thanks to Kurt Alfred Kluever for pull request).
 * Added support for configuring the default timeout, poll interval and poll delay using ISO-8601 system properties. For example:
