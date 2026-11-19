@@ -211,7 +211,7 @@ public class DuringTimeoutTest {
             long elapsedMillis = (System.nanoTime() - start) / 1_000_000L;
             assertThat(elapsedMillis, lessThan(500L));
             assertEquals("Condition can never be fulfilled: during(5 seconds) needs the condition to hold for longer than " +
-                    "atMost(1 seconds) minus pollDelay(100 milliseconds) allows. Use an atMost larger than 5 seconds 100 milliseconds, " +
+                    "atMost(1 second) minus pollDelay(100 milliseconds) allows. Use an atMost larger than 5 seconds 100 milliseconds, " +
                     "or leave atMost unset so that the default timeout is extended by the during period.", e.getMessage());
         }
 
