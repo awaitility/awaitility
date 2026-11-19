@@ -25,6 +25,7 @@ import org.awaitility.classes.FakeRepository
 import org.awaitility.classes.FakeRepositoryImpl
 import org.awaitility.core.ConditionEvaluationListener
 import org.awaitility.core.ConditionTimeoutException
+import org.awaitility.core.TerminalFailureException
 import org.awaitility.pollinterval.FibonacciPollInterval.fibonacci
 import org.hamcrest.Matchers.*
 import org.junit.Assert.assertEquals
@@ -259,6 +260,52 @@ class KotlinTest {
         }
 
         assertThat(duration).isGreaterThan(1000)
+    }
+
+    @Test
+    fun failFastThrowsTerminalFailureExceptionWhenConditionIsTrue() {
+        val counter = AtomicInteger(0)
+        val thrown = catchThrowable {
+            await atMost Duration.ofSeconds(5) failFast { counter.incrementAndGet() >= 3 } until { false }
+        }
+        assertThat(thrown).isInstanceOf(TerminalFailureException::class.java)
+    }
+
+    @Test
+    fun failFastWithReasonThrowsTerminalFailureExceptionWithTheReason() {
+        val counter = AtomicInteger(0)
+        val thrown = catchThrowable {
+            (await atMost Duration.ofSeconds(5)).failFastWithReason("System crash") { counter.incrementAndGet() >= 3 } until { false }
+        }
+        assertThat(thrown).isInstanceOf(TerminalFailureException::class.java).hasMessage("System crash")
+    }
+
+    @Test
+    fun failFastAssertedThrowsTerminalFailureException() {
+        val counter = AtomicInteger(0)
+        val thrown = catchThrowable {
+            await atMost Duration.ofSeconds(5) failFastAsserted {
+                assertThat(counter.incrementAndGet()).isLessThan(3)
+            } until { false }
+        }
+        assertThat(thrown).isInstanceOf(TerminalFailureException::class.java)
+    }
+
+    @Test
+    fun failFastAssertedWithReasonThrowsTerminalFailureExceptionWithTheReason() {
+        val counter = AtomicInteger(0)
+        val thrown = catchThrowable {
+            (await atMost Duration.ofSeconds(5)).failFastAsserted("Workflow failed") {
+                assertThat(counter.incrementAndGet()).isLessThan(3)
+            } until { false }
+        }
+        assertThat(thrown).isInstanceOf(TerminalFailureException::class.java).hasMessage("Workflow failed")
+    }
+
+    @Test
+    fun failFastDoesNotAffectAnAwaitThatSucceeds() {
+        Asynch(fakeRepository).perform()
+        await atMost Duration.ofSeconds(5) failFast { false } until { fakeRepository.value == 1 }
     }
 }
 
