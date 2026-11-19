@@ -81,7 +81,7 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
         } else {
 
             try {
-                final Field declaredField = objectClass.getDeclaredField(expectedFieldName);
+                final Field declaredField = findDeclaredFieldInHierarchy(objectClass, expectedFieldName);
                 builder.append("Field ");
                 builder.append(declaredField);
             } catch (Exception e) {
@@ -90,5 +90,23 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
         }
 
         return builder.toString();
+    }
+
+    /**
+     * Looks up a field by name on {@code type} or any of its superclasses.
+     * {@link Class#getDeclaredField(String)} only searches the given class,
+     * which breaks {@code fieldIn} error messages when the field lives on a
+     * superclass (see issue #247).
+     */
+    private static Field findDeclaredFieldInHierarchy(Class<?> type, String fieldName) throws NoSuchFieldException {
+        Class<?> current = type;
+        while (current != null) {
+            try {
+                return current.getDeclaredField(fieldName);
+            } catch (NoSuchFieldException ignored) {
+                current = current.getSuperclass();
+            }
+        }
+        throw new NoSuchFieldException(fieldName);
     }
 }
