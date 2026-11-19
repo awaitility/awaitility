@@ -288,7 +288,7 @@ public class Awaitility {
      * @since 3.0.0
      */
     public static void pollThread(final Function<Runnable, Thread> threadSupplier) {
-        defaultExecutorLifecycle = ExecutorLifecycle.withNormalCleanupBehavior(() -> InternalExecutorServiceFactory.create(threadSupplier));
+        defaultExecutorLifecycle = ExecutorLifecycle.withNormalCleanupBehavior(() -> InternalExecutorServiceFactory.createFinalizerFree(threadSupplier));
     }
 
     /**
