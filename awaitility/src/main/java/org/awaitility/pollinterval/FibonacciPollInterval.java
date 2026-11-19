@@ -28,6 +28,11 @@ public class FibonacciPollInterval implements PollInterval {
 
     private static final int DEFAULT_OFFSET = 0;
 
+    /**
+     * The largest value for which the fibonacci number fits in an {@code int} (fib(46) = 1836311903).
+     */
+    private static final int MAX_INT_FIBONACCI_VALUE = 46;
+
     private final TimeUnit unit;
     private final int offset;
 
@@ -68,7 +73,13 @@ public class FibonacciPollInterval implements PollInterval {
     }
 
     /**
-     * Generate the next duration
+     * Generate the next duration.
+     * <p>
+     * For values up to 46 (offset + poll count) the duration is {@link #fibonacci(int)}, so subclasses that override
+     * that method keep working. Above 46 the fibonacci number no longer fits in an {@code int}, so it is computed
+     * with 64-bit arithmetic instead. The resulting duration is capped at the largest duration that can be expressed
+     * in nanoseconds, so it never overflows.
+     * </p>
      *
      * @param pollCount        The number of times the condition has been polled (evaluated)
      * @param previousDuration The duration of the previously returned poll interval
@@ -76,7 +87,9 @@ public class FibonacciPollInterval implements PollInterval {
      */
     @Override
     public Duration next(int pollCount, Duration previousDuration) {
-        return DurationFactory.of(fibonacci(offset + pollCount), unit);
+        final int value = offset + pollCount;
+        final long fibonacci = value <= MAX_INT_FIBONACCI_VALUE ? fibonacci(value) : saturatedFibonacci(value);
+        return toDuration(fibonacci);
     }
 
     /**
@@ -165,6 +178,40 @@ public class FibonacciPollInterval implements PollInterval {
             return current;
         }
         return fib(value - 1, current + previous, current);
+    }
+
+    /**
+     * Generate the value of the fibonacci sequence for <code>value</code> using 64-bit arithmetic.
+     * The result saturates at {@link Long#MAX_VALUE} instead of overflowing. {@link #fibonacci(int)} is
+     * left unchanged: it only supports values whose fibonacci number fits in an {@code int} (up to 46).
+     *
+     * @param value The value
+     * @return the fibonacci number, saturated at {@link Long#MAX_VALUE}
+     */
+    private static long saturatedFibonacci(int value) {
+        if (value <= 0) {
+            return 0;
+        }
+        long previous = 0;
+        long current = 1;
+        for (int i = 1; i < value; i++) {
+            if (current > Long.MAX_VALUE - previous) {
+                return Long.MAX_VALUE;
+            }
+            long next = current + previous;
+            previous = current;
+            current = next;
+        }
+        return current;
+    }
+
+    /**
+     * Convert the amount to a {@link Duration} in the configured unit, capped at the largest amount of this unit that
+     * can be converted to nanoseconds (which is what {@link DurationFactory#of(long, TimeUnit)} requires).
+     */
+    private Duration toDuration(long amount) {
+        final long maxAmount = unit.convert(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        return DurationFactory.of(Math.min(amount, maxAmount), unit);
     }
 
     @Override
