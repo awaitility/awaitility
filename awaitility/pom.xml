@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.awaitility</groupId>
         <artifactId>awaitility-parent</artifactId>
-        <version>4.3.1-SNAPSHOT</version>
+        <version>4.4.0-SNAPSHOT</version>
     </parent>
     <artifactId>awaitility</artifactId>
     <packaging>jar</packaging>
@@ -61,6 +61,35 @@
                     <execution>
                         <goals>
                             <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Fails the build if the public API breaks binary compatibility with the last release on Maven Central.
+                 Bump oldVersion after each release. -->
+            <plugin>
+                <groupId>com.github.siom79.japicmp</groupId>
+                <artifactId>japicmp-maven-plugin</artifactId>
+                <version>0.26.5</version>
+                <configuration>
+                    <oldVersion>
+                        <dependency>
+                            <groupId>org.awaitility</groupId>
+                            <artifactId>awaitility</artifactId>
+                            <version>4.3.0</version>
+                            <type>jar</type>
+                        </dependency>
+                    </oldVersion>
+                    <parameter>
+                        <onlyModified>true</onlyModified>
+                        <breakBuildOnBinaryIncompatibleModifications>true</breakBuildOnBinaryIncompatibleModifications>
+                    </parameter>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>cmp</goal>
                         </goals>
                     </execution>
                 </executions>
