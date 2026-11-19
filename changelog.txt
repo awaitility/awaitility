@@ -8,6 +8,8 @@ Changelog 4.4.0 (not released yet)
 
   (thanks to Henning Hoefer for pull request).
 * Clarified fail-fast documentation so that it correctly states that terminal failure happens when the fail-fast condition evaluates to true, and cleaned up related Javadocs (thanks to Mustafa Ulu for pull request).
+* Fixed an int overflow in FibonacciPollInterval from poll 47 onwards. Very long Fibonacci poll intervals are now capped at the longest duration Awaitility supports instead of throwing an exception (issue 319, thanks to xh123637 for pull request).
+* Timeout messages no longer show day-scale durations as months, and use singular units such as "1 second" instead of "1 seconds". Fields are now separated by a single space ("1 minute 30 seconds" instead of "1 minutes  30 seconds"). If you assert on these messages you may need to update your expectations (issue 318, thanks to Shreya Roy Koneri for pull request).
 
 Changelog 4.3.0 (2025-02-21)
 ----------------------------
