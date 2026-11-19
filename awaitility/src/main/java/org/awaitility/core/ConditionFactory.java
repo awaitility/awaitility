@@ -198,7 +198,7 @@ public class ConditionFactory {
      * The text is appended on a new line after the standard timeout message, so the alias and the condition or
      * mismatch description are kept:
      * <pre>
-     * Condition with Lambda expression in org.example.OrderTest was not fulfilled within 5 seconds.
+     * Condition with lambda expression in org.example.OrderTest was not fulfilled within 5 seconds.
      * Order 42 was in state PENDING
      * </pre>
      * The same text is appended when an {@link #atLeast(Duration)} constraint is violated, and the
