@@ -503,6 +503,46 @@ public class Awaitility {
     }
 
     /**
+     * Get the default timeout (the maximum wait time) that all await statements will use.
+     * It reflects the built-in default (10 seconds), the <code>awaitility.defaultTimeout</code>
+     * system property, and any call to <code>setDefaultTimeout(..)</code> or {@link #reset()}.
+     *
+     * @return the default timeout
+     * @since 4.4.0
+     */
+    public static Duration getDefaultTimeout() {
+        return defaultWaitConstraint.getMaxWaitTime();
+    }
+
+    /**
+     * Get the default poll interval that all await statements will use.
+     * It reflects the built-in default (a fixed 100 milliseconds), the <code>awaitility.defaultPollInterval</code>
+     * system property, and any call to <code>setDefaultPollInterval(..)</code> or {@link #reset()}.
+     *
+     * @return the default poll interval
+     * @since 4.4.0
+     */
+    public static PollInterval getDefaultPollInterval() {
+        return defaultPollInterval;
+    }
+
+    /**
+     * Get the default poll delay that all await statements will use.
+     * It reflects the <code>awaitility.defaultPollDelay</code> system property, and any call to
+     * <code>setDefaultPollDelay(..)</code> or {@link #reset()}.
+     * <p>
+     * If no default poll delay has been set, this method returns <code>null</code>. In that case each await statement
+     * derives its poll delay from its poll interval (the same as the poll interval for a fixed poll interval,
+     * otherwise zero).
+     *
+     * @return the default poll delay, or <code>null</code> if none has been set
+     * @since 4.4.0
+     */
+    public static Duration getDefaultPollDelay() {
+        return defaultPollDelay;
+    }
+
+    /**
      * Sets the default condition evaluation listener that all await statements will use.
      *
      * @param defaultConditionEvaluationListener handles condition evaluation each time evaluation of a condition occurs. Works only with Hamcrest matcher-based conditions.
