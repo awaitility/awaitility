@@ -177,9 +177,15 @@ public class ConditionFactory {
     }
 
     /**
-     * Await at the predicate holds during at least <code>timeout</code>
+     * Specify that the condition must hold <em>continuously</em> for at least
+     * <code>timeout</code> before the await succeeds.
+     * <p>
+     * The hold time is not cumulative: brief matches that add up to
+     * <code>timeout</code> across separate intervals are not enough; the
+     * predicate must stay satisfied for an unbroken period of that length.
+     * </p>
      *
-     * @param timeout the timeout
+     * @param timeout the minimum continuous duration the condition must hold
      * @return the condition factory
      */
     public ConditionFactory during(Duration timeout) {
@@ -188,9 +194,15 @@ public class ConditionFactory {
     }
 
     /**
-     * Await at the predicate holds during at least <code>timeout</code>
+     * Specify that the condition must hold <em>continuously</em> for at least
+     * <code>timeout</code> before the await succeeds.
+     * <p>
+     * The hold time is not cumulative: brief matches that add up to
+     * <code>timeout</code> across separate intervals are not enough; the
+     * predicate must stay satisfied for an unbroken period of that length.
+     * </p>
      *
-     * @param timeout the timeout
+     * @param timeout the minimum continuous duration the condition must hold
      * @param unit    the unit
      * @return the condition factory
      */
