@@ -20,6 +20,7 @@ import org.awaitility.pollinterval.PollInterval;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 public class ConditionSettings {
     private final String alias;
@@ -31,6 +32,7 @@ public class ConditionSettings {
     private final ConditionEvaluationListener conditionEvaluationListener;
     private final ExecutorLifecycle executorLifecycle;
     private final FailFastCondition failFastCondition;
+    private final Consumer<? super TimeoutEvent> timeoutCallback;
 
     /**
      * <p>Constructor for ConditionSettings.</p>
@@ -43,10 +45,12 @@ public class ConditionSettings {
      * @param ignoreExceptions            a {@link ExceptionIgnorer} object.
      * @param executorLifecycle           Responsible for performing executor service cleanup after each condition evaluation round
      * @param failFastCondition           a Callable that if returns true, fails the test immediately
+     * @param timeoutCallback             invoked when the await times out, may be <code>null</code>
      */
     ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
                       PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
-                      ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle, final FailFastCondition failFastCondition) {
+                      ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle, final FailFastCondition failFastCondition,
+                      Consumer<? super TimeoutEvent> timeoutCallback) {
         if (waitConstraint == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
@@ -62,6 +66,7 @@ public class ConditionSettings {
         this.conditionEvaluationListener = conditionEvaluationListener;
         this.ignoreExceptions = ignoreExceptions;
         this.failFastCondition = failFastCondition;
+        this.timeoutCallback = timeoutCallback;
     }
 
     /**
@@ -164,5 +169,12 @@ public class ConditionSettings {
      */
     public FailFastCondition getFailFastCondition() {
         return this.failFastCondition;
+    }
+
+    /**
+     * @return the callback to invoke when the await times out, or <code>null</code> if none is set
+     */
+    Consumer<? super TimeoutEvent> getTimeoutCallback() {
+        return timeoutCallback;
     }
 }

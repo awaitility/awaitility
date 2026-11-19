@@ -251,14 +251,14 @@ public class ConditionEvaluationListenerTest {
     }
 
     @Test(timeout = 2000)
-    public void onFailureIsInvokedOnceWhenConditionTimesOut() {
+    public void onTimeoutIsInvokedOnceWhenConditionTimesOut() {
         final AtomicInteger failureCount = new AtomicInteger();
 
         try {
             await().pollDelay(20, TimeUnit.MILLISECONDS)
                     .pollInterval(20, TimeUnit.MILLISECONDS)
                     .atMost(100, TimeUnit.MILLISECONDS)
-                    .onFailure(() -> failureCount.incrementAndGet())
+                    .onTimeout(event -> failureCount.incrementAndGet())
                     .until(() -> false);
             throw new AssertionError("Expected ConditionTimeoutException");
         } catch (ConditionTimeoutException expected) {
@@ -267,24 +267,24 @@ public class ConditionEvaluationListenerTest {
     }
 
     @Test(timeout = 2000)
-    public void onFailureIsNotInvokedWhenConditionIsSatisfied() {
+    public void onTimeoutIsNotInvokedWhenConditionIsSatisfied() {
         final AtomicBoolean failed = new AtomicBoolean(false);
 
         await().atMost(ONE_SECOND)
-                .onFailure(() -> failed.set(true))
+                .onTimeout(event -> failed.set(true))
                 .until(new CountDown(3), is(equalTo(0)));
 
         assertThat(failed.get(), is(false));
     }
 
     @Test(timeout = 2000)
-    public void onFailureComposesWithExistingConditionEvaluationListener() {
+    public void onTimeoutComposesWithExistingConditionEvaluationListener() {
         final AtomicBoolean previousTimeoutSeen = new AtomicBoolean(false);
-        final AtomicBoolean onFailureSeen = new AtomicBoolean(false);
+        final AtomicBoolean onTimeoutSeen = new AtomicBoolean(false);
 
-        ConditionEvaluationListener previous = new ConditionEvaluationListener() {
+        ConditionEvaluationListener<Boolean> previous = new ConditionEvaluationListener<Boolean>() {
             @Override
-            public void conditionEvaluated(EvaluatedCondition condition) {
+            public void conditionEvaluated(EvaluatedCondition<Boolean> condition) {
             }
 
             @Override
@@ -298,12 +298,12 @@ public class ConditionEvaluationListenerTest {
                     .pollInterval(20, TimeUnit.MILLISECONDS)
                     .atMost(100, TimeUnit.MILLISECONDS)
                     .conditionEvaluationListener(previous)
-                    .onFailure(() -> onFailureSeen.set(true))
+                    .onTimeout(event -> onTimeoutSeen.set(true))
                     .until(() -> false);
             throw new AssertionError("Expected ConditionTimeoutException");
         } catch (ConditionTimeoutException expected) {
             assertThat(previousTimeoutSeen.get(), is(true));
-            assertThat(onFailureSeen.get(), is(true));
+            assertThat(onTimeoutSeen.get(), is(true));
         }
     }
 

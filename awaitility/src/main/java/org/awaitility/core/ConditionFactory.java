@@ -122,14 +122,24 @@ public class ConditionFactory {
     }
 
     /**
-     * Specify a callback that is invoked once when the condition evaluation times out.
-     * This is a convenience alternative to implementing
-     * {@link ConditionEvaluationListener#onTimeout(TimeoutEvent)} with a full
-     * {@link ConditionEvaluationListener}.
+     * Specify a callback that is invoked once when the await times out, just before the
+     * {@link ConditionTimeoutException} is thrown. Use it to print extra diagnostics, such as
+     * logs or the state of the system under test, when a test is about to fail on a timeout.
+     * The {@link TimeoutEvent} holds the same description as the exception message, together with
+     * the elapsed time and the alias.
      * <p>
-     * If a {@link ConditionEvaluationListener} is already configured on this factory,
-     * its callbacks are preserved and the given callback is invoked after the previous
-     * listener's {@code onTimeout} method.
+     * The callback is called in exactly the cases where {@link ConditionEvaluationListener#onTimeout(TimeoutEvent)}
+     * is called. That is when the condition is not fulfilled within the {@link #atMost(Duration) at most} duration,
+     * and when it is fulfilled earlier than the {@link #atLeast(Duration) at least} duration. It is <i>not</i> called
+     * when the condition throws an exception that isn't ignored, when a {@link #failFast(Callable) fail-fast condition}
+     * fails (a {@link TerminalFailureException}), or when the condition is fulfilled.
+     * </p>
+     * <p>
+     * The callback is stored separately from the {@link #conditionEvaluationListener(ConditionEvaluationListener) condition evaluation listener},
+     * so it is kept regardless of the order in which <code>onTimeout</code>, <code>conditionEvaluationListener</code> and
+     * <code>logging</code> are called. If a listener is set as well, its <code>onTimeout</code> method is called first.
+     * If the callback throws, the {@link ConditionTimeoutException} is still thrown and the callback's exception is added
+     * to it as a {@link Throwable#getSuppressed() suppressed exception}. Calling this method again replaces the callback.
      * </p>
      * <p>
      * Example usage:
@@ -137,49 +147,19 @@ public class ConditionFactory {
      * <pre>
      * await()
      *     .atMost(10, SECONDS)
-     *     .onFailure(() -&gt; env.printErrors())
+     *     .onTimeout(event -&gt; env.printErrors())
      *     .untilAsserted(() -&gt; assertThat(runQuery()).containsExactly("expected"));
      * </pre>
      *
-     * @param onTimeoutCallback the callback to run when the condition times out (must not be {@code null})
+     * @param timeoutCallback the callback to invoke when the await times out (must not be {@code null})
      * @return the condition factory
-     * @since 4.3.2
+     * @since 4.4.0
      */
-    public ConditionFactory onFailure(final Runnable onTimeoutCallback) {
-        if (onTimeoutCallback == null) {
-            throw new IllegalArgumentException("onTimeoutCallback cannot be null");
+    public ConditionFactory onTimeout(Consumer<? super TimeoutEvent> timeoutCallback) {
+        if (timeoutCallback == null) {
+            throw new IllegalArgumentException("timeoutCallback cannot be null");
         }
-        final ConditionEvaluationListener previous = settings.getConditionEvaluationListener();
-        return conditionEvaluationListener(new ConditionEvaluationListener() {
-            @Override
-            public void conditionEvaluated(EvaluatedCondition condition) {
-                if (previous != null) {
-                    previous.conditionEvaluated(condition);
-                }
-            }
-
-            @Override
-            public void beforeEvaluation(StartEvaluationEvent startEvaluationEvent) {
-                if (previous != null) {
-                    previous.beforeEvaluation(startEvaluationEvent);
-                }
-            }
-
-            @Override
-            public void onTimeout(TimeoutEvent timeoutEvent) {
-                if (previous != null) {
-                    previous.onTimeout(timeoutEvent);
-                }
-                onTimeoutCallback.run();
-            }
-
-            @Override
-            public void exceptionIgnored(IgnoredException ignoredException) {
-                if (previous != null) {
-                    previous.exceptionIgnored(ignoredException);
-                }
-            }
-        });
+        return new ConditionFactory(settings.withTimeoutCallback(timeoutCallback));
     }
 
     /**
@@ -1165,7 +1145,8 @@ public class ConditionFactory {
         }
 
         return new ConditionSettings(alias, settings.isCatchUncaughtExceptions(), timeoutConstraint, pollInterval, actualPollDelay,
-                settings.getConditionEvaluationListener(), settings.getExceptionsIgnorer(), executorLifecycle, settings.getFailFastCondition());
+                settings.getConditionEvaluationListener(), settings.getExceptionsIgnorer(), executorLifecycle, settings.getFailFastCondition(),
+                settings.getTimeoutCallback());
     }
 
     private <T> T until(Condition<T> condition) {
