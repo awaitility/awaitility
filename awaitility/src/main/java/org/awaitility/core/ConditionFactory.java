@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static org.awaitility.core.ForeverDuration.isForever;
 import static org.awaitility.core.TemporalDuration.formatAsString;
@@ -588,6 +589,37 @@ public class ConditionFactory {
     }
 
     /**
+     * If the supplied Callable <i>ever</i> returns true, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * Throws a {@link TerminalFailureException} if fail fast condition evaluates to <code>true</code>.
+     * <p>
+     * Unlike {@link #failFast(String, Callable)} the failure reason is created by a {@link Supplier} that is only called when the fail fast
+     * condition evaluates to <code>true</code>. This lets the reason describe the state at the time of the failure. E.g.
+     * <pre>
+     * await().failFastWithReason(() -&gt; "Order failed, last known state: " + order.state(), () -&gt; order.state() == FAILED)
+     *        .until(() -&gt; order.state() == SHIPPED);
+     * </pre>
+     * If the supplier is <code>null</code> or returns <code>null</code>, the default reason is used, as for a <code>null</code> reason in
+     * {@link #failFast(String, ThrowingRunnable)}. If the supplier throws, the {@link TerminalFailureException}
+     * is still thrown. Its message then says that the supplier failed, and the supplier's exception is added as a suppressed exception.
+     *
+     * @param failFastFailureReason A supplier of a descriptive reason why the fail fast condition has failed, called only if <code>failFastCondition</code> evaluates to <code>true</code>.
+     *                              The method has its own name, rather than being a <code>failFast</code> overload, so that existing calls such as
+     *                              <code>failFast(null, condition)</code> stay unambiguous.
+     *                              The result is included in the {@link TerminalFailureException}.
+     * @param failFastCondition     The terminal failure condition
+     * @return the condition factory
+     * @see #failFast(String, Callable)
+     * @since 4.4.0
+     */
+    public ConditionFactory failFastWithReason(Supplier<String> failFastFailureReason, Callable<Boolean> failFastCondition) {
+        if (failFastCondition == null) {
+            throw new IllegalArgumentException("failFastCondition cannot be null");
+        }
+
+        return new ConditionFactory(settings.withFailFastCondition(CallableFailFastCondition.withReasonSupplier(failFastFailureReason, failFastCondition)));
+    }
+
+    /**
      * If the supplied <code>failFastAssertion</code> <i>ever</i> throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
      * This allows you to use a more descriptive error message of why the fail-fast condition failed by doing e.g.:
      *
@@ -629,6 +661,35 @@ public class ConditionFactory {
             throw new IllegalArgumentException("failFastAssertion cannot be null");
         }
         return new ConditionFactory(settings.withFailFastCondition(new FailFastAssertion(failFastFailureReason, failFastAssertion)));
+    }
+
+    /**
+     * If the supplied <code>failFastAssertion</code> <i>ever</i> throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+     * <p>
+     * Unlike {@link #failFast(String, ThrowingRunnable)} the failure reason is created by a {@link Supplier} that is only called when
+     * <code>failFastAssertion</code> throws. This lets the reason describe the state at the time of the failure. E.g.
+     * <pre>
+     * await()
+     *     .failFastWithReason(() -&gt; "Workflow failed. Last known state:\n" + workflow.toPrettyString(), () -&gt; assertThat(workflow.get("phase")).isNotEqualTo("Failed"))
+     *     .untilAsserted(...);
+     * </pre>
+     * The exception thrown by <code>failFastAssertion</code> is the cause of the {@link TerminalFailureException}. If the supplier is
+     * <code>null</code> or returns <code>null</code>, the message of that exception is used as the reason, as for a <code>null</code> reason in
+     * {@link #failFast(String, ThrowingRunnable)}. If the supplier throws, the {@link TerminalFailureException} is
+     * still thrown. Its message then says that the supplier failed, and the supplier's exception is added as a suppressed exception.
+     *
+     * @param failFastFailureReason A supplier of a descriptive reason why the fail fast condition has failed, called only if <code>failFastAssertion</code> throws an exception.
+     *                              The result is included in the {@link TerminalFailureException}.
+     * @param failFastAssertion     The terminal failure assertion
+     * @return the condition factory
+     * @see #failFast(String, ThrowingRunnable)
+     * @since 4.4.0
+     */
+    public ConditionFactory failFastWithReason(Supplier<String> failFastFailureReason, final ThrowingRunnable failFastAssertion) {
+        if (failFastAssertion == null) {
+            throw new IllegalArgumentException("failFastAssertion cannot be null");
+        }
+        return new ConditionFactory(settings.withFailFastCondition(FailFastAssertion.withReasonSupplier(failFastFailureReason, failFastAssertion)));
     }
 
     /**

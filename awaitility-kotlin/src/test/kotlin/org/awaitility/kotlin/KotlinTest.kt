@@ -25,6 +25,7 @@ import org.awaitility.classes.FakeRepository
 import org.awaitility.classes.FakeRepositoryImpl
 import org.awaitility.core.ConditionEvaluationListener
 import org.awaitility.core.ConditionTimeoutException
+import org.awaitility.core.TerminalFailureException
 import org.awaitility.pollinterval.FibonacciPollInterval.fibonacci
 import org.hamcrest.Matchers.*
 import org.junit.Assert.assertEquals
@@ -34,6 +35,7 @@ import org.junit.Test
 import org.junit.rules.ExpectedException
 import java.lang.Thread.sleep
 import java.time.Duration
+import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicInteger
@@ -259,6 +261,26 @@ class KotlinTest {
         }
 
         assertThat(duration).isGreaterThan(1000)
+    }
+
+    @Test(timeout = 2000)
+    fun failFastWithReasonSupplierFromKotlin() {
+        val evaluations = AtomicInteger()
+
+        // failFastWithReason takes a lambda as reason; failFast(String, ..) is unaffected
+        val lazyReason = catchThrowable {
+            await().atMost(5, SECONDS).pollInterval(Duration.ofMillis(10))
+                .failFastWithReason({ "Gave up after ${evaluations.get()} evaluations" }, Callable { evaluations.incrementAndGet() >= 3 })
+                .until { false }
+        }
+        val staticReason = catchThrowable {
+            await().atMost(5, SECONDS).pollInterval(Duration.ofMillis(10))
+                .failFast("static reason", Callable { true })
+                .until { false }
+        }
+
+        assertThat(lazyReason).isInstanceOf(TerminalFailureException::class.java).hasMessage("Gave up after 3 evaluations")
+        assertThat(staticReason).isInstanceOf(TerminalFailureException::class.java).hasMessage("static reason")
     }
 }
 

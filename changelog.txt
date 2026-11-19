@@ -8,6 +8,11 @@ Changelog 4.4.0 (not released yet)
 
   (thanks to Henning Hoefer for pull request).
 * Clarified fail-fast documentation so that it correctly states that terminal failure happens when the fail-fast condition evaluates to true, and cleaned up related Javadocs (thanks to Mustafa Ulu for pull request).
+* Added failFastWithReason(Supplier<String>, Callable<Boolean>) and failFastWithReason(Supplier<String>, ThrowingRunnable) so that the fail-fast failure reason is created only when the fail-fast condition triggers, and can include the current state (issue 240). For example:
+
+    await().failFastWithReason(() -> "Order failed, last known state: " + order.state(), () -> order.state() == FAILED).until(() -> order.state() == SHIPPED);
+
+  If the supplier throws, the TerminalFailureException is still thrown and the supplier's exception is added to it as a suppressed exception.
 * fieldIn(..) error messages now work for fields declared in a superclass. Before, the timeout message said "Internal error" (issue 247, thanks to Jaya Dileep for pull request).
 * JavaVersionDetector now reads the major version from java.version strings like "25+36" and "25+36-ea" instead of throwing (issue 296, thanks to arimu1 for pull request).
 * Clarified in the Javadoc that during(..) needs the condition to hold continuously, not for a total of that time (issue 298, thanks to Jaya Dileep for pull request).
