@@ -1124,7 +1124,7 @@ public class ConditionFactory {
      * <p>&nbsp;</p>
      * <pre>
      * AwaitResult&lt;Integer&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntil(personRepository::size, is(greaterThan(2)));
-     * int size = result.getValue(); // the matched value, or the last observed (unmatched) value on timeout
+     * Integer size = result.getValue(); // the matched value, or the last observed (unmatched) value on timeout, may be null
      * </pre>
      * <p>&nbsp;</p>
      * Only the timeout is turned into a failed result (this includes a violated <code>atLeast</code> constraint).
