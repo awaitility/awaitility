@@ -21,9 +21,9 @@ import org.awaitility.core.FailFastCondition.CallableFailFastCondition;
 import org.awaitility.core.FailFastCondition.CallableFailFastCondition.FailFastAssertion;
 import org.awaitility.pollinterval.FixedPollInterval;
 import org.awaitility.pollinterval.PollInterval;
+import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeMatcher;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
@@ -686,10 +686,11 @@ public class ConditionFactory {
      * @since 3.1.1
      */
     public <T> T until(final Callable<T> supplier, final Predicate<? super T> predicate) {
-        return until(supplier, new TypeSafeMatcher<T>() {
+        return until(supplier, new BaseMatcher<T>() {
             @Override
-            protected void describeMismatchSafely(T item, Description description) {
-                description.appendText("it returned <false> for input of ").appendValue(item);
+            @SuppressWarnings("unchecked")
+            public boolean matches(Object item) {
+                return predicate.test((T) item);
             }
 
             @Override
@@ -698,8 +699,8 @@ public class ConditionFactory {
             }
 
             @Override
-            protected boolean matchesSafely(T item) {
-                return predicate.test(item);
+            public void describeMismatch(Object item, Description description) {
+                description.appendText("it returned <false> for input of ").appendValue(item);
             }
         });
     }
