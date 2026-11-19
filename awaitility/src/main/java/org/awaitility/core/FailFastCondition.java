@@ -31,9 +31,13 @@ public abstract class FailFastCondition {
     }
 
     /**
-     * Returns the failure reason. If the reason was given as a {@link Supplier}, the supplier is called each time this method is called.
+     * Returns the failure reason. If the reason was given as a {@link Supplier} (see
+     * {@link ConditionFactory#failFastWithReason(Supplier, Callable)}), the supplier is called each time this method is called,
+     * and any exception it throws propagates to the caller.
      *
-     * @return the failure reason
+     * @return the failure reason. For a {@link CallableFailFastCondition} this is never <code>null</code> (the default reason is used
+     * when no reason was given). For a {@link CallableFailFastCondition.FailFastAssertion} it is <code>null</code> when no reason was given,
+     * and then the assertion's message is used.
      */
     public abstract String getFailFastFailureReason();
 

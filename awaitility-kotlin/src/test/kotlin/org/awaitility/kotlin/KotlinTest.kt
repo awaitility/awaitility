@@ -267,10 +267,10 @@ class KotlinTest {
     fun failFastWithReasonSupplierFromKotlin() {
         val evaluations = AtomicInteger()
 
-        // Kotlin picks the Supplier<String> overload for a lambda and the String overload for a string
+        // failFastWithReason takes a lambda as reason; failFast(String, ..) is unaffected
         val lazyReason = catchThrowable {
             await().atMost(5, SECONDS).pollInterval(Duration.ofMillis(10))
-                .failFast({ "Gave up after ${evaluations.get()} evaluations" }, Callable { evaluations.incrementAndGet() >= 3 })
+                .failFastWithReason({ "Gave up after ${evaluations.get()} evaluations" }, Callable { evaluations.incrementAndGet() >= 3 })
                 .until { false }
         }
         val staticReason = catchThrowable {

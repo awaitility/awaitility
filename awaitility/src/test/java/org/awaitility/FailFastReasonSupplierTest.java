@@ -21,6 +21,7 @@ import org.junit.After;
 import org.junit.Test;
 
 import java.time.Duration;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
@@ -51,7 +52,7 @@ public class FailFastReasonSupplierTest {
         AtomicInteger evaluations = new AtomicInteger();
 
         Throwable thrown = catchThrowable(() -> await().atMost(GENEROUS).pollInterval(FAST_POLL)
-                .failFast(() -> "Gave up after " + evaluations.get() + " evaluations", () -> evaluations.incrementAndGet() >= 3)
+                .failFastWithReason(() -> "Gave up after " + evaluations.get() + " evaluations", () -> evaluations.incrementAndGet() >= 3)
                 .until(() -> false));
 
         assertThat(thrown).isExactlyInstanceOf(TerminalFailureException.class).hasMessage("Gave up after 3 evaluations").hasNoCause();
@@ -63,7 +64,7 @@ public class FailFastReasonSupplierTest {
         AtomicInteger polls = new AtomicInteger();
 
         await().atMost(GENEROUS).pollInterval(FAST_POLL)
-                .failFast(() -> {
+                .failFastWithReason(() -> {
                     supplierCalls.incrementAndGet();
                     return "should not be used";
                 }, () -> false)
@@ -78,7 +79,7 @@ public class FailFastReasonSupplierTest {
         AtomicInteger evaluations = new AtomicInteger();
 
         catchThrowable(() -> await().atMost(GENEROUS).pollInterval(FAST_POLL)
-                .failFast(() -> "call " + supplierCalls.incrementAndGet(), () -> evaluations.incrementAndGet() >= 3)
+                .failFastWithReason(() -> "call " + supplierCalls.incrementAndGet(), () -> evaluations.incrementAndGet() >= 3)
                 .until(() -> false));
 
         assertThat(supplierCalls).hasValue(1);
@@ -89,7 +90,7 @@ public class FailFastReasonSupplierTest {
         IllegalStateException supplierFailure = new IllegalStateException("boom");
 
         Throwable thrown = catchThrowable(() -> await().atMost(GENEROUS).pollInterval(FAST_POLL)
-                .failFast(() -> {
+                .failFastWithReason(() -> {
                     throw supplierFailure;
                 }, () -> true)
                 .until(() -> false));
@@ -103,7 +104,7 @@ public class FailFastReasonSupplierTest {
     @Test(timeout = 2000)
     public void default_reason_is_used_when_reason_supplier_returns_null() {
         Throwable thrown = catchThrowable(() -> await().atMost(GENEROUS).pollInterval(FAST_POLL)
-                .failFast(() -> null, () -> true)
+                .failFastWithReason(() -> null, () -> true)
                 .until(() -> false));
 
         assertThat(thrown).isExactlyInstanceOf(TerminalFailureException.class).hasMessage("Fail fast condition triggered");
@@ -114,7 +115,7 @@ public class FailFastReasonSupplierTest {
         AtomicInteger evaluations = new AtomicInteger();
 
         Throwable thrown = catchThrowable(() -> await().atMost(GENEROUS).pollInterval(FAST_POLL)
-                .failFast(() -> "Gave up after " + evaluations.get() + " evaluations", () -> assertThat(evaluations.incrementAndGet()).isLessThan(3))
+                .failFastWithReason(() -> "Gave up after " + evaluations.get() + " evaluations", () -> assertThat(evaluations.incrementAndGet()).isLessThan(3))
                 .until(() -> false));
 
         assertThat(thrown).isExactlyInstanceOf(TerminalFailureException.class).hasMessage("Gave up after 3 evaluations")
@@ -127,7 +128,7 @@ public class FailFastReasonSupplierTest {
         AtomicInteger polls = new AtomicInteger();
 
         await().atMost(GENEROUS).pollInterval(FAST_POLL)
-                .failFast(() -> {
+                .failFastWithReason(() -> {
                     supplierCalls.incrementAndGet();
                     return "should not be used";
                 }, () -> assertThat(true).isTrue())
@@ -141,7 +142,7 @@ public class FailFastReasonSupplierTest {
         IllegalStateException supplierFailure = new IllegalStateException("boom");
 
         Throwable thrown = catchThrowable(() -> await().atMost(GENEROUS).pollInterval(FAST_POLL)
-                .failFast(() -> {
+                .failFastWithReason(() -> {
                     throw supplierFailure;
                 }, phaseWasFailed)
                 .until(() -> false));
@@ -155,23 +156,30 @@ public class FailFastReasonSupplierTest {
     @Test(timeout = 2000)
     public void assertion_message_is_used_when_reason_supplier_for_fail_fast_assertion_returns_null() {
         Throwable thrown = catchThrowable(() -> await().atMost(GENEROUS).pollInterval(FAST_POLL)
-                .failFast(() -> null, phaseWasFailed)
+                .failFastWithReason(() -> null, phaseWasFailed)
                 .until(() -> false));
 
         assertThat(thrown).isExactlyInstanceOf(TerminalFailureException.class).hasMessage("phase was Failed");
     }
 
-    @Test
-    public void null_reason_supplier_is_rejected() {
+    @Test(timeout = 2000)
+    public void null_reason_supplier_behaves_like_a_null_string_reason() {
         Supplier<String> noReason = null;
 
-        assertThat(catchThrowable(() -> await().failFast(noReason, () -> true)))
-                .isInstanceOf(IllegalArgumentException.class).hasMessage("failFastFailureReason cannot be null");
+        Throwable callable = catchThrowable(() -> await().atMost(GENEROUS).pollInterval(FAST_POLL)
+                .failFastWithReason(noReason, () -> true)
+                .until(() -> false));
+        Throwable assertion = catchThrowable(() -> await().atMost(GENEROUS).pollInterval(FAST_POLL)
+                .failFastWithReason(noReason, phaseWasFailed)
+                .until(() -> false));
+
+        assertThat(callable).isExactlyInstanceOf(TerminalFailureException.class).hasMessage("Fail fast condition triggered");
+        assertThat(assertion).isExactlyInstanceOf(TerminalFailureException.class).hasMessage("phase was Failed")
+                .hasCauseInstanceOf(AssertionError.class);
     }
 
     @Test(timeout = 2000)
     public void string_reason_call_sites_with_inline_lambdas_still_resolve_to_the_string_overloads() {
-        // Compiles only if adding the Supplier<String> overloads didn't make these calls ambiguous
         Throwable callable = catchThrowable(() -> await().atMost(GENEROUS).pollInterval(FAST_POLL)
                 .failFast("static reason", () -> true)
                 .until(() -> false));
@@ -181,5 +189,31 @@ public class FailFastReasonSupplierTest {
 
         assertThat(callable).isExactlyInstanceOf(TerminalFailureException.class).hasMessage("static reason");
         assertThat(assertion).isExactlyInstanceOf(TerminalFailureException.class).hasMessage("static reason");
+    }
+
+    @Test
+    public void null_literal_string_reason_still_compiles_and_behaves_as_before_for_callable() {
+        Callable<Boolean> condition = () -> true;
+
+        // Regression guard: the plain null literal must stay unambiguous (it would not compile next to a Supplier<String> overload)
+        Throwable plainNull = catchThrowable(() -> await().failFast(null, condition));
+        Throwable castNull = catchThrowable(() -> await().failFast((String) null, condition));
+
+        assertThat(plainNull).isInstanceOf(IllegalArgumentException.class).hasMessage("failFastFailureReason cannot be null");
+        assertThat(castNull).isInstanceOf(IllegalArgumentException.class).hasMessage("failFastFailureReason cannot be null");
+    }
+
+    @Test(timeout = 2000)
+    public void null_literal_string_reason_still_compiles_and_behaves_as_before_for_throwing_runnable() {
+        // Regression guard: the plain null literal must stay unambiguous and use the assertion's message
+        Throwable plainNull = catchThrowable(() -> await().atMost(GENEROUS).pollInterval(FAST_POLL)
+                .failFast(null, phaseWasFailed)
+                .until(() -> false));
+        Throwable castNull = catchThrowable(() -> await().atMost(GENEROUS).pollInterval(FAST_POLL)
+                .failFast((String) null, phaseWasFailed)
+                .until(() -> false));
+
+        assertThat(plainNull).isExactlyInstanceOf(TerminalFailureException.class).hasMessage("phase was Failed");
+        assertThat(castNull).isExactlyInstanceOf(TerminalFailureException.class).hasMessage("phase was Failed");
     }
 }

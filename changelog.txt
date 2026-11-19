@@ -8,9 +8,9 @@ Changelog 4.4.0 (not released yet)
 
   (thanks to Henning Hoefer for pull request).
 * Clarified fail-fast documentation so that it correctly states that terminal failure happens when the fail-fast condition evaluates to true, and cleaned up related Javadocs (thanks to Mustafa Ulu for pull request).
-* Added failFast(Supplier<String>, Callable<Boolean>) and failFast(Supplier<String>, ThrowingRunnable) so that the fail-fast failure reason is created only when the fail-fast condition triggers, and can include the current state (issue 240). For example:
+* Added failFastWithReason(Supplier<String>, Callable<Boolean>) and failFastWithReason(Supplier<String>, ThrowingRunnable) so that the fail-fast failure reason is created only when the fail-fast condition triggers, and can include the current state (issue 240). For example:
 
-    await().failFast(() -> "Order failed, last known state: " + order.state(), () -> order.state() == FAILED).until(() -> order.state() == SHIPPED);
+    await().failFastWithReason(() -> "Order failed, last known state: " + order.state(), () -> order.state() == FAILED).until(() -> order.state() == SHIPPED);
 
   If the supplier throws, the TerminalFailureException is still thrown and the supplier's exception is added to it as a suppressed exception.
 
