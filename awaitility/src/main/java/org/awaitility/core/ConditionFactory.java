@@ -810,7 +810,7 @@ public class ConditionFactory {
      * @param supplier       the supplier that is responsible for executing the assertion and throwing AssertionError on failure.
      * @param assertConsumer The consumer that will assert that the supplied value is correct, or throw an exception.
      * @throws org.awaitility.core.ConditionTimeoutException If condition was not fulfilled within the given time period.
-     * @since 4.3.2
+     * @since 4.3.0
      */
     public <T> void untilAsserted(final Callable<T> supplier, final Consumer<? super T> assertConsumer) {
         untilAsserted(() -> {

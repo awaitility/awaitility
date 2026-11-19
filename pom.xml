@@ -26,7 +26,7 @@
     <groupId>org.awaitility</groupId>
     <artifactId>awaitility-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.4.2-SNAPSHOT</version>
+    <version>4.3.1-SNAPSHOT</version>
 
     <url>http://github.com/awaitility/awaitility</url>
     <name>Awaitility Parent POM</name>
@@ -282,9 +282,12 @@
         </profile>
         <profile>
             <id>release</id>
+            <!-- nexus-staging-maven-plugin uploads every staged module from the last module in the reactor.
+                 awaitility-osgi-test skips staging, so it must never be last or nothing gets uploaded.
+                 Keep a deployable module (awaitility-kotlin) last. -->
             <modules>
-                <module>awaitility-kotlin</module>
                 <module>awaitility-osgi-test</module>
+                <module>awaitility-kotlin</module>
             </modules>
             <build>
                 <plugins>
