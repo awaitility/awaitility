@@ -8,6 +8,7 @@ Changelog 4.4.0 (not released yet)
 
   (thanks to Henning Hoefer for pull request).
 * Clarified fail-fast documentation so that it correctly states that terminal failure happens when the fail-fast condition evaluates to true, and cleaned up related Javadocs (thanks to Mustafa Ulu for pull request).
+* The Java 8 test module is built and run in CI again (issue 156).
 
 Changelog 4.3.0 (2025-02-21)
 ----------------------------

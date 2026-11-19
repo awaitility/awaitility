@@ -108,6 +108,7 @@
         <module>awaitility-scala</module>
         <module>awaitility-groovy</module>
         <module>awaitility-test-support</module>
+        <module>awaitility-java8-test</module>
     </modules>
 
     <build>
