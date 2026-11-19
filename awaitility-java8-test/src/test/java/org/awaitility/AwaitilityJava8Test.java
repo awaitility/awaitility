@@ -23,6 +23,7 @@ import org.awaitility.classes.FakeRepositoryImpl;
 import org.awaitility.classes.FakeRepositoryList;
 import org.awaitility.core.ConditionEvaluationLogger;
 import org.awaitility.core.ConditionTimeoutException;
+import org.awaitility.core.JavaVersionDetector;
 import org.awaitility.core.ThrowingRunnable;
 import org.awaitility.support.CountDown;
 import org.junit.Before;
@@ -141,7 +142,9 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000)
     public void lambdaErrorMessageLooksAlrightWhenUsingMethodReferences() {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage("Lambda expression in org.awaitility.AwaitilityJava8Test that uses org.awaitility.classes.FakeRepository: expected <1> but was <0> within 120 milliseconds.");
+        exception.expectMessage(JavaVersionDetector.getJavaMajorVersion() < 17
+                ? "Lambda expression in org.awaitility.AwaitilityJava8Test that uses org.awaitility.classes.FakeRepository: expected <1> but was <0> within 120 milliseconds."
+                : "Lambda expression in org.awaitility.AwaitilityJava8Test expected <1> but was <0> within 120 milliseconds.");
         with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(fakeRepository::getValue, equalTo(1));
     }
 
@@ -149,7 +152,9 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000)
     public void lambdaErrorMessageLooksAlrightWhenUsingLambda() {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage("Lambda expression in org.awaitility.AwaitilityJava8Test: expected <1> but was <0> within 120 milliseconds.");
+        exception.expectMessage(JavaVersionDetector.getJavaMajorVersion() < 17
+                ? "Lambda expression in org.awaitility.AwaitilityJava8Test: expected <1> but was <0> within 120 milliseconds."
+                : "Lambda expression in org.awaitility.AwaitilityJava8Test expected <1> but was <0> within 120 milliseconds.");
 
         with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(() -> fakeRepository.getValue(), equalTo(1));
     }
@@ -158,7 +163,9 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000)
     public void lambdaErrorMessageLooksAlrightWhenUsingLambdaWithCurlyBraces() {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage("Lambda expression in org.awaitility.AwaitilityJava8Test: expected <1> but was <0> within 120 milliseconds.");
+        exception.expectMessage(JavaVersionDetector.getJavaMajorVersion() < 17
+                ? "Lambda expression in org.awaitility.AwaitilityJava8Test: expected <1> but was <0> within 120 milliseconds."
+                : "Lambda expression in org.awaitility.AwaitilityJava8Test expected <1> but was <0> within 120 milliseconds.");
 
         with().pollInterval(10, MILLISECONDS).then().await().atMost(120, MILLISECONDS).until(() -> {
             return fakeRepository.getValue();
@@ -239,7 +246,7 @@ public class AwaitilityJava8Test {
     @Test
     public void errorMessageLooksOkForHamcrestLambdaExpressionsWhoseMismatchDescriptionOriginallyIsEmptyStringByHamcrest() throws Exception {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage(endsWith("expected a collection containing a string ending with \"hello\" but was <[]> within 50 milliseconds."));
+        exception.expectMessage(endsWith("expected a collection containing a string ending with \"hello\" but was empty within 50 milliseconds."));
 
         // Given
         FakeRepositoryList fakeRepositoryList = new FakeRepositoryList();
@@ -262,7 +269,7 @@ public class AwaitilityJava8Test {
     @Test(timeout = 2000L)
     public void longConditionThrowsConditionTimeoutException() throws Exception {
         exception.expect(ConditionTimeoutException.class);
-        exception.expectMessage("Condition with org.awaitility.AwaitilityJava8Test was not fulfilled within 50 milliseconds.");
+        exception.expectMessage("Condition with lambda expression in org.awaitility.AwaitilityJava8Test was not fulfilled within 50 milliseconds.");
 
         given().pollDelay(10, MILLISECONDS).await().atMost(50, MILLISECONDS).until(() -> {
             Thread.sleep(1000);
