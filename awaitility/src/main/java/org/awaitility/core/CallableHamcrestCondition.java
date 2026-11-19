@@ -15,7 +15,6 @@
  */
 package org.awaitility.core;
 
-import org.awaitility.reflect.WhiteboxImpl;
 import org.hamcrest.Matcher;
 
 import java.lang.annotation.Annotation;
@@ -59,8 +58,21 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
         return supplierClass.isMemberClass() && supplierClass.getEnclosingClass() == FieldSupplierBuilder.class;
     }
 
+    private static FieldSupplierBuilder getFieldSupplierBuilder(Callable<?> supplier) {
+        if (supplier instanceof FieldSupplierBuilder.NameFieldSupplier) {
+            return ((FieldSupplierBuilder.NameFieldSupplier<?>) supplier).getFieldSupplierBuilder();
+        } else if (supplier instanceof FieldSupplierBuilder.NameAndAnnotationFieldSupplier) {
+            return ((FieldSupplierBuilder.NameAndAnnotationFieldSupplier<?>) supplier).getFieldSupplierBuilder();
+        } else if (supplier instanceof FieldSupplierBuilder.AnnotationFieldSupplier) {
+            return ((FieldSupplierBuilder.AnnotationFieldSupplier<?>) supplier).getFieldSupplierBuilder();
+        } else if (supplier instanceof FieldSupplierBuilder.NameAndTypeFieldSupplier) {
+            return ((FieldSupplierBuilder.NameAndTypeFieldSupplier<?>) supplier).getFieldSupplierBuilder();
+        }
+        throw new IllegalArgumentException("Not a field supplier: " + supplier.getClass().getName());
+    }
+
     private String generateFieldSupplierErrorMessage(Callable<T> supplier) {
-        final FieldSupplierBuilder fieldSupplier = WhiteboxImpl.getInternalState(supplier, "this$0");
+        final FieldSupplierBuilder fieldSupplier = getFieldSupplierBuilder(supplier);
         final Class<? extends Annotation> expectedAnnotation = fieldSupplier.getExpectedAnnotation();
         final String expectedFieldName = fieldSupplier.getExpectedFieldName();
         final Class<?> expectedFieldType = fieldSupplier.getExpectedFieldType();
@@ -81,7 +93,7 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
         } else {
 
             try {
-                final Field declaredField = objectClass.getDeclaredField(expectedFieldName);
+                final Field declaredField = findDeclaredFieldInHierarchy(objectClass, expectedFieldName);
                 builder.append("Field ");
                 builder.append(declaredField);
             } catch (Exception e) {
@@ -90,5 +102,23 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
         }
 
         return builder.toString();
+    }
+
+    /**
+     * Looks up a field by name on {@code type} or any of its superclasses.
+     * {@link Class#getDeclaredField(String)} only searches the given class,
+     * which breaks {@code fieldIn} error messages when the field lives on a
+     * superclass (see issue #247).
+     */
+    private static Field findDeclaredFieldInHierarchy(Class<?> type, String fieldName) throws NoSuchFieldException {
+        Class<?> current = type;
+        while (current != null) {
+            try {
+                return current.getDeclaredField(fieldName);
+            } catch (NoSuchFieldException ignored) {
+                current = current.getSuperclass();
+            }
+        }
+        throw new NoSuchFieldException(fieldName);
     }
 }
