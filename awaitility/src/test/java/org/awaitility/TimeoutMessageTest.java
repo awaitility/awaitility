@@ -78,15 +78,22 @@ public class TimeoutMessageTest {
     @Test(timeout = 2000)
     public void supplier_is_evaluated_lazily_so_it_sees_the_state_at_the_time_of_failure() {
         AtomicInteger polls = new AtomicInteger();
+        AtomicInteger pollsSeenBySupplier = new AtomicInteger(-1);
 
         ConditionTimeoutException e = catchThrowableOfType(ConditionTimeoutException.class, () ->
                 await().atMost(SHORT)
                         .pollInterval(Duration.ofMillis(20))
-                        .timeoutMessage(() -> "polled " + polls.get() + " times")
+                        .timeoutMessage(() -> {
+                            int seen = polls.get();
+                            pollsSeenBySupplier.set(seen);
+                            return "polled " + seen + " times";
+                        })
                         .until(() -> polls.incrementAndGet() < 0));
 
-        assertThat(polls.get()).isGreaterThan(1);
-        assertThat(e.getMessage()).endsWith("\npolled " + polls.get() + " times");
+        // A poll that is cancelled at the timeout may still increment polls after the message is built,
+        // so compare with what the supplier saw rather than with polls.get().
+        assertThat(pollsSeenBySupplier.get()).isGreaterThan(1);
+        assertThat(e.getMessage()).endsWith("\npolled " + pollsSeenBySupplier.get() + " times");
     }
 
     @Test(timeout = 2000)
