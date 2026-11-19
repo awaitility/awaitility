@@ -71,6 +71,10 @@ public class FieldSupplierBuilder {
     }
 
     public class NameFieldSupplier<T> implements Callable<T> {
+        FieldSupplierBuilder getFieldSupplierBuilder() {
+            return FieldSupplierBuilder.this;
+        }
+
         private final Field foundField;
 
         public NameFieldSupplier() {
@@ -109,6 +113,10 @@ public class FieldSupplierBuilder {
 
 
     public class NameAndAnnotationFieldSupplier<T> implements Callable<T> {
+        FieldSupplierBuilder getFieldSupplierBuilder() {
+            return FieldSupplierBuilder.this;
+        }
+
         /**
          * Find a field based on the type and name. E.g.
          * <p>&nbsp;</p>
@@ -147,6 +155,10 @@ public class FieldSupplierBuilder {
     }
 
     public class AnnotationFieldSupplier<T> implements Callable<T> {
+        FieldSupplierBuilder getFieldSupplierBuilder() {
+            return FieldSupplierBuilder.this;
+        }
+
         public AnnotationFieldSupplier() {
         }
 
@@ -179,6 +191,10 @@ public class FieldSupplierBuilder {
     }
 
     public class NameAndTypeFieldSupplier<T> implements Callable<T> {
+        FieldSupplierBuilder getFieldSupplierBuilder() {
+            return FieldSupplierBuilder.this;
+        }
+
         /**
          * Find a field based on the annotation and field name. E.g.
          * <p>&nbsp;</p>

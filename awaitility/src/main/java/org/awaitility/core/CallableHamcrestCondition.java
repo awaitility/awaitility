@@ -15,7 +15,6 @@
  */
 package org.awaitility.core;
 
-import org.awaitility.reflect.WhiteboxImpl;
 import org.hamcrest.Matcher;
 
 import java.lang.annotation.Annotation;
@@ -59,8 +58,21 @@ class CallableHamcrestCondition<T> extends AbstractHamcrestCondition<T> {
         return supplierClass.isMemberClass() && supplierClass.getEnclosingClass() == FieldSupplierBuilder.class;
     }
 
+    private static FieldSupplierBuilder getFieldSupplierBuilder(Callable<?> supplier) {
+        if (supplier instanceof FieldSupplierBuilder.NameFieldSupplier) {
+            return ((FieldSupplierBuilder.NameFieldSupplier<?>) supplier).getFieldSupplierBuilder();
+        } else if (supplier instanceof FieldSupplierBuilder.NameAndAnnotationFieldSupplier) {
+            return ((FieldSupplierBuilder.NameAndAnnotationFieldSupplier<?>) supplier).getFieldSupplierBuilder();
+        } else if (supplier instanceof FieldSupplierBuilder.AnnotationFieldSupplier) {
+            return ((FieldSupplierBuilder.AnnotationFieldSupplier<?>) supplier).getFieldSupplierBuilder();
+        } else if (supplier instanceof FieldSupplierBuilder.NameAndTypeFieldSupplier) {
+            return ((FieldSupplierBuilder.NameAndTypeFieldSupplier<?>) supplier).getFieldSupplierBuilder();
+        }
+        throw new IllegalArgumentException("Not a field supplier: " + supplier.getClass().getName());
+    }
+
     private String generateFieldSupplierErrorMessage(Callable<T> supplier) {
-        final FieldSupplierBuilder fieldSupplier = WhiteboxImpl.getInternalState(supplier, "this$0");
+        final FieldSupplierBuilder fieldSupplier = getFieldSupplierBuilder(supplier);
         final Class<? extends Annotation> expectedAnnotation = fieldSupplier.getExpectedAnnotation();
         final String expectedFieldName = fieldSupplier.getExpectedFieldName();
         final Class<?> expectedFieldType = fieldSupplier.getExpectedFieldType();
