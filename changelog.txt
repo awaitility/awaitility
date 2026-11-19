@@ -1,5 +1,13 @@
 Changelog 4.4.0 (not released yet)
 -----------------------------------
+* Added an Automatic-Module-Name to the jar manifests, which changes the module names for module-path users:
+    awaitility        -> org.awaitility
+    awaitility.kotlin -> org.awaitility.kotlin
+    awaitility.scala  -> org.awaitility.scala
+    awaitility.groovy -> org.awaitility.groovy
+  (issue 205, thanks to Piotr P. Karwasz for the original pull request).
+* awaitility-groovy can now be used on the module path. Its Groovy extension module descriptor moved from META-INF/services to META-INF/groovy, where Groovy 2.5 and later look for it, because the module system rejected the old file.
+* fieldIn(..) no longer relies on the compiler's synthetic this$0 field to build its timeout message (issue 223).
 * Upgraded assertj-core to 3.27.7 (thanks to Ian Hundere for pull request).
 * Updated the README example to use the Duration overload in await().atMost(..) (thanks to Kurt Alfred Kluever for pull request).
 * Added support for configuring the default timeout, poll interval and poll delay using ISO-8601 system properties. For example:
