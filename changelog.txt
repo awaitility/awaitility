@@ -8,6 +8,13 @@ Changelog 4.4.0 (not released yet)
 
   (thanks to Henning Hoefer for pull request).
 * Clarified fail-fast documentation so that it correctly states that terminal failure happens when the fail-fast condition evaluates to true, and cleaned up related Javadocs (thanks to Mustafa Ulu for pull request).
+* Added timeoutMessage(Supplier<String>) to the DSL. The supplier is only called if the await times out, and its text is appended on a new line after the standard timeout message, so the alias and the mismatch description are kept. For example:
+
+    await().atMost(5, SECONDS)
+           .timeoutMessage(() -> "Order state was " + orders.stateOf(orderId))
+           .until(() -> orders.stateOf(orderId) == SHIPPED);
+
+  Kotlin users can write "await withTimeoutMessage { .. } until { .. }" (pull request 195, thanks to James Agnew for the original pull request).
 * fieldIn(..) error messages now work for fields declared in a superclass. Before, the timeout message said "Internal error" (issue 247, thanks to Jaya Dileep for pull request).
 * JavaVersionDetector now reads the major version from java.version strings like "25+36" and "25+36-ea" instead of throwing (issue 296, thanks to arimu1 for pull request).
 * Clarified in the Javadoc that during(..) needs the condition to hold continuously, not for a total of that time (issue 298, thanks to Jaya Dileep for pull request).

@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.time.temporal.ChronoUnit.NANOS;
@@ -168,13 +169,17 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                         // don't init trace and move on.
                     }
                 }
-                conditionEvaluationHandler.handleTimeout(message, false);
-                throw new ConditionTimeoutException(message, cause);
+                TimeoutMessage timeoutMessageWithCustomText = appendCustomTimeoutMessage(message);
+                conditionEvaluationHandler.handleTimeout(timeoutMessageWithCustomText.message, false);
+                throw timeoutMessageWithCustomText.addSupplierFailureTo(
+                        new ConditionTimeoutException(timeoutMessageWithCustomText.message, cause));
             } else if (evaluationDuration.compareTo(minWaitTime) < 0) {
                 String message = String.format("Condition was evaluated in %s which is earlier than expected minimum timeout %s",
                         formatAsString(evaluationDuration), formatAsString(minWaitTime));
-                conditionEvaluationHandler.handleTimeout(message, true);
-                throw new ConditionTimeoutException(message);
+                TimeoutMessage timeoutMessageWithCustomText = appendCustomTimeoutMessage(message);
+                conditionEvaluationHandler.handleTimeout(timeoutMessageWithCustomText.message, true);
+                throw timeoutMessageWithCustomText.addSupplierFailureTo(
+                        new ConditionTimeoutException(timeoutMessageWithCustomText.message));
             }
         } catch (Throwable e) {
             CheckedExceptionRethrower.safeRethrow(e);
@@ -206,6 +211,44 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 String failFastFailureReason = failFastAssertion.getFailFastFailureReason();
                 throw new TerminalFailureException(failFastFailureReason == null ? e.getMessage() : failFastFailureReason, e);
             }
+        }
+    }
+
+    /**
+     * Appends the text of the user's timeout message supplier, if any, to the standard timeout message.
+     * The supplier is called at most once. If it throws, the standard message is kept and the
+     * supplier's exception is remembered so it can be added as suppressed to the timeout exception.
+     */
+    private TimeoutMessage appendCustomTimeoutMessage(String standardMessage) {
+        Supplier<String> timeoutMessageSupplier = conditionSettings.getTimeoutMessageSupplier();
+        if (timeoutMessageSupplier == null) {
+            return new TimeoutMessage(standardMessage, null);
+        }
+        try {
+            String customMessage = timeoutMessageSupplier.get();
+            if (customMessage == null || customMessage.isEmpty()) {
+                return new TimeoutMessage(standardMessage, null);
+            }
+            return new TimeoutMessage(standardMessage + "\n" + customMessage, null);
+        } catch (Throwable e) {
+            return new TimeoutMessage(standardMessage, e);
+        }
+    }
+
+    private static class TimeoutMessage {
+        private final String message;
+        private final Throwable supplierFailure;
+
+        TimeoutMessage(String message, Throwable supplierFailure) {
+            this.message = message;
+            this.supplierFailure = supplierFailure;
+        }
+
+        ConditionTimeoutException addSupplierFailureTo(ConditionTimeoutException exception) {
+            if (supplierFailure != null) {
+                exception.addSuppressed(supplierFailure);
+            }
+            return exception;
         }
     }
 
