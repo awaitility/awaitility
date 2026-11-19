@@ -142,9 +142,28 @@ public class ConditionFactory {
     }
 
     /**
-     * Await at the predicate holds during at least <code>timeout</code>
+     * Specify that the condition must hold <em>continuously</em> for at least
+     * <code>timeout</code> before the await succeeds.
+     * <p>
+     * The hold time is not cumulative: brief matches that add up to
+     * <code>timeout</code> across separate intervals are not enough; the
+     * predicate must stay satisfied for an unbroken period of that length.
+     * </p>
+     * <p>
+     * The hold period starts at the first successful evaluation, which happens no earlier than the poll delay,
+     * while the at most timeout counts from the start of the await. So:
+     * </p>
+     * <ul>
+     * <li>If you have not set an at most timeout yourself (you rely on the default timeout, for example the
+     * built-in 10 seconds or one set with {@link org.awaitility.Awaitility#setDefaultTimeout(Duration)}), the timeout
+     * of this await is the default timeout plus <code>timeout</code>. A default timeout of forever stays forever.</li>
+     * <li>If you set an at most timeout yourself (for example with {@link #atMost(Duration)}) that is not larger than
+     * the poll delay plus <code>timeout</code>, the condition can never be fulfilled, and the await fails at once with a
+     * {@link ConditionTimeoutException} that explains why. Choose an at most timeout comfortably larger than the poll
+     * delay plus <code>timeout</code>.</li>
+     * </ul>
      *
-     * @param timeout the timeout
+     * @param timeout the minimum continuous duration the condition must hold
      * @return the condition factory
      */
     public ConditionFactory during(Duration timeout) {
@@ -152,9 +171,28 @@ public class ConditionFactory {
     }
 
     /**
-     * Await at the predicate holds during at least <code>timeout</code>
+     * Specify that the condition must hold <em>continuously</em> for at least
+     * <code>timeout</code> before the await succeeds.
+     * <p>
+     * The hold time is not cumulative: brief matches that add up to
+     * <code>timeout</code> across separate intervals are not enough; the
+     * predicate must stay satisfied for an unbroken period of that length.
+     * </p>
+     * <p>
+     * The hold period starts at the first successful evaluation, which happens no earlier than the poll delay,
+     * while the at most timeout counts from the start of the await. So:
+     * </p>
+     * <ul>
+     * <li>If you have not set an at most timeout yourself (you rely on the default timeout, for example the
+     * built-in 10 seconds or one set with {@link org.awaitility.Awaitility#setDefaultTimeout(Duration)}), the timeout
+     * of this await is the default timeout plus <code>timeout</code>. A default timeout of forever stays forever.</li>
+     * <li>If you set an at most timeout yourself (for example with {@link #atMost(long, TimeUnit)}) that is not larger than
+     * the poll delay plus <code>timeout</code>, the condition can never be fulfilled, and the await fails at once with a
+     * {@link ConditionTimeoutException} that explains why. Choose an at most timeout comfortably larger than the poll
+     * delay plus <code>timeout</code>.</li>
+     * </ul>
      *
-     * @param timeout the timeout
+     * @param timeout the minimum continuous duration the condition must hold
      * @param unit    the unit
      * @return the condition factory
      */
@@ -1077,7 +1115,8 @@ public class ConditionFactory {
         until(new CallableCondition(conditionEvaluator, generateConditionSettings()));
     }
 
-    private ConditionSettings generateConditionSettings() {
+    // Package-private so that tests can verify the effective timeout
+    ConditionSettings generateConditionSettings() {
         final String alias = settings.getAlias();
         final WaitConstraint timeoutConstraint = settings.getTimeoutConstraint();
         final PollInterval pollInterval = settings.getPollInterval();
@@ -1096,6 +1135,26 @@ public class ConditionFactory {
                     formatAsString(timeout), formatAsString(actualPollDelay)));
         }
 
+        // The hold period (during) starts at the first successful evaluation, which is never earlier than the poll delay,
+        // while the timeout counts from the start of the await. See issues 165, 186 and 264.
+        WaitConstraint effectiveTimeoutConstraint = timeoutConstraint;
+        String unsatisfiableHoldMessage = null;
+        Duration holdPredicateTime = timeoutConstraint.getHoldPredicateTime();
+        if (holdPredicateTime != null && !holdPredicateTime.isZero() && !isForever(holdPredicateTime) && !isForever(timeout)) {
+            if (!settings.isAtMostSetByUser()) {
+                // The timeout comes from the defaults, so give the condition the during period on top of it
+                effectiveTimeoutConstraint = timeoutConstraint.withMaxWaitTime(extendTimeout(timeout, holdPredicateTime));
+            } else if (timeout.minus(actualPollDelay).compareTo(holdPredicateTime) <= 0) {
+                // The user asked for an at most timeout that the condition can never satisfy
+                unsatisfiableHoldMessage = String.format("%s can never be fulfilled: during(%s) needs the condition to hold for longer " +
+                                "than atMost(%s) minus pollDelay(%s) allows. Use an atMost larger than %s, or leave atMost unset " +
+                                "so that the default timeout is extended by the during period.",
+                        alias == null ? "Condition" : "Condition with alias '" + alias + "'",
+                        formatAsString(holdPredicateTime), formatAsString(timeout), formatAsString(actualPollDelay),
+                        formatAsString(actualPollDelay.plus(holdPredicateTime)));
+            }
+        }
+
         ExecutorLifecycle executorLifecycle;
         if (settings.getExecutorLifecycle() == null) {
             executorLifecycle = ExecutorLifecycle.withNormalCleanupBehavior(() -> InternalExecutorServiceFactory.create((r, threadName) -> new Thread(Thread.currentThread().getThreadGroup(), r, threadName), alias));
@@ -1103,8 +1162,17 @@ public class ConditionFactory {
             executorLifecycle = settings.getExecutorLifecycle();
         }
 
-        return new ConditionSettings(alias, settings.isCatchUncaughtExceptions(), timeoutConstraint, pollInterval, actualPollDelay,
-                settings.getConditionEvaluationListener(), settings.getExceptionsIgnorer(), executorLifecycle, settings.getFailFastCondition());
+        return new ConditionSettings(alias, settings.isCatchUncaughtExceptions(), effectiveTimeoutConstraint, pollInterval, actualPollDelay,
+                settings.getConditionEvaluationListener(), settings.getExceptionsIgnorer(), executorLifecycle, settings.getFailFastCondition(),
+                unsatisfiableHoldMessage);
+    }
+
+    private static Duration extendTimeout(Duration timeout, Duration holdPredicateTime) {
+        try {
+            return timeout.plus(holdPredicateTime);
+        } catch (ArithmeticException e) {
+            return AtMostWaitConstraint.FOREVER.getMaxWaitTime();
+        }
     }
 
     private <T> T until(Condition<T> condition) {

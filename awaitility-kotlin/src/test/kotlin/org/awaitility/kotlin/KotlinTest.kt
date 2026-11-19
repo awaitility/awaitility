@@ -18,6 +18,7 @@ package org.awaitility.kotlin
 
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
+import org.awaitility.Awaitility
 import org.awaitility.Awaitility.await
 import org.awaitility.Durations.*
 import org.awaitility.classes.Asynch
@@ -41,6 +42,7 @@ import java.util.concurrent.atomic.AtomicReference
 import kotlin.system.measureTimeMillis
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 class KotlinTest {
 
@@ -259,6 +261,27 @@ class KotlinTest {
         }
 
         assertThat(duration).isGreaterThan(1000)
+    }
+
+    @Test(timeout = 2000)
+    fun awaitDuringExtendsTheDefaultTimeout() {
+        Awaitility.setDefaultTimeout(500.milliseconds.toJavaDuration())
+        try {
+            await() during 500.milliseconds until { true }
+        } finally {
+            Awaitility.reset()
+        }
+    }
+
+    @Test(timeout = 2000)
+    fun awaitDuringFailsAtOnceWhenTheUserSetAtMostIsTooShort() {
+        var throwable: Throwable? = null
+        val duration = measureTimeMillis {
+            throwable = catchThrowable { await() atMost 300.milliseconds during 1.seconds until { true } }
+        }
+
+        assertThat(throwable).isInstanceOf(ConditionTimeoutException::class.java).hasMessageContaining("can never be fulfilled")
+        assertThat(duration).isLessThan(500)
     }
 }
 

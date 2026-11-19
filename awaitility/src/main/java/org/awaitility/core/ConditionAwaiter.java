@@ -74,6 +74,8 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
         final Duration maxWaitTime = conditionSettings.getMaxWaitTime();
         final Duration minWaitTime = conditionSettings.getMinWaitTime();
         final Duration holdPredicateWaitTime = conditionSettings.getHoldPredicateTime();
+        // Set when the hold period (during) cannot fit within the user's at most timeout, see ConditionFactory
+        final String unsatisfiableHoldMessage = conditionSettings.getUnsatisfiableHoldMessage();
 
         long pollingStartedNanos = System.nanoTime() - pollDelay.toNanos();
 
@@ -89,11 +91,13 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             }
 
             conditionEvaluationHandler.start();
-            if (!pollDelay.isZero()) {
+            // When the condition can never be fulfilled we skip polling and go straight to the timeout handling below
+            final boolean canSucceed = unsatisfiableHoldMessage == null;
+            if (canSucceed && !pollDelay.isZero()) {
                 sleepUninterruptibly(pollDelay.toNanos(), NANOSECONDS);
             }
             Duration pollInterval = pollDelay;
-            while (maxWaitTime.compareTo(evaluationDuration) > 0) {
+            while (canSucceed && maxWaitTime.compareTo(evaluationDuration) > 0) {
                 executeFailFastConditionIfDefined();
                 pollCount = pollCount + 1;
                 // Only wait for the next condition evaluation for at most what's remaining of
@@ -118,7 +122,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStartedNanos, firstSucceedSinceStarted, minWaitTime, holdPredicateWaitTime);
             }
             evaluationDuration = calculateConditionEvaluationDuration(pollDelay, pollingStartedNanos, firstSucceedSinceStarted, minWaitTime, holdPredicateWaitTime);
-            succeededBeforeTimeout = maxWaitTime.compareTo(evaluationDuration) > 0;
+            succeededBeforeTimeout = canSucceed && maxWaitTime.compareTo(evaluationDuration) > 0;
         } catch (TimeoutException e) {
             lastResult = new ConditionEvaluationResult(false, null, e);
         } catch (ExecutionException e) {
@@ -139,15 +143,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             } else if (lastResult != null && lastResult.hasThrowable()) {
                 throw lastResult.getThrowable();
             } else if (!succeededBeforeTimeout) {
-                final String message;
-                String timeoutMessage = getTimeoutMessage();
-                String durationAsString = formatAsString(maxWaitTime);
-                if (conditionSettings.hasAlias()) {
-                    message = String.format("Condition with alias '%s' didn't complete within %s because %s.",
-                            conditionSettings.getAlias(), durationAsString, decapitalize(timeoutMessage));
-                } else {
-                    message = String.format("%s within %s.", timeoutMessage, durationAsString);
-                }
+                final String message = createTimeoutMessage(unsatisfiableHoldMessage, lastResult, maxWaitTime, holdPredicateWaitTime);
 
                 Throwable cause = lastResult != null && lastResult.hasTrace() ? lastResult.getTrace() : null;
                 // Not all systems support deadlock detection so ignore if ThreadMXBean & ManagementFactory is not in classpath
@@ -202,6 +198,30 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                 throw new TerminalFailureException(failFastFailureReason == null ? e.getMessage() : failFastFailureReason, e);
             }
         }
+    }
+
+    private String createTimeoutMessage(String unsatisfiableHoldMessage, ConditionEvaluationResult lastResult,
+                                        Duration maxWaitTime, Duration holdPredicateWaitTime) {
+        if (unsatisfiableHoldMessage != null) {
+            return unsatisfiableHoldMessage;
+        }
+        String durationAsString = formatAsString(maxWaitTime);
+        if (!holdPredicateWaitTime.isZero() && lastResult != null && lastResult.isSuccessful()) {
+            // The condition matched at the end but had not held for the whole during period. Don't use the condition's
+            // own timeout message since it can read like "expected X but was X" (issue 264, message idea from pull request 309).
+            String holdAsString = formatAsString(holdPredicateWaitTime);
+            if (conditionSettings.hasAlias()) {
+                return String.format("Condition with alias '%s' was fulfilled but did not remain fulfilled for %s within %s.",
+                        conditionSettings.getAlias(), holdAsString, durationAsString);
+            }
+            return String.format("Condition was fulfilled but did not remain fulfilled for %s within %s.", holdAsString, durationAsString);
+        }
+        String timeoutMessage = getTimeoutMessage();
+        if (conditionSettings.hasAlias()) {
+            return String.format("Condition with alias '%s' didn't complete within %s because %s.",
+                    conditionSettings.getAlias(), durationAsString, decapitalize(timeoutMessage));
+        }
+        return String.format("%s within %s.", timeoutMessage, durationAsString);
     }
 
     private static String decapitalize(String str) {
