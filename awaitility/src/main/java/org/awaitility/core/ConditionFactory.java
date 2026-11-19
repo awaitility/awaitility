@@ -784,6 +784,11 @@ public class ConditionFactory {
      *     in which case Awaitility keeps polling.</li>
      * </ul>
      * Use {@link #untilThrownExactly(Callable, Class)} if a subclass of <code>exceptionType</code> should not count.
+     * <p>
+     * A method reference to an overloaded method, such as <code>queue::remove</code>, can't be told apart from a
+     * {@link ThrowingRunnable} by the compiler and gives an "ambiguous" error. Use a lambda instead, e.g.
+     * <code>() -&gt; queue.remove()</code>.
+     * </p>
      *
      * @param callable      the code that is expected to eventually throw
      * @param exceptionType the expected exception type, subclasses match as well

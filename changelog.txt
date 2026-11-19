@@ -12,7 +12,7 @@ Changelog 4.4.0 (not released yet)
 
     IOException e = await().atMost(5, SECONDS).untilThrown(() -> client.fetch("/status"), IOException.class);
 
-  untilThrown also matches subclasses, untilThrownExactly only the exact class. Both take a Callable or a ThrowingRunnable. If the code returns normally Awaitility keeps polling, and any other exception fails the wait right away unless it's ignored with e.g. ignoreException(..). The Kotlin DSL has "await.untilThrown<IOException> { client.fetch("/status") }" and untilThrownExactly<T>.
+  untilThrown also matches subclasses, untilThrownExactly only the exact class. Both take a Callable or a ThrowingRunnable. If the code returns normally Awaitility keeps polling, and any other exception fails the wait right away unless it's ignored with e.g. ignoreException(..). A method reference to an overloaded method is ambiguous here, so use a lambda for those. The Kotlin DSL has "await.untilThrown<IOException> { client.fetch("/status") }" and untilThrownExactly<T>.
 
 Changelog 4.3.0 (2025-02-21)
 ----------------------------
