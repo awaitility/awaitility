@@ -52,7 +52,7 @@ class LambdaErrorMessageGenerator {
         }
 
         if (lambdaMethod == null) {
-            nameToReturn = "Lambda expression in " + nameWithoutLambda;
+            nameToReturn = (firstLetterUpperCaseAndEndWithColon ? "L" : "l") + "ambda expression in " + nameWithoutLambda;
         } else {
             Class<?>[] lambdaParams = lambdaMethod.getParameterTypes();
             if (lambdaParams.length > 0) {
