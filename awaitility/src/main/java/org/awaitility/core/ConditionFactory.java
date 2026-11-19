@@ -234,11 +234,12 @@ public class ConditionFactory {
      * Await forever until the condition is satisfied. Caution: You can block
      * subsequent tests and the entire build can hang indefinitely, it's
      * recommended to always use a timeout.
+     * Previously configured minimum wait and condition hold durations are preserved.
      *
      * @return the condition factory
      */
     public ConditionFactory forever() {
-        return new ConditionFactory(settings.withUserSetAtMost(AtMostWaitConstraint.FOREVER));
+        return atMost(AtMostWaitConstraint.FOREVER.getMaxWaitTime());
     }
 
     /**
