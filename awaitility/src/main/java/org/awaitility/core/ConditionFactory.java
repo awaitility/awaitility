@@ -156,6 +156,67 @@ public class ConditionFactory {
     }
 
     /**
+     * Specify a callback that is invoked once when the condition evaluation times out.
+     * This is a convenience alternative to implementing
+     * {@link ConditionEvaluationListener#onTimeout(TimeoutEvent)} with a full
+     * {@link ConditionEvaluationListener}.
+     * <p>
+     * If a {@link ConditionEvaluationListener} is already configured on this factory,
+     * its callbacks are preserved and the given callback is invoked after the previous
+     * listener's {@code onTimeout} method.
+     * </p>
+     * <p>
+     * Example usage:
+     * </p>
+     * <pre>
+     * await()
+     *     .atMost(10, SECONDS)
+     *     .onFailure(() -&gt; env.printErrors())
+     *     .untilAsserted(() -&gt; assertThat(runQuery()).containsExactly("expected"));
+     * </pre>
+     *
+     * @param onTimeoutCallback the callback to run when the condition times out (must not be {@code null})
+     * @return the condition factory
+     * @since 4.3.2
+     */
+    public ConditionFactory onFailure(final Runnable onTimeoutCallback) {
+        if (onTimeoutCallback == null) {
+            throw new IllegalArgumentException("onTimeoutCallback cannot be null");
+        }
+        final ConditionEvaluationListener previous = this.conditionEvaluationListener;
+        return conditionEvaluationListener(new ConditionEvaluationListener() {
+            @Override
+            public void conditionEvaluated(EvaluatedCondition condition) {
+                if (previous != null) {
+                    previous.conditionEvaluated(condition);
+                }
+            }
+
+            @Override
+            public void beforeEvaluation(StartEvaluationEvent startEvaluationEvent) {
+                if (previous != null) {
+                    previous.beforeEvaluation(startEvaluationEvent);
+                }
+            }
+
+            @Override
+            public void onTimeout(TimeoutEvent timeoutEvent) {
+                if (previous != null) {
+                    previous.onTimeout(timeoutEvent);
+                }
+                onTimeoutCallback.run();
+            }
+
+            @Override
+            public void exceptionIgnored(IgnoredException ignoredException) {
+                if (previous != null) {
+                    previous.exceptionIgnored(ignoredException);
+                }
+            }
+        });
+    }
+
+    /**
      * Await at most <code>timeout</code> before throwing a timeout exception.
      *
      * @param timeout the timeout
