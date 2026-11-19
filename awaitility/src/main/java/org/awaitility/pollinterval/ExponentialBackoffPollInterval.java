@@ -31,6 +31,13 @@ import static org.awaitility.core.ForeverDuration.isForever;
  * The static factory is imported from this class. An explicitly configured poll delay
  * occurs before the first interval and does not change the starting duration.
  * Instances are immutable and can be shared between awaits.
+ * <p>
+ * If you want doubling without an upper bound, use
+ * <code>iterative(d -&gt; d.multipliedBy(2), start)</code> from {@link IterativePollInterval} instead.
+ * Note that the iterative interval applies the function to the start duration, so its first interval is
+ * twice the start duration.
+ *
+ * @since 4.4.0
  */
 public final class ExponentialBackoffPollInterval implements PollInterval {
 
@@ -45,6 +52,7 @@ public final class ExponentialBackoffPollInterval implements PollInterval {
      * @param maxDuration the upper bound, positive, finite and at least the start duration
      * @throws IllegalArgumentException if either duration is null, non-positive or forever,
      *                                  or the maximum is smaller than the start
+     * @since 4.4.0
      */
     public ExponentialBackoffPollInterval(Duration startDuration, Duration maxDuration) {
         validateDuration(startDuration, "Start duration");
@@ -92,6 +100,7 @@ public final class ExponentialBackoffPollInterval implements PollInterval {
      * @param startDuration the first interval, positive and finite
      * @param maxDuration the positive, finite upper bound, at least the start duration
      * @return a new poll interval
+     * @since 4.4.0
      */
     public static ExponentialBackoffPollInterval exponential(Duration startDuration, Duration maxDuration) {
         return new ExponentialBackoffPollInterval(startDuration, maxDuration);

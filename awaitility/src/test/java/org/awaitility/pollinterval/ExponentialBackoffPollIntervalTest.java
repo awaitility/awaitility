@@ -20,19 +20,19 @@ import org.awaitility.Awaitility;
 import org.awaitility.core.ForeverDuration;
 import org.junit.Test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.awaitility.pollinterval.ExponentialBackoffPollInterval.exponential;
 import static org.junit.Assert.*;
 
 public class ExponentialBackoffPollIntervalTest {
 
     @Test
-    public void requestedSequenceStartsThenDoublesAndStaysCapped() throws Exception {
+    public void requestedSequenceStartsThenDoublesAndStaysCapped() {
         PollInterval interval = create(Duration.ofMillis(500), Duration.ofSeconds(5));
         Duration previous = null;
         long[] expectedMillis = {500, 1000, 2000, 4000, 5000, 5000};
@@ -43,14 +43,14 @@ public class ExponentialBackoffPollIntervalTest {
     }
 
     @Test
-    public void firstIntervalIgnoresPreviousDurationAndPollDelay() throws Exception {
+    public void firstIntervalIgnoresPreviousDurationAndPollDelay() {
         PollInterval interval = create(Duration.ofMillis(3), Duration.ofMillis(9));
         assertEquals(Duration.ofMillis(3), interval.next(1, Duration.ofSeconds(30)));
         assertEquals(Duration.ofMillis(3), interval.next(1, null));
     }
 
     @Test
-    public void preservesNanosecondPrecisionAtOddMaximum() throws Exception {
+    public void preservesNanosecondPrecisionAtOddMaximum() {
         PollInterval interval = create(Duration.ofNanos(1), Duration.ofNanos(3));
         assertEquals(Duration.ofNanos(1), interval.next(1, null));
         assertEquals(Duration.ofNanos(2), interval.next(2, Duration.ofNanos(1)));
@@ -59,7 +59,7 @@ public class ExponentialBackoffPollIntervalTest {
     }
 
     @Test
-    public void capsBeforeDurationMultiplicationCanOverflow() throws Exception {
+    public void capsBeforeDurationMultiplicationCanOverflow() {
         Duration maximum = Duration.ofSeconds(Long.MAX_VALUE - 1);
         PollInterval interval = create(Duration.ofSeconds(1), maximum);
         Duration half = maximum.dividedBy(2);
@@ -70,7 +70,7 @@ public class ExponentialBackoffPollIntervalTest {
     }
 
     @Test
-    public void equalStartAndMaximumRemainConstant() throws Exception {
+    public void equalStartAndMaximumRemainConstant() {
         Duration value = Duration.ofMillis(5);
         PollInterval interval = create(value, value);
         assertEquals(value, interval.next(1, null));
@@ -78,7 +78,7 @@ public class ExponentialBackoffPollIntervalTest {
     }
 
     @Test
-    public void rejectsInvalidConstructorDurations() throws Exception {
+    public void rejectsInvalidConstructorDurations() {
         Duration one = Duration.ofSeconds(1);
         for (Duration invalid : Arrays.asList(null, Duration.ZERO, Duration.ofNanos(-1), ForeverDuration.FOREVER)) {
             expectInvalid(invalid, one);
@@ -88,7 +88,7 @@ public class ExponentialBackoffPollIntervalTest {
     }
 
     @Test
-    public void rejectsInvalidPreviousDurationAfterFirstPoll() throws Exception {
+    public void rejectsInvalidPreviousDurationAfterFirstPoll() {
         PollInterval interval = create(Duration.ofNanos(1), Duration.ofNanos(3));
         try {
             interval.next(2, null);
@@ -105,11 +105,11 @@ public class ExponentialBackoffPollIntervalTest {
     }
 
     @Test
-    public void factoryAndConstructorHaveValueSemanticsWithoutMutableState() throws Exception {
+    public void factoryAndConstructorHaveValueSemanticsWithoutMutableState() {
         Duration start = Duration.ofMillis(1);
         Duration maximum = Duration.ofMillis(5);
         PollInterval constructor = create(start, maximum);
-        Object factory = intervalType().getMethod("exponential", Duration.class, Duration.class).invoke(null, start, maximum);
+        PollInterval factory = exponential(start, maximum);
         assertEquals(constructor, factory);
         assertEquals(constructor.hashCode(), factory.hashCode());
         assertNotEquals(constructor, create(start, Duration.ofMillis(6)));
@@ -122,7 +122,7 @@ public class ExponentialBackoffPollIntervalTest {
     }
 
     @Test
-    public void publicAwaitilityApiUsesTheStrategy() throws Exception {
+    public void publicAwaitilityApiUsesTheStrategy() {
         PollInterval interval = create(Duration.ofNanos(1), Duration.ofNanos(4));
         List<Duration> intervals = new ArrayList<>();
         AtomicInteger evaluations = new AtomicInteger();
@@ -150,22 +150,16 @@ public class ExponentialBackoffPollIntervalTest {
         assertEquals(Duration.ofSeconds(2), interval.next(2, Duration.ofSeconds(1)));
     }
 
-    // Reflective construction allows the exact same regression source to compile on base.
-    // Missing class/factory on base is the intended feature failure, not a setup workaround.
-    private static Class<?> intervalType() throws ClassNotFoundException {
-        return Class.forName("org.awaitility.pollinterval.ExponentialBackoffPollInterval");
+    private static PollInterval create(Duration start, Duration maximum) {
+        return new ExponentialBackoffPollInterval(start, maximum);
     }
 
-    private static PollInterval create(Duration start, Duration maximum) throws Exception {
-        return (PollInterval) intervalType().getConstructor(Duration.class, Duration.class).newInstance(start, maximum);
-    }
-
-    private static void expectInvalid(Duration start, Duration maximum) throws Exception {
+    private static void expectInvalid(Duration start, Duration maximum) {
         try {
-            create(start, maximum);
+            exponential(start, maximum);
             fail("invalid durations should be rejected");
-        } catch (InvocationTargetException ex) {
-            assertTrue(ex.getCause() instanceof IllegalArgumentException);
+        } catch (IllegalArgumentException expected) {
+            // Expected.
         }
     }
 }
