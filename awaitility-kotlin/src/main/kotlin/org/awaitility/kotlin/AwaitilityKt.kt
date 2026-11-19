@@ -417,18 +417,22 @@ infix fun <T> ConditionFactory.conditionEvaluationListener(conditionEvaluationLi
 infix fun ConditionFactory.logging(logPrinter: (String) -> Unit) = logging(logPrinter)
 
 /**
- * Await at the predicate holds during at least <code>timeout</code>
+ * Await until the condition has held continuously for at least <code>duration</code>.
+ * If you haven't set an at most timeout yourself, the default timeout is extended by <code>duration</code>.
+ * If you have, and it is too short to fit the poll delay plus <code>duration</code>, the await fails at once.
  *
- * @param timeout the timeout
+ * @param duration how long the condition must hold
  * @return the condition factory
  * @since 4.2.3
  */
 infix fun ConditionFactory.during(duration: Duration): ConditionFactory = during(duration)
 
 /**
- * Await at the predicate holds during at least <code>timeout</code>
+ * Await until the condition has held continuously for at least <code>duration</code>.
+ * If you haven't set an at most timeout yourself, the default timeout is extended by <code>duration</code>.
+ * If you have, and it is too short to fit the poll delay plus <code>duration</code>, the await fails at once.
  *
- * @param timeout the timeout
+ * @param duration how long the condition must hold
  * @return the condition factory
  * @since 4.2.3
  */
