@@ -88,7 +88,7 @@ class KotlinTest {
     @Test
     fun booleanConditionFailsWithANiceErrorMessage() {
         exception.expect(ConditionTimeoutException::class.java)
-        exception.expectMessage(allOf(startsWith("Condition"), endsWith("was not fulfilled within 1 seconds.")))
+        exception.expectMessage(allOf(startsWith("Condition"), endsWith("was not fulfilled within 1 second.")))
 
         Asynch(fakeRepository).perform()
         await().atMost(1, SECONDS).until { fakeRepository.value == 2 }
@@ -170,7 +170,7 @@ class KotlinTest {
             await() atMost Duration.ofSeconds(1) untilCallTo { fakeRepository.value } matches { it == 2 }
         }
 
-        assertThat(throwable).isExactlyInstanceOf(ConditionTimeoutException::class.java).hasMessageEndingWith("expected the predicate to return <true> but it returned <false> for input of <1> within 1 seconds.")
+        assertThat(throwable).isExactlyInstanceOf(ConditionTimeoutException::class.java).hasMessageEndingWith("expected the predicate to return <true> but it returned <false> for input of <1> within 1 second.")
     }
 
     @Test
