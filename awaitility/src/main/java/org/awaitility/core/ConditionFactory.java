@@ -674,7 +674,11 @@ public class ConditionFactory {
      * @since 3.1.1
      */
     public <T> T until(final Callable<T> supplier, final Predicate<? super T> predicate) {
-        return until(supplier, new TypeSafeMatcher<T>() {
+        return until(supplier, predicateMatcher(predicate));
+    }
+
+    private static <T> Matcher<T> predicateMatcher(final Predicate<? super T> predicate) {
+        return new TypeSafeMatcher<T>() {
             @Override
             protected void describeMismatchSafely(T item, Description description) {
                 description.appendText("it returned <false> for input of ").appendValue(item);
@@ -689,7 +693,7 @@ public class ConditionFactory {
             protected boolean matchesSafely(T item) {
                 return predicate.test(item);
             }
-        });
+        };
     }
 
     /**
@@ -1075,6 +1079,100 @@ public class ConditionFactory {
      */
     public void until(Callable<Boolean> conditionEvaluator) {
         until(new CallableCondition(conditionEvaluator, generateConditionSettings()));
+    }
+
+    /**
+     * Like {@link #until(Callable)}, but returns an {@link AwaitResult} instead of throwing a {@link ConditionTimeoutException}
+     * when the condition is not fulfilled in time. E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * AwaitResult&lt;Boolean&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntil(() -&gt; personRepository.size() == 3);
+     * if (!result.isSuccess()) {
+     *     // result.getCause() is the ConditionTimeoutException that until(..) would have thrown
+     * }
+     * </pre>
+     * <p>&nbsp;</p>
+     * Only the timeout is turned into a failed result (this includes a violated <code>atLeast</code> constraint).
+     * Everything else is thrown exactly as by {@link #until(Callable)}, for example a {@link TerminalFailureException}
+     * from <code>failFast</code> or an exception thrown by the condition that is not ignored. A registered
+     * {@link ConditionEvaluationListener} is notified about the timeout just like for {@link #until(Callable)}.
+     *
+     * @param conditionEvaluator the condition evaluator
+     * @return the result. Its value is the last {@link Boolean} returned by the condition
+     * (<code>null</code> if the condition never returned).
+     * @since 4.4.0
+     */
+    public AwaitResult<Boolean> tryUntil(Callable<Boolean> conditionEvaluator) {
+        return new CallableCondition(conditionEvaluator, generateConditionSettings()).tryAwait();
+    }
+
+    /**
+     * Like {@link #until(Callable, Matcher)}, but returns an {@link AwaitResult} instead of throwing a {@link ConditionTimeoutException}
+     * when the supplied value doesn't match in time. E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * AwaitResult&lt;Integer&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntil(personRepository::size, is(greaterThan(2)));
+     * int size = result.getValue(); // the matched value, or the last observed (unmatched) value on timeout
+     * </pre>
+     * <p>&nbsp;</p>
+     * Only the timeout is turned into a failed result (this includes a violated <code>atLeast</code> constraint).
+     * Everything else is thrown exactly as by {@link #until(Callable, Matcher)}, for example a {@link TerminalFailureException}
+     * from <code>failFast</code> or an exception thrown by the supplier that is not ignored. A registered
+     * {@link ConditionEvaluationListener} is notified about the timeout just like for {@link #until(Callable, Matcher)}.
+     *
+     * @param <T>      the generic type
+     * @param supplier the supplier that is responsible for getting the value that should be matched.
+     * @param matcher  the hamcrest matcher that checks whether the condition is fulfilled.
+     * @return the result. On success its value is the matched value. On failure it is the last observed value, which did
+     * not match in time (or, if <code>atLeast</code> was violated, matched too early).
+     * @since 4.4.0
+     */
+    public <T> AwaitResult<T> tryUntil(final Callable<T> supplier, final Matcher<? super T> matcher) {
+        return new CallableHamcrestCondition<>(supplier, matcher, generateConditionSettings()).tryAwait();
+    }
+
+    /**
+     * Like {@link #until(Callable, Predicate)}, but returns an {@link AwaitResult} instead of throwing a {@link ConditionTimeoutException}
+     * when the supplied value doesn't match the predicate in time. E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * AwaitResult&lt;Long&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntil(myRepository::count, cnt -&gt; cnt == 2);
+     * </pre>
+     * <p>&nbsp;</p>
+     * See {@link #tryUntil(Callable, Matcher)} for what counts as a failed result and what is still thrown.
+     *
+     * @param <T>       the generic type
+     * @param supplier  the supplier that returns the object that will be evaluated by the predicate.
+     * @param predicate the predicate that must match
+     * @return the result. On success its value is the matched value. On failure it is the last observed value, which did
+     * not match in time (or, if <code>atLeast</code> was violated, matched too early).
+     * @since 4.4.0
+     */
+    public <T> AwaitResult<T> tryUntil(final Callable<T> supplier, final Predicate<? super T> predicate) {
+        return tryUntil(supplier, ConditionFactory.<T>predicateMatcher(predicate));
+    }
+
+    /**
+     * Like {@link #untilAsserted(ThrowingRunnable)}, but returns an {@link AwaitResult} instead of throwing a
+     * {@link ConditionTimeoutException} when the assertion doesn't pass in time. E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * AwaitResult&lt;Void&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntilAsserted(() -&gt; assertThat(personRepository.size()).isEqualTo(6));
+     * if (!result.isSuccess()) {
+     *     // result.getCause() is the ConditionTimeoutException that untilAsserted(..) would have thrown
+     * }
+     * </pre>
+     * <p>&nbsp;</p>
+     * Only the timeout is turned into a failed result (this includes a violated <code>atLeast</code> constraint).
+     * Everything else is thrown exactly as by {@link #untilAsserted(ThrowingRunnable)}, for example a {@link TerminalFailureException}
+     * from <code>failFast</code> or an exception other than {@link AssertionError} that is not ignored.
+     *
+     * @param assertion the supplier that is responsible for executing the assertion and throwing AssertionError on failure.
+     * @return the result. Its value is always <code>null</code>.
+     * @since 4.4.0
+     */
+    public AwaitResult<Void> tryUntilAsserted(final ThrowingRunnable assertion) {
+        return new AssertionCondition(assertion, generateConditionSettings()).tryAwait();
     }
 
     private ConditionSettings generateConditionSettings() {

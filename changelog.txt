@@ -8,6 +8,14 @@ Changelog 4.4.0 (not released yet)
 
   (thanks to Henning Hoefer for pull request).
 * Clarified fail-fast documentation so that it correctly states that terminal failure happens when the fail-fast condition evaluates to true, and cleaned up related Javadocs (thanks to Mustafa Ulu for pull request).
+* Added tryUntil(..) and tryUntilAsserted(..) that return an AwaitResult instead of throwing ConditionTimeoutException when the condition is not fulfilled in time. Other exceptions, such as fail fast failures, are still thrown. For example:
+
+    AwaitResult<Integer> result = await().atMost(Duration.ofSeconds(2)).tryUntil(repository::count, is(greaterThan(2)));
+    if (!result.isSuccess()) {
+        log.warn("Got {} items: {}", result.getValue(), result.getCause().getMessage());
+    }
+
+  Kotlin users can write "await atMost 2.seconds tryUntil { repository.count() > 2 }" (issue 48, thanks to Jonatan Ivanov for the design).
 
 Changelog 4.3.0 (2025-02-21)
 ----------------------------

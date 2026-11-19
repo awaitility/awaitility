@@ -70,6 +70,21 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
      * @param conditionEvaluationHandler The conditionEvaluationHandler
      */
     public <T> void await(final ConditionEvaluationHandler<T> conditionEvaluationHandler) {
+        final ConditionTimeoutException timeout = tryAwait(conditionEvaluationHandler);
+        if (timeout != null) {
+            throw timeout;
+        }
+    }
+
+    /**
+     * Same as {@link #await(ConditionEvaluationHandler)}, but the {@link ConditionTimeoutException} that it would throw
+     * is returned instead. The listener is notified about the timeout in exactly the same way. Every other exception
+     * (from the condition, from fail fast, uncaught exceptions etc) is still thrown.
+     *
+     * @param conditionEvaluationHandler The conditionEvaluationHandler
+     * @return the timeout exception, or <code>null</code> if the condition was fulfilled in time
+     */
+    <T> ConditionTimeoutException tryAwait(final ConditionEvaluationHandler<T> conditionEvaluationHandler) {
         final Duration pollDelay = conditionSettings.getPollDelay();
         final Duration maxWaitTime = conditionSettings.getMaxWaitTime();
         final Duration minWaitTime = conditionSettings.getMinWaitTime();
@@ -133,6 +148,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             }
         }
 
+        ConditionTimeoutException timeout = null;
         try {
             if (uncaughtThrowable.get() != null) {
                 throw uncaughtThrowable.get();
@@ -164,12 +180,12 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                     }
                 }
                 conditionEvaluationHandler.handleTimeout(message, false);
-                throw new ConditionTimeoutException(message, cause);
+                timeout = new ConditionTimeoutException(message, cause);
             } else if (evaluationDuration.compareTo(minWaitTime) < 0) {
                 String message = String.format("Condition was evaluated in %s which is earlier than expected minimum timeout %s",
                         formatAsString(evaluationDuration), formatAsString(minWaitTime));
                 conditionEvaluationHandler.handleTimeout(message, true);
-                throw new ConditionTimeoutException(message);
+                timeout = new ConditionTimeoutException(message);
             }
         } catch (Throwable e) {
             CheckedExceptionRethrower.safeRethrow(e);
@@ -178,6 +194,7 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             uncaughtThrowable.set(null);
             conditionSettings.getExecutorLifecycle().executeNormalCleanupBehavior(executor);
         }
+        return timeout;
     }
 
     private void executeFailFastConditionIfDefined() throws Throwable {

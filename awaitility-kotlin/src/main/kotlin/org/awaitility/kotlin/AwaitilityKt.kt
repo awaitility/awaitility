@@ -7,6 +7,7 @@
 package org.awaitility.kotlin
 
 import org.awaitility.Awaitility
+import org.awaitility.core.AwaitResult
 import org.awaitility.core.ConditionEvaluationListener
 import org.awaitility.core.ConditionFactory
 import org.awaitility.pollinterval.PollInterval
@@ -156,6 +157,48 @@ infix fun ConditionFactory.until(fn: () -> Boolean) = until(fn)
  * @since 3.1.2
  */
 infix fun ConditionFactory.untilAsserted(fn: () -> Unit): Unit = untilAsserted(fn)
+
+/**
+ * An extension function to `ConditionFactory` that works like [until] but returns an [AwaitResult] instead of
+ * throwing a [org.awaitility.core.ConditionTimeoutException] when the condition is not fulfilled in time. For example:
+ *
+ * ```
+ * val result = await atMost 2.seconds tryUntil { myRepository.count() == 1 }
+ * if (!result.isSuccess) {
+ *     println(result.cause.message)
+ * }
+ * ```
+ *
+ * Only the timeout becomes a failed result. Everything else (for example a fail fast failure, or an exception
+ * thrown by [fn] that is not ignored) is thrown just like for [until].
+ * Note that [await] is a getter that needs to imported from `org.awaitility.kotlin`.
+ *
+ * @param fn The function to evaluate
+ * @return the result, its value is the last `Boolean` returned by [fn]
+ * @see ConditionFactory.tryUntil
+ * @since 4.4.0
+ */
+infix fun ConditionFactory.tryUntil(fn: () -> Boolean): AwaitResult<Boolean> = tryUntil(fn)
+
+/**
+ * An extension function to `ConditionFactory` that works like [untilAsserted] but returns an [AwaitResult] instead of
+ * throwing a [org.awaitility.core.ConditionTimeoutException] when the assertion doesn't pass in time. For example:
+ *
+ * ```
+ * val result = await atMost 2.seconds tryUntilAsserted {
+ *     assertThat(fakeRepository.value).isEqualTo(1)
+ * }
+ * ```
+ *
+ * Only the timeout becomes a failed result. Everything else is thrown just like for [untilAsserted].
+ * Note that [await] is a getter that needs to imported from `org.awaitility.kotlin`.
+ *
+ * @param fn A function that performs the assertion
+ * @return the result, its value is always `null`
+ * @see ConditionFactory.tryUntilAsserted
+ * @since 4.4.0
+ */
+infix fun ConditionFactory.tryUntilAsserted(fn: () -> Unit): AwaitResult<Void> = tryUntilAsserted(fn)
 
 /**
  * Await at most `timeout` before throwing a timeout exception.
