@@ -768,6 +768,107 @@ public class ConditionFactory {
     }
 
     /**
+     * Await until the supplied {@link Callable} throws an exception of the given type, or a subclass of it, and return that exception. E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * IOException e = await().atMost(5, SECONDS).untilThrown(() -&gt; client.fetch("/status"), IOException.class);
+     * assertThat(e).hasMessageContaining("Connection refused");
+     * </pre>
+     * <p>&nbsp;</p>
+     * The callable is polled like any other condition:
+     * <ul>
+     *     <li>If it throws an exception that is an instance of <code>exceptionType</code>, the wait ends and the exception is returned.</li>
+     *     <li>If it returns normally, Awaitility keeps polling.</li>
+     *     <li>If it throws any other exception, that exception is handled as in {@link #until(Callable, Matcher)}: it fails the
+     *     wait immediately, unless it's ignored by e.g. {@link #ignoreExceptions()} or {@link #ignoreException(Class)},
+     *     in which case Awaitility keeps polling.</li>
+     * </ul>
+     * Use {@link #untilThrownExactly(Callable, Class)} if a subclass of <code>exceptionType</code> should not count.
+     *
+     * @param callable      the code that is expected to eventually throw
+     * @param exceptionType the expected exception type, subclasses match as well
+     * @param <T>           the type of the expected exception
+     * @return the exception thrown by <code>callable</code>
+     * @throws org.awaitility.core.ConditionTimeoutException If <code>callable</code> did not throw the expected exception within the given time period.
+     * @since 4.4.0
+     */
+    public <T extends Throwable> T untilThrown(final Callable<?> callable, final Class<T> exceptionType) {
+        return until(new UntilThrownCondition<>(callable, true, callable, exceptionType, false, generateConditionSettings()));
+    }
+
+    /**
+     * Await until the supplied {@link ThrowingRunnable} throws an exception of the given type, or a subclass of it, and return that exception.
+     * This is the same as {@link #untilThrown(Callable, Class)} but for code that doesn't return a value. E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * IllegalStateException e = await().untilThrown(() -&gt; connection.send(message), IllegalStateException.class);
+     * </pre>
+     *
+     * @param runnable      the code that is expected to eventually throw
+     * @param exceptionType the expected exception type, subclasses match as well
+     * @param <T>           the type of the expected exception
+     * @return the exception thrown by <code>runnable</code>
+     * @throws org.awaitility.core.ConditionTimeoutException If <code>runnable</code> did not throw the expected exception within the given time period.
+     * @see #untilThrown(Callable, Class)
+     * @since 4.4.0
+     */
+    public <T extends Throwable> T untilThrown(final ThrowingRunnable runnable, final Class<T> exceptionType) {
+        return until(new UntilThrownCondition<>(toCallable(runnable), false, runnable, exceptionType, false, generateConditionSettings()));
+    }
+
+    /**
+     * Await until the supplied {@link Callable} throws an exception of exactly the given type and return that exception.
+     * Unlike {@link #untilThrown(Callable, Class)}, a subclass of <code>exceptionType</code> does not match. It's handled like
+     * any other exception: it fails the wait immediately unless it's ignored. E.g.
+     * <p>&nbsp;</p>
+     * <pre>
+     * IOException e = await().untilThrownExactly(() -&gt; client.fetch("/status"), IOException.class);
+     * </pre>
+     *
+     * @param callable      the code that is expected to eventually throw
+     * @param exceptionType the exact expected exception type
+     * @param <T>           the type of the expected exception
+     * @return the exception thrown by <code>callable</code>
+     * @throws org.awaitility.core.ConditionTimeoutException If <code>callable</code> did not throw the expected exception within the given time period.
+     * @see #untilThrown(Callable, Class)
+     * @since 4.4.0
+     */
+    public <T extends Throwable> T untilThrownExactly(final Callable<?> callable, final Class<T> exceptionType) {
+        return until(new UntilThrownCondition<>(callable, true, callable, exceptionType, true, generateConditionSettings()));
+    }
+
+    /**
+     * Await until the supplied {@link ThrowingRunnable} throws an exception of exactly the given type and return that exception.
+     * This is the same as {@link #untilThrownExactly(Callable, Class)} but for code that doesn't return a value.
+     *
+     * @param runnable      the code that is expected to eventually throw
+     * @param exceptionType the exact expected exception type
+     * @param <T>           the type of the expected exception
+     * @return the exception thrown by <code>runnable</code>
+     * @throws org.awaitility.core.ConditionTimeoutException If <code>runnable</code> did not throw the expected exception within the given time period.
+     * @see #untilThrownExactly(Callable, Class)
+     * @since 4.4.0
+     */
+    public <T extends Throwable> T untilThrownExactly(final ThrowingRunnable runnable, final Class<T> exceptionType) {
+        return until(new UntilThrownCondition<>(toCallable(runnable), false, runnable, exceptionType, true, generateConditionSettings()));
+    }
+
+    private static Callable<Object> toCallable(final ThrowingRunnable runnable) {
+        if (runnable == null) {
+            return null;
+        }
+        return () -> {
+            try {
+                runnable.run();
+            } catch (Throwable throwable) {
+                // Rethrow as is (also when it's not an Exception) so that the expected type can be matched
+                CheckedExceptionRethrower.safeRethrow(throwable);
+            }
+            return null;
+        };
+    }
+
+    /**
      * Await until a Atomic variable has a value matching the specified
      * {@link org.hamcrest.Matcher}. E.g.
      * <p>&nbsp;</p>

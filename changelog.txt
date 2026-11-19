@@ -8,6 +8,11 @@ Changelog 4.4.0 (not released yet)
 
   (thanks to Henning Hoefer for pull request).
 * Clarified fail-fast documentation so that it correctly states that terminal failure happens when the fail-fast condition evaluates to true, and cleaned up related Javadocs (thanks to Mustafa Ulu for pull request).
+* Added untilThrown(..) and untilThrownExactly(..) that wait until some code throws an exception of a given type and return that exception (issue 129). For example:
+
+    IOException e = await().atMost(5, SECONDS).untilThrown(() -> client.fetch("/status"), IOException.class);
+
+  untilThrown also matches subclasses, untilThrownExactly only the exact class. Both take a Callable or a ThrowingRunnable. If the code returns normally Awaitility keeps polling, and any other exception fails the wait right away unless it's ignored with e.g. ignoreException(..). The Kotlin DSL has "await.untilThrown<IOException> { client.fetch("/status") }" and untilThrownExactly<T>.
 
 Changelog 4.3.0 (2025-02-21)
 ----------------------------

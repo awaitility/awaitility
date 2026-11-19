@@ -158,6 +158,38 @@ infix fun ConditionFactory.until(fn: () -> Boolean) = until(fn)
 infix fun ConditionFactory.untilAsserted(fn: () -> Unit): Unit = untilAsserted(fn)
 
 /**
+ * An extension function to `ConditionFactory` that waits until [fn] throws an exception of type [T], or a subclass of it,
+ * and returns that exception. For example:
+ *
+ * ```
+ * val e = await.atMost(5, SECONDS).untilThrown<IOException> { client.fetch("/status") }
+ * ```
+ *
+ * If [fn] returns normally, Awaitility keeps polling. If it throws any other exception, the wait fails immediately
+ * unless the exception is ignored (e.g. with [ignoreException]). Use [untilThrownExactly] if a subclass of [T]
+ * should not count.
+ *
+ * @param fn The function that is expected to eventually throw
+ * @return the exception thrown by [fn]
+ * @since 4.4.0
+ */
+inline fun <reified T : Throwable> ConditionFactory.untilThrown(noinline fn: () -> Any?): T = untilThrown(fn, T::class.java)
+
+/**
+ * An extension function to `ConditionFactory` that waits until [fn] throws an exception of exactly type [T]
+ * and returns that exception. A subclass of [T] does not match. For example:
+ *
+ * ```
+ * val e = await.untilThrownExactly<IOException> { client.fetch("/status") }
+ * ```
+ *
+ * @param fn The function that is expected to eventually throw
+ * @return the exception thrown by [fn]
+ * @since 4.4.0
+ */
+inline fun <reified T : Throwable> ConditionFactory.untilThrownExactly(noinline fn: () -> Any?): T = untilThrownExactly(fn, T::class.java)
+
+/**
  * Await at most `timeout` before throwing a timeout exception.
  *
  * @param duration the duration
