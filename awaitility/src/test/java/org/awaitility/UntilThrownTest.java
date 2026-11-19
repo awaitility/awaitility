@@ -160,7 +160,7 @@ public class UntilThrownTest {
 
         assertThat(thrown).isInstanceOf(ConditionTimeoutException.class);
         assertThat(thrown.getMessage())
-                .startsWith("Condition with Lambda expression in " + UntilThrownTest.class.getName())
+                .startsWith("Condition with lambda expression in " + UntilThrownTest.class.getName())
                 .contains(" was expected to throw java.io.IOException but it returned ")
                 .endsWith(" within 300 milliseconds.");
     }
@@ -191,7 +191,7 @@ public class UntilThrownTest {
 
         assertThat(thrown).isInstanceOf(ConditionTimeoutException.class);
         assertThat(thrown.getMessage())
-                .startsWith("Condition with alias 'connection' didn't complete within 300 milliseconds because condition with Lambda expression in " + UntilThrownTest.class.getName())
+                .startsWith("Condition with alias 'connection' didn't complete within 300 milliseconds because condition with lambda expression in " + UntilThrownTest.class.getName())
                 .endsWith(" was expected to throw java.io.IOException but it returned 42.");
     }
 }
