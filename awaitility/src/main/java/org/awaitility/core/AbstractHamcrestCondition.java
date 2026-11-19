@@ -26,6 +26,11 @@ public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
     private ConditionAwaiter conditionAwaiter;
 
     private volatile T lastResult;
+    /**
+     * The value that the timeout message describes, captured when the timeout message is generated.
+     */
+    private volatile T lastResultAtTimeout;
+    private volatile boolean timedOut;
     private final ConditionEvaluationHandler<T> conditionEvaluationHandler;
 
     /**
@@ -50,7 +55,7 @@ public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
             if (matches) {
                 conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(supplier, matcher), lastResult, pollInterval);
             } else {
-                conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, matcher), lastResult, pollInterval);
+                conditionEvaluationHandler.handleConditionResultMismatch(getMismatchMessage(supplier, matcher, lastResult), lastResult, pollInterval);
             }
             return new ConditionEvaluationResult(matches);
 
@@ -58,7 +63,10 @@ public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         conditionAwaiter = new ConditionAwaiter(callable, settings) {
             @Override
             protected String getTimeoutMessage() {
-                return getMismatchMessage(supplier, matcher);
+                final T value = lastResult;
+                lastResultAtTimeout = value;
+                timedOut = true;
+                return getMismatchMessage(supplier, matcher, value);
             }
         };
     }
@@ -68,11 +76,11 @@ public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
         return String.format("%s reached its end value of %s", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher));
     }
 
-    private String getMismatchMessage(Callable<T> supplier, Matcher<? super T> matcher) {
+    private String getMismatchMessage(Callable<T> supplier, Matcher<? super T> matcher, T value) {
         Description mismatchDescription = new StringDescription();
-        matcher.describeMismatch(lastResult, mismatchDescription);
+        matcher.describeMismatch(value, mismatchDescription);
         if (mismatchDescription.toString() != null && mismatchDescription.toString().isEmpty()) {
-            mismatchDescription.appendText("was ").appendValue(lastResult);
+            mismatchDescription.appendText("was ").appendValue(value);
         }
         return String.format("%s expected %s but %s", getCallableDescription(supplier), HamcrestToStringFilter.filter(matcher), mismatchDescription);
     }
@@ -85,6 +93,21 @@ public abstract class AbstractHamcrestCondition<T> implements Condition<T> {
     public T await() {
         conditionAwaiter.await(conditionEvaluationHandler);
         return lastResult;
+    }
+
+    /**
+     * Like {@link #await()} but returns a failed {@link AwaitResult} instead of throwing a {@link ConditionTimeoutException}.
+     * On timeout the value is the one described by the timeout message.
+     *
+     * @return the result
+     */
+    AwaitResult<T> tryAwait() {
+        final ConditionTimeoutException timeout = conditionAwaiter.tryAwait(conditionEvaluationHandler);
+        if (timeout == null) {
+            return AwaitResult.success(lastResult);
+        }
+        // timedOut is false when atLeast was violated, then the last (too early) value is stable
+        return AwaitResult.failure(timedOut ? lastResultAtTimeout : lastResult, timeout);
     }
 
     protected abstract String getCallableDescription(final Callable<T> supplier);

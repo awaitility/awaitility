@@ -29,6 +29,14 @@ class CallableCondition implements Condition<Void> {
 
     private final ConditionEvaluationHandler<Object> conditionEvaluationHandler;
 
+    private final ConditionEvaluationWrapper conditionEvaluationWrapper;
+
+    /**
+     * The last value returned by the condition, captured when the timeout message is generated.
+     */
+    private volatile Boolean lastValueAtTimeout;
+    private volatile boolean timedOut;
+
     /**
      * <p>Constructor for CallableCondition.</p>
      *
@@ -37,11 +45,13 @@ class CallableCondition implements Condition<Void> {
      */
     CallableCondition(final Callable<Boolean> matcher, ConditionSettings settings) {
         conditionEvaluationHandler = new ConditionEvaluationHandler<Object>(null, settings);
-        ConditionEvaluationWrapper conditionEvaluationWrapper = new ConditionEvaluationWrapper(matcher, settings, conditionEvaluationHandler);
+        conditionEvaluationWrapper = new ConditionEvaluationWrapper(matcher, settings, conditionEvaluationHandler);
         conditionAwaiter = new ConditionAwaiter(conditionEvaluationWrapper, settings) {
             @SuppressWarnings("rawtypes")
             @Override
             protected String getTimeoutMessage() {
+                lastValueAtTimeout = conditionEvaluationWrapper.lastValue;
+                timedOut = true;
                 if (timeout_message != null) {
                     return timeout_message;
                 }
@@ -80,6 +90,20 @@ class CallableCondition implements Condition<Void> {
     }
 
     /**
+     * Like {@link #await()} but returns a failed {@link AwaitResult} instead of throwing a {@link ConditionTimeoutException}.
+     *
+     * @return the result, its value is the last {@link Boolean} returned by the condition
+     */
+    AwaitResult<Boolean> tryAwait() {
+        final ConditionTimeoutException timeout = conditionAwaiter.tryAwait(conditionEvaluationHandler);
+        if (timeout == null) {
+            return AwaitResult.success(conditionEvaluationWrapper.lastValue);
+        }
+        // timedOut is false when atLeast was violated, then the last (too early) value is stable
+        return AwaitResult.failure(timedOut ? lastValueAtTimeout : conditionEvaluationWrapper.lastValue, timeout);
+    }
+
+    /**
      * Wraps and delegates to another callable and invokes the {@link org.awaitility.core.ConditionEvaluationHandler}.
      */
     private static class ConditionEvaluationWrapper implements ConditionEvaluator {
@@ -87,6 +111,7 @@ class CallableCondition implements Condition<Void> {
         private final Callable<Boolean> matcher;
         private final ConditionSettings settings;
         private final ConditionEvaluationHandler<Object> conditionEvaluationHandler;
+        private volatile Boolean lastValue;
 
         ConditionEvaluationWrapper(Callable<Boolean> matcher, ConditionSettings settings, ConditionEvaluationHandler<Object> conditionEvaluationHandler) {
 
@@ -96,7 +121,9 @@ class CallableCondition implements Condition<Void> {
         }
 
         public ConditionEvaluationResult eval(Duration pollInterval) throws Exception {
-            boolean conditionFulfilled = matcher.call();
+            final Boolean value = matcher.call();
+            lastValue = value;
+            boolean conditionFulfilled = value;
             if (conditionFulfilled) {
                 conditionEvaluationHandler.handleConditionResultMatch(getMatchMessage(matcher, settings.getAlias()), true, pollInterval);
             } else {

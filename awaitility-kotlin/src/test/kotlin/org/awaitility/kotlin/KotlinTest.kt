@@ -41,6 +41,7 @@ import java.util.concurrent.atomic.AtomicReference
 import kotlin.system.measureTimeMillis
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 class KotlinTest {
 
@@ -259,6 +260,46 @@ class KotlinTest {
         }
 
         assertThat(duration).isGreaterThan(1000)
+    }
+
+    @Test(timeout = 2000)
+    fun tryUntilReturnsSuccessfulResult() {
+        Asynch(fakeRepository).perform()
+
+        val result = await atMost 2.seconds tryUntil { fakeRepository.value == 1 }
+
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.value).isTrue()
+    }
+
+    @Test(timeout = 2000)
+    fun tryUntilReturnsFailedResultInsteadOfThrowing() {
+        val result = await atMost 300.milliseconds tryUntil { fakeRepository.value == 2 }
+
+        assertThat(result.isSuccess).isFalse()
+        assertThat(result.value).isFalse()
+        assertThat(result.cause).isExactlyInstanceOf(ConditionTimeoutException::class.java)
+            .hasMessageEndingWith("was not fulfilled within 300 milliseconds.")
+    }
+
+    @Test(timeout = 2000)
+    fun tryUntilAssertedReturnsFailedResultInsteadOfThrowing() {
+        val result = await atMost 300.milliseconds tryUntilAsserted {
+            assertThat(fakeRepository.value).isEqualTo(2)
+        }
+
+        assertThat(result.isSuccess).isFalse()
+        assertThat(result.value).isNull()
+        assertThat(result.cause).hasMessageStartingWith("Assertion condition defined")
+    }
+
+    @Test(timeout = 2000)
+    fun tryUntilWithSupplierAndPredicateCanBeCalledFromKotlin() {
+        Asynch(fakeRepository).perform()
+
+        val result = await.atMost(2.seconds.toJavaDuration()).tryUntil({ fakeRepository.value }) { it == 1 }
+
+        assertThat(result.value).isEqualTo(1)
     }
 }
 
