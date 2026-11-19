@@ -31,6 +31,7 @@ public class ConditionSettings {
     private final ConditionEvaluationListener conditionEvaluationListener;
     private final ExecutorLifecycle executorLifecycle;
     private final FailFastCondition failFastCondition;
+    private final String unsatisfiableHoldMessage;
 
     /**
      * <p>Constructor for ConditionSettings.</p>
@@ -47,6 +48,21 @@ public class ConditionSettings {
     ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
                       PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
                       ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle, final FailFastCondition failFastCondition) {
+        this(alias, catchUncaughtExceptions, waitConstraint, pollInterval, pollDelay, conditionEvaluationListener, ignoreExceptions,
+                executorLifecycle, failFastCondition, null);
+    }
+
+    /**
+     * Creates condition settings that may know up front that the condition can never be fulfilled.
+     *
+     * @param unsatisfiableHoldMessage the timeout message to raise at the start of the await because the hold period
+     *                                 (during) cannot fit within the user-set at most timeout and the poll delay,
+     *                                 or <code>null</code> if the await can succeed
+     */
+    ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
+                      PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
+                      ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle, final FailFastCondition failFastCondition,
+                      String unsatisfiableHoldMessage) {
         if (waitConstraint == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
@@ -62,6 +78,7 @@ public class ConditionSettings {
         this.conditionEvaluationListener = conditionEvaluationListener;
         this.ignoreExceptions = ignoreExceptions;
         this.failFastCondition = failFastCondition;
+        this.unsatisfiableHoldMessage = unsatisfiableHoldMessage;
     }
 
     /**
@@ -164,5 +181,13 @@ public class ConditionSettings {
      */
     public FailFastCondition getFailFastCondition() {
         return this.failFastCondition;
+    }
+
+    /**
+     * @return the timeout message to use when the condition can never be fulfilled because the hold period (during)
+     * does not fit within the at most timeout minus the poll delay, or <code>null</code> if the condition can be fulfilled.
+     */
+    String getUnsatisfiableHoldMessage() {
+        return unsatisfiableHoldMessage;
     }
 }
