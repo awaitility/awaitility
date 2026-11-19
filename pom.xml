@@ -80,7 +80,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
-        <maven.version>3.5.0</maven.version>
+        <maven.version>3.6.3</maven.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scm.branch>master</scm.branch>
         <slf4j.version>2.0.16</slf4j.version>
@@ -120,7 +120,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.4</version>
+                    <version>3.5.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-shade-plugin</artifactId>
@@ -193,7 +193,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-help-plugin</artifactId>
-                <version>2.2</version>
+                <version>3.5.1</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

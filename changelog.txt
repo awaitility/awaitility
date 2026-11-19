@@ -8,7 +8,12 @@ Changelog 4.4.0 (not released yet)
 
   (thanks to Henning Hoefer for pull request).
 * Clarified fail-fast documentation so that it correctly states that terminal failure happens when the fail-fast condition evaluates to true, and cleaned up related Javadocs (thanks to Mustafa Ulu for pull request).
+* fieldIn(..) error messages now work for fields declared in a superclass. Before, the timeout message said "Internal error" (issue 247, thanks to Jaya Dileep for pull request).
+* JavaVersionDetector now reads the major version from java.version strings like "25+36" and "25+36-ea" instead of throwing (issue 296, thanks to arimu1 for pull request).
+* Clarified in the Javadoc that during(..) needs the condition to hold continuously, not for a total of that time (issue 298, thanks to Jaya Dileep for pull request).
+* Upgraded maven-jar-plugin from 2.4 to 3.5.1 and maven-help-plugin from 2.2 to 3.5.1. Building Awaitility now needs Maven 3.6.3 or later.
 * The Java 8 test module is built and run in CI again (issue 156).
+* Timeout messages on JDK 15 and later say "Condition defined as a lambda expression in ..." again instead of "... a Lambda expression in ...".
 
 Changelog 4.3.0 (2025-02-21)
 ----------------------------

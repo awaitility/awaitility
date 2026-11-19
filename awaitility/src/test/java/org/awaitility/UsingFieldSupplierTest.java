@@ -219,4 +219,21 @@ public class UsingFieldSupplierTest {
         new Asynch(repository).perform();
         await().atMost(200, MILLISECONDS).until(fieldIn(repository).ofType(int.class).andAnnotatedWith(ExampleAnnotation.class), equalTo(1));
     }
+
+    @Test(timeout = 2000)
+    public void ofTypeAndNameResolvesFieldDeclaredInSuperclass() throws Exception {
+        FakeRepositorySubclass repository = new FakeRepositorySubclass();
+        new Asynch(repository).perform();
+        await().until(fieldIn(repository).ofType(int.class).andWithName("value"), equalTo(1));
+        assertEquals(1, repository.getValue());
+    }
+
+    @Test
+    public void showsErrorMessageForFieldDeclaredInSuperclassWhenTimeout() throws Exception {
+        exception.expect(ConditionTimeoutException.class);
+        exception.expectMessage("Field private volatile int org.awaitility.classes.FakeRepositoryImpl.value expected <1> but was <0> within 200 milliseconds.");
+
+        FakeRepositorySubclass repository = new FakeRepositorySubclass();
+        await().atMost(200, MILLISECONDS).until(fieldIn(repository).ofType(int.class).andWithName("value"), equalTo(1));
+    }
 }
