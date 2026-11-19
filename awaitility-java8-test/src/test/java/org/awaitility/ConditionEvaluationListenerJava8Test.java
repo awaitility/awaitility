@@ -17,6 +17,7 @@
 package org.awaitility;
 
 import org.awaitility.core.ConditionTimeoutException;
+import org.awaitility.core.JavaVersionDetector;
 import org.awaitility.core.ThrowingRunnable;
 import org.awaitility.support.CountDown;
 import org.junit.Rule;
@@ -55,7 +56,7 @@ public class ConditionEvaluationListenerJava8Test {
                 })
                 .untilAsserted(() -> assertEquals(5, (int) countDown.get()));
 
-        String expectedMatchMessage = String.format("%s reached its end value", CountDown.class.getName());
+        String expectedMatchMessage = String.format("%s reached its end value", JavaVersionDetector.getJavaMajorVersion() < 17 ? CountDown.class.getName() : getClass().getName());
         assertThat(lastMatchMessage.get(), allOf(startsWith("Assertion condition defined as a lambda expression"), endsWith(expectedMatchMessage)));
     }
 
@@ -74,7 +75,7 @@ public class ConditionEvaluationListenerJava8Test {
                 }).await("my alias")
                 .untilAsserted(() -> assertEquals(5, (int) countDown.get()));
 
-        String expectedMatchMessage = String.format("%s reached its end value", CountDown.class.getName());
+        String expectedMatchMessage = String.format("%s reached its end value", JavaVersionDetector.getJavaMajorVersion() < 17 ? CountDown.class.getName() : getClass().getName());
         assertThat(lastMatchMessage.get(), allOf(startsWith("Assertion condition with alias my alias defined as a lambda expression"), endsWith(expectedMatchMessage)));
     }
 
