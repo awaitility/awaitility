@@ -298,7 +298,7 @@ public class Awaitility {
      * <ul>
      * <li>timeout - 10 seconds</li>
      * <li>poll interval - 100 milliseconds</li>
-     * <li>poll delay - 100 milliseconds</li>
+     * <li>poll delay - none, so each await derives it from its poll interval</li>
      * <li>Catch all uncaught exceptions - true</li>
      * <li>Do not ignore caught exceptions</li>
      * <li>Don't handle condition evaluation results</li>
@@ -480,13 +480,15 @@ public class Awaitility {
 
     /**
      * Sets the default poll delay that all await statements will use.
+     * <p>
+     * Since 4.4.0 you can pass <code>null</code> to remove a default poll delay set earlier. Each await statement then
+     * derives its poll delay from its poll interval again, as it does when no default poll delay is set. This lets you
+     * restore a value returned by {@link #getDefaultPollDelay()}.
+     * </p>
      *
-     * @param pollDelay the new default poll delay
+     * @param pollDelay the new default poll delay, or <code>null</code> to remove the default poll delay
      */
     public static void setDefaultPollDelay(Duration pollDelay) {
-        if (pollDelay == null) {
-            throw new IllegalArgumentException("You must specify a poll delay (was null).");
-        }
         defaultPollDelay = pollDelay;
     }
 
@@ -533,7 +535,8 @@ public class Awaitility {
      * <p>
      * If no default poll delay has been set, this method returns <code>null</code>. In that case each await statement
      * derives its poll delay from its poll interval (the same as the poll interval for a fixed poll interval,
-     * otherwise zero).
+     * otherwise zero). You can pass the returned value, <code>null</code> included, back to
+     * {@link #setDefaultPollDelay(Duration)} to restore it.
      *
      * @return the default poll delay, or <code>null</code> if none has been set
      * @since 4.4.0

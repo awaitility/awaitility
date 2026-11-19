@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -65,6 +66,35 @@ public class AwaitilityDefaultGettersTest {
         assertEquals(Duration.ofMillis(6), Awaitility.getDefaultPollDelay());
         Awaitility.reset();
         assertNull(Awaitility.getDefaultPollDelay());
+    }
+
+    @Test(timeout = 2000)
+    public void defaultsCanBeSavedAndRestoredIncludingAnUnsetPollDelay() {
+        Awaitility.setDefaultPollInterval(Duration.ofMillis(300));
+        Duration savedTimeout = Awaitility.getDefaultTimeout();
+        PollInterval savedPollInterval = Awaitility.getDefaultPollInterval();
+        Duration savedPollDelay = Awaitility.getDefaultPollDelay();
+
+        Awaitility.setDefaultTimeout(Duration.ofSeconds(1));
+        Awaitility.setDefaultPollInterval(Duration.ofMillis(10));
+        Awaitility.setDefaultPollDelay(Duration.ZERO);
+
+        Awaitility.setDefaultTimeout(savedTimeout);
+        Awaitility.setDefaultPollInterval(savedPollInterval);
+        Awaitility.setDefaultPollDelay(savedPollDelay);
+
+        assertEquals(Duration.ofSeconds(10), Awaitility.getDefaultTimeout());
+        assertSame(savedPollInterval, Awaitility.getDefaultPollInterval());
+        assertNull(Awaitility.getDefaultPollDelay());
+
+        // With no default poll delay, a fixed poll interval of 300 ms is also used as the poll delay
+        long start = System.nanoTime();
+        AtomicLong firstEvaluationAfterMillis = new AtomicLong(-1);
+        Awaitility.await().until(() -> {
+            firstEvaluationAfterMillis.compareAndSet(-1, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start));
+            return true;
+        });
+        assertTrue("First evaluation after " + firstEvaluationAfterMillis.get() + " ms", firstEvaluationAfterMillis.get() >= 250);
     }
 
     private static void assertFixed(Duration expected, PollInterval actual) {
