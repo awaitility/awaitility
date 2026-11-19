@@ -169,7 +169,20 @@ public class ConditionFactorySettingsTest {
         ConditionFactory conditionFactory = await().forever();
 
         assertAtMostSetByUser(conditionFactory, AtMostWaitConstraint.FOREVER.getMaxWaitTime());
-        assertSame(AtMostWaitConstraint.FOREVER, conditionFactory.getSettings().getTimeoutConstraint());
+        WaitConstraint timeoutConstraint = conditionFactory.getSettings().getTimeoutConstraint();
+        assertTrue(timeoutConstraint instanceof AtMostWaitConstraint);
+        assertEquals(Duration.ZERO, timeoutConstraint.getMinWaitTime());
+        assertEquals(Duration.ZERO, timeoutConstraint.getHoldPredicateTime());
+    }
+
+    @Test
+    public void foreverKeepsAtLeastAndDuringSetEarlier() {
+        ConditionFactory conditionFactory = await().atLeast(Duration.ofMillis(100)).during(Duration.ofMillis(200)).forever();
+
+        assertAtMostSetByUser(conditionFactory, AtMostWaitConstraint.FOREVER.getMaxWaitTime());
+        WaitConstraint timeoutConstraint = conditionFactory.getSettings().getTimeoutConstraint();
+        assertEquals(Duration.ofMillis(100), timeoutConstraint.getMinWaitTime());
+        assertEquals(Duration.ofMillis(200), timeoutConstraint.getHoldPredicateTime());
     }
 
     @Test
