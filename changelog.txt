@@ -13,6 +13,16 @@ Changelog 4.4.0 (not released yet)
     IOException e = await().atMost(5, SECONDS).untilThrown(() -> client.fetch("/status"), IOException.class);
 
   untilThrown also matches subclasses, untilThrownExactly only the exact class. Both take a Callable or a ThrowingRunnable. If the code returns normally Awaitility keeps polling, and any other exception fails the wait right away unless it's ignored with e.g. ignoreException(..). A method reference to an overloaded method is ambiguous here, so use a lambda for those. The Kotlin DSL has "await.untilThrown<IOException> { client.fetch("/status") }" and untilThrownExactly<T>.
+* fieldIn(..) error messages now work for fields declared in a superclass. Before, the timeout message said "Internal error" (issue 247, thanks to Jaya Dileep for pull request).
+* JavaVersionDetector now reads the major version from java.version strings like "25+36" and "25+36-ea" instead of throwing (issue 296, thanks to arimu1 for pull request).
+* Clarified in the Javadoc that during(..) needs the condition to hold continuously, not for a total of that time (issue 298, thanks to Jaya Dileep for pull request).
+* When an await times out while a condition evaluation is still running, ConditionTimeoutException.getCause() is now the assertion error from the previous evaluation, if that evaluation failed with one, instead of a java.util.concurrent.TimeoutException. If you check getCause() for a TimeoutException in this case, you need to update that check (issue 286, thanks to DragonFSKY for pull request).
+* Upgraded maven-jar-plugin from 2.4 to 3.5.1 and maven-help-plugin from 2.2 to 3.5.1. Building Awaitility now needs Maven 3.6.3 or later.
+* fieldIn(..) no longer relies on the compiler's synthetic this$0 field to build its timeout message (issue 223).
+* Fixed an int overflow in FibonacciPollInterval from poll 47 onwards. Very long Fibonacci poll intervals are now capped at the longest duration Awaitility supports instead of throwing an exception (issue 319, thanks to xh123637 for pull request).
+* Timeout messages no longer show day-scale durations as months, and use singular units such as "1 second" instead of "1 seconds". Fields are now separated by a single space ("1 minute 30 seconds" instead of "1 minutes  30 seconds"). If you assert on these messages you may need to update your expectations (issue 318, thanks to Shreya Roy Koneri for pull request).
+* The Java 8 test module is built and run in CI again (issue 156).
+* Timeout messages on JDK 15 and later say "Condition defined as a lambda expression in ..." again instead of "... a Lambda expression in ...".
 
 Changelog 4.3.0 (2025-02-21)
 ----------------------------
