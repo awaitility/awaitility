@@ -19,6 +19,7 @@ import org.awaitility.constraint.WaitConstraint;
 import org.awaitility.pollinterval.PollInterval;
 
 import java.time.Duration;
+import java.util.function.Supplier;
 
 /**
  * Immutable holder of the settings that a {@link ConditionFactory} carries from one DSL call to the next.
@@ -78,20 +79,26 @@ final class ConditionFactorySettings {
     private final FailFastCondition failFastCondition;
 
     /**
-     * Creates settings whose at most constraint is not set by the user.
+     * Supplies extra text that is appended to the timeout message, or <code>null</code> if none.
+     */
+    private final Supplier<String> timeoutMessageSupplier;
+
+    /**
+     * Creates settings whose at most constraint is not set by the user and that have no timeout message.
      */
     ConditionFactorySettings(String alias, WaitConstraint timeoutConstraint, PollInterval pollInterval, Duration pollDelay,
                              boolean catchUncaughtExceptions, ExceptionIgnorer exceptionsIgnorer,
                              ConditionEvaluationListener conditionEvaluationListener, ExecutorLifecycle executorLifecycle,
                              FailFastCondition failFastCondition) {
         this(alias, timeoutConstraint, false, pollInterval, pollDelay, catchUncaughtExceptions, exceptionsIgnorer,
-                conditionEvaluationListener, executorLifecycle, failFastCondition);
+                conditionEvaluationListener, executorLifecycle, failFastCondition, null);
     }
 
     private ConditionFactorySettings(String alias, WaitConstraint timeoutConstraint, boolean atMostSetByUser,
                                      PollInterval pollInterval, Duration pollDelay, boolean catchUncaughtExceptions,
                                      ExceptionIgnorer exceptionsIgnorer, ConditionEvaluationListener conditionEvaluationListener,
-                                     ExecutorLifecycle executorLifecycle, FailFastCondition failFastCondition) {
+                                     ExecutorLifecycle executorLifecycle, FailFastCondition failFastCondition,
+                                     Supplier<String> timeoutMessageSupplier) {
         this.alias = alias;
         this.timeoutConstraint = timeoutConstraint;
         this.atMostSetByUser = atMostSetByUser;
@@ -102,11 +109,12 @@ final class ConditionFactorySettings {
         this.conditionEvaluationListener = conditionEvaluationListener;
         this.executorLifecycle = executorLifecycle;
         this.failFastCondition = failFastCondition;
+        this.timeoutMessageSupplier = timeoutMessageSupplier;
     }
 
     ConditionFactorySettings withAlias(String alias) {
         return new ConditionFactorySettings(alias, timeoutConstraint, atMostSetByUser, pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition, timeoutMessageSupplier);
     }
 
     /**
@@ -114,7 +122,7 @@ final class ConditionFactorySettings {
      */
     ConditionFactorySettings withTimeoutConstraint(WaitConstraint timeoutConstraint) {
         return new ConditionFactorySettings(alias, timeoutConstraint, atMostSetByUser, pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition, timeoutMessageSupplier);
     }
 
     /**
@@ -122,42 +130,48 @@ final class ConditionFactorySettings {
      */
     ConditionFactorySettings withUserSetAtMost(WaitConstraint timeoutConstraint) {
         return new ConditionFactorySettings(alias, timeoutConstraint, true, pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition, timeoutMessageSupplier);
     }
 
     ConditionFactorySettings withPollInterval(PollInterval pollInterval) {
         return new ConditionFactorySettings(alias, timeoutConstraint, atMostSetByUser, pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition, timeoutMessageSupplier);
     }
 
     ConditionFactorySettings withPollDelay(Duration pollDelay) {
         return new ConditionFactorySettings(alias, timeoutConstraint, atMostSetByUser, pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition, timeoutMessageSupplier);
     }
 
     ConditionFactorySettings withCatchUncaughtExceptions(boolean catchUncaughtExceptions) {
         return new ConditionFactorySettings(alias, timeoutConstraint, atMostSetByUser, pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition, timeoutMessageSupplier);
     }
 
     ConditionFactorySettings withExceptionsIgnorer(ExceptionIgnorer exceptionsIgnorer) {
         return new ConditionFactorySettings(alias, timeoutConstraint, atMostSetByUser, pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition, timeoutMessageSupplier);
     }
 
     ConditionFactorySettings withConditionEvaluationListener(ConditionEvaluationListener conditionEvaluationListener) {
         return new ConditionFactorySettings(alias, timeoutConstraint, atMostSetByUser, pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition, timeoutMessageSupplier);
     }
 
     ConditionFactorySettings withExecutorLifecycle(ExecutorLifecycle executorLifecycle) {
         return new ConditionFactorySettings(alias, timeoutConstraint, atMostSetByUser, pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition, timeoutMessageSupplier);
     }
 
     ConditionFactorySettings withFailFastCondition(FailFastCondition failFastCondition) {
         return new ConditionFactorySettings(alias, timeoutConstraint, atMostSetByUser, pollInterval, pollDelay,
-                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition);
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition, timeoutMessageSupplier);
+    }
+
+    ConditionFactorySettings withTimeoutMessageSupplier(Supplier<String> timeoutMessageSupplier) {
+        return new ConditionFactorySettings(alias, timeoutConstraint, atMostSetByUser, pollInterval, pollDelay,
+                catchUncaughtExceptions, exceptionsIgnorer, conditionEvaluationListener, executorLifecycle, failFastCondition,
+                timeoutMessageSupplier);
     }
 
     String getAlias() {
@@ -198,5 +212,9 @@ final class ConditionFactorySettings {
 
     FailFastCondition getFailFastCondition() {
         return failFastCondition;
+    }
+
+    Supplier<String> getTimeoutMessageSupplier() {
+        return timeoutMessageSupplier;
     }
 }

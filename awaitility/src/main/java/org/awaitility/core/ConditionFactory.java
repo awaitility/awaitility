@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static org.awaitility.core.ForeverDuration.isForever;
 import static org.awaitility.core.TemporalDuration.formatAsString;
@@ -171,6 +172,39 @@ public class ConditionFactory {
      */
     public ConditionFactory alias(String alias) {
         return new ConditionFactory(settings.withAlias(alias));
+    }
+
+    /**
+     * Append extra text to the message of the {@link ConditionTimeoutException} that is thrown if the condition
+     * is not fulfilled in time. The <code>messageSupplier</code> is called lazily, at most once, and only when the
+     * await times out, so it can describe the state of the system at the moment of failure. For example:
+     * <pre>
+     * await().atMost(5, SECONDS)
+     *        .timeoutMessage(() -&gt; "Order " + orderId + " was in state " + orderRepository.stateOf(orderId))
+     *        .until(() -&gt; orderRepository.stateOf(orderId) == SHIPPED);
+     * </pre>
+     * The text is appended on a new line after the standard timeout message, so the alias and the condition or
+     * mismatch description are kept:
+     * <pre>
+     * Condition with Lambda expression in org.example.OrderTest was not fulfilled within 5 seconds.
+     * Order 42 was in state PENDING
+     * </pre>
+     * The same text is appended when an {@link #atLeast(Duration)} constraint is violated, and the
+     * {@link ConditionEvaluationListener#onTimeout(TimeoutEvent)} callback receives the combined message.
+     * If the supplier returns <code>null</code> or an empty string, nothing is appended. If the supplier throws,
+     * the {@link ConditionTimeoutException} is still thrown with the standard message, and the exception thrown by
+     * the supplier is added to it as a suppressed exception.
+     * <p>
+     * Use {@link #alias(String)} to give the await a fixed name instead.
+     * </p>
+     *
+     * @param messageSupplier supplies the text to append to the timeout message, <code>null</code> removes a
+     *                        previously set supplier
+     * @return the condition factory
+     * @since 4.4.0
+     */
+    public ConditionFactory timeoutMessage(Supplier<String> messageSupplier) {
+        return new ConditionFactory(settings.withTimeoutMessageSupplier(messageSupplier));
     }
 
     /**
@@ -1104,7 +1138,8 @@ public class ConditionFactory {
         }
 
         return new ConditionSettings(alias, settings.isCatchUncaughtExceptions(), timeoutConstraint, pollInterval, actualPollDelay,
-                settings.getConditionEvaluationListener(), settings.getExceptionsIgnorer(), executorLifecycle, settings.getFailFastCondition());
+                settings.getConditionEvaluationListener(), settings.getExceptionsIgnorer(), executorLifecycle, settings.getFailFastCondition(),
+                settings.getTimeoutMessageSupplier());
     }
 
     private <T> T until(Condition<T> condition) {
