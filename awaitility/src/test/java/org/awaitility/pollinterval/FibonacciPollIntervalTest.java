@@ -63,6 +63,42 @@ public class FibonacciPollIntervalTest {
     }
 
     @Test public void
+    next_does_not_overflow_at_poll_count_47() {
+        // Given
+        FibonacciPollInterval pollInterval = new FibonacciPollInterval(TimeUnit.NANOSECONDS);
+
+        // When
+        Duration next = pollInterval.next(47, Duration.ZERO);
+
+        // Then
+        assertThat(next, is(Duration.ofNanos(2971215073L)));
+    }
+
+    @Test public void
+    next_returns_correct_value_at_poll_count_46() {
+        // Given
+        FibonacciPollInterval pollInterval = new FibonacciPollInterval(TimeUnit.NANOSECONDS);
+
+        // When
+        Duration next = pollInterval.next(46, Duration.ZERO);
+
+        // Then
+        assertThat(next, is(Duration.ofNanos(1836311903L)));
+    }
+
+    @Test public void
+    next_saturates_for_very_large_poll_counts() {
+        // Given
+        FibonacciPollInterval pollInterval = new FibonacciPollInterval(TimeUnit.NANOSECONDS);
+
+        // When
+        Duration next = pollInterval.next(200, Duration.ZERO);
+
+        // Then
+        assertThat(next, is(Duration.ofNanos(Long.MAX_VALUE)));
+    }
+
+    @Test public void
     next_negative_offset() {
         // Given
         Duration unused = Duration.ofMillis(ThreadLocalRandom.current().nextLong());

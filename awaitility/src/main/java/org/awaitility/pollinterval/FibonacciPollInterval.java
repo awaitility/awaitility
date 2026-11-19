@@ -76,7 +76,7 @@ public class FibonacciPollInterval implements PollInterval {
      */
     @Override
     public Duration next(int pollCount, Duration previousDuration) {
-        return DurationFactory.of(fibonacci(offset + pollCount), unit);
+        return DurationFactory.of(fibonacciLong(offset + pollCount), unit);
     }
 
     /**
@@ -165,6 +165,34 @@ public class FibonacciPollInterval implements PollInterval {
             return current;
         }
         return fib(value - 1, current + previous, current);
+    }
+
+    /**
+     * Generate the value of the fibonacci sequence for <code>value</code> using 64-bit arithmetic.
+     * The result saturates at {@link Long#MAX_VALUE} instead of overflowing, so poll intervals
+     * never wrap to negative or arbitrary values for large poll counts. Note that {@link #fibonacci(int)}
+     * is intentionally left unchanged: it only supports values whose fibonacci number fits in an {@code int}
+     * (up to {@code value} 46).
+     *
+     * @param value The value
+     * @return the fibonacci number, saturated at {@link Long#MAX_VALUE}
+     */
+    private long fibonacciLong(int value) {
+        return fibLong(value, 1L, 0L);
+    }
+
+    // Tail recursive implementation of fibonacci with saturation on overflow
+    private long fibLong(int value, long current, long previous) {
+        if (value == 0) {
+            return previous;
+        } else if (value == 1) {
+            return current;
+        }
+        long next = current + previous;
+        if (next < 0) {
+            next = Long.MAX_VALUE;
+        }
+        return fibLong(value - 1, next, current);
     }
 
     @Override
