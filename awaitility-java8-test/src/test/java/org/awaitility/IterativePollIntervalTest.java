@@ -32,7 +32,7 @@ public class IterativePollIntervalTest {
     @Test public void
     iterative_poll_interval_allows_specifying_start_duration() {
         // Given
-        IterativePollInterval pollInterval = new IterativePollInterval(prev -> prev.multipliedBy(2));
+        IterativePollInterval pollInterval = new IterativePollInterval(prev -> prev.multipliedBy(2), Duration.ofMillis(1));
 
         // When
         Duration duration = pollInterval.next(1, Duration.ZERO);
