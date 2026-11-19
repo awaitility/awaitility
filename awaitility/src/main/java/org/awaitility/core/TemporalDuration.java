@@ -42,7 +42,8 @@ class TemporalDuration {
         appendField(result, duration.toHours() % 24, "hour", "hours");
         appendField(result, duration.toMinutes() % 60, "minute", "minutes");
         appendField(result, duration.getSeconds() % 60, "second", "seconds");
-        appendField(result, duration.toMillis() % 1000, "millisecond", "milliseconds");
+        // Not toMillis() % 1000, since toMillis() overflows for very long durations such as ChronoUnit.FOREVER
+        appendField(result, duration.getNano() / 1_000_000, "millisecond", "milliseconds");
 
         return result.length() == 0 ? "0 milliseconds" : result.toString();
     }
