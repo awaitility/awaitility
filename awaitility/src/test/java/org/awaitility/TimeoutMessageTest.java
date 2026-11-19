@@ -269,7 +269,7 @@ public class TimeoutMessageTest {
         assertThat(calls).hasValue(1);
         assertThat(e.getMessage())
                 .startsWith("Condition was evaluated in ")
-                .contains("which is earlier than expected minimum timeout 1 seconds\n")
+                .contains("which is earlier than expected minimum timeout 1 second\n")
                 .endsWith("\ncustom text");
         assertThat(listenerMessage.get()).isEqualTo(e.getMessage());
     }
