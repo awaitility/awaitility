@@ -52,9 +52,10 @@ public class InternalExecutorServiceFactory {
     /**
      * Internal use only, it may be moved or renamed without notice (it is public only because Awaitility
      * lives in another package). Same as {@link #create(Function)}, but the returned executor is a plain
-     * {@link ThreadPoolExecutor} with one thread. Unlike the wrapper returned by
-     * {@link Executors#newSingleThreadExecutor(java.util.concurrent.ThreadFactory)}, it is not finalizable
-     * on Java 8 to 17, so it doesn't add a finalizable object to every await statement (issue 168).
+     * {@link ThreadPoolExecutor} with one thread, without the wrapper that
+     * {@link Executors#newSingleThreadExecutor(java.util.concurrent.ThreadFactory)} adds. That wrapper is finalizable
+     * (a cleaner registration from Java 21), so dropping it saves GC work for every await statement (issue 168).
+     * On Java 8 the {@link ThreadPoolExecutor} itself still has a finalizer.
      *
      * @param threadSupplier The thread supplier
      * @return An executor service that will use the thread created by the <code>threadSupplier</code> when polling
@@ -70,7 +71,7 @@ public class InternalExecutorServiceFactory {
     /**
      * Internal use only, it may be moved or renamed without notice (it is public only because Awaitility
      * lives in another package). Same as {@link #create(BiFunction, String)}, but the returned executor is a plain
-     * {@link ThreadPoolExecutor} with one thread, which is not finalizable on Java 8 to 17 (issue 168).
+     * {@link ThreadPoolExecutor} with one thread, see {@link #createFinalizerFree(Function)} (issue 168).
      *
      * @param threadSupplier The thread supplier
      * @param alias          The alias used to generate the default thread name
