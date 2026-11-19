@@ -1,6 +1,5 @@
 Changelog 4.4.0 (not released yet)
 -----------------------------------
-* fieldIn(..) no longer relies on the compiler's synthetic this$0 field to build its timeout message (issue 223).
 * Upgraded assertj-core to 3.27.7 (thanks to Ian Hundere for pull request).
 * Updated the README example to use the Duration overload in await().atMost(..) (thanks to Kurt Alfred Kluever for pull request).
 * Added support for configuring the default timeout, poll interval and poll delay using ISO-8601 system properties. For example:
@@ -13,6 +12,9 @@ Changelog 4.4.0 (not released yet)
 * JavaVersionDetector now reads the major version from java.version strings like "25+36" and "25+36-ea" instead of throwing (issue 296, thanks to arimu1 for pull request).
 * Clarified in the Javadoc that during(..) needs the condition to hold continuously, not for a total of that time (issue 298, thanks to Jaya Dileep for pull request).
 * Upgraded maven-jar-plugin from 2.4 to 3.5.1 and maven-help-plugin from 2.2 to 3.5.1. Building Awaitility now needs Maven 3.6.3 or later.
+* fieldIn(..) no longer relies on the compiler's synthetic this$0 field to build its timeout message (issue 223).
+* Fixed an int overflow in FibonacciPollInterval from poll 47 onwards. Very long Fibonacci poll intervals are now capped at the longest duration Awaitility supports instead of throwing an exception (issue 319, thanks to xh123637 for pull request).
+* Timeout messages no longer show day-scale durations as months, and use singular units such as "1 second" instead of "1 seconds". Fields are now separated by a single space ("1 minute 30 seconds" instead of "1 minutes  30 seconds"). If you assert on these messages you may need to update your expectations (issue 318, thanks to Shreya Roy Koneri for pull request).
 
 Changelog 4.3.0 (2025-02-21)
 ----------------------------
