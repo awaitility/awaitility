@@ -104,11 +104,20 @@ class UntilThrownCondition<T extends Throwable> implements Condition<T> {
     private static String describe(Object descriptionSource, String alias) {
         Class<?> type = descriptionSource.getClass();
         String aliasDescription = alias == null ? "" : " with alias " + alias;
-        if (isLambdaClass(type)) {
+        if (isJavaLambda(type)) {
             String lambdaDescription = generateLambdaErrorMessagePrefix(type, false);
             return alias == null ? "Condition with " + lambdaDescription : "Condition" + aliasDescription + " using " + lambdaDescription;
         }
         return "Condition" + aliasDescription + " " + type.getName() + generateMethodDescription(type);
+    }
+
+    private static boolean isJavaLambda(Class<?> type) {
+        try {
+            return isLambdaClass(type);
+        } catch (InternalError e) {
+            // On Java 8, Class.getSimpleName throws "Malformed class name" for some Kotlin generated classes
+            return false;
+        }
     }
 
     private static String generateMethodDescription(Class<?> type) {
