@@ -1,5 +1,6 @@
 Changelog 4.4.0 (not released yet)
 -----------------------------------
+* Awaitility's internal polling executor is now a plain ThreadPoolExecutor instead of Executors.newSingleThreadExecutor(..), so await statements no longer create a finalizable object on Java 8 to 17 (issue 168). Executors passed in by users and the existing InternalExecutorServiceFactory.create(..) methods are unchanged.
 * fieldIn(..) no longer relies on the compiler's synthetic this$0 field to build its timeout message (issue 223).
 * Upgraded assertj-core to 3.27.7 (thanks to Ian Hundere for pull request).
 * Updated the README example to use the Duration overload in await().atMost(..) (thanks to Kurt Alfred Kluever for pull request).
