@@ -4,7 +4,6 @@ import org.awaitility.Awaitility;
 import org.junit.After;
 import org.junit.Test;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -98,20 +97,12 @@ public class InternalExecutorServiceFactoryTest {
     @Test
     public void globalDefaultPollThreadExecutorIsAPlainThreadPoolExecutor() throws Exception {
         Awaitility.pollThread(Thread::new);
-        Field f = Awaitility.class.getDeclaredField("defaultExecutorLifecycle");
-        f.setAccessible(true);
-        ExecutorService es = ((ExecutorLifecycle) f.get(null)).supplyExecutorService();
-        try {
-            assertSame(ThreadPoolExecutor.class, es.getClass());
-        } finally {
-            es.shutdownNow();
-        }
+        // await() copies the global default executor lifecycle into its settings
+        assertPlain(Awaitility.await());
     }
 
     private static void assertPlain(ConditionFactory factory) throws Exception {
-        Field f = ConditionFactory.class.getDeclaredField("executorLifecycle");
-        f.setAccessible(true);
-        ExecutorService es = ((ExecutorLifecycle) f.get(factory)).supplyExecutorService();
+        ExecutorService es = factory.getSettings().getExecutorLifecycle().supplyExecutorService();
         try {
             assertSame(ThreadPoolExecutor.class, es.getClass());
         } finally {

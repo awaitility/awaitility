@@ -405,9 +405,7 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory waitAtMost(Duration timeout) {
-        return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(timeout), defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle, defaultFailFastCondition);
+        return await().atMost(timeout);
     }
 
     /**
@@ -419,9 +417,7 @@ public class Awaitility {
      * @return the condition factory
      */
     public static ConditionFactory waitAtMost(long value, TimeUnit unit) {
-        return new ConditionFactory(null, defaultWaitConstraint.withMaxWaitTime(DurationFactory.of(value, unit)), defaultPollInterval, defaultPollDelay,
-                defaultCatchUncaughtExceptions, defaultExceptionIgnorer, defaultConditionEvaluationListener,
-                defaultExecutorLifecycle, defaultFailFastCondition);
+        return await().atMost(value, unit);
     }
 
     /**
