@@ -17,8 +17,10 @@
 package org.awaitility;
 
 import org.awaitility.core.ConditionEvaluationListener;
+import org.awaitility.core.ConditionTimeoutException;
 import org.awaitility.core.EvaluatedCondition;
 import org.awaitility.core.StartEvaluationEvent;
+import org.awaitility.core.TimeoutEvent;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,7 +32,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.setDefaultConditionEvaluationListener;
 import static org.awaitility.Awaitility.with;
 import static org.awaitility.Durations.ONE_SECOND;
@@ -242,6 +248,63 @@ public class ConditionEvaluationListenerTest {
 
         assertThat(remainingTimes, everyItem(is(Long.MAX_VALUE)));
         assertThat(elapsedTimes, everyItem(is(not(Long.MAX_VALUE))));
+    }
+
+    @Test(timeout = 2000)
+    public void onTimeoutIsInvokedOnceWhenConditionTimesOut() {
+        final AtomicInteger failureCount = new AtomicInteger();
+
+        try {
+            await().pollDelay(20, TimeUnit.MILLISECONDS)
+                    .pollInterval(20, TimeUnit.MILLISECONDS)
+                    .atMost(100, TimeUnit.MILLISECONDS)
+                    .onTimeout(event -> failureCount.incrementAndGet())
+                    .until(() -> false);
+            throw new AssertionError("Expected ConditionTimeoutException");
+        } catch (ConditionTimeoutException expected) {
+            assertThat(failureCount.get(), is(1));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void onTimeoutIsNotInvokedWhenConditionIsSatisfied() {
+        final AtomicBoolean failed = new AtomicBoolean(false);
+
+        await().atMost(ONE_SECOND)
+                .onTimeout(event -> failed.set(true))
+                .until(new CountDown(3), is(equalTo(0)));
+
+        assertThat(failed.get(), is(false));
+    }
+
+    @Test(timeout = 2000)
+    public void onTimeoutComposesWithExistingConditionEvaluationListener() {
+        final AtomicBoolean previousTimeoutSeen = new AtomicBoolean(false);
+        final AtomicBoolean onTimeoutSeen = new AtomicBoolean(false);
+
+        ConditionEvaluationListener<Boolean> previous = new ConditionEvaluationListener<Boolean>() {
+            @Override
+            public void conditionEvaluated(EvaluatedCondition<Boolean> condition) {
+            }
+
+            @Override
+            public void onTimeout(TimeoutEvent timeoutEvent) {
+                previousTimeoutSeen.set(true);
+            }
+        };
+
+        try {
+            await().pollDelay(20, TimeUnit.MILLISECONDS)
+                    .pollInterval(20, TimeUnit.MILLISECONDS)
+                    .atMost(100, TimeUnit.MILLISECONDS)
+                    .conditionEvaluationListener(previous)
+                    .onTimeout(event -> onTimeoutSeen.set(true))
+                    .until(() -> false);
+            throw new AssertionError("Expected ConditionTimeoutException");
+        } catch (ConditionTimeoutException expected) {
+            assertThat(previousTimeoutSeen.get(), is(true));
+            assertThat(onTimeoutSeen.get(), is(true));
+        }
     }
 
     private static class CountDown implements Callable<Integer> {
