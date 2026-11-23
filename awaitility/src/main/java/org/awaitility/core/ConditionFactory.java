@@ -26,6 +26,7 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
@@ -193,6 +194,22 @@ public class ConditionFactory {
      */
     public ConditionFactory atLeast(Duration timeout) {
         return new ConditionFactory(settings.withTimeoutConstraint(settings.getTimeoutConstraint().withMinWaitTime(timeout)));
+    }
+
+    /**
+     * Require the condition to succeed no earlier than the given instant. The instant is
+     * converted to a remaining duration when each wait begins, so a factory can be
+     * configured in advance and reused. Changes to the system clock after a wait starts
+     * do not change that wait's bound. Instants in the past impose no minimum wait.
+     * Like {@link #atLeast(Duration)}, an early success fails rather than being retried.
+     * For example, {@code await().notBefore(startTime).atMost(Duration.ofSeconds(10)).until(condition)}.
+     *
+     * @param instant earliest permitted success time
+     * @return the condition factory
+     */
+    public ConditionFactory notBefore(Instant instant) {
+        return new ConditionFactory(settings.withTimeoutConstraint(
+                new InstantWaitConstraint(settings.getTimeoutConstraint(), instant)));
     }
 
     /**
