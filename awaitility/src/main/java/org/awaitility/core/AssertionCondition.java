@@ -119,4 +119,14 @@ public class AssertionCondition implements Condition<Void> {
         conditionAwaiter.await(conditionEvaluationHandler);
         return null;
     }
+
+    /**
+     * Like {@link #await()} but returns a failed {@link AwaitResult} instead of throwing a {@link ConditionTimeoutException}.
+     *
+     * @return the result, its value is always <code>null</code>
+     */
+    AwaitResult<Void> tryAwait() {
+        final ConditionTimeoutException timeout = conditionAwaiter.tryAwait(conditionEvaluationHandler);
+        return timeout == null ? AwaitResult.success(null) : AwaitResult.failure(null, timeout);
+    }
 }

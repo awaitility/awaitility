@@ -451,6 +451,46 @@ class KotlinTest {
         assertThat(throwable).isInstanceOf(ConditionTimeoutException::class.java).hasMessageContaining("can never be fulfilled")
         assertThat(duration).isLessThan(500)
     }
+
+    @Test(timeout = 2000)
+    fun untilOrTimeoutReturnsSuccessfulResult() {
+        Asynch(fakeRepository).perform()
+
+        val result = await atMost 2.seconds untilOrTimeout { fakeRepository.value == 1 }
+
+        assertThat(result.isSuccess).isTrue()
+        assertThat(result.value).isTrue()
+    }
+
+    @Test(timeout = 2000)
+    fun untilOrTimeoutReturnsFailedResultInsteadOfThrowing() {
+        val result = await atMost 300.milliseconds untilOrTimeout { fakeRepository.value == 2 }
+
+        assertThat(result.isSuccess).isFalse()
+        assertThat(result.value).isFalse()
+        assertThat(result.cause).isExactlyInstanceOf(ConditionTimeoutException::class.java)
+            .hasMessageEndingWith("was not fulfilled within 300 milliseconds.")
+    }
+
+    @Test(timeout = 2000)
+    fun untilAssertedOrTimeoutReturnsFailedResultInsteadOfThrowing() {
+        val result = await atMost 300.milliseconds untilAssertedOrTimeout {
+            assertThat(fakeRepository.value).isEqualTo(2)
+        }
+
+        assertThat(result.isSuccess).isFalse()
+        assertThat(result.value).isNull()
+        assertThat(result.cause).hasMessageStartingWith("Assertion condition defined")
+    }
+
+    @Test(timeout = 2000)
+    fun untilOrTimeoutWithSupplierAndPredicateCanBeCalledFromKotlin() {
+        Asynch(fakeRepository).perform()
+
+        val result = await.atMost(2.seconds.toJavaDuration()).untilOrTimeout({ fakeRepository.value }) { it == 1 }
+
+        assertThat(result.value).isEqualTo(1)
+    }
 }
 
 class AsynchObject<T>(private val repository: FakeGenericRepository<T>, private val changeTo: T) {
