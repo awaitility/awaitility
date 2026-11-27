@@ -7,6 +7,7 @@
 package org.awaitility.kotlin
 
 import org.awaitility.Awaitility
+import org.awaitility.core.AwaitResult
 import org.awaitility.core.ConditionEvaluationListener
 import org.awaitility.core.ConditionFactory
 import org.awaitility.core.ThrowingRunnable
@@ -192,6 +193,51 @@ inline fun <reified T : Throwable> ConditionFactory.untilThrown(noinline fn: () 
  * @since 4.4.0
  */
 inline fun <reified T : Throwable> ConditionFactory.untilThrownExactly(noinline fn: () -> Any?): T = untilThrownExactly(fn, T::class.java)
+
+/**
+ * An extension function to `ConditionFactory` that works like [until], but a timeout returns a failed [AwaitResult]
+ * instead of throwing a [org.awaitility.core.ConditionTimeoutException]. Exceptions thrown by [fn] are not affected:
+ * they end the await just like for [until], unless you ignore them with `ignoreExceptions()`. For example:
+ *
+ * ```
+ * val result = await atMost 2.seconds untilOrTimeout { myRepository.count() == 1 }
+ * if (!result.isSuccess) {
+ *     println(result.cause.message)
+ * }
+ * ```
+ *
+ * Only the timeout becomes a failed result. Everything else (for example a fail fast failure, or an exception
+ * thrown by [fn] that is not ignored) is thrown just like for [until].
+ * Note that [await] is a getter that needs to imported from `org.awaitility.kotlin`.
+ *
+ * @param fn The function to evaluate
+ * @return the result, its value is the last `Boolean` returned by [fn]
+ * @see ConditionFactory.untilOrTimeout
+ * @since 4.4.0
+ */
+infix fun ConditionFactory.untilOrTimeout(fn: () -> Boolean): AwaitResult<Boolean> = untilOrTimeout(fn)
+
+/**
+ * An extension function to `ConditionFactory` that works like [untilAsserted], but a timeout returns a failed
+ * [AwaitResult] instead of throwing a [org.awaitility.core.ConditionTimeoutException]. Exceptions other than
+ * `AssertionError` are not affected: they end the await just like for [untilAsserted], unless you ignore them with
+ * `ignoreExceptions()`. For example:
+ *
+ * ```
+ * val result = await atMost 2.seconds untilAssertedOrTimeout {
+ *     assertThat(fakeRepository.value).isEqualTo(1)
+ * }
+ * ```
+ *
+ * Only the timeout becomes a failed result. Everything else is thrown just like for [untilAsserted].
+ * Note that [await] is a getter that needs to imported from `org.awaitility.kotlin`.
+ *
+ * @param fn A function that performs the assertion
+ * @return the result, its value is always `null`
+ * @see ConditionFactory.untilAssertedOrTimeout
+ * @since 4.4.0
+ */
+infix fun ConditionFactory.untilAssertedOrTimeout(fn: () -> Unit): AwaitResult<Void> = untilAssertedOrTimeout(fn)
 
 /**
  * Await at most `timeout` before throwing a timeout exception.
