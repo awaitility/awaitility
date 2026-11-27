@@ -17,8 +17,8 @@ public void updatesCustomerStatus() {
 ```
 
 ## News
+* 2026-11-27: Awaitility `4.4.0` is released with [untilOrTimeout](https://github.com/awaitility/awaitility/wiki/Usage#awaiting-without-throwing-on-timeout) to wait without throwing on timeout, [untilThrown](https://github.com/awaitility/awaitility/wiki/Usage#wait-until-an-exception-is-thrown), a [during](https://github.com/awaitility/awaitility/wiki/Usage#assert-that-a-value-is-maintained) that works with the default timeout, timeout messages and callbacks, and more. It also includes everything planned for 4.3.1, which was never published. See [release notes](https://github.com/awaitility/awaitility/wiki/ReleaseNotes44) and [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
 * 2025-02-21: Awaitility `4.3.0` is released with better Kotlin time support and a new way of using [untilAsserted](https://github.com/awaitility/awaitility/wiki/Usage#using-assertj-or-fest-assert). See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details. 
-* 2024-08-07: Awaitility `4.2.2` is released with support for "ea" JVM versions. See [changelog](https://raw.githubusercontent.com/awaitility/awaitility/master/changelog.txt) for details.
   
 [Older news](https://github.com/awaitility/awaitility/wiki/OldNews)
 
@@ -26,7 +26,7 @@ public void updatesCustomerStatus() {
 
 * [Getting started](https://github.com/awaitility/awaitility/wiki/Getting_started)
 * [Usage Guide](https://github.com/awaitility/awaitility/wiki/Usage)
-* [Awaitility Javadoc](http://www.javadoc.io/doc/org.awaitility/awaitility/4.3.0)
+* [Awaitility Javadoc](http://www.javadoc.io/doc/org.awaitility/awaitility/4.4.0)
 
 ## Links
 * [Change log](https://github.com/awaitility/awaitility/raw/master/changelog.txt)
