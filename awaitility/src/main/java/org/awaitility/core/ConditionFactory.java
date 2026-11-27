@@ -534,7 +534,7 @@ public class ConditionFactory {
     }
 
     /**
-     * Instructs Awaitility to execute the polling of the condition from the same as the test.
+     * Instructs Awaitility to execute the polling of the condition from the same thread as the test.
      * This is an advanced feature and you should be careful when combining this with conditions that
      * wait forever (or a long time) since Awaitility cannot interrupt the thread when it's using the same
      * thread as the test. For safety you should always combine tests using this feature with a test framework specific timeout,
