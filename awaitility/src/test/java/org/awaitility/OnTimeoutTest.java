@@ -241,6 +241,63 @@ public class OnTimeoutTest {
         assertThat(e.getSuppressed(), arrayWithSize(1));
     }
 
+    // The next three tests are based on tests by Burak KALAYCI in pull request 310
+
+    @Test(timeout = 2000)
+    public void on_timeout_is_called_when_the_listener_on_timeout_throws_and_the_listener_exception_is_thrown() {
+        IllegalStateException listenerException = new IllegalStateException("listener failed");
+        AtomicInteger calls = new AtomicInteger();
+
+        try {
+            shortAwait()
+                    .conditionEvaluationListener(throwingOnTimeoutListener(listenerException))
+                    .onTimeout(event -> calls.incrementAndGet())
+                    .until(() -> false);
+            fail("Expected the listener's exception");
+        } catch (IllegalStateException e) {
+            assertThat(e, sameInstance(listenerException));
+            assertThat(e.getSuppressed(), arrayWithSize(0));
+            assertThat(calls.get(), is(1));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void callback_exception_is_suppressed_by_the_listener_exception_when_both_throw() {
+        IllegalStateException listenerException = new IllegalStateException("listener failed");
+        IllegalArgumentException callbackException = new IllegalArgumentException("callback failed");
+
+        try {
+            shortAwait()
+                    .conditionEvaluationListener(throwingOnTimeoutListener(listenerException))
+                    .onTimeout(event -> {
+                        throw callbackException;
+                    })
+                    .until(() -> false);
+            fail("Expected the listener's exception");
+        } catch (IllegalStateException e) {
+            assertThat(e, sameInstance(listenerException));
+            assertThat(e.getSuppressed(), arrayContaining((Throwable) callbackException));
+        }
+    }
+
+    @Test(timeout = 2000)
+    public void an_exception_thrown_by_both_the_listener_and_the_callback_is_not_suppressed_on_itself() {
+        IllegalStateException sharedException = new IllegalStateException("failed");
+
+        try {
+            shortAwait()
+                    .conditionEvaluationListener(throwingOnTimeoutListener(sharedException))
+                    .onTimeout(event -> {
+                        throw sharedException;
+                    })
+                    .until(() -> false);
+            fail("Expected the listener's exception");
+        } catch (IllegalStateException e) {
+            assertThat(e, sameInstance(sharedException));
+            assertThat(e.getSuppressed(), arrayWithSize(0));
+        }
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void on_timeout_does_not_accept_null() {
         await().onTimeout(null);
@@ -255,6 +312,19 @@ public class OnTimeoutTest {
             @Override
             public void onTimeout(TimeoutEvent timeoutEvent) {
                 timeouts.incrementAndGet();
+            }
+        };
+    }
+
+    private static ConditionEvaluationListener<Boolean> throwingOnTimeoutListener(RuntimeException exception) {
+        return new ConditionEvaluationListener<Boolean>() {
+            @Override
+            public void conditionEvaluated(EvaluatedCondition<Boolean> condition) {
+            }
+
+            @Override
+            public void onTimeout(TimeoutEvent timeoutEvent) {
+                throw exception;
             }
         };
     }
