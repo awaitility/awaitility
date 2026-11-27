@@ -11,6 +11,7 @@ Changelog 4.4.0 (not released yet)
 
     await atMost Duration.ofMinutes(1) failFast { workflow.phase == "Failed" } until { workflow.phase == "Done" }
   Also available are failFastWithReason("reason") { .. } and failFastAsserted { .. } (with an optional reason).
+* Added Awaitility.getDefaultTimeout(), getDefaultPollInterval() and getDefaultPollDelay() that return the current defaults. getDefaultPollDelay() returns null when no default poll delay is set, and setDefaultPollDelay(Duration) now accepts null to go back to that, so you can save and restore all three (issue 269, thanks to Alexander Schmidt for the original pull request).
 * Awaitility's internal polling executor is now a plain ThreadPoolExecutor instead of Executors.newSingleThreadExecutor(..), so each await statement no longer creates the finalizable wrapper that newSingleThreadExecutor adds (a cleaner registration from Java 21). On Java 8 ThreadPoolExecutor itself has a finalizer, so the saving there is one finalizable object instead of two (issue 168). Executors passed in by users and the existing InternalExecutorServiceFactory.create(..) methods are unchanged.
 * fieldIn(..) no longer relies on the compiler's synthetic this$0 field to build its timeout message (issue 223).
 * Upgraded assertj-core to 3.27.7 (thanks to Ian Hundere for pull request).
