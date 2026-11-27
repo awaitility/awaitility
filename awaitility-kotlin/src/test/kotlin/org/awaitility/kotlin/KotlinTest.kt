@@ -378,6 +378,33 @@ class KotlinTest {
         assertThat(thrown).isInstanceOf(ConditionTimeoutException::class.java)
             .hasMessageContaining("was expected to throw java.io.IOException but it returned 42 within 300 milliseconds.")
     }
+
+    @Test
+    fun withTimeoutMessageAppendsLazilyEvaluatedTextToTheTimeoutMessage() {
+        val value = AtomicInteger(1)
+        var calls = 0
+
+        val throwable = catchThrowable {
+            await withAlias "Kotlin Test" atMost 200.milliseconds withTimeoutMessage {
+                calls++
+                "value was ${value.get()}"
+            } untilCallTo { value.get() } matches { it == 2 }
+        }
+
+        assertThat(calls).isEqualTo(1)
+        assertThat(throwable).isExactlyInstanceOf(ConditionTimeoutException::class.java)
+            .hasMessageStartingWith("Condition with alias 'Kotlin Test' didn't complete within 200 milliseconds because ")
+            .hasMessageEndingWith(".\nvalue was 1")
+    }
+
+    @Test
+    fun withTimeoutMessageIsNotCalledWhenTheConditionIsFulfilled() {
+        var calls = 0
+
+        await atMost 2.seconds withTimeoutMessage { calls++; "never shown" } until { true }
+
+        assertThat(calls).isEqualTo(0)
+    }
 }
 
 class AsynchObject<T>(private val repository: FakeGenericRepository<T>, private val changeTo: T) {
