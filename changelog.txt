@@ -1,5 +1,5 @@
-Changelog 4.4.0 (not released yet)
------------------------------------
+Changelog 4.4.0 (2026-11-27)
+----------------------------
 * Added an Automatic-Module-Name to the jar manifests, which changes the module names for module-path users:
     awaitility        -> org.awaitility
     awaitility.kotlin -> org.awaitility.kotlin
@@ -54,7 +54,6 @@ Changelog 4.4.0 (not released yet)
 
     await().pollInterval(exponential(Duration.ofMillis(500), Duration.ofSeconds(5))).until(..);
   gives poll intervals of 500ms, 1s, 2s, 4s, 5s, 5s, and so on.
-* fieldIn(..) no longer relies on the compiler's synthetic this$0 field to build its timeout message (issue 223).
 * Fixed an int overflow in FibonacciPollInterval from poll 47 onwards. Very long Fibonacci poll intervals are now capped at the longest duration Awaitility supports instead of throwing an exception (issue 319, thanks to xh123637 for pull request).
 * Timeout messages no longer show day-scale durations as months, and use singular units such as "1 second" instead of "1 seconds". Fields are now separated by a single space ("1 minute 30 seconds" instead of "1 minutes  30 seconds"). If you assert on these messages you may need to update your expectations (issue 318, thanks to Shreya Roy Koneri for pull request).
 * The Java 8 test module is built and run in CI again (issue 156).
