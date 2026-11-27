@@ -170,16 +170,18 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
                     }
                 }
                 TimeoutMessage timeoutMessageWithCustomText = appendCustomTimeoutMessage(message);
-                conditionEvaluationHandler.handleTimeout(timeoutMessageWithCustomText.message, false);
-                throw timeoutMessageWithCustomText.addSupplierFailureTo(
+                ConditionTimeoutException timeoutException = timeoutMessageWithCustomText.addSupplierFailureTo(
                         new ConditionTimeoutException(timeoutMessageWithCustomText.message, cause));
+                conditionEvaluationHandler.handleTimeout(timeoutMessageWithCustomText.message, false, timeoutException);
+                throw timeoutException;
             } else if (evaluationDuration.compareTo(minWaitTime) < 0) {
                 String message = String.format("Condition was evaluated in %s which is earlier than expected minimum timeout %s",
                         formatAsString(evaluationDuration), formatAsString(minWaitTime));
                 TimeoutMessage timeoutMessageWithCustomText = appendCustomTimeoutMessage(message);
-                conditionEvaluationHandler.handleTimeout(timeoutMessageWithCustomText.message, true);
-                throw timeoutMessageWithCustomText.addSupplierFailureTo(
+                ConditionTimeoutException timeoutException = timeoutMessageWithCustomText.addSupplierFailureTo(
                         new ConditionTimeoutException(timeoutMessageWithCustomText.message));
+                conditionEvaluationHandler.handleTimeout(timeoutMessageWithCustomText.message, true, timeoutException);
+                throw timeoutException;
             }
         } catch (Throwable e) {
             CheckedExceptionRethrower.safeRethrow(e);

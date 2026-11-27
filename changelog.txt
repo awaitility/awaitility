@@ -35,6 +35,9 @@ Changelog 4.4.0 (not released yet)
            .timeoutMessage(() -> "Order state was " + orders.stateOf(orderId))
            .until(() -> orders.stateOf(orderId) == SHIPPED);
   Kotlin users can write "await withTimeoutMessage { .. } until { .. }" (pull request 195, thanks to James Agnew for the original pull request).
+* Added ConditionFactory#onTimeout(..) that takes a callback which is called once when the await times out, just before the ConditionTimeoutException is thrown. Use it to print extra diagnostics when a test is about to fail. For example:
+    await().atMost(10, SECONDS).onTimeout(event -> env.printErrors()).until(..);
+  The callback receives the TimeoutEvent and is called in the same cases as ConditionEvaluationListener#onTimeout (a timeout or an atLeast violation), not when the condition throws or a fail-fast condition fails. It is kept when conditionEvaluationListener(..) or logging(..) is called afterwards. If the callback throws, its exception is added as suppressed to the ConditionTimeoutException. Also available in the Kotlin DSL as "await atMost 10.seconds onTimeout { .. } until { .. }" (issue 283, thanks to Burak KALAYCI for pull request).
 * fieldIn(..) error messages now work for fields declared in a superclass. Before, the timeout message said "Internal error" (issue 247, thanks to Jaya Dileep for pull request).
 * JavaVersionDetector now reads the major version from java.version strings like "25+36" and "25+36-ea" instead of throwing (issue 296, thanks to arimu1 for pull request).
 * Clarified in the Javadoc that during(..) needs the condition to hold continuously, not for a total of that time (issue 298, thanks to Jaya Dileep for pull request).
