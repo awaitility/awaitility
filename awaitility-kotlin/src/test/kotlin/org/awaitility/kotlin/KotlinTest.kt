@@ -33,6 +33,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
+import java.io.FileNotFoundException
+import java.io.IOException
 import java.lang.Thread.sleep
 import java.time.Duration
 import java.util.concurrent.Callable
@@ -327,6 +329,54 @@ class KotlinTest {
 
         assertThat(lazyReason).isInstanceOf(TerminalFailureException::class.java).hasMessage("Gave up after 3 evaluations")
         assertThat(staticReason).isInstanceOf(TerminalFailureException::class.java).hasMessage("static reason")
+    }
+
+    @Test(timeout = 2000)
+    fun untilThrownReturnsTheExceptionThrownOnTheThirdCall() {
+        val calls = AtomicInteger()
+
+        val e = await.atMost(5.seconds).withPollInterval(10.milliseconds).untilThrown<IOException> {
+            if (calls.incrementAndGet() == 3) throw FileNotFoundException("third")
+            calls.get()
+        }
+
+        assertThat(e).isInstanceOf(FileNotFoundException::class.java).hasMessage("third")
+        assertThat(calls).hasValue(3)
+    }
+
+    @Test(timeout = 2000)
+    fun untilThrownAcceptsAFunctionThatReturnsUnit() {
+        val calls = AtomicInteger()
+
+        val e = await.atMost(5.seconds).withPollInterval(10.milliseconds).untilThrown<IllegalStateException> {
+            check(calls.incrementAndGet() < 3) { "third" }
+        }
+
+        assertThat(e).hasMessage("third")
+    }
+
+    @Test(timeout = 2000)
+    fun untilThrownExactlyDoesNotMatchASubclass() {
+        val e = await.atMost(5.seconds).withPollInterval(10.milliseconds) ignoreException FileNotFoundException::class
+        val calls = AtomicInteger()
+
+        val actual = e.untilThrownExactly<IOException> {
+            if (calls.incrementAndGet() < 3) throw FileNotFoundException("subclass")
+            throw IOException("exact")
+        }
+
+        assertThat(actual.javaClass).isEqualTo(IOException::class.java)
+        assertThat(calls).hasValue(3)
+    }
+
+    @Test(timeout = 2000)
+    fun untilThrownTimesOutWithAMessageThatNamesTheExpectedException() {
+        val thrown = catchThrowable {
+            await.atMost(300.milliseconds).withPollInterval(10.milliseconds).untilThrown<IOException> { 42 }
+        }
+
+        assertThat(thrown).isInstanceOf(ConditionTimeoutException::class.java)
+            .hasMessageContaining("was expected to throw java.io.IOException but it returned 42 within 300 milliseconds.")
     }
 }
 
