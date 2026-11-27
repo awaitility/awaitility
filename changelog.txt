@@ -7,6 +7,7 @@ Changelog 4.4.0 (not released yet)
     awaitility.groovy -> org.awaitility.groovy
   (issue 205, thanks to Piotr P. Karwasz for the original pull request).
 * awaitility-groovy can now be used on the module path. Its Groovy extension module descriptor moved from META-INF/services to META-INF/groovy, where Groovy 2.5 and later look for it, because the module system rejected the old file.
+* Awaitility's internal polling executor is now a plain ThreadPoolExecutor instead of Executors.newSingleThreadExecutor(..), so each await statement no longer creates the finalizable wrapper that newSingleThreadExecutor adds (a cleaner registration from Java 21). On Java 8 ThreadPoolExecutor itself has a finalizer, so the saving there is one finalizable object instead of two (issue 168). Executors passed in by users and the existing InternalExecutorServiceFactory.create(..) methods are unchanged.
 * fieldIn(..) no longer relies on the compiler's synthetic this$0 field to build its timeout message (issue 223).
 * Upgraded assertj-core to 3.27.7 (thanks to Ian Hundere for pull request).
 * Updated the README example to use the Duration overload in await().atMost(..) (thanks to Kurt Alfred Kluever for pull request).
@@ -26,6 +27,8 @@ Changelog 4.4.0 (not released yet)
 * Timeout messages no longer show day-scale durations as months, and use singular units such as "1 second" instead of "1 seconds". Fields are now separated by a single space ("1 minute 30 seconds" instead of "1 minutes  30 seconds"). If you assert on these messages you may need to update your expectations (issue 318, thanks to Shreya Roy Koneri for pull request).
 * The Java 8 test module is built and run in CI again (issue 156).
 * Timeout messages on JDK 15 and later say "Condition defined as a lambda expression in ..." again instead of "... a Lambda expression in ...".
+* Added StartEvaluationEvent.getPollDelay(), so a ConditionEvaluationListener can see the poll delay of the await before the first evaluation (issue 278, thanks to barthollomew for pull request).
+* forever() no longer drops an atLeast(..) or during(..) set earlier in the chain, so await().atLeast(1, SECONDS).forever() still fails if the condition is fulfilled too early (thanks to Jaehong Park for pull request).
 
 Changelog 4.3.0 (2025-02-21)
 ----------------------------
