@@ -195,18 +195,41 @@ abstract class ConditionAwaiter implements UncaughtExceptionHandler {
             CallableFailFastCondition callableFailFastCondition = (CallableFailFastCondition) failFastCondition;
             Boolean terminalFailureReached = callableFailFastCondition.getFailFastCondition().call();
             if (terminalFailureReached != null && terminalFailureReached) {
-                String failureReason = callableFailFastCondition.getFailFastFailureReason();
-                throw new TerminalFailureException(failureReason);
+                throw newTerminalFailureException(callableFailFastCondition, FailFastCondition.DEFAULT_FAILURE_REASON, null);
             }
         } else if (failFastCondition instanceof FailFastAssertion) {
             FailFastAssertion failFastAssertion = (FailFastAssertion) failFastCondition;
             try {
                 failFastAssertion.getFailFastAssertion().run();
             } catch (Throwable e) {
-                String failFastFailureReason = failFastAssertion.getFailFastFailureReason();
-                throw new TerminalFailureException(failFastFailureReason == null ? e.getMessage() : failFastFailureReason, e);
+                throw newTerminalFailureException(failFastAssertion, e.getMessage(), e);
             }
         }
+    }
+
+    /**
+     * Creates the {@link TerminalFailureException}. The failure reason may come from a user supplied {@link java.util.function.Supplier}.
+     * If that supplier throws, the terminal failure must still be reported, so <code>fallbackReason</code> is used instead
+     * (with a note) and the supplier's exception is added as a suppressed exception.
+     */
+    private static TerminalFailureException newTerminalFailureException(FailFastCondition failFastCondition, String fallbackReason, Throwable cause) {
+        String failureReason;
+        Throwable reasonFailure = null;
+        try {
+            failureReason = failFastCondition.getFailFastFailureReason();
+        } catch (Throwable t) {
+            reasonFailure = t;
+            failureReason = (fallbackReason == null ? FailFastCondition.DEFAULT_FAILURE_REASON : fallbackReason)
+                    + " (the fail fast failure reason supplier threw " + t + ")";
+        }
+        if (failureReason == null) {
+            failureReason = fallbackReason;
+        }
+        TerminalFailureException terminalFailureException = new TerminalFailureException(failureReason, cause);
+        if (reasonFailure != null) {
+            terminalFailureException.addSuppressed(reasonFailure);
+        }
+        return terminalFailureException;
     }
 
     private static String decapitalize(String str) {
