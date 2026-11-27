@@ -20,6 +20,7 @@ import org.awaitility.pollinterval.PollInterval;
 
 import java.time.Duration;
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 public class ConditionSettings {
     private final String alias;
@@ -31,6 +32,7 @@ public class ConditionSettings {
     private final ConditionEvaluationListener conditionEvaluationListener;
     private final ExecutorLifecycle executorLifecycle;
     private final FailFastCondition failFastCondition;
+    private final Supplier<String> timeoutMessageSupplier;
 
     /**
      * <p>Constructor for ConditionSettings.</p>
@@ -43,10 +45,12 @@ public class ConditionSettings {
      * @param ignoreExceptions            a {@link ExceptionIgnorer} object.
      * @param executorLifecycle           Responsible for performing executor service cleanup after each condition evaluation round
      * @param failFastCondition           a Callable that if returns true, fails the test immediately
+     * @param timeoutMessageSupplier      supplies text to append to the timeout message, or <code>null</code>
      */
     ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
                       PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
-                      ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle, final FailFastCondition failFastCondition) {
+                      ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle, final FailFastCondition failFastCondition,
+                      Supplier<String> timeoutMessageSupplier) {
         if (waitConstraint == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
@@ -62,6 +66,7 @@ public class ConditionSettings {
         this.conditionEvaluationListener = conditionEvaluationListener;
         this.ignoreExceptions = ignoreExceptions;
         this.failFastCondition = failFastCondition;
+        this.timeoutMessageSupplier = timeoutMessageSupplier;
     }
 
     /**
@@ -164,5 +169,12 @@ public class ConditionSettings {
      */
     public FailFastCondition getFailFastCondition() {
         return this.failFastCondition;
+    }
+
+    /**
+     * @return the supplier of the text that is appended to the timeout message, or <code>null</code> if none was set.
+     */
+    Supplier<String> getTimeoutMessageSupplier() {
+        return timeoutMessageSupplier;
     }
 }

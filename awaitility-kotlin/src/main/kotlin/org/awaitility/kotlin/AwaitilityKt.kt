@@ -19,6 +19,7 @@ import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Predicate
+import java.util.function.Supplier
 import kotlin.reflect.KClass
 import kotlin.time.toJavaDuration
 
@@ -291,6 +292,22 @@ val ConditionFactory.and: ConditionFactory
  * @since 3.1.2
  */
 infix fun ConditionFactory.withAlias(alias: String): ConditionFactory = alias(alias)
+
+/**
+ * Append extra text to the timeout message. The <code>messageSupplier</code> is only called if the await
+ * times out, so it can describe the state at the time of failure. The text is added on a new line after
+ * the standard timeout message. For example:
+ *
+ * <pre>
+ * await withTimeoutMessage { "Order state was ${repository.state}" } until { repository.state == SHIPPED }
+ * </pre>
+ *
+ * @param messageSupplier supplies the text to append to the timeout message.
+ * @return the condition factory
+ * @since 4.4.0
+ * @see ConditionFactory.timeoutMessage
+ */
+infix fun ConditionFactory.withTimeoutMessage(messageSupplier: () -> String?): ConditionFactory = timeoutMessage(Supplier { messageSupplier() })
 
 /**
  * Specify the delay that will be used before Awaitility starts polling for
