@@ -18,6 +18,7 @@ Changelog 4.4.0 (not released yet)
 * Timeout messages no longer show day-scale durations as months, and use singular units such as "1 second" instead of "1 seconds". Fields are now separated by a single space ("1 minute 30 seconds" instead of "1 minutes  30 seconds"). If you assert on these messages you may need to update your expectations (issue 318, thanks to Shreya Roy Koneri for pull request).
 * The Java 8 test module is built and run in CI again (issue 156).
 * Timeout messages on JDK 15 and later say "Condition defined as a lambda expression in ..." again instead of "... a Lambda expression in ...".
+* Added StartEvaluationEvent.getPollDelay(), so a ConditionEvaluationListener can see the poll delay of the await before the first evaluation (issue 278, thanks to barthollomew for pull request).
 * forever() no longer drops an atLeast(..) or during(..) set earlier in the chain, so await().atLeast(1, SECONDS).forever() still fails if the condition is fulfilled too early (thanks to Jaehong Park for pull request).
 
 Changelog 4.3.0 (2025-02-21)
