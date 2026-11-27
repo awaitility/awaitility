@@ -140,7 +140,9 @@ public class ConditionFactory {
      * so it is kept regardless of the order in which <code>onTimeout</code>, <code>conditionEvaluationListener</code> and
      * <code>logging</code> are called. If a listener is set as well, its <code>onTimeout</code> method is called first.
      * If the callback throws, the {@link ConditionTimeoutException} is still thrown and the callback's exception is added
-     * to it as a {@link Throwable#getSuppressed() suppressed exception}. Calling this method again replaces the callback.
+     * to it as a {@link Throwable#getSuppressed() suppressed exception}. If the listener's <code>onTimeout</code> throws,
+     * the callback is still called, and the listener's exception is thrown instead of the {@link ConditionTimeoutException},
+     * with any exception from the callback added to it as suppressed. Calling this method again replaces the callback.
      * </p>
      * <p>
      * Example usage:

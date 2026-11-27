@@ -110,14 +110,33 @@ class ConditionEvaluationHandler<T> {
         long elapsedTimeInMS = watch.getElapsedTimeInMS();
         long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
         TimeoutEvent timeoutEvent = new TimeoutEvent(message, elapsedTimeInMS, remainingTimeInMS, isConditionSatisfied, settings.getAlias());
-        if (listener != null) {
-            listener.onTimeout(timeoutEvent);
+        try {
+            if (listener != null) {
+                listener.onTimeout(timeoutEvent);
+            }
+        } catch (Throwable listenerFailure) {
+            // The listener's exception replaces the timeout exception, as before, but the callback still runs
+            callTimeoutCallback(timeoutCallback, timeoutEvent, listenerFailure);
+            CheckedExceptionRethrower.safeRethrow(listenerFailure);
+            return;
         }
-        if (timeoutCallback != null) {
-            try {
-                timeoutCallback.accept(timeoutEvent);
-            } catch (Throwable t) {
-                timeoutException.addSuppressed(t);
+        callTimeoutCallback(timeoutCallback, timeoutEvent, timeoutException);
+    }
+
+    /**
+     * Calls the timeout callback, if any. If it throws, its exception is added as suppressed to the exception that is
+     * about to be thrown, so the callback can never hide that exception.
+     */
+    private static void callTimeoutCallback(Consumer<? super TimeoutEvent> timeoutCallback, TimeoutEvent timeoutEvent,
+                                            Throwable exceptionToBeThrown) {
+        if (timeoutCallback == null) {
+            return;
+        }
+        try {
+            timeoutCallback.accept(timeoutEvent);
+        } catch (Throwable callbackFailure) {
+            if (callbackFailure != exceptionToBeThrown) {
+                exceptionToBeThrown.addSuppressed(callbackFailure);
             }
         }
     }
