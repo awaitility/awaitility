@@ -123,6 +123,47 @@ public class ConditionFactory {
     }
 
     /**
+     * Specify a callback that is invoked once when the await times out, just before the
+     * {@link ConditionTimeoutException} is thrown. Use it to print extra diagnostics, such as
+     * logs or the state of the system under test, when a test is about to fail on a timeout.
+     * The {@link TimeoutEvent} holds the same description as the exception message, together with
+     * the elapsed time and the alias.
+     * <p>
+     * The callback is called in exactly the cases where {@link ConditionEvaluationListener#onTimeout(TimeoutEvent)}
+     * is called. That is when the condition is not fulfilled within the {@link #atMost(Duration) at most} duration,
+     * and when it is fulfilled earlier than the {@link #atLeast(Duration) at least} duration. It is <i>not</i> called
+     * when the condition throws an exception that isn't ignored, when a {@link #failFast(Callable) fail-fast condition}
+     * fails (a {@link TerminalFailureException}), or when the condition is fulfilled.
+     * </p>
+     * <p>
+     * The callback is stored separately from the {@link #conditionEvaluationListener(ConditionEvaluationListener) condition evaluation listener},
+     * so it is kept regardless of the order in which <code>onTimeout</code>, <code>conditionEvaluationListener</code> and
+     * <code>logging</code> are called. If a listener is set as well, its <code>onTimeout</code> method is called first.
+     * If the callback throws, the {@link ConditionTimeoutException} is still thrown and the callback's exception is added
+     * to it as a {@link Throwable#getSuppressed() suppressed exception}. Calling this method again replaces the callback.
+     * </p>
+     * <p>
+     * Example usage:
+     * </p>
+     * <pre>
+     * await()
+     *     .atMost(10, SECONDS)
+     *     .onTimeout(event -&gt; env.printErrors())
+     *     .untilAsserted(() -&gt; assertThat(runQuery()).containsExactly("expected"));
+     * </pre>
+     *
+     * @param timeoutCallback the callback to invoke when the await times out (must not be {@code null})
+     * @return the condition factory
+     * @since 4.4.0
+     */
+    public ConditionFactory onTimeout(Consumer<? super TimeoutEvent> timeoutCallback) {
+        if (timeoutCallback == null) {
+            throw new IllegalArgumentException("timeoutCallback cannot be null");
+        }
+        return new ConditionFactory(settings.withTimeoutCallback(timeoutCallback));
+    }
+
+    /**
      * Await at most <code>timeout</code> before throwing a timeout exception.
      *
      * @param timeout the timeout
@@ -1318,7 +1359,7 @@ public class ConditionFactory {
 
         return new ConditionSettings(alias, settings.isCatchUncaughtExceptions(), timeoutConstraint, pollInterval, actualPollDelay,
                 settings.getConditionEvaluationListener(), settings.getExceptionsIgnorer(), executorLifecycle, settings.getFailFastCondition(),
-                settings.getTimeoutMessageSupplier());
+                settings.getTimeoutMessageSupplier(), settings.getTimeoutCallback());
     }
 
     private <T> T until(Condition<T> condition) {

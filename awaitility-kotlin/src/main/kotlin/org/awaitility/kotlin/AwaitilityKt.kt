@@ -10,6 +10,7 @@ import org.awaitility.Awaitility
 import org.awaitility.core.ConditionEvaluationListener
 import org.awaitility.core.ConditionFactory
 import org.awaitility.core.ThrowingRunnable
+import org.awaitility.core.TimeoutEvent
 import org.awaitility.pollinterval.PollInterval
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.not
@@ -544,3 +545,21 @@ infix fun ConditionFactory.failFastAsserted(fn: () -> Unit): ConditionFactory = 
  * @since 4.4.0
  */
 fun ConditionFactory.failFastAsserted(failFastFailureReason: String, fn: () -> Unit): ConditionFactory = failFast(failFastFailureReason, ThrowingRunnable { fn() })
+
+/**
+ * Specify a callback that is invoked once when the await times out, just before the
+ * [org.awaitility.core.ConditionTimeoutException] is thrown. For example:
+ *
+ * ```
+ * await atMost 5.seconds onTimeout { env.printErrors() } until { myRepository.count() == 2 }
+ * ```
+ *
+ * It is called in the same cases as [ConditionEvaluationListener.onTimeout], so not when the condition throws or a
+ * fail-fast condition fails, and it is kept if a condition evaluation listener or logging is set later.
+ *
+ * @param timeoutCallback the callback, which receives the [TimeoutEvent]
+ * @return the condition factory
+ * @see ConditionFactory.onTimeout
+ * @since 4.4.0
+ */
+infix fun ConditionFactory.onTimeout(timeoutCallback: (TimeoutEvent) -> Unit): ConditionFactory = onTimeout(timeoutCallback)

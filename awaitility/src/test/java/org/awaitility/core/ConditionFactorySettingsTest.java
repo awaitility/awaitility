@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -210,6 +211,35 @@ public class ConditionFactorySettingsTest {
 
         assertTrue(conditionFactory.getSettings().isAtMostSetByUser());
         assertEquals(Duration.ofSeconds(2), conditionFactory.getSettings().getTimeoutConstraint().getMaxWaitTime());
+    }
+
+    @Test
+    public void timeoutCallbackIsNotSetByDefault() {
+        assertNull(await().getSettings().getTimeoutCallback());
+    }
+
+    @Test
+    public void timeoutCallbackSurvivesOtherSettings() {
+        Consumer<TimeoutEvent> timeoutCallback = event -> {
+        };
+        ConditionFactory conditionFactory = await().onTimeout(timeoutCallback)
+                .atMost(2, SECONDS)
+                .atLeast(Duration.ofMillis(10))
+                .during(Duration.ofMillis(20))
+                .alias("alias")
+                .pollInterval(Duration.ofMillis(30))
+                .pollDelay(Duration.ofMillis(40))
+                .ignoreExceptions()
+                .catchUncaughtExceptions()
+                .conditionEvaluationListener(new ConditionEvaluationLogger())
+                .logging()
+                .logging(message -> {
+                })
+                .failFast(() -> false)
+                .pollInSameThread()
+                .forever();
+
+        assertSame(timeoutCallback, conditionFactory.getSettings().getTimeoutCallback());
     }
 
     // Unchanged settings

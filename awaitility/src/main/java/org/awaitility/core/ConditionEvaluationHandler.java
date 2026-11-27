@@ -96,13 +96,29 @@ class ConditionEvaluationHandler<T> {
         watch.start();
     }
 
-    public void handleTimeout(String message, boolean isConditionSatisfied) {
+    /**
+     * Notifies the condition evaluation listener, and then the timeout callback, that the await timed out.
+     * If the timeout callback throws, its exception is added as suppressed to <code>timeoutException</code>
+     * so that the timeout exception is still the one that is thrown.
+     */
+    public void handleTimeout(String message, boolean isConditionSatisfied, ConditionTimeoutException timeoutException) {
         ConditionEvaluationListener<T> listener = settings.getConditionEvaluationListener();
+        Consumer<? super TimeoutEvent> timeoutCallback = settings.getTimeoutCallback();
+        if (listener == null && timeoutCallback == null) {
+            return;
+        }
+        long elapsedTimeInMS = watch.getElapsedTimeInMS();
+        long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
+        TimeoutEvent timeoutEvent = new TimeoutEvent(message, elapsedTimeInMS, remainingTimeInMS, isConditionSatisfied, settings.getAlias());
         if (listener != null) {
-            long elapsedTimeInMS = watch.getElapsedTimeInMS();
-            long remainingTimeInMS = getRemainingTimeInMS(elapsedTimeInMS, settings.getMaxWaitTime());
-            listener.onTimeout(new TimeoutEvent(message, elapsedTimeInMS, remainingTimeInMS,
-                    isConditionSatisfied, settings.getAlias()));
+            listener.onTimeout(timeoutEvent);
+        }
+        if (timeoutCallback != null) {
+            try {
+                timeoutCallback.accept(timeoutEvent);
+            } catch (Throwable t) {
+                timeoutException.addSuppressed(t);
+            }
         }
     }
 

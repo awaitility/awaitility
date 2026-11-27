@@ -405,6 +405,29 @@ class KotlinTest {
 
         assertThat(calls).isEqualTo(0)
     }
+
+    @Test(timeout = 2000)
+    fun onTimeoutIsCalledOnceWhenTheAwaitTimesOutAndSurvivesLaterLogging() {
+        val descriptions = mutableListOf<String>()
+        val logged = mutableListOf<String>()
+
+        val throwable = catchThrowable {
+            await atMost 300.milliseconds onTimeout { descriptions.add(it.description) } logging { logged.add(it) } until { false }
+        }
+
+        assertThat(throwable).isExactlyInstanceOf(ConditionTimeoutException::class.java)
+        assertThat(descriptions).containsExactly(throwable.message)
+        assertThat(logged).isNotEmpty
+    }
+
+    @Test(timeout = 2000)
+    fun onTimeoutIsNotCalledWhenTheConditionIsFulfilled() {
+        var called = false
+
+        await atMost 1.seconds onTimeout { called = true } until { true }
+
+        assertThat(called).isFalse
+    }
 }
 
 class AsynchObject<T>(private val repository: FakeGenericRepository<T>, private val changeTo: T) {
