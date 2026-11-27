@@ -159,8 +159,9 @@ infix fun ConditionFactory.until(fn: () -> Boolean) = until(fn)
 infix fun ConditionFactory.untilAsserted(fn: () -> Unit): Unit = untilAsserted(fn)
 
 /**
- * An extension function to `ConditionFactory` that works like [until] but returns an [AwaitResult] instead of
- * throwing a [org.awaitility.core.ConditionTimeoutException] when the condition is not fulfilled in time. For example:
+ * An extension function to `ConditionFactory` that works like [until], but a timeout returns a failed [AwaitResult]
+ * instead of throwing a [org.awaitility.core.ConditionTimeoutException]. Exceptions thrown by [fn] are not affected:
+ * they end the await just like for [until], unless you ignore them with `ignoreExceptions()`. For example:
  *
  * ```
  * val result = await atMost 2.seconds tryUntil { myRepository.count() == 1 }
@@ -181,8 +182,10 @@ infix fun ConditionFactory.untilAsserted(fn: () -> Unit): Unit = untilAsserted(f
 infix fun ConditionFactory.tryUntil(fn: () -> Boolean): AwaitResult<Boolean> = tryUntil(fn)
 
 /**
- * An extension function to `ConditionFactory` that works like [untilAsserted] but returns an [AwaitResult] instead of
- * throwing a [org.awaitility.core.ConditionTimeoutException] when the assertion doesn't pass in time. For example:
+ * An extension function to `ConditionFactory` that works like [untilAsserted], but a timeout returns a failed
+ * [AwaitResult] instead of throwing a [org.awaitility.core.ConditionTimeoutException]. Exceptions other than
+ * `AssertionError` are not affected: they end the await just like for [untilAsserted], unless you ignore them with
+ * `ignoreExceptions()`. For example:
  *
  * ```
  * val result = await atMost 2.seconds tryUntilAsserted {

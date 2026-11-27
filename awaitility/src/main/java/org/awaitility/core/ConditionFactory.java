@@ -1094,8 +1094,9 @@ public class ConditionFactory {
     }
 
     /**
-     * Like {@link #until(Callable)}, but returns an {@link AwaitResult} instead of throwing a {@link ConditionTimeoutException}
-     * when the condition is not fulfilled in time. E.g.
+     * Like {@link #until(Callable)}, but a timeout returns a failed {@link AwaitResult} instead of throwing a
+     * {@link ConditionTimeoutException}. Exceptions thrown by the condition are not affected: they end the await just
+     * like for {@link #until(Callable)}, unless you ignore them with {@link #ignoreExceptions()}. E.g.
      * <p>&nbsp;</p>
      * <pre>
      * AwaitResult&lt;Boolean&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntil(() -&gt; personRepository.size() == 3);
@@ -1119,8 +1120,9 @@ public class ConditionFactory {
     }
 
     /**
-     * Like {@link #until(Callable, Matcher)}, but returns an {@link AwaitResult} instead of throwing a {@link ConditionTimeoutException}
-     * when the supplied value doesn't match in time. E.g.
+     * Like {@link #until(Callable, Matcher)}, but a timeout returns a failed {@link AwaitResult} instead of throwing a
+     * {@link ConditionTimeoutException}. Exceptions thrown by the supplier are not affected: they end the await just
+     * like for {@link #until(Callable, Matcher)}, unless you ignore them with {@link #ignoreExceptions()}. E.g.
      * <p>&nbsp;</p>
      * <pre>
      * AwaitResult&lt;Integer&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntil(personRepository::size, is(greaterThan(2)));
@@ -1144,8 +1146,9 @@ public class ConditionFactory {
     }
 
     /**
-     * Like {@link #until(Callable, Predicate)}, but returns an {@link AwaitResult} instead of throwing a {@link ConditionTimeoutException}
-     * when the supplied value doesn't match the predicate in time. E.g.
+     * Like {@link #until(Callable, Predicate)}, but a timeout returns a failed {@link AwaitResult} instead of throwing a
+     * {@link ConditionTimeoutException}. Exceptions thrown by the supplier are not affected: they end the await just
+     * like for {@link #until(Callable, Predicate)}, unless you ignore them with {@link #ignoreExceptions()}. E.g.
      * <p>&nbsp;</p>
      * <pre>
      * AwaitResult&lt;Long&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntil(myRepository::count, cnt -&gt; cnt == 2);
@@ -1165,8 +1168,10 @@ public class ConditionFactory {
     }
 
     /**
-     * Like {@link #untilAsserted(ThrowingRunnable)}, but returns an {@link AwaitResult} instead of throwing a
-     * {@link ConditionTimeoutException} when the assertion doesn't pass in time. E.g.
+     * Like {@link #untilAsserted(ThrowingRunnable)}, but a timeout returns a failed {@link AwaitResult} instead of
+     * throwing a {@link ConditionTimeoutException}. Exceptions other than {@link AssertionError} are not affected: they
+     * end the await just like for {@link #untilAsserted(ThrowingRunnable)}, unless you ignore them with
+     * {@link #ignoreExceptions()}. E.g.
      * <p>&nbsp;</p>
      * <pre>
      * AwaitResult&lt;Void&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntilAsserted(() -&gt; assertThat(personRepository.size()).isEqualTo(6));
