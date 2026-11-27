@@ -530,7 +530,7 @@ public class ConditionFactory {
      */
     public ConditionFactory pollThread(final Function<Runnable, Thread> threadSupplier) {
         return new ConditionFactory(settings.withCatchUncaughtExceptions(false)
-                .withExecutorLifecycle(ExecutorLifecycle.withNormalCleanupBehavior(() -> InternalExecutorServiceFactory.create(threadSupplier))));
+                .withExecutorLifecycle(ExecutorLifecycle.withNormalCleanupBehavior(() -> InternalExecutorServiceFactory.createFinalizerFree(threadSupplier))));
     }
 
     /**
@@ -1111,7 +1111,7 @@ public class ConditionFactory {
 
         ExecutorLifecycle executorLifecycle;
         if (settings.getExecutorLifecycle() == null) {
-            executorLifecycle = ExecutorLifecycle.withNormalCleanupBehavior(() -> InternalExecutorServiceFactory.create((r, threadName) -> new Thread(Thread.currentThread().getThreadGroup(), r, threadName), alias));
+            executorLifecycle = ExecutorLifecycle.withNormalCleanupBehavior(() -> InternalExecutorServiceFactory.createFinalizerFree((r, threadName) -> new Thread(Thread.currentThread().getThreadGroup(), r, threadName), alias));
         } else {
             executorLifecycle = settings.getExecutorLifecycle();
         }

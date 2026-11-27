@@ -2,6 +2,9 @@ package org.awaitility.core;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -41,6 +44,41 @@ public class InternalExecutorServiceFactory {
             throw new IllegalArgumentException("Condition evaluation thread supplier cannot be null");
         }
         return Executors.newSingleThreadExecutor(r -> {
+            final String threadName = generateDefaultThreadName(alias);
+            return threadSupplier.apply(r, threadName);
+        });
+    }
+
+    /**
+     * Same as {@link #create(Function)}, but the returned executor is a plain
+     * {@link ThreadPoolExecutor} with one thread, without the wrapper that
+     * {@link Executors#newSingleThreadExecutor(java.util.concurrent.ThreadFactory)} adds. That wrapper is finalizable
+     * (a cleaner registration from Java 21), so dropping it saves GC work for every await statement (issue 168).
+     * On Java 8 the {@link ThreadPoolExecutor} itself still has a finalizer.
+     *
+     * @param threadSupplier The thread supplier
+     * @return An executor service that will use the thread created by the <code>threadSupplier</code> when polling
+     */
+    static ExecutorService createFinalizerFree(final Function<Runnable, Thread> threadSupplier) {
+        if (threadSupplier == null) {
+            throw new IllegalArgumentException("Condition evaluation thread supplier cannot be null");
+        }
+        return createFinalizerFree((runnable, __) -> threadSupplier.apply(runnable), null);
+    }
+
+    /**
+     * Same as {@link #create(BiFunction, String)}, but the returned executor is a plain
+     * {@link ThreadPoolExecutor} with one thread, see {@link #createFinalizerFree(Function)} (issue 168).
+     *
+     * @param threadSupplier The thread supplier
+     * @param alias          The alias used to generate the default thread name
+     * @return An executor service that will use the thread created by the <code>threadSupplier</code> when polling
+     */
+    static ExecutorService createFinalizerFree(final BiFunction<Runnable, String, Thread> threadSupplier, final String alias) {
+        if (threadSupplier == null) {
+            throw new IllegalArgumentException("Condition evaluation thread supplier cannot be null");
+        }
+        return new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), r -> {
             final String threadName = generateDefaultThreadName(alias);
             return threadSupplier.apply(r, threadName);
         });
