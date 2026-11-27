@@ -35,6 +35,7 @@ public class ConditionSettings {
     private final FailFastCondition failFastCondition;
     private final Supplier<String> timeoutMessageSupplier;
     private final Consumer<? super TimeoutEvent> timeoutCallback;
+    private final String unsatisfiableHoldMessage;
 
     /**
      * <p>Constructor for ConditionSettings.</p>
@@ -49,11 +50,15 @@ public class ConditionSettings {
      * @param failFastCondition           a Callable that if returns true, fails the test immediately
      * @param timeoutMessageSupplier      supplies text to append to the timeout message, or <code>null</code>
      * @param timeoutCallback             invoked when the await times out, may be <code>null</code>
+     * @param unsatisfiableHoldMessage    the timeout message to raise at the start of the await because the hold period
+     *                                    (during) cannot fit within the user-set at most timeout and the poll delay,
+     *                                    or <code>null</code> if the await can succeed
      */
     ConditionSettings(String alias, boolean catchUncaughtExceptions, WaitConstraint waitConstraint,
                       PollInterval pollInterval, Duration pollDelay, ConditionEvaluationListener conditionEvaluationListener,
                       ExceptionIgnorer ignoreExceptions, ExecutorLifecycle executorLifecycle, final FailFastCondition failFastCondition,
-                      Supplier<String> timeoutMessageSupplier, Consumer<? super TimeoutEvent> timeoutCallback) {
+                      Supplier<String> timeoutMessageSupplier, Consumer<? super TimeoutEvent> timeoutCallback,
+                      String unsatisfiableHoldMessage) {
         if (waitConstraint == null) {
             throw new IllegalArgumentException("You must specify a maximum waiting time (was null).");
         }
@@ -71,6 +76,7 @@ public class ConditionSettings {
         this.failFastCondition = failFastCondition;
         this.timeoutMessageSupplier = timeoutMessageSupplier;
         this.timeoutCallback = timeoutCallback;
+        this.unsatisfiableHoldMessage = unsatisfiableHoldMessage;
     }
 
     /**
@@ -187,5 +193,13 @@ public class ConditionSettings {
      */
     Consumer<? super TimeoutEvent> getTimeoutCallback() {
         return timeoutCallback;
+    }
+
+    /**
+     * @return the timeout message to use when the condition can never be fulfilled because the hold period (during)
+     * does not fit within the at most timeout minus the poll delay, or <code>null</code> if the condition can be fulfilled.
+     */
+    String getUnsatisfiableHoldMessage() {
+        return unsatisfiableHoldMessage;
     }
 }
