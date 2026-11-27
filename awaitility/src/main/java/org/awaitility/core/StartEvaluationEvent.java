@@ -18,12 +18,15 @@ package org.awaitility.core;
 
 import org.hamcrest.Matcher;
 
+import java.time.Duration;
+
 public class StartEvaluationEvent<T> {
     private final String description;
     private final Matcher<? super T> matcher;
     private final long elapsedTimeInMS;
     private final long remainingTimeInMS;
     private final String alias;
+    private final Duration pollDelay;
 
     /**
      * @param description           description message of the event
@@ -33,11 +36,25 @@ public class StartEvaluationEvent<T> {
      */
     StartEvaluationEvent(String description, Matcher<? super T> matcher, long elapsedTimeInMS, long remainingTimeInMS,
                          String alias) {
+        this(description, matcher, elapsedTimeInMS, remainingTimeInMS, alias, Duration.ZERO);
+    }
+
+    /**
+     * @param description       description message of the event
+     * @param matcher           the Hamcrest matcher used in the condition
+     * @param elapsedTimeInMS   elapsed time in milliseconds
+     * @param remainingTimeInMS remaining time to wait in milliseconds or <code>Long.MAX_VALUE</code> if no timeout is defined
+     * @param alias             the Awaitility alias for the condition or <code>null</code>
+     * @param pollDelay         the poll delay before condition evaluation starts
+     */
+    StartEvaluationEvent(String description, Matcher<? super T> matcher, long elapsedTimeInMS, long remainingTimeInMS,
+                         String alias, Duration pollDelay) {
         this.description = description;
         this.matcher = matcher;
         this.elapsedTimeInMS = elapsedTimeInMS;
         this.remainingTimeInMS = remainingTimeInMS;
         this.alias = alias;
+        this.pollDelay = pollDelay;
     }
 
     public String getDescription() {
@@ -58,5 +75,14 @@ public class StartEvaluationEvent<T> {
 
     public String getAlias() {
         return alias;
+    }
+
+    /**
+     * @return The poll delay of this await, that is how long Awaitility waits before it evaluates the condition the
+     * first time. If no poll delay was set, this is the fixed poll interval, or zero for other poll intervals.
+     * @since 4.4.0
+     */
+    public Duration getPollDelay() {
+        return pollDelay;
     }
 }

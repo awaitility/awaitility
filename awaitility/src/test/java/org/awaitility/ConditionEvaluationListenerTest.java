@@ -19,17 +19,21 @@ package org.awaitility;
 import org.awaitility.core.ConditionEvaluationListener;
 import org.awaitility.core.EvaluatedCondition;
 import org.awaitility.core.StartEvaluationEvent;
+import org.awaitility.pollinterval.FibonacciPollInterval;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.awaitility.Awaitility.setDefaultConditionEvaluationListener;
 import static org.awaitility.Awaitility.with;
@@ -242,6 +246,90 @@ public class ConditionEvaluationListenerTest {
 
         assertThat(remainingTimes, everyItem(is(Long.MAX_VALUE)));
         assertThat(elapsedTimes, everyItem(is(not(Long.MAX_VALUE))));
+    }
+
+    @Test(timeout = 2000)
+    public void beforeEvaluationReceivesExplicitPollDelay() {
+        final AtomicReference<StartEvaluationEvent<Integer>> capturedEvent = new AtomicReference<>();
+        with()
+                .conditionEvaluationListener(capturingStartEventListener(capturedEvent))
+                .pollDelay(120, TimeUnit.MILLISECONDS)
+                .pollInterval(30, TimeUnit.MILLISECONDS)
+                .until(new CountDown(1), is(equalTo(0)));
+
+        assertThat(capturedEvent.get(), is(notNullValue()));
+        assertThat(capturedEvent.get().getPollDelay(), is(Duration.ofMillis(120)));
+    }
+
+    @Test(timeout = 2000)
+    public void beforeEvaluationUsesFixedPollIntervalAsDefaultPollDelay() {
+        final AtomicReference<StartEvaluationEvent<Integer>> defaultEvent = new AtomicReference<>();
+        with()
+                .conditionEvaluationListener(capturingStartEventListener(defaultEvent))
+                .until(new CountDown(0), is(equalTo(0)));
+
+        assertThat(defaultEvent.get(), is(notNullValue()));
+        assertThat(defaultEvent.get().getPollDelay(), is(Duration.ofMillis(100)));
+
+        final AtomicReference<StartEvaluationEvent<Integer>> customIntervalEvent = new AtomicReference<>();
+        with()
+                .conditionEvaluationListener(capturingStartEventListener(customIntervalEvent))
+                .pollInterval(60, TimeUnit.MILLISECONDS)
+                .until(new CountDown(0), is(equalTo(0)));
+
+        assertThat(customIntervalEvent.get(), is(notNullValue()));
+        assertThat(customIntervalEvent.get().getPollDelay(), is(Duration.ofMillis(60)));
+    }
+
+    @Test(timeout = 2000)
+    public void beforeEvaluationDefaultsPollDelayToZeroForNonFixedPollInterval() {
+        final AtomicReference<StartEvaluationEvent<Integer>> capturedEvent = new AtomicReference<>();
+        with()
+                .conditionEvaluationListener(capturingStartEventListener(capturedEvent))
+                .pollInterval(FibonacciPollInterval.fibonacci())
+                .until(new CountDown(1), is(equalTo(0)));
+
+        assertThat(capturedEvent.get(), is(notNullValue()));
+        assertThat(capturedEvent.get().getPollDelay(), is(Duration.ZERO));
+    }
+
+    @Test(timeout = 2000)
+    public void beforeEvaluationReceivesExplicitZeroPollDelay() {
+        final AtomicReference<StartEvaluationEvent<Integer>> capturedEvent = new AtomicReference<>();
+        with()
+                .conditionEvaluationListener(capturingStartEventListener(capturedEvent))
+                .pollDelay(Duration.ZERO)
+                .until(new CountDown(1), is(equalTo(0)));
+
+        assertThat(capturedEvent.get(), is(notNullValue()));
+        assertThat(capturedEvent.get().getPollDelay(), is(Duration.ZERO));
+    }
+
+    @Test(timeout = 2000)
+    public void beforeEvaluationReflectsDefaultPollDelayConfiguration() {
+        Awaitility.setDefaultPollDelay(Duration.ofMillis(75));
+
+        final AtomicReference<StartEvaluationEvent<Integer>> capturedEvent = new AtomicReference<>();
+        with()
+                .conditionEvaluationListener(capturingStartEventListener(capturedEvent))
+                .until(new CountDown(0), is(equalTo(0)));
+
+        assertThat(capturedEvent.get(), is(notNullValue()));
+        assertThat(capturedEvent.get().getPollDelay(), is(Duration.ofMillis(75)));
+    }
+
+    private static <T> ConditionEvaluationListener<T> capturingStartEventListener(
+            final AtomicReference<StartEvaluationEvent<T>> capturedEvent) {
+        return new ConditionEvaluationListener<T>() {
+            @Override
+            public void conditionEvaluated(EvaluatedCondition<T> condition) {
+            }
+
+            @Override
+            public void beforeEvaluation(StartEvaluationEvent<T> startEvaluationEvent) {
+                capturedEvent.set(startEvaluationEvent);
+            }
+        };
     }
 
     private static class CountDown implements Callable<Integer> {
