@@ -88,9 +88,10 @@ class ConditionEvaluationHandler<T> {
         if (listener != null) {
             long elapsedTimeInMS = 0L;
             long remainingTimeInMS = getRemainingTimeInMS(0, settings.getMaxWaitTime());
+            Duration pollDelay = settings.getPollDelay() != null ? settings.getPollDelay() : Duration.ZERO;
 
             listener.beforeEvaluation(new StartEvaluationEvent<>("Starting evaluation", matcher, elapsedTimeInMS,
-                    remainingTimeInMS, settings.getAlias()));
+                    remainingTimeInMS, settings.getAlias(), pollDelay));
         }
         watch.start();
     }
