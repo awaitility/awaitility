@@ -1,5 +1,12 @@
 Changelog 4.4.0 (not released yet)
 -----------------------------------
+* Added an Automatic-Module-Name to the jar manifests, which changes the module names for module-path users:
+    awaitility        -> org.awaitility
+    awaitility.kotlin -> org.awaitility.kotlin
+    awaitility.scala  -> org.awaitility.scala
+    awaitility.groovy -> org.awaitility.groovy
+  (issue 205, thanks to Piotr P. Karwasz for the original pull request).
+* awaitility-groovy can now be used on the module path. Its Groovy extension module descriptor moved from META-INF/services to META-INF/groovy, where Groovy 2.5 and later look for it, because the module system rejected the old file.
 * Awaitility's internal polling executor is now a plain ThreadPoolExecutor instead of Executors.newSingleThreadExecutor(..), so each await statement no longer creates the finalizable wrapper that newSingleThreadExecutor adds (a cleaner registration from Java 21). On Java 8 ThreadPoolExecutor itself has a finalizer, so the saving there is one finalizable object instead of two (issue 168). Executors passed in by users and the existing InternalExecutorServiceFactory.create(..) methods are unchanged.
 * fieldIn(..) no longer relies on the compiler's synthetic this$0 field to build its timeout message (issue 223).
 * Upgraded assertj-core to 3.27.7 (thanks to Ian Hundere for pull request).
