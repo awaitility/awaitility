@@ -34,7 +34,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 
-public class TryUntilTest {
+public class UntilOrTimeoutTest {
 
     private static final Duration SHORT = Duration.ofMillis(200);
     private static final Duration LONG = Duration.ofSeconds(2);
@@ -50,10 +50,10 @@ public class TryUntilTest {
     // Matcher form
 
     @Test(timeout = 2000)
-    public void tryUntilWithMatcherReturnsMatchedValueOnSuccess() {
+    public void untilOrTimeoutWithMatcherReturnsMatchedValueOnSuccess() {
         new Asynch(fakeRepository).perform();
 
-        AwaitResult<Integer> result = await().atMost(LONG).tryUntil(fakeRepository::getValue, equalTo(1));
+        AwaitResult<Integer> result = await().atMost(LONG).untilOrTimeout(fakeRepository::getValue, equalTo(1));
 
         assertThat(result.isSuccess()).isTrue();
         assertThat(result.getValue()).isEqualTo(1);
@@ -62,10 +62,10 @@ public class TryUntilTest {
     }
 
     @Test(timeout = 2000)
-    public void tryUntilWithMatcherReturnsLastObservedValueOnTimeout() {
+    public void untilOrTimeoutWithMatcherReturnsLastObservedValueOnTimeout() {
         AtomicInteger counter = new AtomicInteger();
 
-        AwaitResult<Integer> result = await().atMost(SHORT).pollInterval(Duration.ofMillis(10)).tryUntil(counter::incrementAndGet, greaterThan(100_000));
+        AwaitResult<Integer> result = await().atMost(SHORT).pollInterval(Duration.ofMillis(10)).untilOrTimeout(counter::incrementAndGet, greaterThan(100_000));
 
         assertThat(result.isSuccess()).isFalse();
         assertThat(result.getValue()).isEqualTo(counter.get()).isGreaterThan(1);
@@ -74,10 +74,10 @@ public class TryUntilTest {
     }
 
     @Test(timeout = 2000)
-    public void tryUntilWithMatcherHasSameTimeoutMessageAsUntil() {
+    public void untilOrTimeoutWithMatcherHasSameTimeoutMessageAsUntil() {
         Callable<Integer> supplier = () -> 1;
 
-        AwaitResult<Integer> result = await().atMost(SHORT).tryUntil(supplier, is(2));
+        AwaitResult<Integer> result = await().atMost(SHORT).untilOrTimeout(supplier, is(2));
         Throwable thrown = catchThrowable(() -> await().atMost(SHORT).until(supplier, is(2)));
 
         assertThat(result.getValue()).isEqualTo(1);
@@ -86,10 +86,10 @@ public class TryUntilTest {
     }
 
     @Test(timeout = 2000)
-    public void tryUntilWithMatcherAndAliasHasSameTimeoutMessageAsUntil() {
+    public void untilOrTimeoutWithMatcherAndAliasHasSameTimeoutMessageAsUntil() {
         Callable<Integer> supplier = () -> 1;
 
-        AwaitResult<Integer> result = await("my alias").atMost(SHORT).tryUntil(supplier, is(2));
+        AwaitResult<Integer> result = await("my alias").atMost(SHORT).untilOrTimeout(supplier, is(2));
         Throwable thrown = catchThrowable(() -> await("my alias").atMost(SHORT).until(supplier, is(2)));
 
         assertThat(result.getCause()).hasMessage(thrown.getMessage()).hasMessageStartingWith("Condition with alias 'my alias'");
@@ -97,7 +97,7 @@ public class TryUntilTest {
 
     @Test(timeout = 2000)
     public void orElseThrowThrowsTheCauseOnFailure() {
-        AwaitResult<Integer> result = await().atMost(SHORT).tryUntil(() -> 1, is(2));
+        AwaitResult<Integer> result = await().atMost(SHORT).untilOrTimeout(() -> 1, is(2));
 
         Throwable thrown = catchThrowable(result::orElseThrow);
 
@@ -107,20 +107,20 @@ public class TryUntilTest {
     // Predicate form
 
     @Test(timeout = 2000)
-    public void tryUntilWithPredicateReturnsMatchedValueOnSuccess() {
+    public void untilOrTimeoutWithPredicateReturnsMatchedValueOnSuccess() {
         new Asynch(fakeRepository).perform();
 
-        AwaitResult<Integer> result = await().atMost(LONG).tryUntil(fakeRepository::getValue, value -> value == 1);
+        AwaitResult<Integer> result = await().atMost(LONG).untilOrTimeout(fakeRepository::getValue, value -> value == 1);
 
         assertThat(result.isSuccess()).isTrue();
         assertThat(result.getValue()).isEqualTo(1);
     }
 
     @Test(timeout = 2000)
-    public void tryUntilWithPredicateHasSameTimeoutMessageAsUntil() {
+    public void untilOrTimeoutWithPredicateHasSameTimeoutMessageAsUntil() {
         Callable<Integer> supplier = () -> 1;
 
-        AwaitResult<Integer> result = await().atMost(SHORT).tryUntil(supplier, value -> value == 2);
+        AwaitResult<Integer> result = await().atMost(SHORT).untilOrTimeout(supplier, value -> value == 2);
         Throwable thrown = catchThrowable(() -> await().atMost(SHORT).until(supplier, value -> value == 2));
 
         assertThat(result.isSuccess()).isFalse();
@@ -132,20 +132,20 @@ public class TryUntilTest {
     // Boolean form
 
     @Test(timeout = 2000)
-    public void tryUntilWithBooleanConditionReturnsTrueOnSuccess() {
+    public void untilOrTimeoutWithBooleanConditionReturnsTrueOnSuccess() {
         new Asynch(fakeRepository).perform();
 
-        AwaitResult<Boolean> result = await().atMost(LONG).tryUntil(() -> fakeRepository.getValue() == 1);
+        AwaitResult<Boolean> result = await().atMost(LONG).untilOrTimeout(() -> fakeRepository.getValue() == 1);
 
         assertThat(result.isSuccess()).isTrue();
         assertThat(result.getValue()).isTrue();
     }
 
     @Test(timeout = 2000)
-    public void tryUntilWithBooleanConditionReturnsLastBooleanAndSameMessageAsUntilOnTimeout() {
+    public void untilOrTimeoutWithBooleanConditionReturnsLastBooleanAndSameMessageAsUntilOnTimeout() {
         Callable<Boolean> condition = () -> false;
 
-        AwaitResult<Boolean> result = await().atMost(SHORT).tryUntil(condition);
+        AwaitResult<Boolean> result = await().atMost(SHORT).untilOrTimeout(condition);
         Throwable thrown = catchThrowable(() -> await().atMost(SHORT).until(condition));
 
         assertThat(result.isSuccess()).isFalse();
@@ -157,10 +157,10 @@ public class TryUntilTest {
     // Assertion form
 
     @Test(timeout = 2000)
-    public void tryUntilAssertedReturnsSuccessWithNullValue() {
+    public void untilAssertedOrTimeoutReturnsSuccessWithNullValue() {
         new Asynch(fakeRepository).perform();
 
-        AwaitResult<Void> result = await().atMost(LONG).tryUntilAsserted(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
+        AwaitResult<Void> result = await().atMost(LONG).untilAssertedOrTimeout(() -> assertThat(fakeRepository.getValue()).isEqualTo(1));
 
         assertThat(result.isSuccess()).isTrue();
         assertThat(result.getValue()).isNull();
@@ -168,10 +168,10 @@ public class TryUntilTest {
     }
 
     @Test(timeout = 2000)
-    public void tryUntilAssertedHasSameTimeoutMessageAsUntilAsserted() {
+    public void untilAssertedOrTimeoutHasSameTimeoutMessageAsUntilAsserted() {
         ThrowingRunnable assertion = () -> assertThat(fakeRepository.getValue()).isEqualTo(1);
 
-        AwaitResult<Void> result = await().atMost(SHORT).tryUntilAsserted(assertion);
+        AwaitResult<Void> result = await().atMost(SHORT).untilAssertedOrTimeout(assertion);
         Throwable thrown = catchThrowable(() -> await().atMost(SHORT).untilAsserted(assertion));
 
         assertThat(result.isSuccess()).isFalse();
@@ -181,8 +181,8 @@ public class TryUntilTest {
     }
 
     @Test(timeout = 2000)
-    public void tryUntilAssertedStillThrowsExceptionsThatAreNotAssertionErrors() {
-        Throwable thrown = catchThrowable(() -> await().atMost(LONG).tryUntilAsserted(() -> {
+    public void untilAssertedOrTimeoutStillThrowsExceptionsThatAreNotAssertionErrors() {
+        Throwable thrown = catchThrowable(() -> await().atMost(LONG).untilAssertedOrTimeout(() -> {
             throw new IllegalStateException("boom");
         }));
 
@@ -193,23 +193,23 @@ public class TryUntilTest {
 
     @Test(timeout = 2000)
     public void failFastStillThrowsTerminalFailureException() {
-        Throwable thrown = catchThrowable(() -> await().atMost(LONG).failFast("terminal", () -> true).tryUntil(() -> false));
+        Throwable thrown = catchThrowable(() -> await().atMost(LONG).failFast("terminal", () -> true).untilOrTimeout(() -> false));
 
         assertThat(thrown).isExactlyInstanceOf(TerminalFailureException.class).hasMessage("terminal");
     }
 
     @Test(timeout = 2000)
-    public void failFastAssertionStillThrowsTerminalFailureExceptionFromTryUntilAsserted() {
+    public void failFastAssertionStillThrowsTerminalFailureExceptionFromUntilAssertedOrTimeout() {
         Throwable thrown = catchThrowable(() -> await().atMost(LONG)
                 .failFast("terminal", () -> assertThat(true).isFalse())
-                .tryUntilAsserted(() -> assertThat(fakeRepository.getValue()).isEqualTo(1)));
+                .untilAssertedOrTimeout(() -> assertThat(fakeRepository.getValue()).isEqualTo(1)));
 
         assertThat(thrown).isExactlyInstanceOf(TerminalFailureException.class).hasMessage("terminal");
     }
 
     @Test(timeout = 2000)
     public void exceptionFromTheSupplierThatIsNotIgnoredStillThrows() {
-        Throwable thrown = catchThrowable(() -> await().atMost(LONG).tryUntil(() -> {
+        Throwable thrown = catchThrowable(() -> await().atMost(LONG).untilOrTimeout(() -> {
             throw new IllegalStateException("boom");
         }, is(2)));
 
@@ -218,7 +218,7 @@ public class TryUntilTest {
 
     @Test(timeout = 2000)
     public void exceptionFromTheBooleanConditionThatIsNotIgnoredStillThrows() {
-        Throwable thrown = catchThrowable(() -> await().atMost(LONG).tryUntil(() -> {
+        Throwable thrown = catchThrowable(() -> await().atMost(LONG).untilOrTimeout(() -> {
             throw new IllegalStateException("boom");
         }));
 
@@ -227,7 +227,7 @@ public class TryUntilTest {
 
     @Test(timeout = 2000)
     public void ignoredExceptionsLeadToAFailedResultOnTimeout() {
-        AwaitResult<Integer> result = await().atMost(SHORT).ignoreExceptions().tryUntil(() -> {
+        AwaitResult<Integer> result = await().atMost(SHORT).ignoreExceptions().untilOrTimeout(() -> {
             throw new IllegalStateException("boom");
         }, is(2));
 
@@ -238,7 +238,7 @@ public class TryUntilTest {
 
     @Test(timeout = 2000)
     public void timeoutOfANestedAwaitInsideTheConditionIsThrownAndNotTurnedIntoAFailedResult() {
-        Throwable thrown = catchThrowable(() -> await().atMost(LONG).tryUntil(() -> {
+        Throwable thrown = catchThrowable(() -> await().atMost(LONG).untilOrTimeout(() -> {
             await("inner").atMost(Duration.ofMillis(50)).pollInterval(Duration.ofMillis(10)).until(() -> false);
             return true;
         }));
@@ -250,14 +250,14 @@ public class TryUntilTest {
     public void uncaughtExceptionFromOtherThreadStillThrows() {
         new ExceptionThrowingAsynch(new IllegalStateException("Illegal state!")).perform();
 
-        Throwable thrown = catchThrowable(() -> await().atMost(LONG).tryUntil(fakeRepository::getValue, equalTo(1)));
+        Throwable thrown = catchThrowable(() -> await().atMost(LONG).untilOrTimeout(fakeRepository::getValue, equalTo(1)));
 
         assertThat(thrown).isExactlyInstanceOf(IllegalStateException.class).hasMessage("Illegal state!");
     }
 
     @Test(timeout = 2000)
     public void illegalSettingsStillThrowIllegalArgumentException() {
-        Throwable thrown = catchThrowable(() -> await().pollDelay(Duration.ofSeconds(1)).atMost(Duration.ofMillis(500)).tryUntil(() -> true));
+        Throwable thrown = catchThrowable(() -> await().pollDelay(Duration.ofSeconds(1)).atMost(Duration.ofMillis(500)).untilOrTimeout(() -> true));
 
         assertThat(thrown).isExactlyInstanceOf(IllegalArgumentException.class)
                 .hasMessageStartingWith("Timeout (500 milliseconds) must be greater than the poll delay");
@@ -267,7 +267,7 @@ public class TryUntilTest {
 
     @Test(timeout = 2000)
     public void atLeastViolationIsAFailedResult() {
-        AwaitResult<Boolean> result = await().atLeast(Duration.ofMillis(500)).atMost(LONG).tryUntil(() -> true);
+        AwaitResult<Boolean> result = await().atLeast(Duration.ofMillis(500)).atMost(LONG).untilOrTimeout(() -> true);
 
         assertThat(result.isSuccess()).isFalse();
         assertThat(result.getValue()).isTrue();
@@ -277,7 +277,7 @@ public class TryUntilTest {
 
     @Test(timeout = 2000)
     public void atLeastViolationIsAFailedResultWithTheTooEarlyValue() {
-        AwaitResult<Integer> result = await().atLeast(Duration.ofMillis(500)).atMost(LONG).tryUntil(() -> 2, is(2));
+        AwaitResult<Integer> result = await().atLeast(Duration.ofMillis(500)).atMost(LONG).untilOrTimeout(() -> 2, is(2));
 
         assertThat(result.isSuccess()).isFalse();
         assertThat(result.getValue()).isEqualTo(2);
@@ -300,7 +300,7 @@ public class TryUntilTest {
             }
         };
 
-        AwaitResult<Integer> result = await().atMost(SHORT).conditionEvaluationListener(listener).tryUntil(() -> 1, is(2));
+        AwaitResult<Integer> result = await().atMost(SHORT).conditionEvaluationListener(listener).untilOrTimeout(() -> 1, is(2));
 
         assertThat(result.isSuccess()).isFalse();
         assertThat(onTimeoutCalls).hasValue(1);
@@ -320,7 +320,7 @@ public class TryUntilTest {
             }
         };
 
-        AwaitResult<Boolean> result = await().atMost(LONG).conditionEvaluationListener(listener).tryUntil(() -> true);
+        AwaitResult<Boolean> result = await().atMost(LONG).conditionEvaluationListener(listener).untilOrTimeout(() -> true);
 
         assertThat(result.isSuccess()).isTrue();
         assertThat(onTimeoutCalls).hasValue(0);

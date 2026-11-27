@@ -16,12 +16,12 @@
 package org.awaitility.core;
 
 /**
- * The immutable result of a <code>tryUntil</code> await statement, such as
- * {@link ConditionFactory#tryUntil(java.util.concurrent.Callable, org.hamcrest.Matcher)}. Instead of throwing a
- * {@link ConditionTimeoutException} when the condition is not fulfilled in time, <code>tryUntil</code> returns a failed result. E.g.
+ * The immutable result of a <code>untilOrTimeout</code> await statement, such as
+ * {@link ConditionFactory#untilOrTimeout(java.util.concurrent.Callable, org.hamcrest.Matcher)}. Instead of throwing a
+ * {@link ConditionTimeoutException} when the condition is not fulfilled in time, <code>untilOrTimeout</code> returns a failed result. E.g.
  * <p>&nbsp;</p>
  * <pre>
- * AwaitResult&lt;Integer&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntil(repository::count, is(greaterThan(2)));
+ * AwaitResult&lt;Integer&gt; result = await().atMost(Duration.ofSeconds(2)).untilOrTimeout(repository::count, is(greaterThan(2)));
  * if (!result.isSuccess()) {
  *     log.warn("Still only {} items: {}", result.getValue(), result.getCause().getMessage());
  * }
@@ -67,8 +67,8 @@ public final class AwaitResult<T> {
      * <li>On failure this is the <i>last observed</i> value. It did <b>not</b> fulfill the condition in time (or, if
      * <code>atLeast</code> was violated, it fulfilled the condition too early). It is <code>null</code> if the
      * condition was never evaluated to completion.</li>
-     * <li>For <code>tryUntil(Callable&lt;Boolean&gt;)</code> it is the last returned {@link Boolean}.</li>
-     * <li>For <code>tryUntilAsserted</code> it is always <code>null</code>.</li>
+     * <li>For <code>untilOrTimeout(Callable&lt;Boolean&gt;)</code> it is the last returned {@link Boolean}.</li>
+     * <li>For <code>untilAssertedOrTimeout</code> it is always <code>null</code>.</li>
      * </ul>
      *
      * @return the observed value, may be <code>null</code>

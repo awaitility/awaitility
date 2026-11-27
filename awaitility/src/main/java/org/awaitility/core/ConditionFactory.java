@@ -1099,7 +1099,7 @@ public class ConditionFactory {
      * like for {@link #until(Callable)}, unless you ignore them with {@link #ignoreExceptions()}. E.g.
      * <p>&nbsp;</p>
      * <pre>
-     * AwaitResult&lt;Boolean&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntil(() -&gt; personRepository.size() == 3);
+     * AwaitResult&lt;Boolean&gt; result = await().atMost(Duration.ofSeconds(2)).untilOrTimeout(() -&gt; personRepository.size() == 3);
      * if (!result.isSuccess()) {
      *     // result.getCause() is the ConditionTimeoutException that until(..) would have thrown
      * }
@@ -1115,7 +1115,7 @@ public class ConditionFactory {
      * (<code>null</code> if the condition never returned).
      * @since 4.4.0
      */
-    public AwaitResult<Boolean> tryUntil(Callable<Boolean> conditionEvaluator) {
+    public AwaitResult<Boolean> untilOrTimeout(Callable<Boolean> conditionEvaluator) {
         return new CallableCondition(conditionEvaluator, generateConditionSettings()).tryAwait();
     }
 
@@ -1125,7 +1125,7 @@ public class ConditionFactory {
      * like for {@link #until(Callable, Matcher)}, unless you ignore them with {@link #ignoreExceptions()}. E.g.
      * <p>&nbsp;</p>
      * <pre>
-     * AwaitResult&lt;Integer&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntil(personRepository::size, is(greaterThan(2)));
+     * AwaitResult&lt;Integer&gt; result = await().atMost(Duration.ofSeconds(2)).untilOrTimeout(personRepository::size, is(greaterThan(2)));
      * Integer size = result.getValue(); // the matched value, or the last observed (unmatched) value on timeout, may be null
      * </pre>
      * <p>&nbsp;</p>
@@ -1141,7 +1141,7 @@ public class ConditionFactory {
      * not match in time (or, if <code>atLeast</code> was violated, matched too early).
      * @since 4.4.0
      */
-    public <T> AwaitResult<T> tryUntil(final Callable<T> supplier, final Matcher<? super T> matcher) {
+    public <T> AwaitResult<T> untilOrTimeout(final Callable<T> supplier, final Matcher<? super T> matcher) {
         return new CallableHamcrestCondition<>(supplier, matcher, generateConditionSettings()).tryAwait();
     }
 
@@ -1151,10 +1151,10 @@ public class ConditionFactory {
      * like for {@link #until(Callable, Predicate)}, unless you ignore them with {@link #ignoreExceptions()}. E.g.
      * <p>&nbsp;</p>
      * <pre>
-     * AwaitResult&lt;Long&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntil(myRepository::count, cnt -&gt; cnt == 2);
+     * AwaitResult&lt;Long&gt; result = await().atMost(Duration.ofSeconds(2)).untilOrTimeout(myRepository::count, cnt -&gt; cnt == 2);
      * </pre>
      * <p>&nbsp;</p>
-     * See {@link #tryUntil(Callable, Matcher)} for what counts as a failed result and what is still thrown.
+     * See {@link #untilOrTimeout(Callable, Matcher)} for what counts as a failed result and what is still thrown.
      *
      * @param <T>       the generic type
      * @param supplier  the supplier that returns the object that will be evaluated by the predicate.
@@ -1163,8 +1163,8 @@ public class ConditionFactory {
      * not match in time (or, if <code>atLeast</code> was violated, matched too early).
      * @since 4.4.0
      */
-    public <T> AwaitResult<T> tryUntil(final Callable<T> supplier, final Predicate<? super T> predicate) {
-        return tryUntil(supplier, ConditionFactory.<T>predicateMatcher(predicate));
+    public <T> AwaitResult<T> untilOrTimeout(final Callable<T> supplier, final Predicate<? super T> predicate) {
+        return untilOrTimeout(supplier, ConditionFactory.<T>predicateMatcher(predicate));
     }
 
     /**
@@ -1174,7 +1174,7 @@ public class ConditionFactory {
      * {@link #ignoreExceptions()}. E.g.
      * <p>&nbsp;</p>
      * <pre>
-     * AwaitResult&lt;Void&gt; result = await().atMost(Duration.ofSeconds(2)).tryUntilAsserted(() -&gt; assertThat(personRepository.size()).isEqualTo(6));
+     * AwaitResult&lt;Void&gt; result = await().atMost(Duration.ofSeconds(2)).untilAssertedOrTimeout(() -&gt; assertThat(personRepository.size()).isEqualTo(6));
      * if (!result.isSuccess()) {
      *     // result.getCause() is the ConditionTimeoutException that untilAsserted(..) would have thrown
      * }
@@ -1188,7 +1188,7 @@ public class ConditionFactory {
      * @return the result. Its value is always <code>null</code>.
      * @since 4.4.0
      */
-    public AwaitResult<Void> tryUntilAsserted(final ThrowingRunnable assertion) {
+    public AwaitResult<Void> untilAssertedOrTimeout(final ThrowingRunnable assertion) {
         return new AssertionCondition(assertion, generateConditionSettings()).tryAwait();
     }
 

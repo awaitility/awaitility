@@ -263,18 +263,18 @@ class KotlinTest {
     }
 
     @Test(timeout = 2000)
-    fun tryUntilReturnsSuccessfulResult() {
+    fun untilOrTimeoutReturnsSuccessfulResult() {
         Asynch(fakeRepository).perform()
 
-        val result = await atMost 2.seconds tryUntil { fakeRepository.value == 1 }
+        val result = await atMost 2.seconds untilOrTimeout { fakeRepository.value == 1 }
 
         assertThat(result.isSuccess).isTrue()
         assertThat(result.value).isTrue()
     }
 
     @Test(timeout = 2000)
-    fun tryUntilReturnsFailedResultInsteadOfThrowing() {
-        val result = await atMost 300.milliseconds tryUntil { fakeRepository.value == 2 }
+    fun untilOrTimeoutReturnsFailedResultInsteadOfThrowing() {
+        val result = await atMost 300.milliseconds untilOrTimeout { fakeRepository.value == 2 }
 
         assertThat(result.isSuccess).isFalse()
         assertThat(result.value).isFalse()
@@ -283,8 +283,8 @@ class KotlinTest {
     }
 
     @Test(timeout = 2000)
-    fun tryUntilAssertedReturnsFailedResultInsteadOfThrowing() {
-        val result = await atMost 300.milliseconds tryUntilAsserted {
+    fun untilAssertedOrTimeoutReturnsFailedResultInsteadOfThrowing() {
+        val result = await atMost 300.milliseconds untilAssertedOrTimeout {
             assertThat(fakeRepository.value).isEqualTo(2)
         }
 
@@ -294,10 +294,10 @@ class KotlinTest {
     }
 
     @Test(timeout = 2000)
-    fun tryUntilWithSupplierAndPredicateCanBeCalledFromKotlin() {
+    fun untilOrTimeoutWithSupplierAndPredicateCanBeCalledFromKotlin() {
         Asynch(fakeRepository).perform()
 
-        val result = await.atMost(2.seconds.toJavaDuration()).tryUntil({ fakeRepository.value }) { it == 1 }
+        val result = await.atMost(2.seconds.toJavaDuration()).untilOrTimeout({ fakeRepository.value }) { it == 1 }
 
         assertThat(result.value).isEqualTo(1)
     }

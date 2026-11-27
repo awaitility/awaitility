@@ -164,7 +164,7 @@ infix fun ConditionFactory.untilAsserted(fn: () -> Unit): Unit = untilAsserted(f
  * they end the await just like for [until], unless you ignore them with `ignoreExceptions()`. For example:
  *
  * ```
- * val result = await atMost 2.seconds tryUntil { myRepository.count() == 1 }
+ * val result = await atMost 2.seconds untilOrTimeout { myRepository.count() == 1 }
  * if (!result.isSuccess) {
  *     println(result.cause.message)
  * }
@@ -176,10 +176,10 @@ infix fun ConditionFactory.untilAsserted(fn: () -> Unit): Unit = untilAsserted(f
  *
  * @param fn The function to evaluate
  * @return the result, its value is the last `Boolean` returned by [fn]
- * @see ConditionFactory.tryUntil
+ * @see ConditionFactory.untilOrTimeout
  * @since 4.4.0
  */
-infix fun ConditionFactory.tryUntil(fn: () -> Boolean): AwaitResult<Boolean> = tryUntil(fn)
+infix fun ConditionFactory.untilOrTimeout(fn: () -> Boolean): AwaitResult<Boolean> = untilOrTimeout(fn)
 
 /**
  * An extension function to `ConditionFactory` that works like [untilAsserted], but a timeout returns a failed
@@ -188,7 +188,7 @@ infix fun ConditionFactory.tryUntil(fn: () -> Boolean): AwaitResult<Boolean> = t
  * `ignoreExceptions()`. For example:
  *
  * ```
- * val result = await atMost 2.seconds tryUntilAsserted {
+ * val result = await atMost 2.seconds untilAssertedOrTimeout {
  *     assertThat(fakeRepository.value).isEqualTo(1)
  * }
  * ```
@@ -198,10 +198,10 @@ infix fun ConditionFactory.tryUntil(fn: () -> Boolean): AwaitResult<Boolean> = t
  *
  * @param fn A function that performs the assertion
  * @return the result, its value is always `null`
- * @see ConditionFactory.tryUntilAsserted
+ * @see ConditionFactory.untilAssertedOrTimeout
  * @since 4.4.0
  */
-infix fun ConditionFactory.tryUntilAsserted(fn: () -> Unit): AwaitResult<Void> = tryUntilAsserted(fn)
+infix fun ConditionFactory.untilAssertedOrTimeout(fn: () -> Unit): AwaitResult<Void> = untilAssertedOrTimeout(fn)
 
 /**
  * Await at most `timeout` before throwing a timeout exception.
