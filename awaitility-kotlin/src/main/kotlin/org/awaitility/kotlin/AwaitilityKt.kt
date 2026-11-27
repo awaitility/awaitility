@@ -9,11 +9,13 @@ package org.awaitility.kotlin
 import org.awaitility.Awaitility
 import org.awaitility.core.ConditionEvaluationListener
 import org.awaitility.core.ConditionFactory
+import org.awaitility.core.ThrowingRunnable
 import org.awaitility.pollinterval.PollInterval
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.not
 import org.hamcrest.Matchers.nullValue
 import java.time.Duration
+import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Predicate
@@ -433,3 +435,63 @@ infix fun ConditionFactory.during(duration: Duration): ConditionFactory = during
  * @since 4.2.3
  */
 infix fun ConditionFactory.during(duration: kotlin.time.Duration): ConditionFactory = during(duration.toJavaDuration())
+
+/**
+ * If the supplied function <i>ever</i> returns true, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+ * Throws a [org.awaitility.core.TerminalFailureException] if the fail fast condition evaluates to `true`.
+ *
+ * ```
+ * await failFast { workflow.phase == "Failed" } until { workflow.phase == "Done" }
+ * ```
+ *
+ * @param fn The terminal failure condition
+ * @return the condition factory
+ * @since 4.4.0
+ */
+infix fun ConditionFactory.failFast(fn: () -> Boolean): ConditionFactory = failFast(Callable { fn() })
+
+/**
+ * Same as [failFast], but with a descriptive reason that is included in the [org.awaitility.core.TerminalFailureException]
+ * thrown if the fail fast condition evaluates to `true`. It is not named `failFast` because the Java member
+ * `failFast(String, ...)` would take precedence and be ambiguous for a lambda.
+ *
+ * ```
+ * await.failFastWithReason("workflow failed") { workflow.phase == "Failed" } until { workflow.phase == "Done" }
+ * ```
+ *
+ * @param failFastFailureReason A descriptive reason why the fail fast condition has failed
+ * @param fn The terminal failure condition
+ * @return the condition factory
+ * @since 4.4.0
+ */
+fun ConditionFactory.failFastWithReason(failFastFailureReason: String, fn: () -> Boolean): ConditionFactory = failFast(failFastFailureReason, Callable { fn() })
+
+/**
+ * If the supplied assertion <i>ever</i> throws an exception, it indicates our condition will <i>never</i> be true, and if so fail the system immediately.
+ * This lets you use an assertion library of choice to describe why the fail fast condition failed. It is named differently
+ * from [failFast] because a lambda that returns `Unit` and one that returns `Boolean` would otherwise be ambiguous.
+ *
+ * ```
+ * await failFastAsserted { assertThat(workflow.phase).isNotEqualTo("Failed") } untilAsserted { ... }
+ * ```
+ *
+ * @param fn The terminal failure assertion
+ * @return the condition factory
+ * @since 4.4.0
+ */
+infix fun ConditionFactory.failFastAsserted(fn: () -> Unit): ConditionFactory = failFast(ThrowingRunnable { fn() })
+
+/**
+ * Same as [failFastAsserted], but with a descriptive reason that is included in the [org.awaitility.core.TerminalFailureException]
+ * thrown if the assertion throws an exception.
+ *
+ * ```
+ * await.failFastAsserted("workflow failed") { assertThat(workflow.phase).isNotEqualTo("Failed") } untilAsserted { ... }
+ * ```
+ *
+ * @param failFastFailureReason A descriptive reason why the fail fast condition has failed
+ * @param fn The terminal failure assertion
+ * @return the condition factory
+ * @since 4.4.0
+ */
+fun ConditionFactory.failFastAsserted(failFastFailureReason: String, fn: () -> Unit): ConditionFactory = failFast(failFastFailureReason, ThrowingRunnable { fn() })

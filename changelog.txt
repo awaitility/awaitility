@@ -7,6 +7,10 @@ Changelog 4.4.0 (not released yet)
     awaitility.groovy -> org.awaitility.groovy
   (issue 205, thanks to Piotr P. Karwasz for the original pull request).
 * awaitility-groovy can now be used on the module path. Its Groovy extension module descriptor moved from META-INF/services to META-INF/groovy, where Groovy 2.5 and later look for it, because the module system rejected the old file.
+* Added failFast to the Kotlin DSL (issue 206). For example:
+
+    await atMost Duration.ofMinutes(1) failFast { workflow.phase == "Failed" } until { workflow.phase == "Done" }
+  Also available are failFastWithReason("reason") { .. } and failFastAsserted { .. } (with an optional reason).
 * Awaitility's internal polling executor is now a plain ThreadPoolExecutor instead of Executors.newSingleThreadExecutor(..), so each await statement no longer creates the finalizable wrapper that newSingleThreadExecutor adds (a cleaner registration from Java 21). On Java 8 ThreadPoolExecutor itself has a finalizer, so the saving there is one finalizable object instead of two (issue 168). Executors passed in by users and the existing InternalExecutorServiceFactory.create(..) methods are unchanged.
 * fieldIn(..) no longer relies on the compiler's synthetic this$0 field to build its timeout message (issue 223).
 * Upgraded assertj-core to 3.27.7 (thanks to Ian Hundere for pull request).
