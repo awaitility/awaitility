@@ -28,6 +28,8 @@ import java.time.Duration;
 import java.time.format.DateTimeParseException;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -288,7 +290,16 @@ public class Awaitility {
      * @since 3.0.0
      */
     public static void pollThread(final Function<Runnable, Thread> threadSupplier) {
-        defaultExecutorLifecycle = ExecutorLifecycle.withNormalCleanupBehavior(() -> InternalExecutorServiceFactory.createFinalizerFree(threadSupplier));
+        defaultExecutorLifecycle = ExecutorLifecycle.withNormalCleanupBehavior(() -> singleThreadExecutor(threadSupplier));
+    }
+
+    // Same executor as InternalExecutorServiceFactory.createFinalizerFree(..), which is package-private in
+    // org.awaitility.core. Not Executors.newSingleThreadExecutor(..), whose wrapper is finalizable (issue 168).
+    private static ExecutorService singleThreadExecutor(final Function<Runnable, Thread> threadSupplier) {
+        if (threadSupplier == null) {
+            throw new IllegalArgumentException("Condition evaluation thread supplier cannot be null");
+        }
+        return new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), threadSupplier::apply);
     }
 
     /**

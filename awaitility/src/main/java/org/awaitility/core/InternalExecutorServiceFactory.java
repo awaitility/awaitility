@@ -50,8 +50,7 @@ public class InternalExecutorServiceFactory {
     }
 
     /**
-     * Internal use only, it may be moved or renamed without notice (it is public only because Awaitility
-     * lives in another package). Same as {@link #create(Function)}, but the returned executor is a plain
+     * Same as {@link #create(Function)}, but the returned executor is a plain
      * {@link ThreadPoolExecutor} with one thread, without the wrapper that
      * {@link Executors#newSingleThreadExecutor(java.util.concurrent.ThreadFactory)} adds. That wrapper is finalizable
      * (a cleaner registration from Java 21), so dropping it saves GC work for every await statement (issue 168).
@@ -59,9 +58,8 @@ public class InternalExecutorServiceFactory {
      *
      * @param threadSupplier The thread supplier
      * @return An executor service that will use the thread created by the <code>threadSupplier</code> when polling
-     * @since 4.4.0
      */
-    public static ExecutorService createFinalizerFree(final Function<Runnable, Thread> threadSupplier) {
+    static ExecutorService createFinalizerFree(final Function<Runnable, Thread> threadSupplier) {
         if (threadSupplier == null) {
             throw new IllegalArgumentException("Condition evaluation thread supplier cannot be null");
         }
@@ -69,16 +67,14 @@ public class InternalExecutorServiceFactory {
     }
 
     /**
-     * Internal use only, it may be moved or renamed without notice (it is public only because Awaitility
-     * lives in another package). Same as {@link #create(BiFunction, String)}, but the returned executor is a plain
+     * Same as {@link #create(BiFunction, String)}, but the returned executor is a plain
      * {@link ThreadPoolExecutor} with one thread, see {@link #createFinalizerFree(Function)} (issue 168).
      *
      * @param threadSupplier The thread supplier
      * @param alias          The alias used to generate the default thread name
      * @return An executor service that will use the thread created by the <code>threadSupplier</code> when polling
-     * @since 4.4.0
      */
-    public static ExecutorService createFinalizerFree(final BiFunction<Runnable, String, Thread> threadSupplier, final String alias) {
+    static ExecutorService createFinalizerFree(final BiFunction<Runnable, String, Thread> threadSupplier, final String alias) {
         if (threadSupplier == null) {
             throw new IllegalArgumentException("Condition evaluation thread supplier cannot be null");
         }
