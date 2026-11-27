@@ -68,7 +68,6 @@ public class ConditionEvaluationHandlerTest {
         assertThat(event.getRemainingTimeInMS(), is(10000L));
         assertThat(event.getAlias(), is("customAlias"));
         assertThat(event.getPollDelay(), is(Duration.ofMillis(250)));
-        assertThat(event.getPollDelayInMS(), is(250L));
     }
 
     @Test
@@ -102,7 +101,6 @@ public class ConditionEvaluationHandlerTest {
         StartEvaluationEvent<Integer> event = capturedEvent.get();
         assertThat(event, is(notNullValue()));
         assertThat(event.getPollDelay(), is(Duration.ZERO));
-        assertThat(event.getPollDelayInMS(), is(0L));
     }
 
     @Test

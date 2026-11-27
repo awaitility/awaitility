@@ -259,7 +259,6 @@ public class ConditionEvaluationListenerTest {
 
         assertThat(capturedEvent.get(), is(notNullValue()));
         assertThat(capturedEvent.get().getPollDelay(), is(Duration.ofMillis(120)));
-        assertThat(capturedEvent.get().getPollDelayInMS(), is(120L));
     }
 
     @Test(timeout = 2000)
@@ -271,7 +270,6 @@ public class ConditionEvaluationListenerTest {
 
         assertThat(defaultEvent.get(), is(notNullValue()));
         assertThat(defaultEvent.get().getPollDelay(), is(Duration.ofMillis(100)));
-        assertThat(defaultEvent.get().getPollDelayInMS(), is(100L));
 
         final AtomicReference<StartEvaluationEvent<Integer>> customIntervalEvent = new AtomicReference<>();
         with()
@@ -281,7 +279,6 @@ public class ConditionEvaluationListenerTest {
 
         assertThat(customIntervalEvent.get(), is(notNullValue()));
         assertThat(customIntervalEvent.get().getPollDelay(), is(Duration.ofMillis(60)));
-        assertThat(customIntervalEvent.get().getPollDelayInMS(), is(60L));
     }
 
     @Test(timeout = 2000)
@@ -294,7 +291,6 @@ public class ConditionEvaluationListenerTest {
 
         assertThat(capturedEvent.get(), is(notNullValue()));
         assertThat(capturedEvent.get().getPollDelay(), is(Duration.ZERO));
-        assertThat(capturedEvent.get().getPollDelayInMS(), is(0L));
     }
 
     @Test(timeout = 2000)
@@ -307,7 +303,6 @@ public class ConditionEvaluationListenerTest {
 
         assertThat(capturedEvent.get(), is(notNullValue()));
         assertThat(capturedEvent.get().getPollDelay(), is(Duration.ZERO));
-        assertThat(capturedEvent.get().getPollDelayInMS(), is(0L));
     }
 
     @Test(timeout = 2000)
@@ -321,7 +316,6 @@ public class ConditionEvaluationListenerTest {
 
         assertThat(capturedEvent.get(), is(notNullValue()));
         assertThat(capturedEvent.get().getPollDelay(), is(Duration.ofMillis(75)));
-        assertThat(capturedEvent.get().getPollDelayInMS(), is(75L));
     }
 
     private static <T> ConditionEvaluationListener<T> capturingStartEventListener(

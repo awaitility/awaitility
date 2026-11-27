@@ -78,24 +78,11 @@ public class StartEvaluationEvent<T> {
     }
 
     /**
-     * @return The poll delay before condition evaluation starts.
+     * @return The poll delay of this await, that is how long Awaitility waits before it evaluates the condition the
+     * first time. If no poll delay was set, this is the fixed poll interval, or zero for other poll intervals.
      * @since 4.4.0
      */
     public Duration getPollDelay() {
         return pollDelay;
-    }
-
-    /**
-     * @return The poll delay in milliseconds before condition evaluation starts.
-     * @since 4.4.0
-     */
-    public long getPollDelayInMS() {
-        if (pollDelay == null) {
-            return 0L;
-        }
-        if (ForeverDuration.isForever(pollDelay)) {
-            return Long.MAX_VALUE;
-        }
-        return pollDelay.toMillis();
     }
 }

@@ -39,7 +39,6 @@ public class StartEvaluationEventTest {
         assertThat(event.getRemainingTimeInMS(), is(5000L));
         assertThat(event.getAlias(), is("myAlias"));
         assertThat(event.getPollDelay(), is(Duration.ZERO));
-        assertThat(event.getPollDelayInMS(), is(0L));
     }
 
     @Test
@@ -54,7 +53,6 @@ public class StartEvaluationEventTest {
         assertThat(event.getRemainingTimeInMS(), is(1000L));
         assertThat(event.getAlias(), is("alias"));
         assertThat(event.getPollDelay(), is(Duration.ofMillis(250)));
-        assertThat(event.getPollDelayInMS(), is(250L));
     }
 
     @Test
@@ -62,22 +60,19 @@ public class StartEvaluationEventTest {
         StartEvaluationEvent<Integer> event = new StartEvaluationEvent<>("Starting evaluation", equalTo(1), 0L, 1000L, null, Duration.ZERO);
 
         assertThat(event.getPollDelay(), is(Duration.ZERO));
-        assertThat(event.getPollDelayInMS(), is(0L));
     }
 
     @Test
-    public void getPollDelayInMSReturnsZeroWhenPollDelayIsNull() {
+    public void sixArgConstructorKeepsANullPollDelay() {
         StartEvaluationEvent<Integer> event = new StartEvaluationEvent<>("Starting evaluation", equalTo(1), 0L, 1000L, null, null);
 
         assertThat(event.getPollDelay(), is(nullValue()));
-        assertThat(event.getPollDelayInMS(), is(0L));
     }
 
     @Test
-    public void getPollDelayInMSReturnsLongMaxValueWhenPollDelayIsForever() {
+    public void sixArgConstructorKeepsAForeverPollDelay() {
         StartEvaluationEvent<Integer> event = new StartEvaluationEvent<>("Starting evaluation", equalTo(1), 0L, 1000L, null, ForeverDuration.FOREVER);
 
         assertThat(event.getPollDelay(), is(ForeverDuration.FOREVER));
-        assertThat(event.getPollDelayInMS(), is(Long.MAX_VALUE));
     }
 }
